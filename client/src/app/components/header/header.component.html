@@ -1,0 +1,24 @@
+<nav class="navbar nav-color main-nav">
+  <span class="logo-center">
+    <img class= "logo" src={{logo}} alt="logo lunette de vue">
+    <a class="navbar-brand brand" href="/" matTooltip="Retourner à l'accueil" >{{title}}</a>
+  </span>
+
+  <div *ngIf = "iconUsed" class="display-button">
+    <button mat-icon-button class="icon-display">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+    <button mat-icon-button class="icon-display">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button mat-icon-button class="icon-display">
+      <mat-icon>autorenew</mat-icon>
+    </button>
+    <button mat-icon-button class="icon-display">
+      <mat-icon>history</mat-icon>
+    </button>
+    <button mat-icon-button class="icon-display">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </div>
+</nav> 

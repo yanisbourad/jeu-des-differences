@@ -1,44 +1,170 @@
-.container {
-    min-height: 100vh;
-    height: auto;
-}
-
-.justified {
+.title{
+    color: var(--white);
+    font-family: var(--font-family-poppins), sans-serif;
+    font-size: var(--font-size-l2);
+    font-weight: 700;
+    left: 900px;
+    position: absolute;
+    top: 150px;
+    letter-spacing: -1.65px;
+    line-height: 48px;
+    width: 706px;
+    white-space: nowrap;
+  }
+  .slogan{
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    font-weight: 400;
+    height: 175px;
+    left: 1130px;
+    position: absolute;
+    top: 85px;
+    line-height: normal;
+    width: 500px;
+    text-align: start;
+  }
+  
+  .align-text-bottom{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
+  
+  }
+  .main{
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .homepage{
+    background-color: #765fa0;
+    display: grid;
+    grid-template-areas:
+        "nav-bar"
+        "main-area"
+        "footer";
+    grid-template-columns: auto;
+    grid-template-rows: 80px 1fr ;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+    margin: 0 0 0 0;
+  }
+  
+  .home{
+    display: flex;
+    grid-area: "main-area";
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content:center;
+    width: 100%;
+    height: 100%;
+    line-height: normal;
+    font-size: 60px;
+    text-align: center;
+    background: linear-gradient(#765fa0, #3b2957);
+  
+  }
+  
+  .btn {
+    margin-top: 1%;
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  .home-btn{
+    -webkit-backdrop-filter: blur(32px) brightness(100%);
     align-items: center;
-}
-
-.button {
-    margin-top: 10px;
-    text-align: center;
-}
-
-.team-name {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    color: green;
-}
-
-.header-item {
+    backdrop-filter: blur(32px) brightness(100%);
+    border: 2px solid;
+    border-color: rgb(166, 151, 220);
+    border-radius: 32px;
+    -webkit-border-radius: 32px;
+    -moz-border-radius: 32px;
+    -ms-border-radius: 32px;
+    -o-border-radius: 32px;
+    margin-top: 5%;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 75px;
     justify-content: center;
+    left: 610px;
+    padding: 8px 32px;
+    width: 252px;
+    background-color: #5b467c;
+  }
+
+  .home-btn:hover{
+    background-color: #9845e7;
+  }
+
+  .image-minecraft{
+    background-color: #5b467c;
+    height: 550px;
+    width: 800px;
+    object-fit: cover;
+    position: absolute;
+    bottom: 0;
+    right: -25px;
+    mix-blend-mode: lighten;
+    border: none;
+    filter: contrast(100%) saturate(100%) brightness(45%);
+    -webkit-filter: contrast(100%) saturate(100%) brightness(45%);
+  }
+
+  .navigation{
+    grid-area: "navbar";
+  }
+
+  .footer-display{
+    grid-area: "footer";
+    position: absolute;
+    padding-left: 5%;
+    text-align: start;
+    font-size: 20px;
+    color: #ffffffcc;
+    padding-top: 20px;
+    bottom: 0;
+    background-color: #645381;
+    width: 100%;
+    }
+
+  .company-name{
+      display: inline;
+    }
+
+    .animate-character
+  {
+    padding-left: 60px;
+    text-transform: uppercase;
+    background-image: linear-gradient(    -225deg,    #231557 0%,    #44107a 29%,    #ff1361 67%,    #fff800 100%  );
+    background-size: auto auto;
+    background-clip: border-box;
+    background-size: 200% auto;
+    color: #fff;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textclip 2s linear infinite;
+    display: inline-block;
+    font-size: var(--font-size-l2);
+    -webkit-animation: textclip 3s linear infinite;
+  }
+  
+  @keyframes textclip {
+    to {
+      background-position: 200% center;
+    }
+  }
+  
+  ::ng-deep .mat-tooltip{
+    font-size: 15px;
+    color: white;
+    background-color: hsla(262, 23%, 21%, 0.478);
     text-align: center;
-}
-
-.footer-item {
-    text-align: center;
-}
-
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
-}
-
-.server-message {
-    justify-content: center;
-    width: 20%;
-    min-width: min-content;
-}
+    padding: 5%;
+    width: fit-content;
+    height: fit-content;
+  }
+  

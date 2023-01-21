@@ -33,8 +33,26 @@ describe('MainPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it("should have as title 'LOG2990'", () => {
-        expect(component.title).toEqual('LOG2990');
+    it('should have a game title', () => {
+        expect(component.title).toEqual('VISUAL QUEST');
+    });
+
+    it('should have a button for classic mode', () => {
+        const button = fixture.nativeElement;
+        expect(button.querySelector('button')).toBeTruthy();
+        expect(button.querySelector('#classique').textContent).toContain('Mode Classique');
+    });
+
+    it('should have a button for limited time mode', () => {
+        const button = fixture.nativeElement;
+        expect(button.querySelector('button')).toBeTruthy();
+        expect(button.querySelector('#tempsLimite').textContent).toContain('Mode Temps limité');
+    });
+
+    it('should have a button for configuration', () => {
+        const button = fixture.nativeElement;
+        expect(button.querySelector('button')).toBeTruthy();
+        expect(button.querySelector('#configuration').textContent).toContain('Configuration');
     });
 
     it('should call basicGet when calling getMessagesFromServer', () => {

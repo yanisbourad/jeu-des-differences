@@ -9,6 +9,7 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { HeaderComponent } from './components/header/header.component';
 
 /**
  * Main module that is used in main.ts.
@@ -17,7 +18,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, SidebarComponent],
+    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, SidebarComponent, HeaderComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

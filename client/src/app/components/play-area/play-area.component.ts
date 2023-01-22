@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Point } from '@app/interfaces/point';
 import { DrawService } from '@app/services/draw.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
@@ -23,7 +23,7 @@ export enum MouseButton {
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
 
-    mousePosition: Vec2 = { x: 0, y: 0 };
+    mousePosition: Point = { x: 0, y: 0 };
     buttonPressed = '';
 
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
@@ -44,8 +44,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this.drawService.context = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.drawService.drawGrid();
-        this.drawService.drawWord('Différence');
+        // this.drawService.drawGrid();
+        // this.drawService.drawWord('Différence');
         this.canvas.nativeElement.focus();
     }
 

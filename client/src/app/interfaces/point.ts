@@ -1,4 +1,4 @@
-export interface Vec2 {
+export interface Point {
     x: number;
     y: number;
 }

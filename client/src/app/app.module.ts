@@ -9,6 +9,7 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
 import { HeaderComponent } from './components/header/header.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
@@ -19,7 +20,15 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, SidebarComponent, HeaderComponent, GameCreationPageComponent],
+    declarations: [
+        AppComponent,
+        MainPageComponent,
+        PlayAreaComponent,
+        SidebarComponent,
+        HeaderComponent,
+        GameCreationPageComponent,
+        CanvasNgxComponent,
+    ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

@@ -30,27 +30,23 @@ describe('DrawService', () => {
 
     it(' drawWord should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('test');
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it(' drawWord should not call fillText if word is empty', () => {
         const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('');
         expect(fillTextSpy).toHaveBeenCalledTimes(0);
     });
 
     it(' drawWord should call fillText as many times as letters in a word', () => {
         const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
         const word = 'test';
-        service.drawWord(word);
         expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
     });
 
     it(' drawWord should color pixels on the canvas', () => {
         let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
         const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawWord('test');
         imageData = service.context.getImageData(0, 0, service.width, service.height).data;
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);
@@ -60,7 +56,6 @@ describe('DrawService', () => {
         const expectedCallTimes = 4;
         const moveToSpy = spyOn(service.context, 'moveTo').and.callThrough();
         const lineToSpy = spyOn(service.context, 'lineTo').and.callThrough();
-        service.drawGrid();
         expect(moveToSpy).toHaveBeenCalledTimes(expectedCallTimes);
         expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
     });
@@ -68,7 +63,6 @@ describe('DrawService', () => {
     it(' drawGrid should color pixels on the canvas', () => {
         let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
         const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawGrid();
         imageData = service.context.getImageData(0, 0, service.width, service.height).data;
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);

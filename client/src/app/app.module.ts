@@ -10,8 +10,6 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { HeaderComponent } from './components/header/header.component';
-import { GamePageComponent } from './pages/game-page/game-page.component';
-import { TimerComponent } from './components/timer/timer.component';
 
 /**
  * Main module that is used in main.ts.
@@ -20,7 +18,7 @@ import { TimerComponent } from './components/timer/timer.component';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, SidebarComponent, HeaderComponent, GamePageComponent, TimerComponent],
+    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, SidebarComponent, HeaderComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

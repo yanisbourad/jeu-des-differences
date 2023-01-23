@@ -33,6 +33,10 @@ describe('MainPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    /**
+    Les tests pour le logo sont faits dans le component Header
+     */
+
     it('should have a game title', () => {
         expect(component.title).toEqual('VISUAL QUEST');
     });

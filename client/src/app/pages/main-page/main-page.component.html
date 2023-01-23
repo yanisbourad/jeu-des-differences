@@ -1,35 +1,30 @@
 <div class="homepage">
-    <app-header [iconUsed]= false class="navigation"></app-header>
-    <div class="home">
-      <main class="main">
-        <h1 class="title animate-character">{{title}}</h1>
-        <p class="slogan align-text-bottom">
-          Un défi pour tes yeux et ton esprit!<br/> Met ta vision au défi en trouvant les différences cachées
-        </p>
-          <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
-              matTooltip="Trouve rapidement les différences en mode solo ou 1v1"  
-              matTooltipPosition="left"routerLink="/classique" id="classique">
-              Mode Classique</button>
-          <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
-              matTooltip="Trouve les différences dans un temps limité" 
-              matTooltipPosition="left" routerLink="/tempsLimite" id="tempsLimite">
-              Mode Temps limité</button>
-          <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
-              matTooltip="Modifie les paramètres du jeu ou crée ton propre jeu" 
-              matTooltipPosition="left" routerLink="/configuration" id="configuration">
-              Configuration</button>
-          <div>
-            <img class="image-minecraft" src="https://feedback.minecraft.net/hc/user_images/75HO_-N1k4xJ6JjJBLCI9Q.png" alt="image-minecraft">
-          </div>
-      </main>
-     
-      <footer class="footer-display">
-        <p>Équipe:&nbsp;&nbsp;208</p>
-        <div class="auteurs">  
-          <p>Auteurs:&nbsp;&nbsp; Guimfack Melvice Junior, Hamza Berrada, Daniel Giao, Yanis Bouarad, Lounes Sadmi</p>
+  <app-header [iconUsed]= false class="navigation"></app-header>
+  <div class="home">
+    <main class="main">
+      <h1 class="title animate-character">{{title}}</h1>
+      <p class="slogan align-text-bottom">
+        Un défi pour tes yeux et ton esprit!<br/> Met ta vision au défi en trouvant les différences cachées
+      </p>
+        <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
+            routerLink="/game">
+            Mode Classique</button>
+        <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
+            routerLink="/tempsLimite">
+            Mode Temps limité</button>
+        <button mat-raised-button color="primary" class="btn btn-animate home-btn" 
+            routerLink="/configuration">
+            Configuration</button>
+        <div>
+          <img class="image-minecraft" src="https://feedback.minecraft.net/hc/user_images/75HO_-N1k4xJ6JjJBLCI9Q.png" alt="image-minecraft">
         </div>
-      </footer>
-      <router-outlet></router-outlet>
-    </div>
+    </main>
+    <footer class="footer-display">
+      <p id="team-number">Équipe : 208</p>
+      <div id="authors">  
+        <p>Auteurs : Guimfack Melvice Junior, Hamza Berrada, Daniel Giao, Yanis Bouarad, Lounes Sadmi, Renel Lherisson</p>
+      </div>
+    </footer>
   </div>
-    
+</div>
+  

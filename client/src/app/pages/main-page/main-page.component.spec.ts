@@ -39,20 +39,29 @@ describe('MainPageComponent', () => {
 
     it('should have a button for classic mode', () => {
         const button = fixture.nativeElement;
-        expect(button.querySelector('button')).toBeTruthy();
-        expect(button.querySelector('#classique').textContent).toContain('Mode Classique');
+        expect(button.querySelector('button:nth-of-type(1)').textContent).toContain('Mode Classique');
     });
 
     it('should have a button for limited time mode', () => {
         const button = fixture.nativeElement;
-        expect(button.querySelector('button')).toBeTruthy();
-        expect(button.querySelector('#tempsLimite').textContent).toContain('Mode Temps limité');
+        expect(button.querySelector('button:nth-of-type(2)').textContent).toContain('Mode Temps limité');
     });
 
     it('should have a button for configuration', () => {
         const button = fixture.nativeElement;
-        expect(button.querySelector('button')).toBeTruthy();
-        expect(button.querySelector('#configuration').textContent).toContain('Configuration');
+        expect(button.querySelector('button:nth-of-type(3)').textContent).toContain('Configuration');
+    });
+
+    it('should have 6 authors', () => {
+        const authors = fixture.nativeElement;
+        expect(authors.querySelector('#authors p').textContent).toContain(
+            'Auteurs : Guimfack Melvice Junior, Hamza Berrada, Daniel Giao, Yanis Bouarad, Lounes Sadmi, Renel Lherisson',
+        );
+    });
+
+    it('should have a team number', () => {
+        const team = fixture.nativeElement;
+        expect(team.querySelector('#team-number').textContent).toContain('Équipe : 208');
     });
 
     it('should call basicGet when calling getMessagesFromServer', () => {

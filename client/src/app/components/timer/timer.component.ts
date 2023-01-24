@@ -1,64 +1,42 @@
 import { Component, Input, OnInit } from '@angular/core';
-
+import { Time } from '@app/interfaces/time';
+import { TimeService } from '@app/services/time.service';
 @Component({
   selector: 'app-timer',
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss']
 })
 export class TimerComponent implements OnInit {
-@Input() countDown : number = 30; // the time must be transformed to second before being processed
-second: number = 0;
-minute: number = 0;
-count: number = 0;
+@Input() isClassicmode : boolean = false; // can be classique or temps limite
+time: Time;
 
-  constructor() { }
+constructor(private readonly timeService: TimeService) { }
 
   ngOnInit(): void {
-    this.startCountDown();
-  }
-
-  startTimer(): number{
-    setInterval(() => {
-      this.count++;
-    }, 1000);
-    return this.count;
-  }
-
-  startCountDown():number{
-    setInterval(() => {
-      this.countDown--;
-    }, 1000);
-    return this.countDown;
-  }
-
-  stopCountDown():void{
-    this.countDown = 0;
+    this.time = {minute: 0, second: 0};
+    (this.isClassicmode)? this.timeService.startTimer() : this.timeService.startCountDown();
   }
 
   formatTime(): string{
-    return (this.minute < 10 ? "0" + this.minute : this.minute) + ":" + (this.second < 10 ? "0" + this.second : this.second);
+    return (this.time.minute < 10 ? "0" + this.time.minute : this.time.minute) + ":" 
+    + (this.time.second < 10 ? "0" + this.time.second : this.time.second);
   }
 
-  transformCountDown (): string{
-    this.second = this.countDown % 60;
-    this.minute = Math.floor(this.countDown / 60);
-    if(this.second<=0 && this.minute<=0){
-      return "00:00";
+  transformCountDown (): string{ 
+    this.time.second = this.timeService.getCountDown() % 60;
+    this.time.minute = Math.floor(this.timeService.getCountDown() / 60);
+    if (this.time.second ===0 && this.time.minute === 0){
+      this.timeService.stopTimer();
+      return (this.time.second < 10 || this.time.minute < 10) ? this.formatTime() : this.time.minute + ":" + this.time.second;
     }
     else{
-      return (this.second < 10 || this.minute < 10) ? this.formatTime() : this.minute + ":" + this.second;
+      return (this.time.second < 10 || this.time.minute < 10) ? this.formatTime() : this.time.minute + ":" + this.time.second;
     }
   }
 
   transform (): string{
-    this.second = this.count % 60;
-    this.minute = Math.floor(this.count / 60);
-    return (this.second < 10 || this.minute < 10) ? this.formatTime() : this.minute + ":" + this.second;
+    this.time.second = this.timeService.getCount() % 60;
+    this.time.minute = Math.floor(this.timeService.getCount() / 60);
+    return (this.time.second < 10 || this.time.minute < 10) ? this.formatTime() : this.time.minute + ":" + this.time.second;
   }
-
-  stopTimer(): number{
-    //return this.count;
-    return 0;
-  }
-
 }

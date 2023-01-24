@@ -1,1 +1,4 @@
-<div class="timer">{{transformCountDown()}}</div>
+<div class="timer" *ngIf="isClassicmode; else tempsLimite">{{transform()}}</div>
+<ng-template #tempsLimite>
+  <div class="timer"> {{transformCountDown()}}</div>
+</ng-template>

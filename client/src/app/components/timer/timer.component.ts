@@ -6,7 +6,7 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./timer.component.scss']
 })
 export class TimerComponent implements OnInit {
-@Input() countDown : number = 0; // the time must be transformed to second before being processed
+@Input() countDown : number = 30; // the time must be transformed to second before being processed
 second: number = 0;
 minute: number = 0;
 count: number = 0;
@@ -30,6 +30,7 @@ count: number = 0;
     }, 1000);
     return this.countDown;
   }
+
   stopCountDown():void{
     this.countDown = 0;
   }

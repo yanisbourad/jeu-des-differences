@@ -86,7 +86,33 @@ body {
     font-size: 20px;
     padding: 10px;
     cursor: pointer;
-    border: 2px solid;
-    border-color: rgb(166, 151, 220);
+    border: 2px solid #7B57B8;
+    background: rgba(85, 66, 116, 0.1);
     border-radius: 32px;
+    color: white;
+  }
+  .btn:hover{
+    background-color: #9845e7;
+  }
+
+  .title {
+    color: white;
+    text-decoration: none;
+    font-size: 40px;
+    margin-left: 10px;
+    font-weight: 700;
+    line-height: 48px;
+    margin-right: -46px;
+    width: fit-content;
+    white-space: nowrap;
+  }
+
+  .sub-title{
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    margin-left: 10px;
+    font-weight: 500;
+    width: fit-content;
+    white-space: nowrap;
   }

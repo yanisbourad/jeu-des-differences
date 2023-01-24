@@ -65,6 +65,9 @@ input {
     background: #2C2042;
     border: 3px solid #2C2042;
     border-radius: 30px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
     color: white;
 }
 ::placeholder {
@@ -91,5 +94,8 @@ input {
 }
 
 .message{
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
     border-left: 1px solid white;
 }

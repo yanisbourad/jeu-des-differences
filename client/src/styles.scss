@@ -72,7 +72,6 @@ $indigo-pink-theme: mat.define-light-theme(
 
 html,
 body {
-    //height: 100%;
     margin: 0;
     font-family: Roboto, 'Helvetica Neue', sans-serif;
     background: linear-gradient(#765fa0, #3b2957);
@@ -80,11 +79,14 @@ body {
     width: 100vw;
     overflow: hidden;
     position: relative;
-    margin: 0 0 0 0;
 }
 
 .btn {
     margin-top: 1%;
     font-size: 20px;
     padding: 10px;
+    cursor: pointer;
+    border: 2px solid;
+    border-color: rgb(166, 151, 220);
+    border-radius: 32px;
   }

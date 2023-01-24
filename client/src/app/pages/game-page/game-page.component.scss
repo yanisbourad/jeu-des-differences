@@ -12,10 +12,22 @@
     "footer message"; 
 }
 .header { grid-area: header; }
-.infos { grid-area: infos; background-color: #3b2957;}
-.mainView { grid-area: mainView;background-color: #294457; }
-.footer { grid-area: footer;background-color: #14d033;  }
-.message { grid-area: message; background-color: #81798e; }
+.infos { 
+  grid-area: infos; 
+  background-color: #3b2957;
+}
+.mainView { 
+  grid-area: mainView;
+  background-color: #294457; 
+}
+.footer { 
+  grid-area: footer;
+  background-color: #14d033;  
+}
+.message { 
+  grid-area: message; 
+  background-color: #81798e; 
+}
 
 .giveUp{
   display: flex;

@@ -85,13 +85,12 @@ canvas{
 
 .differences-trouvees-img {
   z-index: 1;
-  content:url("../../../assets/img/differenceEye.png");
   height: auto;
   max-width: 36px;
   margin-right: 10px;
 }
 .difficulty {
-  text-align: center;
+  text-align: start;
   font-size: 25px;
   font-weight: 500;
   color: white;
@@ -111,4 +110,22 @@ canvas{
   max-width: 38px;
   margin: 0px 0px 10px 10px;
   content:url("../../../assets/img/hints.png");
+}
+
+@media (min-width: 1920px) {
+  .container {
+      width: 1920px;
+  }
+}
+
+@media (max-width: 1920px) {
+  .container {
+      width: 1920px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+      width: 1920px;
+  }
 }

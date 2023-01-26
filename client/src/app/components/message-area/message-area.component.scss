@@ -7,7 +7,7 @@
     align-items: center;
 }
 .player-circle {
-    background: #B8B7FF;
+    background: #b8b7ff;
     width: 90px;
     height: 90px;
     border-radius: 50%;
@@ -17,16 +17,16 @@
     padding: 25px;
     position: relative;
 }
-.player-initials{
+.player-initials {
     text-align: center;
-    transform:translate(-50%,-50%);
-    position:absolute;
+    transform: translate(-50%, -50%);
+    position: absolute;
     top: 50%;
     left: 50%;
     font-weight: 700;
     font-size: 64px;
     line-height: 77px;
-    color: #2C0064;
+    color: #2c0064;
 }
 .discussion-box {
     width: 379px;
@@ -40,11 +40,11 @@
     font-weight: 500;
     font-size: 20px;
     line-height: 24px;
-    color: #ABABAB;
+    color: #ababab;
 }
 hr {
     width: 310px;
-    border: 1px solid #ABABAB;
+    border: 1px solid #ababab;
 }
 .event-message {
     margin-top: 10px;
@@ -55,15 +55,15 @@ hr {
     text-align: center;
     padding: 12px 20px;
     color: white;
-    background: #458FFF;
+    background: #458fff;
     border-radius: 20px;
 }
 input {
     box-sizing: border-box;
     width: 331px;
     height: 83px;
-    background: #2C2042;
-    border: 3px solid #2C2042;
+    background: #2c2042;
+    border: 3px solid #2c2042;
     border-radius: 30px;
     font-weight: 500;
     font-size: 20px;
@@ -75,25 +75,25 @@ input {
     font-weight: 500;
     font-size: 20px;
     line-height: 24px;
-    color: #A8A8A8;
+    color: #a8a8a8;
     white-space: pre-line;
 }
 .send-btn {
     width: 177px;
     height: 43px;
     background: rgba(85, 66, 116, 0.1);
-    border: 2px solid #7B57B8;
+    border: 2px solid #7b57b8;
     border-radius: 32px;
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    color: #FFFFFF;
+    color: #ffffff;
 }
-.send-btn:hover{
+.send-btn:hover {
     background-color: #9845e7;
 }
 
-.message{
+.message {
     font-size: 16px;
     line-height: 24px;
     border-left: 1px solid white;

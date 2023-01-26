@@ -41,10 +41,10 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     getPoint(e: MouseEvent): Point | undefined {
-        const it = this.canvas.nativeElement.getBoundingClientRect();
-        const x: number = e.clientX - it.left;
-        const y: number = e.clientY - it.top;
-        if (x < 0 || x > it.right || y < 0 || y > it.bottom) {
+        const canvasBound = this.canvas.nativeElement.getBoundingClientRect();
+        const x: number = e.clientX - canvasBound.left;
+        const y: number = e.clientY - canvasBound.top;
+        if (x < 0 || x > canvasBound.right || y < 0 || y > canvasBound.bottom) {
             return undefined;
         }
         return { x, y };

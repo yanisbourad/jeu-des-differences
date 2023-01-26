@@ -22,20 +22,20 @@ export class DrawService {
         return this.canvasSize.y;
     }
 
-    setColor(color: string) {
+    set setColor(color: string) {
         this.color = color;
     }
 
-    setLineWidth(width: number) {
+    set setLineWidth(width: number) {
         this.lineWidth = width;
     }
 
-    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement) {
+    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.context.drawImage(image, 0, 0, this.width, this.height);
     }
 
-    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement) {
+    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
         this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.context.beginPath();
         this.context.moveTo(lastPoint.x, lastPoint.y);

@@ -11,23 +11,26 @@ export class BannerComponent {
     color: string = '';
     text: string = 'Classique';
 
-    changeColor() {
+    changeColor() : string {
         switch (this.text) {
             case 'Classique': {
                 this.color = 'blue';
-
+                return "blue";
                 break;
+                
             }
             case 'Temps limité': {
                 this.color = 'orange';
-
+                return "orange";
                 break;
             }
             case 'Configuration': {
                 this.color = 'purple';
-
+                return "purple";
                 break;
             }
+
         }
+        return "nik";
     }
 }

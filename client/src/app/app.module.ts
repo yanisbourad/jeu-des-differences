@@ -14,6 +14,8 @@ import { BannerComponent } from './components/banner/banner.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
 import { PreviousNextComponent } from './components/previous-next/previous-next.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
+import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 /**
  * Main module that is used in main.ts.
@@ -32,8 +34,9 @@ import { GameCardComponent } from './components/game-card/game-card.component';
         SelectionJeuPageComponent,
         PreviousNextComponent,
         GameCardComponent,
+        CardDisplayerComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatGridListModule],
     providers: [],
     bootstrap: [AppComponent],
 })

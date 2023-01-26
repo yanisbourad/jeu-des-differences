@@ -1,0 +1,10 @@
+<div id = "card-display">
+    <mdb-carousel [controls]="true" [indicators]="true">
+        <mdb-carousel-item>
+            <mat-grid-list cols="4" rowHeight="4:1">
+                <mat-grid-tile *ngFor = " let card of cards"> {{card}}
+                </mat-grid-tile>
+            </mat-grid-list>
+        </mdb-carousel-item>
+    </mdb-carousel>
+</div>

@@ -7,15 +7,18 @@ import { TimeService } from '@app/services/time.service';
   styleUrls: ['./timer.component.scss']
 })
 export class TimerComponent implements OnInit {
-@Input() isClassicmode : boolean = false; // can be classique or temps limite
-time: Time;
-
-constructor(private readonly timeService: TimeService) { }
-
-  ngOnInit(): void {
-    this.time = {minute: 0, second: 0};
-    (this.isClassicmode)? this.timeService.startTimer() : this.timeService.startCountDown();
-  }
+  @Input() isClassicMode : boolean = false; // can be classique or temps limite
+  time: Time;
+  
+  constructor(private readonly timeService: TimeService) {
+      this.time = {minute: 0, second: 0};
+   }
+  
+    ngOnInit(): void {
+      (this.isClassicMode)? this.timeService.startTimer() : this.timeService.startCountDown();
+    }
+  
+  
 
   formatTime(): string{
     return (this.time.minute < 10 ? "0" + this.time.minute : this.time.minute) + ":" 

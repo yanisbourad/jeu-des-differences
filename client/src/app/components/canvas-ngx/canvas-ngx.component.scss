@@ -1,0 +1,16 @@
+.Canvas-ngx {
+    display: flex;
+    margin: 0 auto;
+    width: 640px;
+    flex-direction: column;
+    border: 1px solid red;
+}
+
+canvas {
+    background-color: white;
+    border: 1px solid black;
+}
+
+.file-upload {
+    display: none;
+}

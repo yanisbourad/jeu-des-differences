@@ -1,19 +1,12 @@
 <div class="game-creation-page">
-
-  <app-header [iconUsed]= false class="navigation"></app-header>
-  <div class="body">
-
-    <div id="drawing-column">
-      <p>Section de dessin!</p>
-      <app-canvas-ngx></app-canvas-ngx>
-
-      <app-canvas-ngx></app-canvas-ngx>
-
-
+    <app-header [iconUsed]="false" class="navigation"></app-header>
+    <div class="body">
+        <div id="drawing-column">
+            <app-canvas-ngx class="Canvas-ngx" (type)="(originalCanvas)"></app-canvas-ngx>
+            <app-canvas-ngx class="Canvas-ngx" (type)="(modifiedCanvas)"></app-canvas-ngx>
+        </div>
+        <div id="tools-column">
+            <p>Tools Section</p>
+        </div>
     </div>
-    <div id="tools-column">
-         <p>hello world</p>
-    </div>
-   
-  </div>  
 </div>

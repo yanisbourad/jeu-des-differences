@@ -1,16 +1,13 @@
 import { Injectable } from '@angular/core';
+import * as constants from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
-
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 640;
-export const DEFAULT_HEIGHT = 480;
 
 @Injectable({
     providedIn: 'root',
 })
 export class DrawService {
     context: CanvasRenderingContext2D;
-    private canvasSize: Point = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Point = { x: constants.defaultWidth, y: constants.defaultHeight };
     private color: string = 'black';
     private lineWidth: number = 3;
 
@@ -46,7 +43,7 @@ export class DrawService {
     }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
-    // drowCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
+    // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
     // drawTriangle(canvas: HTMLCanvasElement) {}
 

@@ -12,9 +12,9 @@ import { DrawService } from '@app/services/draw.service';
 })
 export class CanvasNgxComponent implements AfterViewInit {
     @ViewChild('Canvas', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
     @Input() private type!: string;
     listDraw: Drawing[] = [];
-    originalImage: ImageBitmap;
     isDrawing = false;
     currentDrawing: Drawing = { points: [] };
 
@@ -31,7 +31,6 @@ export class CanvasNgxComponent implements AfterViewInit {
     get height(): number {
         return constants.defaultHeight;
     }
-
     ngAfterViewInit(): void {
         this.canvas.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
@@ -41,8 +40,9 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     async onFileSelected(e: Event) {
-        const img = await this.bitmap.fileToImageBitmap(this.bitmap.getFile(e));
-        this.drawService.drawImage(img, this.canvas.nativeElement);
+        const newImage = await this.bitmap.fileToImageBitmap(this.bitmap.getFile(e));
+        this.drawService.drawImage(newImage, this.canvas.nativeElement);
+        this.fileUpload.nativeElement.value = '';
     }
 
     getPoint(e: MouseEvent): Point | undefined {
@@ -96,5 +96,8 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvas.nativeElement.removeEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
+    }
+    clearCanvas(): void {
+        this.drawService.clearCanvas(this.canvas.nativeElement);
     }
 }

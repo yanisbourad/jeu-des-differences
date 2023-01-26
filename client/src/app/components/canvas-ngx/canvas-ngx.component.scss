@@ -14,3 +14,23 @@ canvas {
 .file-upload {
     display: none;
 }
+
+.Tools-Canvas {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    width: 640px;
+    border: 1px solid blue;
+}
+
+.btn-tools-canvas {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    width: 640px;
+    border: 1px solid blue;
+}

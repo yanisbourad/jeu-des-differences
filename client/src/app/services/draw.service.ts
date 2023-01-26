@@ -47,5 +47,8 @@ export class DrawService {
 
     // drawTriangle(canvas: HTMLCanvasElement) {}
 
-    // clear(canvas: HTMLCanvasElement) {}
+    clearCanvas(canvas: HTMLCanvasElement) {
+        this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        this.context.clearRect(0, 0, this.width, this.height);
+    }
 }

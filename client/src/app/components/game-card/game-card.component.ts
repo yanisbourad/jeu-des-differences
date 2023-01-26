@@ -1,29 +1,39 @@
 import { Component } from '@angular/core';
-
+import { card } from '@app/interfaces/card';
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent {
-    cards: unknown = [
+    cards: card[] = [
         {
-            title: 'jeu 1',
-            image: 'image 1',
-            difficulty: 8,
-            solo: [{ name: 'yanis', time: '01:02' }],
+            title: 'Mont Saint Michel',
+            difficulty: 0,
+            rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            image: '../../../assets/imagePaysage.jpeg',
         },
         {
-            title: 'jeu 2',
-            image: 'image 2',
-            difficulty: 8,
-            solo: [{ name: 'daniel', time: '01:03' }],
+            title: 'Mont Saint Michel',
+            difficulty: 0,
+            rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            image: '../../../assets/imagePaysage.jpeg',
         },
         {
-            title: 'jeu 3',
-            image: 'image 3',
-            difficulty: 8,
-            solo: [{ name: 'lounes', time: '01:04' }],
+            title: 'Mont Saint Michel',
+            difficulty: 0,
+            rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            image: '../../../assets/imagePaysage.jpeg',
+        },
+        {
+            title: 'Mont Saint Michel',
+            difficulty: 0,
+            rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
+            image: '../../../assets/imagePaysage.jpeg',
         },
     ];
 }

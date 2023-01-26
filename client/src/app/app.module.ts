@@ -10,7 +10,9 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
+import { GameCreateContainerComponent } from './components/game-create-container/game-create-container.component';
 import { HeaderComponent } from './components/header/header.component';
+import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**
@@ -28,6 +30,8 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         HeaderComponent,
         GameCreationPageComponent,
         CanvasNgxComponent,
+        ValidateCreateBtnComponent,
+        GameCreateContainerComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

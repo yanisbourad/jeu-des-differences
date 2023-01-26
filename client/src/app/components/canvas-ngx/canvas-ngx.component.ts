@@ -10,9 +10,13 @@ import { DrawService } from '@app/services/draw.service';
     styleUrls: ['./canvas-ngx.component.scss'],
 })
 export class CanvasNgxComponent implements AfterViewInit {
-    @ViewChild('Canvas', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('Canvas1', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('Canvas2', { static: false }) private canvas2!: ElementRef<HTMLCanvasElement>; // added by renel
+
     listDraw: Drawing[] = [];
     originalImage: ImageBitmap;
+    modifiedImage: ImageBitmap; // added by renel
+
     isDrawing = false;
     currentDrawing: Drawing = { points: [] };
 
@@ -26,6 +30,9 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvas.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
+        this.canvas2.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
+            this.mouseHitDetection(e);
+        });
     }
 
     onFileSelected(e: Event): void {
@@ -34,6 +41,19 @@ export class CanvasNgxComponent implements AfterViewInit {
             .then((img: ImageBitmap) => {
                 this.originalImage = img;
                 this.drawService.drawImage(img, this.canvas.nativeElement);
+            })
+            .catch((err) => {
+                alert(err);
+            });
+    }
+
+    onFileSelected2(e: Event): void {
+        // duplicata added for modified
+        this.bitmap
+            .fileToImageBitmap(this.bitmap.getFile(e))
+            .then((img: ImageBitmap) => {
+                this.modifiedImage = img;
+                this.drawService.drawImage(img, this.canvas2.nativeElement);
             })
             .catch((err) => {
                 alert(err);
@@ -91,5 +111,12 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.isDrawing = false;
         this.listDraw.push(this.currentDrawing);
         this.currentDrawing = { points: [] };
+    }
+
+    // read image data from canvas
+
+    printData() {
+        console.log(this.bitmap.generatePixelMatrices(this.canvas.nativeElement).length);
+        console.log(this.bitmap.generatePixelMatrices(this.canvas2.nativeElement));
     }
 }

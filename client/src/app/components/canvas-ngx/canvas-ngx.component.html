@@ -1,5 +1,10 @@
-
-<div class="Canvas-ngx">
-    <input type="file" class="file-upload" (change)="onFileSelected($event)" #fileUpload/>
-    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+<div div class="Canvas-ngx" (click)="printData()">
+    <div class="canvas-wrapper">
+        <canvas #Canvas1 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+        <input type="file" class="file-upload" (change)="onFileSelected($event)" #fileUpload />
+    </div>
+    <div class="canvas-wrapper">
+        <canvas #Canvas2 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+        <input type="file" class="file-upload" (change)="onFileSelected2($event)" #fileUpload />
+    </div>
 </div>

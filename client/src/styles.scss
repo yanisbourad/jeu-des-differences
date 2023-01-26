@@ -76,5 +76,8 @@ body {
 }
 body {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(#765fa0, #3b2957);
     font-family: Roboto, 'Helvetica Neue', sans-serif;
 }

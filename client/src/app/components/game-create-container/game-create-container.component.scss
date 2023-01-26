@@ -1,0 +1,33 @@
+.game-creation-container {
+    display: flex;
+    margin: 0 auto;
+    padding: 10px;
+    justify-content: center;
+    width: 90%;
+    border: 1px solid black;
+}
+
+.drawing-canvas {
+    display: flex;
+    margin: 0 auto;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.body {
+    display: flex;
+    margin-top: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+    border: 1px solid yellow;
+}
+
+.body app-validate-create-btn {
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.tools-container {
+    border: 1px solid green;
+    height: 100%;
+}

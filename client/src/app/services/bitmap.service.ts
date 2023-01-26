@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class BitmapService {
+    context: CanvasRenderingContext2D;
     getFile(e: Event): File {
         const target = e.target as HTMLInputElement;
         if (target.files === null) {
@@ -27,5 +28,10 @@ export class BitmapService {
             };
             reader.readAsDataURL(file);
         });
+    }
+
+    generatePixelMatrices(canvas: HTMLCanvasElement) {
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        return context.getImageData(0, 0, canvas.width, canvas.height).data;
     }
 }

@@ -1,0 +1,20 @@
+.Canvas-ngx {
+    display: flex;
+    margin: 0 auto;
+    width: 1400px;
+    justify-content: space-between;
+    border: 1px solid red;
+}
+
+.canvas-wrapper {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    width: 640px;
+    border: 1px solid red;
+}
+
+canvas {
+    background-color: white;
+    border: 1px solid black;
+}

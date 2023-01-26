@@ -1,26 +1,9 @@
-.body{
-  justify-content:center;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  background: linear-gradient(#765fa0, #3b2957);
-  // column-count: 2; 
-  display: inline-block;
+.playing-page {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(#765fa0, #3b2957);
 }
-.game-creation-page{
-  width: 100%;
-  height: 100%;
-}
-
-#drawing-column{
-  width: 70%; 
-  height: 100%;
-  float:left;
-
-}
-#tools-column{
-  width: 30%; 
-  height: 100%;
-  float:right;
-
+.navigation {
+    width: 100%;
 }

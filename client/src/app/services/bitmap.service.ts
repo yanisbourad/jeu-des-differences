@@ -5,6 +5,7 @@ import * as constants from '@app/configuration/const-canvas';
     providedIn: 'root',
 })
 export class BitmapService {
+    context: CanvasRenderingContext2D;
     getFile(e: Event): File {
         const target = e.target as HTMLInputElement;
         if (target.files === null) {

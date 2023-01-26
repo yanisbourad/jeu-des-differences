@@ -12,6 +12,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
 import { HeaderComponent } from './components/header/header.component';
+import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**
@@ -30,6 +31,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
+        ValidateCreateBtnComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

@@ -39,4 +39,11 @@ describe('CanvasHolderServiceService', () => {
         const bitmap = service.fileToImageBitmap(file);
         expect(bitmap).toBeTruthy();
     });
+    it('should return true if the file contains a bitmap', async () => {
+        const blob = await fetch('/assets/imag-expl.bmp').then(async (r) => r.blob());
+        const file = new File([blob], 'imag-expl.bmp', { type: 'image/bmp' });
+        const bitmap = await service.fileToImageBitmap(file);
+        const isValid = service.validateBitmap(bitmap);
+        expect(isValid).toBeTruthy();
+    });
 });

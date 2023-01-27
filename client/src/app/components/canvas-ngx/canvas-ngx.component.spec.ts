@@ -154,24 +154,31 @@ describe('CanvasNgxComponent', () => {
     });
 
     it('should read the file when the user selects a file', () => {
-        const file = new File([], 'test.bmp', { type: 'image/bmp' });
-        const event = new Event('change', {});
-        Object.defineProperty(event, 'target', {
-            value: {
-                files: [file],
-            },
-        });
+        // file read from ./assets/test.bmp
+        // const blob = new Blob([''], { type: 'image/bmp' });
+        // const file = new File([blob], 'test.bmp', { type: 'image/bmp' });
         const spy = spyOn(component, 'onFileSelected');
-        const fileInput = fixture.nativeElement.querySelector('input');
-        fileInput.dispatchEvent(event);
-        fixture.detectChanges();
+        const event = new Event('change');
+        const input = fixture.nativeElement.querySelector('input');
+        input.dispatchEvent(event);
         expect(spy).toHaveBeenCalled();
     });
     it('should dispatch the right event when mouseUp after mouseDown', () => {
-        component.isDrawing = true;
+        const canvas = fixture.nativeElement.querySelector('canvas');
         const spy = spyOn(component, 'mouseUpDetection');
-        component.mouseUpDetection();
+        component.isDrawing = true;
+        canvas.addEventListener('mouseup', () => {
+            component.mouseUpDetection();
+        });
+        canvas.dispatchEvent(new MouseEvent('mouseup'));
         expect(spy).toHaveBeenCalled();
         expect(component.isDrawing).toEqual(false);
+    });
+    it('should call clearCanvas when the user clicks on the clear button', () => {
+        const spy = spyOn(component, 'clearCanvas');
+        const button = fixture.nativeElement.querySelector('#ClearBtn');
+        button.dispatchEvent(new MouseEvent('click'));
+        expect(spy).toHaveBeenCalled();
+        expect(component.isDrawing);
     });
 });

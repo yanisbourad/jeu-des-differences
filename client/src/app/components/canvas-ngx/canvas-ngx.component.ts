@@ -39,10 +39,15 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvasHolderService.setCanvas(this.canvas, this.type);
     }
 
+    // TODO: create a test for this method
     async onFileSelected(e: Event) {
         const newImage = await this.bitmap.fileToImageBitmap(this.bitmap.getFile(e));
-        this.drawService.drawImage(newImage, this.canvas.nativeElement);
         this.fileUpload.nativeElement.value = '';
+        if (this.bitmap.validateBitmap(newImage)) {
+            this.drawService.drawImage(newImage, this.canvas.nativeElement);
+        } else {
+            alert('Error: Invalid image Size!');
+        }
     }
 
     getPoint(e: MouseEvent): Point | undefined {
@@ -86,10 +91,11 @@ export class CanvasNgxComponent implements AfterViewInit {
         }
     }
 
+    // TODO: create a test for this method
     mouseUpDetection(): void {
-        this.isDrawing = false;
         this.listDraw.push(this.currentDrawing);
-        this.currentDrawing.points = new Array<Point>();
+        this.currentDrawing.points = [];
+        this.isDrawing = false;
         this.canvas.nativeElement.removeEventListener('mousemove', (e) => {
             this.mouseMoveDetection(e);
         });
@@ -97,7 +103,10 @@ export class CanvasNgxComponent implements AfterViewInit {
             this.mouseUpDetection();
         });
     }
+
+    // TODO: create a test for this method
     clearCanvas(): void {
         this.drawService.clearCanvas(this.canvas.nativeElement);
+        this.listDraw = [];
     }
 }

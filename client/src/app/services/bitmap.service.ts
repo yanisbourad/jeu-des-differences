@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as constants from '@app/configuration/const-canvas';
 
 @Injectable({
     providedIn: 'root',
@@ -24,5 +25,8 @@ export class BitmapService {
             };
             reader.readAsDataURL(file);
         });
+    }
+    validateBitmap(img: ImageBitmap): boolean {
+        return img.width === constants.defaultWidth && img.height === constants.defaultHeight;
     }
 }

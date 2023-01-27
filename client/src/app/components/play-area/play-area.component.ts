@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Point } from '@app/interfaces/point';
-import { DrawService } from '@app/services/draw.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 500;
@@ -27,7 +26,6 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonPressed = '';
 
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    constructor(private readonly drawService: DrawService) {}
 
     get width(): number {
         return this.canvasSize.x;
@@ -43,7 +41,6 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.drawService.context = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         // this.drawService.drawGrid();
         // this.drawService.drawWord('Différence');
         this.canvas.nativeElement.focus();

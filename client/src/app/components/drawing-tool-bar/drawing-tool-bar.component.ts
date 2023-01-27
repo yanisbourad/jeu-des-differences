@@ -14,17 +14,11 @@ export class DrawingToolBarComponent {
     get const(): typeof constants {
         return constants;
     }
-    // validateDrawing(): void {}
-    // ngOnInit(): void {}
-    // ngAfterViewInit(): void {}
 
     setLineWidth(): void {
         this.drawingService.setLineWidth = this.lineWidth;
     }
     setLineColor(): void {
         this.drawingService.setColor = this.lineColor;
-    }
-    validateDrawing(): void {
-        this.drawingService.validateDrawing(this.selectedRadius);
     }
 }

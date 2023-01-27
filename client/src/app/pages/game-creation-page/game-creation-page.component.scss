@@ -5,7 +5,8 @@
     flex-direction: column;
     border: 1px solid black;
     background: linear-gradient(#765fa0, #3b2957);
-    height: 100;
+    height: 100%;
+    width: 100%;
 }
 .body {
     display: flex;
@@ -18,10 +19,11 @@
 
 #drawing-column {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     min-width: 1400px;
-    width: 80%;
-    border: 1px solid yellow;
+    width: 70%;
+    height: 50%;
+    margin-inline: auto;
     padding: 1rem;
 }
 .Canvas-ngx {
@@ -29,7 +31,42 @@
     height: 100%;
 }
 #tools-column {
-    width: 30%;
+    width: 100%;
     height: 100%;
     float: right;
+}
+.vertical-line {
+    width: 10px;
+    height: 90%;
+    margin: auto;
+    background-color: black;
+}
+#return-container {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: 30%;
+    width: 70%;
+    padding: 3%;
+}
+.btn {
+    margin-top: 1%;
+    font-size: 20px;
+    padding: 10px;
+    -webkit-backdrop-filter: blur(32px) brightness(100%);
+    align-items: center;
+    backdrop-filter: blur(32px) brightness(100%);
+    border: 2px solid;
+    border-color: rgb(166, 151, 220);
+    border-radius: 32px;
+    -webkit-border-radius: 32px;
+    -moz-border-radius: 32px;
+    -ms-border-radius: 32px;
+    -o-border-radius: 32px;
+    background-color: #5b467c;
+    width: fit-content;
+}
+
+.btn:hover {
+    background-color: #9845e7;
 }

@@ -17,4 +17,7 @@ export class GameCreationPageComponent implements OnInit {
     ngOnInit(): void {
         this.canvasHolderService.clearCanvas();
     }
+    goBack(): void {
+        this.canvasHolderService.clearCanvas();
+    }
 }

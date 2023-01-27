@@ -51,4 +51,8 @@ export class DrawService {
         this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.context.clearRect(0, 0, this.width, this.height);
     }
+    validateDrawing(selectedRadius: number) {
+        // TODO: check if the drawing is valid
+        return selectedRadius ? true : false;
+    }
 }

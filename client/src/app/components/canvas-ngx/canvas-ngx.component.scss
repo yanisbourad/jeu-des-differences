@@ -1,12 +1,13 @@
 .Canvas-ngx {
     display: flex;
     margin: 0 auto;
-    width: 640px;
     flex-direction: column;
-    border: 1px solid red;
 }
 
 canvas {
+    margin: auto;
+    width: 640px;
+    height: 480px;
     background-color: white;
     border: 1px solid black;
 }
@@ -20,9 +21,9 @@ canvas {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin: 0 auto;
-    width: 640px;
-    border: 1px solid blue;
+    margin: auto;
+    margin-top: 3%;
+    width: 70%;
 }
 
 .btn-tools-canvas {
@@ -31,6 +32,5 @@ canvas {
     justify-content: space-between;
     align-items: center;
     margin: 0 auto;
-    width: 640px;
-    border: 1px solid blue;
+    width: 70%;
 }

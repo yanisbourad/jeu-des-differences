@@ -1,0 +1,38 @@
+.drawing-tool-bar {
+    margin: auto;
+    width: 90%;
+    height: 80%;
+    border-radius: 20px;
+    background-color: #f5f5f5;
+}
+
+.tool-parial {
+    margin: 2rem;
+    font-size: 1.5rem;
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+
+    p {
+        padding-top: 10px;
+    }
+    select {
+        height: 2rem;
+        width: 5rem;
+        font-size: 1rem;
+    }
+}
+#line-width input {
+    height: 2rem;
+    width: 60%;
+    font-size: 1rem;
+}
+
+#line {
+    margin: 3rem;
+    width: 80%;
+    height: 2px;
+    border: 2px solid red;
+}

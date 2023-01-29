@@ -10,9 +10,7 @@ export class ImageDiffService {
     originalImageData: number[];
     modifiedImageData: number[];
 
-    test: string = 'test';
-
-    // derived matrices red green blue alpha
+    // Derived matrices red green blue alpha
     originalPixelMatrix: PixelMatrix;
     modifiedPixelMatrix: PixelMatrix;
     drawingDifferenceArray: Uint8ClampedArray;
@@ -20,7 +18,6 @@ export class ImageDiffService {
 
     private imageMatrixSize: number = 0;
     private differenceMatrix: number[] = [];
-
     private pixelNumberByImage: number = 0;
 
     NEXT_PIXEL_START_INDEX: number = 4;
@@ -53,21 +50,25 @@ export class ImageDiffService {
         );
     }
 
+    private readData(originalImageData: number[], modifiedImageData: number[]): void {
+        this.imageMatrixSize = this.originalImageData.length;
+        for (let i = 0; i < this.imageMatrixSize; i = i + this.NEXT_PIXEL_START_INDEX) {
+            this.originalPixelMatrix.red.push(originalImageData[i]);
+            this.originalPixelMatrix.green.push(originalImageData[i + 1]);
+            this.originalPixelMatrix.blue.push(originalImageData[i + 2]);
+            this.originalPixelMatrix.alpha.push(originalImageData[i + 3]);
+            this.modifiedPixelMatrix.red.push(modifiedImageData[i]);
+            this.modifiedPixelMatrix.green.push(modifiedImageData[i + 1]);
+            this.modifiedPixelMatrix.blue.push(modifiedImageData[i + 2]);
+            this.modifiedPixelMatrix.alpha.push(modifiedImageData[i + 3]);
+        }
+        this.pixelNumberByImage = this.originalPixelMatrix.red.length;
+    }
+
     setPixelMatrix(originalCanvas: ElementRef, modifiedCanvas: ElementRef): void {
         this.resetImageData();
         this.setImageData(originalCanvas, modifiedCanvas);
-        this.imageMatrixSize = this.originalImageData.length;
-        for (let i = 0; i < this.imageMatrixSize; i = i + this.NEXT_PIXEL_START_INDEX) {
-            this.originalPixelMatrix.red.push(this.originalImageData[i]);
-            this.originalPixelMatrix.green.push(this.originalImageData[i + 1]);
-            this.originalPixelMatrix.blue.push(this.originalImageData[i + 2]);
-            this.originalPixelMatrix.alpha.push(this.originalImageData[i + 3]);
-            this.modifiedPixelMatrix.red.push(this.modifiedImageData[i]);
-            this.modifiedPixelMatrix.green.push(this.modifiedImageData[i + 1]);
-            this.modifiedPixelMatrix.blue.push(this.modifiedImageData[i + 2]);
-            this.modifiedPixelMatrix.alpha.push(this.modifiedImageData[i + 3]);
-        }
-        this.pixelNumberByImage = this.originalPixelMatrix.red.length;
+        this.readData(this.originalImageData, this.modifiedImageData);
     }
 
     getDifferenceMatrix(): number[] {
@@ -90,7 +91,6 @@ export class ImageDiffService {
             return this.differenceMatrix;
         }
     }
-
     setDifferenceDataToDraw(): void {
         this.getDifferenceMatrix();
         if (!this.hasBeenChanged) {

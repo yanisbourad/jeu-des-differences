@@ -71,9 +71,9 @@ export class ImageDiffService {
                     this.originalPixelMatrix.blue[i] === this.modifiedPixelMatrix.blue[i] &&
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
-                    this.differenceMatrix.push(0);
+                    this.differenceMatrix.push(0, 0, 0, 0);
                 } else {
-                    this.differenceMatrix.push(1);
+                    this.differenceMatrix.push(1, 1, 1, 1);
                 }
             }
             return this.differenceMatrix;

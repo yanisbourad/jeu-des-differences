@@ -17,8 +17,8 @@ export class ImageDiffService {
     modifiedPixelMatrix: PixelMatrix;
 
     private imageMatrixSize: number = 0;
-    // private differenceMatrix: number[] = [];
-    // private pixelNumberByImage: number = 0;
+    private differenceMatrix: number[] = [];
+    private pixelNumberByImage: number = 0;
 
     NEXT_PIXEL_START_INDEX: number = 4;
     INCREMENT_VALUE: number = 1;
@@ -32,7 +32,7 @@ export class ImageDiffService {
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
     }
 
-    haveSameSize(): boolean {
+    private haveSameSize(): boolean {
         return this.originalImageData.length === this.modifiedImageData.length;
     }
 
@@ -58,6 +58,27 @@ export class ImageDiffService {
             this.modifiedPixelMatrix.blue.push(this.modifiedImageData[i + 2]);
             this.modifiedPixelMatrix.alpha.push(this.modifiedImageData[i + 3]);
         }
-        console.log(this.originalPixelMatrix);
+        this.pixelNumberByImage = this.originalPixelMatrix.red.length;
+    }
+
+    retrieveDifferenceMatrix(): number[] {
+        if (this.haveSameSize()) {
+            this.differenceMatrix = [];
+            for (let i = 0; i < this.pixelNumberByImage; i++) {
+                if (
+                    this.originalPixelMatrix.red[i] === this.modifiedPixelMatrix.red[i] &&
+                    this.originalPixelMatrix.green[i] === this.modifiedPixelMatrix.green[i] &&
+                    this.originalPixelMatrix.blue[i] === this.modifiedPixelMatrix.blue[i] &&
+                    this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
+                ) {
+                    this.differenceMatrix.push(0);
+                } else {
+                    this.differenceMatrix.push(1);
+                }
+            }
+            return this.differenceMatrix;
+        } else {
+            return [];
+        }
     }
 }

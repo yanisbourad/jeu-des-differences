@@ -1,0 +1,75 @@
+#popup{
+    width: 544px;
+    height: 255px;
+    left: 688px;
+    top: 413px;
+    background: #715E91;
+    border: 1px solid #000000;
+    border-radius: 30px;
+}
+#name-input{
+    background: #534370;
+    border: 1px solid #2E1656;
+    border-radius: 10px;
+    // align-items: center;
+    margin-bottom: 10px;
+    // display: block;
+    width: 361px;
+    height: 45px;
+    left: 801px;
+    top: 513px;
+}
+
+#confirmation-button{
+    background: rgba(137, 220, 87, 0.64);
+    backdrop-filter: blur(16px);
+    border-radius: 32px;
+    color: white;
+}
+
+#cancel-button{
+    background: rgba(185, 76, 69, 0.52);
+    backdrop-filter: blur(16px);
+    border-radius: 32px;
+    color: white;
+}
+
+#popup-content{
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    color: #FFFFFF;
+}
+
+#title-popup{
+    text-align: center;
+    
+}
+
+#popup-button{
+    // text-align:center;
+    // /*the same margin which is every button have, it is for small screen, and if you have many buttons.*/
+    // margin-left:-20px;
+    // marin-right:-20px;
+    margin:0 auto;
+    display:block;
+}
+
+
+#name{
+    display:flex; 
+    flex-direction: row; 
+    // justify-content: center; 
+    align-items: center;
+}
+
+#zeb{
+    display: inline-block;
+    text-align: right;
+    clear: both;
+    align-items: center;
+    // margin: auto;
+    // float:left;
+}

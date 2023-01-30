@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { card } from '@app/interfaces/card';
+import { MatDialog } from '@angular/material/dialog';
+import { NamePopupComponent } from '../name-popup/name-popup.component';
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent {
+    name: string;
     cards: card[] = [
         {
             title: 'Mont Saint Michel',
@@ -15,4 +18,14 @@ export class GameCardComponent {
             image: '../../../assets/imagePaysage.jpeg',
         },
     ];
+    constructor(public dialog: MatDialog) {}
+    openDialog(): void {
+        const dialogRef = this.dialog.open(NamePopupComponent, {
+            data: { name: this.name },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            this.name = result;
+        });
+    }
 }

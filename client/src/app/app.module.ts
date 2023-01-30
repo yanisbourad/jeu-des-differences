@@ -17,6 +17,8 @@ import { GameCardComponent } from './components/game-card/game-card.component';
 import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { NamePopupComponent } from './components/name-popup/name-popup.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 /**
  * Main module that is used in main.ts.
@@ -38,7 +40,17 @@ import { NamePopupComponent } from './components/name-popup/name-popup.component
         CardDisplayerComponent,
         NamePopupComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatGridListModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        MatGridListModule,
+        MatDialogModule,
+        MatFormFieldModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

@@ -1,1 +1,13 @@
-<p>name-popup works!</p>
+<div id="popup">
+    <div mat-dialog-content id="popup-content">
+        <p id="title-popup">Veuillez entrez le nom du joueur</p>
+        <mat-form-field id = "name">
+            <label id= "zeb">nom: </label>
+            <input id = "name-input" matInput [(ngModel)]="data.name" placeholder="Ex : WillyWilliam">
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions id= "popup-button">
+        <button mat-button id = "cancel-button" (click)="onNoClick()">Annuler</button>
+        <button mat-button id = "confirmation-button" [mat-dialog-close]="data.name" cdkFocusInitial [disabled]="data.name ===''" routerLink="/" >Jouer</button>
+    </div>
+</div>

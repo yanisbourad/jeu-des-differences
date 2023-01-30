@@ -11,7 +11,6 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
-import { DrawingValidatorComponent } from './components/drawing-tool-bar/drawing-validator/drawing-validator.component';
 import { HeaderComponent } from './components/header/header.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
@@ -31,7 +30,6 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
-        DrawingValidatorComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

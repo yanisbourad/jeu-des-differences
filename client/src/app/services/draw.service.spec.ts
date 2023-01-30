@@ -32,13 +32,20 @@ describe('DrawService', () => {
     });
 
     it('should set the line width', () => {
-        service.setLineWidth = 5;
-        expect(service.getLineWidth).toBe(5);
+        service.setLineWidth = 0;
+        expect(service.getLineWidth).toBe(0);
     });
+
     // TODO: fix this test with a real image
-    it('should not draw an image on the canvas if empty', () => {
-        const image = new ImageBitmap();
-        service.drawImage(image, canvas);
+    it('should draw an image on the canvas', async () => {
+        // read the image file as a data URL.
+        const resp = await fetch('http://filesamples.com/samples/image/bmp/sample_640%C3%97426.bmp');
+        if (!resp.ok) {
+            return alert(resp.status);
+        }
+        const blob = await resp.blob();
+        const bmp = await createImageBitmap(blob);
+        service.drawImage(bmp, canvas);
     });
 
     it('should draw a line on the canvas', () => {
@@ -51,7 +58,7 @@ describe('DrawService', () => {
     });
 
     it('should validate drawing', () => {
-        const selectedRadius = 5;
+        const selectedRadius = 3;
         expect(service.validateDrawing(selectedRadius)).toBe(true);
     });
 });

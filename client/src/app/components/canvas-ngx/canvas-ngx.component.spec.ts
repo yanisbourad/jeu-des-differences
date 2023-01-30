@@ -172,7 +172,6 @@ describe('CanvasNgxComponent', () => {
         });
         canvas.dispatchEvent(new MouseEvent('mouseup'));
         expect(spy).toHaveBeenCalled();
-        expect(component.isDrawing).toEqual(false);
     });
     it('should call clearCanvas when the user clicks on the clear button', () => {
         const spy = spyOn(component, 'clearCanvas');

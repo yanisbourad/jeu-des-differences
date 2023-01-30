@@ -1,4 +1,4 @@
-import { ElementRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 @Injectable({
     providedIn: 'root',
@@ -7,32 +7,28 @@ export class CanvasHolderService {
     originalCanvas: string = 'Original';
     modifiedCanvas: string = 'Modified';
 
-    private canvasOriginal!: ElementRef<HTMLCanvasElement>;
-    private canvasModifier!: ElementRef<HTMLCanvasElement>;
+    private canvasOriginal!: Uint8ClampedArray;
+    private canvasModifier!: Uint8ClampedArray;
 
-    setCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
+    setCanvas(canvasData: Uint8ClampedArray, canvasName: string): void {
         if (canvasName === this.originalCanvas) {
-            this.canvasOriginal = canvas;
+            this.canvasOriginal = canvasData;
         } else if (canvasName === this.modifiedCanvas) {
-            this.canvasModifier = canvas;
+            this.canvasModifier = canvasData;
         }
     }
 
     getCanvasData(canvasName: string): Uint8ClampedArray | undefined {
         if (canvasName === this.originalCanvas) {
-            return this.getData(this.canvasOriginal.nativeElement);
+            return this.canvasOriginal;
         } else if (canvasName === this.modifiedCanvas) {
-            return this.getData(this.canvasModifier.nativeElement);
+            return this.canvasModifier;
         } else return undefined;
     }
 
-    getData(canvas: HTMLCanvasElement): Uint8ClampedArray | undefined {
-        return canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data;
-    }
-
     clearCanvas(): void {
-        this.canvasOriginal = {} as ElementRef<HTMLCanvasElement>;
-        this.canvasModifier = {} as ElementRef<HTMLCanvasElement>;
+        this.canvasOriginal = new Uint8ClampedArray();
+        this.canvasModifier = new Uint8ClampedArray();
     }
 }
 

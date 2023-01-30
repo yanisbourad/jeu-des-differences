@@ -39,6 +39,12 @@ export class DrawService {
         context.drawImage(image, 0, 0, this.width, this.height);
     }
 
+    drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        const imageData = new ImageData(data, this.width, this.height);
+        context.putImageData(imageData, 0, 0);
+    }
+
     drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
         context.beginPath();

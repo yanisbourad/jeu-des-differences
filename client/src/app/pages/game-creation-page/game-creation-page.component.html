@@ -2,8 +2,8 @@
     <app-header [iconUsed]="false" class="navigation"></app-header>
     <div class="body">
         <div id="drawing-column">
-            <app-canvas-ngx class="Canvas-ngx" (type)="(originalCanvas)"></app-canvas-ngx>
-            <app-canvas-ngx class="Canvas-ngx" (type)="(modifiedCanvas)"></app-canvas-ngx>
+            <app-canvas-ngx class="Canvas-ngx" [type]="originalCanvas"></app-canvas-ngx>
+            <app-canvas-ngx class="Canvas-ngx" [type]="modifiedCanvas"></app-canvas-ngx>
         </div>
         <div class="vertical-line"></div>
 

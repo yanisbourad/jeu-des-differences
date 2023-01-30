@@ -11,9 +11,9 @@ import { DrawService } from '@app/services/draw.service';
     styleUrls: ['./canvas-ngx.component.scss'],
 })
 export class CanvasNgxComponent implements AfterViewInit {
+    @Input() type!: string;
     @ViewChild('Canvas', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
-    @Input() private type!: string;
     listDraw: Drawing[] = [];
     isDrawing = false;
     currentDrawing: Drawing = { points: [] };
@@ -36,7 +36,7 @@ export class CanvasNgxComponent implements AfterViewInit {
             this.mouseHitDetection(e);
         });
         // push the canvas pointer to the difference Service
-        this.canvasHolderService.setCanvas(this.canvas, this.type);
+        this.saveCanvas();
     }
 
     // TODO: create a test for this method
@@ -48,6 +48,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         } else {
             alert('Error: Invalid image Size!');
         }
+        this.saveCanvas();
     }
 
     getPoint(e: MouseEvent): Point | undefined {
@@ -87,6 +88,7 @@ export class CanvasNgxComponent implements AfterViewInit {
             if (point !== undefined) {
                 this.drawService.drawVec(point, this.getLastPoint(), this.canvas.nativeElement);
                 this.currentDrawing.points.push(point);
+                this.saveCanvas();
             }
         }
     }
@@ -104,9 +106,16 @@ export class CanvasNgxComponent implements AfterViewInit {
         });
     }
 
+    saveCanvas(): void {
+        const canvasData = this.canvas.nativeElement
+            .getContext('2d')
+            ?.getImageData(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height).data;
+        // console.log(canvasData);
+        if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
+    }
     // TODO: create a test for this method
     clearCanvas(): void {
-        this.drawService.clearCanvas(this.canvas.nativeElement);
+        this.saveCanvas();
         this.listDraw = [];
     }
 }

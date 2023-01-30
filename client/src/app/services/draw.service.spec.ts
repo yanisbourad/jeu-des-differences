@@ -49,11 +49,11 @@ describe('DrawService', () => {
     });
 
     it('should draw a line on the canvas', () => {
-        service.drawVec(point, lastPoint, canvas);
+        service.drawCircle(point, lastPoint, canvas);
     });
 
     it('should clear the canvas', () => {
-        service.drawVec(point, lastPoint, canvas);
+        service.drawCircle(point, lastPoint, canvas);
         service.clearCanvas(canvas);
     });
 

@@ -68,7 +68,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     mouseHitDetection(e: MouseEvent): void {
         this.isDrawing = true;
         const point = this.getPoint(e);
-        if (point === undefined) {
+        if (!point) {
             this.isDrawing = false;
             return;
         }
@@ -86,7 +86,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         {
             const point: Point | undefined = this.getPoint(e);
             if (point !== undefined) {
-                this.drawService.drawVec(point, this.getLastPoint(), this.canvas.nativeElement);
+                this.drawService.drawCircle(point, this.getLastPoint(), this.canvas.nativeElement);
                 this.currentDrawing.points.push(point);
                 this.saveCanvas();
             }
@@ -115,6 +115,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
     // TODO: create a test for this method
     clearCanvas(): void {
+        this.drawService.clearCanvas(this.canvas.nativeElement);
         this.saveCanvas();
         this.listDraw = [];
     }

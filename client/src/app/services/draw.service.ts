@@ -54,6 +54,18 @@ export class DrawService {
         context.lineWidth = this.lineWidth;
         context.stroke();
     }
+
+    drawCircle(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        const radius = Math.sqrt(Math.pow(point.x - lastPoint.x, 2) + Math.pow(point.y - lastPoint.y, 2));
+        context.beginPath();
+        context.arc(lastPoint.x, lastPoint.y, radius, 0, 2 * Math.PI);
+        context.fillStyle = this.color;
+        context.fill();
+        context.strokeStyle = this.color;
+        context.lineWidth = this.lineWidth;
+        context.stroke();
+    }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
     // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}

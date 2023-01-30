@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
@@ -14,6 +14,9 @@ import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-t
 import { HeaderComponent } from './components/header/header.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+import { GamePageComponent } from './pages/game-page/game-page.component';
+import { TimerComponent } from './components/timer/timer.component';
+import { MessageAreaComponent } from './components/message-area/message-area.component';
 
 /**
  * Main module that is used in main.ts.
@@ -22,16 +25,17 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [
-        AppComponent,
+    declarations: [AppComponent,
         MainPageComponent,
         PlayAreaComponent,
-        SidebarComponent,
         HeaderComponent,
-        GameCreationPageComponent,
+         GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
         ValidateCreateBtnComponent,
+        GamePageComponent,
+        TimerComponent, 
+        MessageAreaComponent
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

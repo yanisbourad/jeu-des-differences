@@ -13,7 +13,6 @@ import { map } from 'rxjs/operators';
 export class MainPageComponent {
     readonly title: string = 'VISUAL QUEST';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
     constructor(private readonly communicationService: CommunicationService) {}
 
     sendTimeToServer(): void {

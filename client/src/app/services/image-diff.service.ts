@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { ElementRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { PixelMatrix } from '@app/interfaces/pixel-matrix';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ImageDiffService {
+    private imageMatrixSize: number = 0;
     // rgba array of data
     originalImageData: number[];
     modifiedImageData: number[];
@@ -16,9 +17,8 @@ export class ImageDiffService {
     drawingDifferenceArray: Uint8ClampedArray;
     hasBeenChanged: boolean = false;
 
-    private imageMatrixSize: number = 0;
-    private differenceMatrix: number[] = [];
-    private pixelNumberByImage: number = 0;
+    differenceMatrix: number[] = [];
+    pixelNumberByImage: number = 0;
 
     NEXT_PIXEL_START_INDEX: number = 4;
     INCREMENT_VALUE: number = 1;
@@ -27,53 +27,52 @@ export class ImageDiffService {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
     }
-    private resetImageData(): void {
+
+    resetImageData(): void {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.differenceMatrix = [];
         this.drawingDifferenceArray = new Uint8ClampedArray([]);
     }
 
-    private haveSameSize(): boolean {
-        return this.originalImageData.length === this.modifiedImageData.length;
+    setImageData(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
+        this.originalImageData = Array.prototype.slice.call(originalCanvasArray);
+        this.modifiedImageData = Array.prototype.slice.call(modifiedCanvasArray);
     }
 
-    private setImageData(originalCanvas: ElementRef, modifiedCanvas: ElementRef): void {
-        this.originalImageData = Array.prototype.slice.call(
-            originalCanvas.nativeElement.getContext('2d').getImageData(0, 0, originalCanvas.nativeElement.width, originalCanvas.nativeElement.height)
-                .data,
-        );
-
-        this.modifiedImageData = Array.prototype.slice.call(
-            modifiedCanvas.nativeElement.getContext('2d').getImageData(0, 0, modifiedCanvas.nativeElement.width, modifiedCanvas.nativeElement.height)
-                .data,
-        );
+    haveSameSize(originalImageData: number[], modifiedImageData: number[]): boolean {
+        return originalImageData.length === modifiedImageData.length;
     }
 
-    private readData(originalImageData: number[], modifiedImageData: number[]): void {
-        this.imageMatrixSize = this.originalImageData.length;
-        for (let i = 0; i < this.imageMatrixSize; i = i + this.NEXT_PIXEL_START_INDEX) {
-            this.originalPixelMatrix.red.push(originalImageData[i]);
-            this.originalPixelMatrix.green.push(originalImageData[i + 1]);
-            this.originalPixelMatrix.blue.push(originalImageData[i + 2]);
-            this.originalPixelMatrix.alpha.push(originalImageData[i + 3]);
-            this.modifiedPixelMatrix.red.push(modifiedImageData[i]);
-            this.modifiedPixelMatrix.green.push(modifiedImageData[i + 1]);
-            this.modifiedPixelMatrix.blue.push(modifiedImageData[i + 2]);
-            this.modifiedPixelMatrix.alpha.push(modifiedImageData[i + 3]);
+    readData(originalImageData: number[], modifiedImageData: number[]): void {
+        if (this.haveSameSize(originalImageData, modifiedImageData)) {
+            this.imageMatrixSize = originalImageData.length;
+            for (let i = 0; i < this.imageMatrixSize; i = i + this.NEXT_PIXEL_START_INDEX) {
+                this.originalPixelMatrix.red.push(originalImageData[i]);
+                this.originalPixelMatrix.green.push(originalImageData[i + 1]);
+                this.originalPixelMatrix.blue.push(originalImageData[i + 2]);
+                this.originalPixelMatrix.alpha.push(originalImageData[i + 3]);
+                this.modifiedPixelMatrix.red.push(modifiedImageData[i]);
+                this.modifiedPixelMatrix.green.push(modifiedImageData[i + 1]);
+                this.modifiedPixelMatrix.blue.push(modifiedImageData[i + 2]);
+                this.modifiedPixelMatrix.alpha.push(modifiedImageData[i + 3]);
+            }
+            this.pixelNumberByImage = this.originalPixelMatrix.red.length;
+        } else {
+            this.resetImageData();
         }
-        this.pixelNumberByImage = this.originalPixelMatrix.red.length;
     }
 
-    setPixelMatrix(originalCanvas: ElementRef, modifiedCanvas: ElementRef): void {
+    setPixelMatrix(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
         this.resetImageData();
-        this.setImageData(originalCanvas, modifiedCanvas);
+        this.setImageData(originalCanvasArray, modifiedCanvasArray);
         this.readData(this.originalImageData, this.modifiedImageData);
     }
 
     getDifferenceMatrix(): number[] {
-        if (this.haveSameSize()) {
-            this.differenceMatrix = [];
+        this.differenceMatrix = [];
+        if (this.haveSameSize(this.originalImageData, this.modifiedImageData)) {
+            this.readData(this.originalImageData, this.modifiedImageData);
             for (let i = 0; i < this.pixelNumberByImage; i++) {
                 if (
                     this.originalPixelMatrix.red[i] === this.modifiedPixelMatrix.red[i] &&
@@ -91,11 +90,11 @@ export class ImageDiffService {
             return this.differenceMatrix;
         }
     }
+
     setDifferenceDataToDraw(): void {
         this.getDifferenceMatrix();
-        if (!this.hasBeenChanged) {
+        if (!this.hasBeenChanged && this.differenceMatrix.length !== 0) {
             this.drawingDifferenceArray = new Uint8ClampedArray(this.differenceMatrix);
-            console.log(this.drawingDifferenceArray);
         }
         this.hasBeenChanged = !this.hasBeenChanged;
     }

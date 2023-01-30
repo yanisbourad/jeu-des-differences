@@ -11,6 +11,9 @@ describe('ImageDiffService', () => {
     let testArrayData: number[];
     let arrayData: number[];
 
+    let originalCanvasArray: Uint8ClampedArray;
+    let modifiedCanvasArray: Uint8ClampedArray;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [ImageDiffService],
@@ -20,6 +23,8 @@ describe('ImageDiffService', () => {
         modifiedArrayData = [9, 8, 7, 6, 5, 4, 3, 2];
         testArrayData = [1, 2, 2, 4, 6, 7, 8, 5];
         arrayData = [1, 3, 5, 6, 8, 0, 1, 6];
+        originalCanvasArray = new Uint8ClampedArray([1, 2, 3, 4, 5, 6, 7, 8]);
+        modifiedCanvasArray = new Uint8ClampedArray([9, 8, 7, 6, 5, 4, 3, 2]);
     });
 
     it('should be created', () => {
@@ -122,5 +127,23 @@ describe('ImageDiffService', () => {
         service.setDifferenceDataToDraw();
         expect(service.drawingDifferenceArray.length).toBe(8);
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should generate pixel Image Matrices from Uint8ClampedArray image data', () => {
+        // set image data on mock canvas elements
+        const spyA = spyOn(service, 'setImageData').and.callThrough();
+        const spyB = spyOn(service, 'readData').and.callThrough();
+        const spyC = spyOn(service, 'resetImageData').and.callThrough();
+        service.setPixelMatrix(originalCanvasArray, modifiedCanvasArray);
+        expect(spyA).toHaveBeenCalled();
+        expect(spyB).toHaveBeenCalled();
+        expect(spyC).toHaveBeenCalled();
+    });
+
+    it('should generate a original and modified Arrays to calculate differences', () => {
+        // set image data on mock canvas elements
+        service.setImageData(originalCanvasArray, modifiedCanvasArray);
+        expect(service.originalImageData.length).toBe(8);
+        expect(service.modifiedImageData.length).toBe(8);
     });
 });

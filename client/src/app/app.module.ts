@@ -16,6 +16,7 @@ import { PreviousNextComponent } from './components/previous-next/previous-next.
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { NamePopupComponent } from './components/name-popup/name-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -35,6 +36,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
         PreviousNextComponent,
         GameCardComponent,
         CardDisplayerComponent,
+        NamePopupComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatGridListModule],
     providers: [],

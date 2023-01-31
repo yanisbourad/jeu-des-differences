@@ -6,9 +6,7 @@ import { Injectable } from '@angular/core';
 export class TimeService {
     count: number = 0;
     countDown: number = 30; // from database or something else. The time must be transformed to second before being processed
-    time: any;
-
-    constructor() {}
+    time: unknown;
 
     startTimer(): void {
         this.time = setInterval(() => {
@@ -32,6 +30,6 @@ export class TimeService {
     }
 
     stopTimer(): void {
-        clearInterval(this.time);
+        clearInterval(this.time as number);
     }
 }

@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import { BfsInput } from '@app/interfaces/bfs-input';
 import { PixelMatrix } from '@app/interfaces/pixel-matrix';
 import { Point } from '@app/interfaces/point';
+
 @Injectable({
     providedIn: 'root',
 })
 export class ImageDiffService {
-    private imageMatrixSize: number = 0;
     // rgba array of data
     originalImageData: number[];
     modifiedImageData: number[];
@@ -24,6 +23,8 @@ export class ImageDiffService {
     pixelNumberByImage: number = 0;
     mapDistPoint: Map<number, number> = new Map();
     listBfsInput: BfsInput[] = [];
+    private imageMatrixSize: number = 0;
+
     constructor() {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
@@ -117,7 +118,7 @@ export class ImageDiffService {
         }
         this.hasBeenChanged = !this.hasBeenChanged;
     }
-    defineDifferences(): void {
+    defineDifferences(): number[][] {
         // listDifferences is the list of independent differences
         const listDifferences: number[][] = [];
         while (this.setDiffPixels.size > 0) {
@@ -136,11 +137,10 @@ export class ImageDiffService {
             // after all the recursive calls has ended add the current diff to the diff list
             listDifferences.push(this.differenceMatrix);
         }
-        this.differenceMatrix = [];
-        console.log(listDifferences);
-        console.log(listDifferences.length);
+
         // clearing the service is needed to be able to read the next images
         this.clearService();
+        return listDifferences;
     }
 
     bfs(point: Point, distance: number, radius: number): void {

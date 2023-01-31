@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="header"><app-header></app-header></div>
+  <div class="infos"> <!-- sera probablement un component-->
+    <div class="left">
+      <p class="title">Mont Saint-Hilaire</p>
+      <p class="sub-title game-infos">Partie Classique en mode solo</p>
+      <p class="sub-title">Différences trouvées</p>
+      <div class="difficulty">
+        <img *ngFor="let src of differences" class="differences-trouvees-img" src={{src}} alt="Indices restants"/>
+      </div>
+      <!-- <div>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+        <img class="differences-trouvees-img" alt="Différences trouvées"/>
+      </div> logique pour différences ici -->
+    </div>
+    <div class="middle">
+      <div class="difficulty">
+        <div>
+          <img class="difficulty-bar-img" alt="Bar"/>
+        </div>
+        <div>
+          <img class="difficulty-bar-indicator-img" alt="Bar"/>
+        </div>
+        <p>Difficulté</p>
+      </div>
+      <app-timer [isClassicMode]= true ></app-timer>
+    </div>
+    <div class="right">
+      <p class="sub-title">Indices restants</p>
+      <div>
+        <img class="indices-restants-img" alt="Indices restants"/>
+        <img class="indices-restants-img" alt="Indices restants"/>
+        <img class="indices-restants-img" alt="Indices restants"/>
+      </div> <!-- logique pour indices ici-->
+      <p class="sub-title">pénalité : 5s / indice</p>
+      <div><button mat-raised-button class="btn">Obtenir un indice </button></div>
+    </div>
+  </div> <!-- fin infos-->
+  <div class="mainView">
+    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+  </div>
+  <div class="footer"> <button mat-raised-button class="giveUp btn" (click)="giveUp()"> Abandonner la partie </button></div>
+  <div class="message"><app-message-area></app-message-area></div>
+  <button class="btn" (click)="clicked()"> Différence trouvée</button>
+  <button class="btn">{{differencesFound}}</button>
+</div>

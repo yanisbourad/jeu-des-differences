@@ -2,10 +2,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
+    { path: 'game', component: GamePageComponent },
     // Here we can add the routes for the other pages //
 
     { path: 'game/create', component: GameCreationPageComponent },

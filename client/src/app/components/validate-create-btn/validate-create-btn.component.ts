@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CanvasHolderService } from '@app/services/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff.service';
 
 @Component({
     selector: 'app-validate-create-btn',
@@ -11,11 +13,21 @@ export class ValidateCreateBtnComponent implements OnInit {
     // eslint-disable-next-line @angular-eslint/no-output-on-prefix
     @Output() onBtnClick = new EventEmitter();
 
-    constructor() {}
+    constructor(private readonly canvasHolder: CanvasHolderService, private readonly imageDifferenceService: ImageDiffService) {}
 
     ngOnInit(): void {}
 
     onClick() {
+        const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
+        const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
+        if (originalData && modifiedData) {
+            this.imageDifferenceService.setPixelMatrix(originalData, modifiedData);
+            this.imageDifferenceService.getDifferenceMatrix();
+            this.imageDifferenceService.setDifferenceDataToDraw();
+            this.imageDifferenceService.defineDifferences();
+        } else {
+            alert('Error: No image loaded!');
+        }
         this.onBtnClick.emit();
     }
 }

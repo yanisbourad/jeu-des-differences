@@ -118,6 +118,7 @@ export class ImageDiffService {
         this.hasBeenChanged = !this.hasBeenChanged;
     }
     defineDifferences(): void {
+        // listDifferences is the list of independent differences
         const listDifferences: number[][] = [];
         while (this.setDiffPixels.size > 0) {
             this.mapDistPoint = new Map();
@@ -135,8 +136,8 @@ export class ImageDiffService {
         this.differenceMatrix = [];
         console.log(listDifferences);
         console.log(listDifferences.length);
+        // clearing the service is needed to be able to read the next images
         this.clearService();
-        // this.drawingDifferenceArray;
     }
 
     bfs(point: Point, distance: number, radius: number): void {

@@ -1,4 +1,4 @@
-<h3>Personnalisation</h3>
+<h3>Customize</h3>
 <div class="drawing-tool-bar">
     <div class="tool-parial" id="line-width">
         <input type="range" (min)="(const.minLineWidth)" (max)="(const.maxLineWidth)" [(ngModel)]="lineWidth"
@@ -14,7 +14,7 @@
 
     <!-- The validator -->
     <div class="tool-parial" id="radius-tronslation">
-        <p>Rayon d'élargissement</p>
+        <p>pencil lead radius</p>
         <select [(ngModel)]="selectedRadius" (change)="setRadius()">
             <option *ngFor="let radius of const.possibleRadius" [value]="radius">{{ radius }}</option>
         </select>

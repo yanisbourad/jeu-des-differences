@@ -55,13 +55,13 @@ export class DrawService {
         context.stroke();
     }
 
-    drawCircle(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        const radius = Math.sqrt(Math.pow(point.x - lastPoint.x, 2) + Math.pow(point.y - lastPoint.y, 2));
         context.beginPath();
-        context.arc(lastPoint.x, lastPoint.y, radius, 0, 2 * Math.PI);
-        context.fillStyle = this.color;
-        context.fill();
+        context.moveTo(lastPoint.x, lastPoint.y);
+        context.lineTo(point.x, point.y);
+        // do a circular cap on the line
+        context.lineCap = 'round';
         context.strokeStyle = this.color;
         context.lineWidth = this.lineWidth;
         context.stroke();

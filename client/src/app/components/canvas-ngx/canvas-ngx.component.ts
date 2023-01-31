@@ -85,7 +85,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         {
             const point: Point | undefined = this.getPoint(e);
             if (point !== undefined) {
-                this.drawService.drawCircle(point, this.getLastPoint(), this.canvas.nativeElement);
+                this.drawService.drawLine(point, this.getLastPoint(), this.canvas.nativeElement);
                 this.currentDrawing.points.push(point);
                 this.saveCanvas();
             }
@@ -107,25 +107,13 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     saveCanvas(): void {
         const canvas = this.canvas.nativeElement;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
         const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
         const canvasData = imageData.data;
-        const newData = [];
-
-        for (let i = 0; i < canvasData.length; i += 4) {
-            const r = canvasData[i];
-            const g = canvasData[i + 1];
-            const b = canvasData[i + 2];
-            const d = canvasData[i + 3];
-            newData.push(r, g, b, d);
-        }
-        //    newData as Uint8ClampedArray
-        const data = new Uint8ClampedArray(newData);
-        console.log(data);
-        // console.log(canvasData);
-        if (newData) this.canvasHolderService.setCanvas(data, this.type);
+        if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
     }
+
     // TODO: create a test for this method
     clearCanvas(): void {
         this.drawService.clearCanvas(this.canvas.nativeElement);

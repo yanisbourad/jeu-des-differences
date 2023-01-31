@@ -12,11 +12,11 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
 import { HeaderComponent } from './components/header/header.component';
+import { MessageAreaComponent } from './components/message-area/message-area.component';
+import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
-import { TimerComponent } from './components/timer/timer.component';
-import { MessageAreaComponent } from './components/message-area/message-area.component';
 
 /**
  * Main module that is used in main.ts.
@@ -25,17 +25,18 @@ import { MessageAreaComponent } from './components/message-area/message-area.com
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent,
+    declarations: [
+        AppComponent,
         MainPageComponent,
         PlayAreaComponent,
         HeaderComponent,
-         GameCreationPageComponent,
+        GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
         ValidateCreateBtnComponent,
         GamePageComponent,
-        TimerComponent, 
-        MessageAreaComponent
+        TimerComponent,
+        MessageAreaComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

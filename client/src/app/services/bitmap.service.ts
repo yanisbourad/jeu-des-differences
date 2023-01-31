@@ -29,9 +29,12 @@ export class BitmapService {
     }
     async validateBitmap(img: File): Promise<boolean> {
         const buffer = await img.arrayBuffer();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const header = new Uint8Array(buffer, 0, 14);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const infoHeader = new Uint8Array(buffer, 14, 40);
         const bitDepth = infoHeader[14];
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (header[0] !== 0x42 || header[1] !== 0x4d) {
             alert('Not a bitmap file');
             return false;

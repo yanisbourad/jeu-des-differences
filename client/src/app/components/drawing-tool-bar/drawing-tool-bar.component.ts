@@ -39,4 +39,7 @@ export class DrawingToolBarComponent {
             alert('Error: No image loaded!');
         }
     }
+    setRadius(): void {
+        this.imageDiff.setRadius = this.selectedRadius;
+    }
 }

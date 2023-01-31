@@ -12,6 +12,7 @@ export class ImageDiffService {
     // rgba array of data
     originalImageData: number[];
     modifiedImageData: number[];
+    radius: number;
 
     // Derived matrices red green blue alpha
     originalPixelMatrix: PixelMatrix;
@@ -27,6 +28,11 @@ export class ImageDiffService {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.setDiffPixels = new Set();
+        this.radius = constants.defaultRadius;
+    }
+
+    set setRadius(radius: number) {
+        this.radius = radius;
     }
 
     clearService(): void {
@@ -118,10 +124,11 @@ export class ImageDiffService {
             const position = [...this.setDiffPixels][0];
             const point = this.getPositionFromAbsolute(position);
             this.differenceMatrix = [];
-            this.listBfsInput.push({ x: point.x, y: point.y, distance: 0, radius: 3 });
+            this.listBfsInput.push({ point, distance: 0 });
+            const radius = this.radius;
             while (this.listBfsInput.length > 0) {
                 const bfsInput = this.listBfsInput.pop();
-                if (bfsInput) this.bfs(bfsInput.x, bfsInput.y, bfsInput.distance, bfsInput.radius);
+                if (bfsInput) this.bfs(bfsInput.point, bfsInput.distance, radius);
             }
             listDifferences.push(this.differenceMatrix);
         }
@@ -132,11 +139,11 @@ export class ImageDiffService {
         // this.drawingDifferenceArray;
     }
 
-    bfs(x: number, y: number, distance: number, radius: number): void {
-        if (x < 0 || y < 0 || x >= constants.defaultWidth || y >= constants.defaultHeight) {
+    bfs(point: Point, distance: number, radius: number): void {
+        if (point.x < 0 || point.y < 0 || point.x >= constants.defaultWidth || point.y >= constants.defaultHeight) {
             return;
         }
-        const position = this.getPositionsFromXY(x, y);
+        const position = this.getPositionsFromXY(point.x, point.y);
         if (this.drawingDifferenceArray[position] === 1) {
             if (this.setDiffPixels.has(position)) {
                 this.setDiffPixels.delete(position);
@@ -147,17 +154,18 @@ export class ImageDiffService {
             }
         } else {
             const currentDistance = this.mapDistPoint.get(position) || radius + 1;
-            if (distance++ < radius + 1 && currentDistance > distance) {
+            if (distance < radius && distance < currentDistance) {
                 this.mapDistPoint.set(position, distance);
                 this.differenceMatrix.push(position);
+                distance++;
             } else {
                 return;
             }
         }
-        this.listBfsInput.push({ x: x + 1, y, distance, radius });
-        this.listBfsInput.push({ x: x - 1, y, distance, radius });
-        this.listBfsInput.push({ x, y: y + 1, distance, radius });
-        this.listBfsInput.push({ x, y: y - 1, distance, radius });
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y }, distance });
+        this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
     }
     getPositionsFromXY(x: number, y: number): number {
         return x + y * constants.defaultWidth;

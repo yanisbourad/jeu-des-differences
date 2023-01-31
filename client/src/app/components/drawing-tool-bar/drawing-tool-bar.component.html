@@ -14,7 +14,7 @@
     <!-- The validator -->
     <div class="tool-parial" id="radius-tronslation">
         <p>Rayon d'élargissement</p>
-        <select [(ngModel)]="selectedRadius">
+        <select [(ngModel)]="selectedRadius" (change)="setRadius()">
             <option *ngFor="let radius of const.possibleRadius" [value]="radius">{{ radius }}</option>
         </select>
     </div>

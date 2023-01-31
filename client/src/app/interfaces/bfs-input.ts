@@ -1,6 +1,6 @@
+import { Point } from './point';
+
 export interface BfsInput {
-    x: number;
-    y: number;
+    point: Point;
     distance: number;
-    radius: number;
 }

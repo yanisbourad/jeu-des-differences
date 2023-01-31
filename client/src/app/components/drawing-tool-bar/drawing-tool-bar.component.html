@@ -1,7 +1,8 @@
 <h3>Personnalisation</h3>
 <div class="drawing-tool-bar">
     <div class="tool-parial" id="line-width">
-        <input type="range" (min)="(const.minLineWidth)" (max)="(const.maxLineWidth)" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
+        <input type="range" (min)="(const.minLineWidth)" (max)="(const.maxLineWidth)" [(ngModel)]="lineWidth"
+            (change)="setLineWidth()" />
         <p>{{ lineWidth }}</p>
     </div>
     <div class="tool-parial" id="line-color">
@@ -19,6 +20,7 @@
         </select>
     </div>
     <div class="tool-parial" id="validator">
-        <button (click)="validateDifferences()">Validate</button>
+        <app-validate-create-btn (onBtnClick)="drawDifferenceImage()" color="{{ tic ? 'red' : 'green' }}"
+            text="{{ tic ? 'Validate' : 'Create' }}"></app-validate-create-btn>
     </div>
 </div>

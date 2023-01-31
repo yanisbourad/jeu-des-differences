@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 @Component({
@@ -12,10 +11,12 @@ export class DrawingToolBarComponent {
     lineWidth: number = constants.defaultLineWidth;
     lineColor: string = constants.defaultLineColor;
     selectedRadius: number = constants.possibleRadius[0];
+    tic: boolean = false;
+
     constructor(
         private readonly drawingService: DrawService,
-        private readonly canvasHolder: CanvasHolderService,
-        private readonly imageDiff: ImageDiffService,
+        // private readonly canvasHolder: CanvasHolderService,
+        private readonly imageDifferenceService: ImageDiffService,
     ) {}
     get const(): typeof constants {
         return constants;
@@ -27,19 +28,16 @@ export class DrawingToolBarComponent {
     setLineColor(): void {
         this.drawingService.setColor = this.lineColor;
     }
-    validateDifferences(): void {
-        const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
-        const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
-        if (originalData && modifiedData) {
-            this.imageDiff.setPixelMatrix(originalData, modifiedData);
-            this.imageDiff.getDifferenceMatrix();
-            this.imageDiff.setDifferenceDataToDraw();
-            this.imageDiff.defineDifferences();
-        } else {
-            alert('Error: No image loaded!');
-        }
-    }
+
     setRadius(): void {
-        this.imageDiff.setRadius = this.selectedRadius;
+        this.imageDifferenceService.setRadius = this.selectedRadius;
+    }
+
+    drawDifferenceImage() {
+        // const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
+        // const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
+        console.log('come here now');
+        this.tic = !this.tic;
+        this.imageDifferenceService.resetImageData();
     }
 }

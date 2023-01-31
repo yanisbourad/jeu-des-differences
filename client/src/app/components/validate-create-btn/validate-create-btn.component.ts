@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 
@@ -7,15 +7,13 @@ import { ImageDiffService } from '@app/services/image-diff.service';
     templateUrl: './validate-create-btn.component.html',
     styleUrls: ['./validate-create-btn.component.scss'],
 })
-export class ValidateCreateBtnComponent implements OnInit {
+export class ValidateCreateBtnComponent {
     @Input() text!: string;
     @Input() color!: string;
     // eslint-disable-next-line @angular-eslint/no-output-on-prefix
     @Output() onBtnClick = new EventEmitter();
 
     constructor(private readonly canvasHolder: CanvasHolderService, private readonly imageDifferenceService: ImageDiffService) {}
-
-    ngOnInit(): void {}
 
     onClick() {
         const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);

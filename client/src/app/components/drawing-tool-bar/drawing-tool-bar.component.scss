@@ -1,15 +1,17 @@
 .drawing-tool-bar {
-    margin: auto;
-    width: 90%;
-    height: 80%;
+    display: flex;
+    margin: 0 10px 10px 10px;
+    max-width: 500px;
+    min-width: 450px;
+    flex-direction: column;
     border-radius: 20px;
-    background-color: #f5f5f5;
+    background-color: #3c40fc;
 }
 
 .tool-parial {
     margin: 2rem;
     font-size: 1.5rem;
-    width: 80%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -24,6 +26,17 @@
         font-size: 1rem;
     }
 }
+
+#radius-tronslation {
+    display: flex;
+    justify-content: center;
+    max-width: 400px;
+}
+#radius-tronslation p {
+    margin-right: 20px;
+    width: 70%;
+}
+
 #line-width input {
     height: 2rem;
     width: 60%;
@@ -35,4 +48,10 @@
     width: 80%;
     height: 2px;
     border: 2px solid red;
+}
+
+#validator {
+    display: flex;
+    justify-content: center;
+    flex: initial;
 }

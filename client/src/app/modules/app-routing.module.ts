@@ -8,7 +8,7 @@ const routes: Routes = [
     { path: 'home', component: MainPageComponent },
     // Here we can add the routes for the other pages //
 
-    { path: 'game-create', component: GameCreationPageComponent },
+    { path: 'game/create', component: GameCreationPageComponent },
 
     // this route is used to redirect to the home page if the url is not recognized //
     { path: '**', redirectTo: '/home' },

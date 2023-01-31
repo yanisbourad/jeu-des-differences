@@ -41,13 +41,12 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     // TODO: create a test for this method
     async onFileSelected(e: Event) {
-        const newImage = await this.bitmap.fileToImageBitmap(this.bitmap.getFile(e));
+        const newImage = this.bitmap.getFile(e);
         this.fileUpload.nativeElement.value = '';
-        if (this.bitmap.validateBitmap(newImage)) {
-            this.drawService.drawImage(newImage, this.canvas.nativeElement);
-        } else {
-            alert('Error: Invalid image Size!');
-        }
+        if (!(await this.bitmap.validateBitmap(newImage)).valueOf()) return;
+        const img = await this.bitmap.fileToImageBitmap(newImage);
+        if (!this.bitmap.validateSize(img)) return;
+        this.drawService.drawImage(img, this.canvas.nativeElement);
         this.saveCanvas();
     }
 
@@ -107,11 +106,25 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     saveCanvas(): void {
-        const canvasData = this.canvas.nativeElement
-            .getContext('2d')
-            ?.getImageData(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height).data;
+        const canvas = this.canvas.nativeElement;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
+        const canvasData = imageData.data;
+        const newData = [];
+
+        for (let i = 0; i < canvasData.length; i += 4) {
+            const r = canvasData[i];
+            const g = canvasData[i + 1];
+            const b = canvasData[i + 2];
+            const d = canvasData[i + 3];
+            newData.push(r, g, b, d);
+        }
+        //    newData as Uint8ClampedArray
+        const data = new Uint8ClampedArray(newData);
+        console.log(data);
         // console.log(canvasData);
-        if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
+        if (newData) this.canvasHolderService.setCanvas(data, this.type);
     }
     // TODO: create a test for this method
     clearCanvas(): void {

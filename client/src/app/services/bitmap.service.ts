@@ -27,7 +27,26 @@ export class BitmapService {
             reader.readAsDataURL(file);
         });
     }
-    validateBitmap(img: ImageBitmap): boolean {
-        return img.width === constants.defaultWidth && img.height === constants.defaultHeight;
+    async validateBitmap(img: File): Promise<boolean> {
+        const buffer = await img.arrayBuffer();
+        const header = new Uint8Array(buffer, 0, 14);
+        const infoHeader = new Uint8Array(buffer, 14, 40);
+        const bitDepth = infoHeader[14];
+        if (header[0] !== 0x42 || header[1] !== 0x4d) {
+            alert('Not a bitmap file');
+            return false;
+        }
+        if (bitDepth !== constants.desiredBitDepth) {
+            alert(`Incorrect bit depth: expected ${constants.desiredBitDepth} but got ${bitDepth}`);
+            return false;
+        }
+        return true;
+    }
+    validateSize(imageBitmap: ImageBitmap) {
+        if (imageBitmap.width !== constants.defaultWidth || imageBitmap.height !== constants.defaultHeight) {
+            alert('Image size is not correct');
+            return false;
+        }
+        return true;
     }
 }

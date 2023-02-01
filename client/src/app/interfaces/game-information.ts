@@ -3,4 +3,6 @@ export interface GameInformation {
     gameMode: 'Partie Classique en mode solo' | 'Partie Classique en mode 1 vs 1';
     nDifferences: number;
     nHints: number;
+    playerName: string;
+    isClassical:boolean
 }

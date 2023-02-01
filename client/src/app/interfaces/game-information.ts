@@ -4,5 +4,5 @@ export interface GameInformation {
     nDifferences: number;
     nHints: number;
     playerName: string;
-    isClassical:boolean
+    isClassical: boolean;
 }

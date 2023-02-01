@@ -11,7 +11,7 @@
 .body {
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: 95%;
     height: 100%;
     text-align: center;
     margin-top: 3rem;
@@ -46,25 +46,25 @@
     flex-direction: column;
     width: auto;
     height: 30%;
-    width: 70%;
     padding: 3%;
 }
 .btn {
     margin-top: 1%;
     font-size: 20px;
     padding: 10px;
-    -webkit-backdrop-filter: blur(32px) brightness(100%);
+    //-webkit-backdrop-filter: blur(32px) brightness(100%);
     align-items: center;
-    backdrop-filter: blur(32px) brightness(100%);
+    //backdrop-filter: blur(32px) brightness(100%);
     border: 2px solid;
     border-color: rgb(166, 151, 220);
-    border-radius: 32px;
+    -o-border-radius: 32px;
     -webkit-border-radius: 32px;
     -moz-border-radius: 32px;
     -ms-border-radius: 32px;
-    -o-border-radius: 32px;
-    background-color: #5b467c;
-    width: fit-content;
+    border-radius: 32px;
+    background-color: #4959c2;
+    width: 20%;
+    //width: fit-content;
 }
 
 .btn:hover {

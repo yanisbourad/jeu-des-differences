@@ -6,16 +6,16 @@ import { Injectable } from '@angular/core';
 export class TimeService {
     count: number = 0;
     countDown: number = 30; // from database or something else. The time must be transformed to second before being processed
-    time: number | any;
+    time: number | unknown;
 
     constructor() {}
 
-    addTime(time:number, classical:boolean): void {
-        (classical)? this.count += time : this.countDown += time;
+    addTime(time: number, classical: boolean): void {
+        classical ? (this.count += time) : (this.countDown += time);
     }
-     
-    decreaseTime(time:number): void {
-         this.countDown -= time;
+
+    decreaseTime(time: number): void {
+        this.countDown -= time;
     }
 
     startTimer(): void {
@@ -39,12 +39,11 @@ export class TimeService {
         return this.countDown;
     }
 
-    setCountDown(time:number): void {
+    setCountDown(time: number): void {
         this.countDown = time;
     }
 
     stopTimer(): void {
-        clearInterval(this.time);
+        clearInterval(this.time as number);
     }
-
 }

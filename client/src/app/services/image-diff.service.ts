@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import { BfsInput } from '@app/interfaces/bfs-input';
 import { PixelMatrix } from '@app/interfaces/pixel-matrix';
 import { Point } from '@app/interfaces/point';
+
 @Injectable({
     providedIn: 'root',
 })
 export class ImageDiffService {
-    private imageMatrixSize: number = 0;
     // rgba array of data
     originalImageData: number[];
     modifiedImageData: number[];
@@ -24,6 +23,8 @@ export class ImageDiffService {
     pixelNumberByImage: number = 0;
     mapDistPoint: Map<number, number> = new Map();
     listBfsInput: BfsInput[] = [];
+    private imageMatrixSize: number = 0;
+
     constructor() {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
@@ -116,16 +117,19 @@ export class ImageDiffService {
         // listDifferences is the list of independent differences
         const listDifferences: number[][] = [];
         while (this.setDiffPixels.size > 0) {
+            // represent for each key of position the last smallest distance from a real diff
             this.mapDistPoint = new Map();
+            // get fist diff position
             const position = [...this.setDiffPixels][0];
-            const point = this.getPositionFromAbsolute(position);
+            const point: Point = this.getPositionFromAbsolute(position);
+            // differenceMatrix is a Point[] representing one difference
             this.differenceMatrix = [];
             this.listBfsInput.push({ point, distance: 0 });
-            const radius = this.radius;
             while (this.listBfsInput.length > 0) {
                 const bfsInput = this.listBfsInput.pop();
-                if (bfsInput) this.bfs(bfsInput.point, bfsInput.distance, radius);
+                if (bfsInput) this.bfs(bfsInput.point, bfsInput.distance, this.radius);
             }
+            // after all the recursive calls has ended add the current diff to the diff list
             listDifferences.push(this.differenceMatrix);
         }
         this.differenceMatrix = [];
@@ -135,24 +139,40 @@ export class ImageDiffService {
 
     bfs(point: Point, distance: number, radius: number): void {
         if (point.x < 0 || point.y < 0 || point.x >= constants.defaultWidth || point.y >= constants.defaultHeight) {
+            // Point is outside of borderers
             return;
         }
         const position = this.getPositionsFromXY(point.x, point.y);
         if (this.drawingDifferenceArray[position] === 1) {
+            // if is a difference
             if (this.setDiffPixels.has(position)) {
+                // if the difference has never been visited before
                 this.setDiffPixels.delete(position);
+                // add this position to the differenceMatrix
                 this.differenceMatrix.push(position);
+                // next bfs will have a distance of 0
                 distance = 0;
             } else {
+                // already visited
                 return;
             }
         } else {
-            const currentDistance = this.mapDistPoint.get(position) || radius + 1;
-            if (distance < radius && distance < currentDistance) {
-                this.mapDistPoint.set(position, distance);
+            // if not a difference
+            let lastDistance = this.mapDistPoint.get(position);
+            // if fist time reading this point
+            if (!lastDistance) {
+                // adding it to the differenceMatrix
                 this.differenceMatrix.push(position);
+                // puts the lastDistance as unreachable
+                lastDistance = radius + 1;
+            }
+            if (distance < radius && distance < lastDistance) {
+                // if distance is the lower ever found
+                this.mapDistPoint.set(position, distance);
+                // next bfs should have a distance greater than the parent
                 distance++;
             } else {
+                // distance is greater than the max radius
                 return;
             }
         }

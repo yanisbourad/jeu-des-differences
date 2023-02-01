@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-banner',
@@ -8,29 +9,28 @@ import { Component } from '@angular/core';
 export class BannerComponent {
     width: string = '1920px';
     height: string = '1080px';
-    color: string = '';
-    text: string = 'Classique';
+    color: 'blue' | 'orange' | 'purple';
+    text: 'Classique' | 'Temps limité' | 'Configuration';
+    constructor(private router: Router) {}
 
-    changeColor() : string {
-        switch (this.text) {
-            case 'Classique': {
+    changeColor(): string {
+        switch (this.router.url) {
+            case '/classique': {
+                this.text = 'Classique';
                 this.color = 'blue';
-                return "blue";
-                break;
-                
+                return 'blue';
             }
-            case 'Temps limité': {
+            case '/Tempslimite': {
+                this.text = 'Temps limité';
                 this.color = 'orange';
-                return "orange";
-                break;
+                return 'orange';
             }
-            case 'Configuration': {
+            case '/config': {
+                this.text = 'Configuration';
                 this.color = 'purple';
-                return "purple";
-                break;
+                return 'purple';
             }
-
         }
-        return "nik";
+        return 'white';
     }
 }

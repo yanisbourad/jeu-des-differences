@@ -30,7 +30,10 @@
                 </tr>
             </table>
         </div>
-        <button class="playingButtons" id="playButton" (click)="openDialog()">Jouer</button>
-        <button class="playingButtons" id="joinButton">Joindre</button>   
+        <button *ngIf = "changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()"> Jouer </button>
+        <button *ngIf = "changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>   
+
+        <button *ngIf = "changeButton() === 'Configuration'" class="playingButtons" id="playButton" (click)="openDialog()">Supprimer</button>
+        <button *ngIf = "changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>   
     </div>
 </div>

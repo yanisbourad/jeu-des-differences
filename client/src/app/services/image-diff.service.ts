@@ -17,19 +17,26 @@ export class ImageDiffService {
     originalPixelMatrix: PixelMatrix;
     modifiedPixelMatrix: PixelMatrix;
     drawingDifferenceArray: Uint8ClampedArray;
-    hasBeenChanged: boolean = false;
+    hasBeenChanged: boolean;
     setDiffPixels: Set<number>;
-    differenceMatrix: number[] = [];
-    pixelNumberByImage: number = 0;
-    mapDistPoint: Map<number, number> = new Map();
+    differencePixelArray: number[];
+    differenceMatrix: number[];
+    pixelNumberByImage: number;
+    mapDistPoint: Map<number, number>;
     listBfsInput: BfsInput[] = [];
-    private imageMatrixSize: number = 0;
+    private imageMatrixSize: number;
 
     constructor() {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.setDiffPixels = new Set();
         this.radius = constants.defaultRadius;
+        this.differencePixelArray = [];
+        this.differenceMatrix = [];
+        this.pixelNumberByImage = 0;
+        this.hasBeenChanged = false;
+        this.mapDistPoint = new Map();
+        this.imageMatrixSize = 0;
     }
 
     set setRadius(radius: number) {
@@ -40,6 +47,7 @@ export class ImageDiffService {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.differenceMatrix = [];
+        this.differencePixelArray = [];
         this.drawingDifferenceArray = new Uint8ClampedArray([]);
         this.setDiffPixels = new Set();
         this.hasBeenChanged = false;
@@ -50,26 +58,31 @@ export class ImageDiffService {
     }
 
     setImageData(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
-        this.originalImageData = Array.prototype.slice.call(originalCanvasArray);
-        this.modifiedImageData = Array.prototype.slice.call(modifiedCanvasArray);
+        if (originalCanvasArray.length === modifiedCanvasArray.length) {
+            this.originalImageData = Array.prototype.slice.call(originalCanvasArray);
+            this.modifiedImageData = Array.prototype.slice.call(modifiedCanvasArray);
+        } else {
+            this.originalImageData = [];
+            this.modifiedImageData = [];
+        }
     }
 
-    haveSameSize(originalImageData: number[], modifiedImageData: number[]): boolean {
-        return originalImageData.length === modifiedImageData.length;
+    areEmpty(): boolean {
+        return this.originalImageData.length === 0 && this.modifiedImageData.length === 0;
     }
 
-    readData(originalImageData: number[], modifiedImageData: number[]): void {
-        if (this.haveSameSize(originalImageData, modifiedImageData)) {
-            this.imageMatrixSize = originalImageData.length;
+    readData(): void {
+        if (!this.areEmpty()) {
+            this.imageMatrixSize = this.originalImageData.length;
             for (let i = 0; i < this.imageMatrixSize; i = i + constants.nextPixelStartIndex) {
-                this.originalPixelMatrix.red.push(originalImageData[i]);
-                this.originalPixelMatrix.green.push(originalImageData[i + 1]);
-                this.originalPixelMatrix.blue.push(originalImageData[i + 2]);
-                this.originalPixelMatrix.alpha.push(originalImageData[i + 3]);
-                this.modifiedPixelMatrix.red.push(modifiedImageData[i]);
-                this.modifiedPixelMatrix.green.push(modifiedImageData[i + 1]);
-                this.modifiedPixelMatrix.blue.push(modifiedImageData[i + 2]);
-                this.modifiedPixelMatrix.alpha.push(modifiedImageData[i + 3]);
+                this.originalPixelMatrix.red.push(this.originalImageData[i]);
+                this.originalPixelMatrix.green.push(this.originalImageData[i + 1]);
+                this.originalPixelMatrix.blue.push(this.originalImageData[i + 2]);
+                this.originalPixelMatrix.alpha.push(this.originalImageData[i + 3]);
+                this.modifiedPixelMatrix.red.push(this.modifiedImageData[i]);
+                this.modifiedPixelMatrix.green.push(this.modifiedImageData[i + 1]);
+                this.modifiedPixelMatrix.blue.push(this.modifiedImageData[i + 2]);
+                this.modifiedPixelMatrix.alpha.push(this.modifiedImageData[i + 3]);
             }
             this.pixelNumberByImage = this.originalPixelMatrix.red.length;
         } else {
@@ -80,12 +93,13 @@ export class ImageDiffService {
     setPixelMatrix(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
         this.resetImageData();
         this.setImageData(originalCanvasArray, modifiedCanvasArray);
-        this.readData(this.originalImageData, this.modifiedImageData);
+        this.readData();
     }
 
-    getDifferenceMatrix(): number[] {
+    getDifferenceMatrix(): void {
         this.differenceMatrix = [];
-        if (this.haveSameSize(this.originalImageData, this.modifiedImageData)) {
+        this.differencePixelArray = [];
+        if (!this.areEmpty()) {
             for (let i = 0; i < this.pixelNumberByImage; i++) {
                 if (
                     this.originalPixelMatrix.red[i] === this.modifiedPixelMatrix.red[i] &&
@@ -94,21 +108,20 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
+                    this.differencePixelArray.push(0, 0, 0, 0);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);
+                    this.differencePixelArray.push(1, 1, 1, 1);
                 }
             }
-            return this.differenceMatrix;
-        } else {
-            return this.differenceMatrix;
         }
     }
 
     setDifferenceDataToDraw(): void {
         this.getDifferenceMatrix();
-        if (!this.hasBeenChanged && this.differenceMatrix.length !== 0) {
-            this.drawingDifferenceArray = new Uint8ClampedArray(this.differenceMatrix);
+        if (!this.hasBeenChanged && this.differencePixelArray.length !== 0) {
+            this.drawingDifferenceArray = new Uint8ClampedArray(this.differencePixelArray);
         }
         this.hasBeenChanged = !this.hasBeenChanged;
     }
@@ -184,8 +197,6 @@ export class ImageDiffService {
 
     getPositionsFromXY(x: number, y: number): number {
         return x + y * constants.defaultWidth;
-        // position = this.getPositionsFromXY(3, 4);
-        // drawingDifferenceArray[position];
     }
 
     getPositionFromAbsolute(x: number): Point {

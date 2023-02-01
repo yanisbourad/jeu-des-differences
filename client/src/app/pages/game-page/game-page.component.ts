@@ -1,80 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { GameInformation } from '@app/interfaces/game-information';
-import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { TimeService } from '@app/services/time.service';
-
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MouseButton } from '@app/components/play-area/play-area.component';
+import { Vec2 } from '@app/interfaces/vec2';
+import { DrawService } from '@app/services/draw.service';
+import { GameService } from '@app/services/game.service';
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit {
+    @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
+
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
-    time:Date;
-    path: ImagePath = {
-        differenceNotFound: '../../../assets/img/difference-not-found.png',
-        differenceFound: '../../../assets/img/difference-found.png',
-        hintUnused: '../../../assets/img/hint-unused.png',
-        hintUsed: '../../../assets/img/hint-used.png',
-    };
-
-    gameInformation: GameInformation = {
-        gameTitle: 'Game Title',
-        gameMode: 'Partie Classique en mode solo',
-        nDifferences: 8,
-        nHints: 3,
-        playerName: 'Oscar',
-        isClassical: true,
-    };
-
-    nDifferencesNotFound: number = this.gameInformation.nDifferences;
-    nDifferencesFound: number = 0;
-    differencesArray: string[] = new Array(this.nDifferencesNotFound);
-    isGameFinished: boolean = false;
-
-    nHintsUnused: number = this.gameInformation.nHints;
-    nHintsUsed: number = 0;
-    hintsArray: string[] = new Array(this.nHintsUnused);
-
-    // in infos component change display depending of the game mode (solo, multijoueur, temps limite)
-    constructor(private readonly timeService: TimeService) {
-        this.displayIcons();
-    }
+    mousePosition: Vec2 = { x: 0, y: 0 };
+    constructor(private readonly drawService: DrawService, public gameService: GameService) {}
 
     ngOnInit(): void {}
-
-    displayIcons(): void {
-        for (let i = 0; i < this.nDifferencesNotFound; i++) {
-            this.differencesArray[i] = this.path.differenceNotFound;
-        }
-        for (let i = 0; i < this.nHintsUnused; i++) {
-            this.hintsArray[i] = this.path.hintUnused;
+    mouseHitDetect(event: MouseEvent) {
+        if (event.button === MouseButton.Left) {
+            this.mousePosition = { x: event.offsetX, y: event.offsetY };
+            this.drawService.drawWords('trouvé', this.canvas1.nativeElement, this.mousePosition);
+            this.drawService.drawWords('trouvé', this.canvas2.nativeElement, this.mousePosition);
         }
     }
 
-    clickDifferencesFound(): void {
-        if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            this.nDifferencesFound++;
-            this.differencesArray.pop();
-            this.differencesArray.unshift(this.path.differenceFound);
-        }
-        if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            this.timeService.stopTimer();
-            this.isGameFinished = true;
-        }
-    }
-
-    clickGetHints(): void {
-        if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            if (this.nHintsUsed <= this.nHintsUnused) {
-                this.nHintsUsed++;
-                this.hintsArray.shift();
-                this.hintsArray.push(this.path.hintUsed);
-                this.timeService.addTime(5, this.gameInformation.isClassical);
-            }
-        }
-    }
     giveUp(): void {
         /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
         // if yes do

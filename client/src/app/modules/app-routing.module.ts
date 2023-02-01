@@ -6,7 +6,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    {path: 'game', component:GamePageComponent},
+    { path: 'game', component: GamePageComponent },
     // Here we can add the routes for the other pages //
 
     // this route is used to redirect to the home page if the url is not recognized //

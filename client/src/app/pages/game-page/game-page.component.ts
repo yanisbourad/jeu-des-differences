@@ -29,7 +29,8 @@ export class GamePageComponent implements OnInit {
     nDifferencesNotFound: number = this.gameInformation.nDifferences;
     nDifferencesFound: number = 0;
     differencesArray: string[] = new Array(this.nDifferencesNotFound);
-    isFound: boolean = false;
+    // isFound: boolean = false;
+    isGameFinished: boolean = false;
 
     nHintsUnused: number = this.gameInformation.nHints;
     nHintsUsed: number = 0;
@@ -59,14 +60,17 @@ export class GamePageComponent implements OnInit {
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
             this.timeService.stopTimer();
+            this.isGameFinished = true;
         }
     }
 
     clickGetHints(): void {
-        if (this.nHintsUsed <= this.nHintsUnused) {
-            this.nHintsUsed++;
-            this.hintsArray.shift();
-            this.hintsArray.push(this.path.hintUsed);
+        if (this.nDifferencesFound < this.nDifferencesNotFound) {
+            if (this.nHintsUsed <= this.nHintsUnused) {
+                this.nHintsUsed++;
+                this.hintsArray.shift();
+                this.hintsArray.push(this.path.hintUsed);
+            }
         }
     }
     giveUp(): void {

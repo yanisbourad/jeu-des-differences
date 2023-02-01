@@ -38,7 +38,8 @@
             </div> <!-- logique pour indices ici-->
             <p class="sub-title">pénalité : 5s / indice</p>
             <div>
-                <button mat-raised-button class="btn" (click)="clickGetHints()">Obtenir un indice</button>
+                <button *ngIf="!isGameFinished" mat-raised-button class="btn" (click)="clickGetHints()">Obtenir un indice</button>
+                <button *ngIf="isGameFinished" disabled mat-raised-button class="btn">Obtenir un indice</button>
             </div>
         </div>
     </div> <!-- fin infos-->

@@ -1,4 +1,6 @@
 export interface ImagePath {
-    path1: string;
-    path2: string;
+    differenceNotFound: string;
+    differenceFound: string;
+    hintUnused: string;
+    hintUsed: string;
 }

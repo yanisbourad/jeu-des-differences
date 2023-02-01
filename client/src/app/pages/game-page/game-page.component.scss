@@ -33,7 +33,9 @@
 }
 .mat-raised-button{
   border-radius: 32px;
-  border: 2px solid #7B57B8;
+  :not(:disabled) {
+    border: 2px solid #7B57B8;
+  }
 }
 .giveUp{
   display: flex;

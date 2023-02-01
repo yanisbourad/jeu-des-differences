@@ -43,7 +43,7 @@
         </div>
     </div> <!-- fin infos-->
     <div class="mainView">
-        <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+        <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="clickDifferencesFound()"></canvas>
         <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
     </div>
     <div class="footer">
@@ -52,6 +52,4 @@
     <div class="message">
         <app-message-area></app-message-area>
     </div>
-    <button class="btn" (click)="clickDifferencesFound()"> Différence trouvée</button>
-    <button class="btn">{{nDifferencesFound}}</button>
 </div>

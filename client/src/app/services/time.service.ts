@@ -32,6 +32,6 @@ export class TimeService {
     }
 
     stopTimer(): void {
-        clearInterval(this.time);
+        clearInterval(this.time as number);
     }
 }

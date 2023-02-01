@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ImagePath } from '@app/interfaces/image-diff-path';
 import { TimeService } from '@app/services/time.service';
 
@@ -7,7 +7,9 @@ import { TimeService } from '@app/services/time.service';
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit {
+export class GamePageComponent {
+    // TODO: Remove the magic numbers and replace them with constants
+    //  Pleas look at configuration directory
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
     path: ImagePath = {
@@ -26,8 +28,6 @@ export class GamePageComponent implements OnInit {
     constructor(private readonly timeService: TimeService) {
         this.generateImage();
     }
-
-    ngOnInit(): void {}
 
     generateImage(): void {
         // generate image

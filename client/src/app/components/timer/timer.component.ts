@@ -10,6 +10,8 @@ export class TimerComponent implements OnInit {
     @Input() isClassicMode: boolean = false; // can be classique or temps limite
     time: Time;
 
+    // TODO: Remove the magic numbers and replace them with constants
+
     constructor(private readonly timeService: TimeService) {
         this.time = { minute: 0, second: 0 };
     }

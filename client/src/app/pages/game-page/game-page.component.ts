@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ImagePath } from '@app/interfaces/image-diff-path';
 import { TimeService } from '@app/services/time.service';
-
+import * as constants from '@app/configuration/const-canvas';
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
@@ -10,13 +10,13 @@ import { TimeService } from '@app/services/time.service';
 export class GamePageComponent {
     // TODO: Remove the magic numbers and replace them with constants
     //  Pleas look at configuration directory
-    readonly DEFAULT_WIDTH = 640;
-    readonly DEFAULT_HEIGHT = 480;
+    readonly defaultWidth = constants.defaultWidth;
+    readonly defaultHeight = constants.defaultHeight;
     path: ImagePath = {
         path1: '../../../assets/img/differenceEye.png',
         path2: '../../../assets/img/eyeFound.png',
     };
-
+    // magic numbers will be changed to server values once implemented
     gameName: string;
     gameInfos: string;
     nbrdifferences: number = 8;

@@ -8,15 +8,6 @@
       <div class="difficulty">
         <img *ngFor="let src of differences" class="differences-trouvees-img" src={{src}} alt="Indices restants"/>
       </div>
-      <!-- <div>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-      </div> logique pour différences ici -->
     </div>
     <div class="middle">
       <div class="difficulty">
@@ -42,8 +33,8 @@
     </div>
   </div> <!-- fin infos-->
   <div class="mainView">
-    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
-    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+    <canvas #Canvas [attr.width]="defaultWidth" [attr.height]="defaultHeight"></canvas>
+    <canvas #Canvas [attr.width]="defaultWidth" [attr.height]="defaultHeight"></canvas>
   </div>
   <div class="footer"> <button mat-raised-button class="giveUp btn" (click)="giveUp()"> Abandonner la partie </button></div>
   <div class="message"><app-message-area></app-message-area></div>

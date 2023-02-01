@@ -15,11 +15,11 @@ export class GameService {
     };
 
     gameInformation: GameInformation = {
-        gameTitle: 'Game Title',
+        gameTitle: 'Titre du jeu',
         gameMode: 'Partie Classique en mode solo',
         nDifferences: 8,
         nHints: 3,
-        playerName: 'Oscar',
+        hintsPenalty: 5,
         isClassical: true,
     };
 
@@ -40,7 +40,7 @@ export class GameService {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
-                this.timeService.addTime(5, this.gameInformation.isClassical);
+                this.timeService.addTime(this.gameInformation.hintsPenalty, this.gameInformation.isClassical);
             }
         }
     }

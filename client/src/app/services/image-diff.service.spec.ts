@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
-import { Point } from '../interfaces/point';
 import { ImageDiffService } from './image-diff.service';
 
 describe('ImageDiffService', () => {
@@ -17,8 +16,6 @@ describe('ImageDiffService', () => {
 
     let radiusValue: number;
 
-    let point: Point;
-
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [ImageDiffService],
@@ -30,7 +27,6 @@ describe('ImageDiffService', () => {
         arrayData = [1, 3, 5, 6, 8, 0, 1, 6];
         originalCanvasArray = new Uint8ClampedArray([1, 2, 3, 4, 5, 6, 7, 8]);
         modifiedCanvasArray = new Uint8ClampedArray([9, 8, 7, 6, 5, 4, 3, 2]);
-        point = { x: 0, y: 0 };
     });
 
     it('should be created', () => {
@@ -92,6 +88,7 @@ describe('ImageDiffService', () => {
         expect(service.modifiedPixelMatrix.alpha[0]).toBe(6);
         expect(service.modifiedPixelMatrix.alpha[1]).toBe(2);
     });
+
     it('should not set pixel arrays and should call resetImageData', () => {
         // set image data on mock canvas elements
         service.originalImageData = [];
@@ -174,15 +171,12 @@ describe('ImageDiffService', () => {
     });
 
     it('should return the position combining X and Y coordinates', () => {
-        point.x = 1;
-        point.y = 2;
-        const res = service.getPositionsFromXY(point.x, point.y);
+        const res = service.getPositionsFromXY(1, 2);
         expect(res).toBe(1281);
     });
 
     it('should return the absolute position', () => {
-        point.x = 1;
-        const res = service.getPositionFromAbsolute(point.x);
+        const res = service.getPositionFromAbsolute(1);
         expect(res.x).toBe(1 - 640 * Math.floor(1 / 640));
         expect(res.y).toBe(Math.floor(1 / 640));
     });

@@ -23,6 +23,7 @@ export class ValidateCreateBtnComponent {
             this.imageDifferenceService.getDifferenceMatrix();
             this.imageDifferenceService.setDifferenceDataToDraw();
             this.imageDifferenceService.defineDifferences();
+            alert(`Differences detected from original image : ${this.imageDifferenceService.getDifferenceNumber()}`);
         } else {
             alert('Error: No image loaded!');
         }

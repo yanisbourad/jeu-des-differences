@@ -24,6 +24,7 @@ export class ImageDiffService {
     pixelNumberByImage: number;
     mapDistPoint: Map<number, number>;
     listBfsInput: BfsInput[] = [];
+    differenceNumber;
     private imageMatrixSize: number;
 
     constructor() {
@@ -37,6 +38,7 @@ export class ImageDiffService {
         this.hasBeenChanged = false;
         this.mapDistPoint = new Map();
         this.imageMatrixSize = 0;
+        this.differenceNumber = 0;
     }
 
     set setRadius(radius: number) {
@@ -203,5 +205,9 @@ export class ImageDiffService {
         const y = Math.floor(x / constants.defaultWidth);
         const xPosition = x - y * constants.defaultWidth;
         return { x: xPosition, y };
+    }
+
+    getDifferenceNumber() {
+        return this.differenceNumber;
     }
 }

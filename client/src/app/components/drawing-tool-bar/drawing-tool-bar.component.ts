@@ -36,7 +36,9 @@ export class DrawingToolBarComponent {
     drawDifferenceImage() {
         // const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
         // const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
-        this.tic = !this.tic;
-        this.imageDifferenceService.resetImageData();
+        if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
+            this.tic = !this.tic;
+            this.imageDifferenceService.resetImageData();
+        }
     }
 }

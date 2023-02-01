@@ -20,6 +20,7 @@ export class GamePageComponent implements OnInit {
     ngOnInit(): void {}
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
+            this.gameService.playSuccessAudio();
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             this.drawService.drawWords('trouvé', this.canvas1.nativeElement, this.mousePosition);
             this.drawService.drawWords('trouvé', this.canvas2.nativeElement, this.mousePosition);

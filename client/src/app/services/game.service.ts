@@ -65,4 +65,19 @@ export class GameService {
             this.isGameFinished = true;
         }
     }
+
+    playSuccessAudio(): void {
+        const audio = new Audio();
+        audio.src = '../../assets/sounds/yay-6120.mp3';
+        audio.load();
+        audio.play();
+    }
+
+    playFailureAudio(): void {
+        const audio = new Audio();
+        audio.src = '../../assets/sounds/wronganswer-37702.mp3';
+        audio.load();
+        audio.play();
+    }
+
 }

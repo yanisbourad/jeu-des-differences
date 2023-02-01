@@ -10,6 +10,14 @@ export class TimeService {
 
     constructor() {}
 
+    addTime(time:number, classical:boolean): void {
+        (classical)? this.count += time : this.countDown += time;
+    }
+     
+    decreaseTime(time:number): void {
+         this.countDown -= time;
+    }
+
     startTimer(): void {
         this.time = setInterval(() => {
             this.count++;
@@ -31,7 +39,12 @@ export class TimeService {
         return this.countDown;
     }
 
+    setCountDown(time:number): void {
+        this.countDown = time;
+    }
+
     stopTimer(): void {
         clearInterval(this.time);
     }
+
 }

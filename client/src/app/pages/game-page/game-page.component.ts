@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameInformation } from '@app/interfaces/game-information';
-import { ImagePath } from '@app/interfaces/image-diff-path';
+import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { TimeService } from '@app/services/time.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { TimeService } from '@app/services/time.service';
 export class GamePageComponent implements OnInit {
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
-
+    time:Date;
     path: ImagePath = {
         differenceNotFound: '../../../assets/img/difference-not-found.png',
         differenceFound: '../../../assets/img/difference-found.png',
@@ -24,12 +24,13 @@ export class GamePageComponent implements OnInit {
         gameMode: 'Partie Classique en mode solo',
         nDifferences: 8,
         nHints: 3,
+        playerName: 'Oscar',
+        isClassical: true,
     };
 
     nDifferencesNotFound: number = this.gameInformation.nDifferences;
     nDifferencesFound: number = 0;
     differencesArray: string[] = new Array(this.nDifferencesNotFound);
-    // isFound: boolean = false;
     isGameFinished: boolean = false;
 
     nHintsUnused: number = this.gameInformation.nHints;
@@ -70,6 +71,7 @@ export class GamePageComponent implements OnInit {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
+                this.timeService.addTime(5, this.gameInformation.isClassical);
             }
         }
     }

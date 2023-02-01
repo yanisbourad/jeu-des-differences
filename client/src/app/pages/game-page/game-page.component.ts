@@ -14,16 +14,30 @@ export class GamePageComponent implements OnInit {
 
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
+    readonly ONE_QUARTER = 1 / 4;
+    readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
     constructor(private readonly drawService: DrawService, public gameService: GameService) {}
 
     ngOnInit(): void {}
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
-            this.gameService.playSuccessAudio();
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            this.drawService.drawWords('trouvé', this.canvas1.nativeElement, this.mousePosition);
-            this.drawService.drawWords('trouvé', this.canvas2.nativeElement, this.mousePosition);
+            // Testing mouse click arbitrary interval
+            if (
+                this.mousePosition.y <= this.DEFAULT_HEIGHT * (1 - this.ONE_QUARTER) &&
+                this.mousePosition.y >= this.DEFAULT_HEIGHT * this.ONE_QUARTER &&
+                this.mousePosition.x <= this.DEFAULT_WIDTH * (1 - this.ONE_SIXTH) &&
+                this.mousePosition.x >= this.DEFAULT_WIDTH * this.ONE_SIXTH
+            ) {
+                this.gameService.playSuccessAudio();
+                this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
+                this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
+            } else {
+                this.gameService.playFailureAudio();
+                this.drawService.drawWords('Erreur', this.canvas1.nativeElement, this.mousePosition);
+                this.drawService.drawWords('Erreur', this.canvas2.nativeElement, this.mousePosition);
+            }
         }
     }
 

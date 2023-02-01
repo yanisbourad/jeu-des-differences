@@ -1,16 +1,12 @@
 import { Injectable } from '@angular/core';
+import * as constants from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
-
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 640;
-export const DEFAULT_HEIGHT = 480;
 
 @Injectable({
     providedIn: 'root',
 })
 export class DrawService {
-    context: CanvasRenderingContext2D;
-    private canvasSize: Point = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Point = { x: constants.defaultWidth, y: constants.defaultHeight };
     private color: string = 'black';
     private lineWidth: number = 3;
 
@@ -22,33 +18,69 @@ export class DrawService {
         return this.canvasSize.y;
     }
 
-    setColor(color: string) {
+    get getColor(): string {
+        return this.color;
+    }
+
+    get getLineWidth(): number {
+        return this.lineWidth;
+    }
+
+    set setColor(color: string) {
         this.color = color;
     }
 
-    setLineWidth(width: number) {
+    set setLineWidth(width: number) {
         this.lineWidth = width;
     }
 
-    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement) {
-        this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.context.drawImage(image, 0, 0, this.width, this.height);
+    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.drawImage(image, 0, 0, this.width, this.height);
     }
 
-    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement) {
-        this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.context.beginPath();
-        this.context.moveTo(lastPoint.x, lastPoint.y);
-        this.context.lineTo(point.x, point.y);
-        this.context.strokeStyle = this.color;
-        this.context.lineWidth = this.lineWidth;
-        this.context.stroke();
+    drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        const imageData = new ImageData(data, this.width, this.height);
+        context.putImageData(imageData, 0, 0);
+    }
+
+    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.beginPath();
+        context.moveTo(lastPoint.x, lastPoint.y);
+        context.lineTo(point.x, point.y);
+        context.strokeStyle = this.color;
+        context.lineWidth = this.lineWidth;
+        context.stroke();
+    }
+
+    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.beginPath();
+        context.moveTo(lastPoint.x, lastPoint.y);
+        context.lineTo(point.x, point.y);
+        // do a circular cap on the line
+        context.lineCap = 'round';
+        context.strokeStyle = this.color;
+        context.lineWidth = this.lineWidth;
+        context.stroke();
     }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
-    // drowCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
+    // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
     // drawTriangle(canvas: HTMLCanvasElement) {}
 
-    // clear(canvas: HTMLCanvasElement) {}
+    clearCanvas(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        context.clearRect(0, 0, this.width, this.height);
+    }
+    validateDrawing(selectedRadius: number) {
+        // TODO: check if the drawing is valid
+        return selectedRadius ? true : false;
+    }
+    getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+        return canvas.getContext('2d') as CanvasRenderingContext2D;
+    }
 }

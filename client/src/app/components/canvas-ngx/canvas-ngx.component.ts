@@ -1,70 +1,60 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import * as constants from '@app/configuration/const-canvas';
 import { Drawing } from '@app/interfaces/drawing';
 import { Point } from '@app/interfaces/point';
 import { BitmapService } from '@app/services/bitmap.service';
+import { CanvasHolderService } from '@app/services/canvas-holder.service';
 import { DrawService } from '@app/services/draw.service';
-
 @Component({
     selector: 'app-canvas-ngx',
     templateUrl: './canvas-ngx.component.html',
     styleUrls: ['./canvas-ngx.component.scss'],
 })
 export class CanvasNgxComponent implements AfterViewInit {
-    @ViewChild('Canvas1', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
-    @ViewChild('Canvas2', { static: false }) private canvas2!: ElementRef<HTMLCanvasElement>; // added by renel
-
+    @Input() type!: string;
+    @ViewChild('Canvas', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
     listDraw: Drawing[] = [];
-    originalImage: ImageBitmap;
-    modifiedImage: ImageBitmap; // added by renel
-
     isDrawing = false;
     currentDrawing: Drawing = { points: [] };
 
-    // TODO : Avoir un fichier séparé pour les constantes!
-    readonly DEFAULT_WIDTH = 640;
-    readonly DEFAULT_HEIGHT = 480;
+    constructor(
+        private readonly drawService: DrawService,
+        private readonly bitmap: BitmapService,
+        private readonly canvasHolderService: CanvasHolderService,
+    ) {}
 
-    constructor(private readonly drawService: DrawService, private readonly bitmap: BitmapService) {}
-
+    // needed for the canvas size
+    get width(): number {
+        return constants.defaultWidth;
+    }
+    get height(): number {
+        return constants.defaultHeight;
+    }
     ngAfterViewInit(): void {
         this.canvas.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
-        this.canvas2.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
-            this.mouseHitDetection(e);
-        });
+        // push the canvas pointer to the difference Service
+        this.saveCanvas();
     }
 
-    onFileSelected(e: Event): void {
-        this.bitmap
-            .fileToImageBitmap(this.bitmap.getFile(e))
-            .then((img: ImageBitmap) => {
-                this.originalImage = img;
-                this.drawService.drawImage(img, this.canvas.nativeElement);
-            })
-            .catch((err) => {
-                alert(err);
-            });
-    }
-
-    onFileSelected2(e: Event): void {
-        // duplicata added for modified
-        this.bitmap
-            .fileToImageBitmap(this.bitmap.getFile(e))
-            .then((img: ImageBitmap) => {
-                this.modifiedImage = img;
-                this.drawService.drawImage(img, this.canvas2.nativeElement);
-            })
-            .catch((err) => {
-                alert(err);
-            });
+    // TODO: create a test for this method
+    async onFileSelected(e: Event) {
+        const newImage = this.bitmap.getFile(e);
+        this.fileUpload.nativeElement.value = '';
+        if (!(await this.bitmap.validateBitmap(newImage)).valueOf()) return;
+        const img = await this.bitmap.fileToImageBitmap(newImage);
+        if (!this.bitmap.validateSize(img)) return;
+        this.drawService.drawImage(img, this.canvas.nativeElement);
+        this.saveCanvas();
     }
 
     getPoint(e: MouseEvent): Point | undefined {
-        const it = this.canvas.nativeElement.getBoundingClientRect();
-        const x: number = e.clientX - it.left;
-        const y: number = e.clientY - it.top;
-        if (x < 0 || x > it.right || y < 0 || y > it.bottom) {
+        const canvasBound = this.canvas.nativeElement.getBoundingClientRect();
+        const x: number = e.clientX - canvasBound.left;
+        const y: number = e.clientY - canvasBound.top;
+        if (x < 0 || x > canvasBound.right || y < 0 || y > canvasBound.bottom) {
             return undefined;
         }
         return { x, y };
@@ -77,7 +67,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     mouseHitDetection(e: MouseEvent): void {
         this.isDrawing = true;
         const point = this.getPoint(e);
-        if (point === undefined) {
+        if (!point) {
             this.isDrawing = false;
             return;
         }
@@ -91,32 +81,43 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     mouseMoveDetection(e: MouseEvent): void {
-        if (this.isDrawing) {
+        if (!this.isDrawing) return;
+        {
             const point: Point | undefined = this.getPoint(e);
-            if (point === undefined) {
-                return;
+            if (point !== undefined) {
+                this.drawService.drawLine(point, this.getLastPoint(), this.canvas.nativeElement);
+                this.currentDrawing.points.push(point);
+                this.saveCanvas();
             }
-            this.drawService.drawVec(point, this.getLastPoint(), this.canvas.nativeElement);
-            this.currentDrawing.points.push(point);
         }
     }
 
+    // TODO: create a test for this method
     mouseUpDetection(): void {
+        this.listDraw.push(this.currentDrawing);
+        this.currentDrawing.points = [];
+        this.isDrawing = false;
         this.canvas.nativeElement.removeEventListener('mousemove', (e) => {
             this.mouseMoveDetection(e);
         });
         this.canvas.nativeElement.removeEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
-        this.isDrawing = false;
-        this.listDraw.push(this.currentDrawing);
-        this.currentDrawing = { points: [] };
     }
 
-    // read image data from canvas
+    saveCanvas(): void {
+        const canvas = this.canvas.nativeElement;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return;
+        const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
+        const canvasData = imageData.data;
+        if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
+    }
 
-    printData() {
-        console.log(this.bitmap.generatePixelMatrices(this.canvas.nativeElement).length);
-        console.log(this.bitmap.generatePixelMatrices(this.canvas2.nativeElement));
+    // TODO: create a test for this method
+    clearCanvas(): void {
+        this.drawService.clearCanvas(this.canvas.nativeElement);
+        this.saveCanvas();
+        this.listDraw = [];
     }
 }

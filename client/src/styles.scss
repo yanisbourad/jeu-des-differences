@@ -72,12 +72,50 @@ $indigo-pink-theme: mat.define-light-theme(
 
 html,
 body {
-    height: 100%;
-}
-body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     background: linear-gradient(#765fa0, #3b2957);
     font-family: Roboto, 'Helvetica Neue', sans-serif;
+    background: #362E45;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
 }
+
+.btn {
+    margin-top: 1%;
+    font-size: 20px;
+    padding: 10px;
+    cursor: pointer;
+    border: 2px solid #7B57B8;
+    background: rgba(85, 66, 116, 0.1);
+    border-radius: 32px;
+    color: white;
+  }
+  .btn:hover{
+    background-color: #9845e7;
+  }
+
+  .title {
+    color: white;
+    text-decoration: none;
+    font-size: 40px;
+    margin-left: 10px;
+    font-weight: 700;
+    line-height: 48px;
+    margin-right: -46px;
+    width: fit-content;
+    white-space: nowrap;
+  }
+
+  .sub-title{
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    margin-left: 10px;
+    font-weight: 500;
+    width: fit-content;
+    white-space: nowrap;
+  }

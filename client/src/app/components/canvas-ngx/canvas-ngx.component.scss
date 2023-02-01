@@ -1,20 +1,36 @@
 .Canvas-ngx {
     display: flex;
     margin: 0 auto;
-    width: 1400px;
-    justify-content: space-between;
-    border: 1px solid red;
-}
-
-.canvas-wrapper {
-    display: flex;
-    justify-content: space-around;
     flex-direction: column;
-    width: 640px;
-    border: 1px solid red;
 }
 
 canvas {
+    margin: auto;
+    width: 640px;
+    height: 480px;
     background-color: white;
     border: 1px solid black;
+}
+
+.file-upload {
+    display: none;
+}
+
+.Tools-Canvas {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+    margin-top: 3%;
+    width: 70%;
+}
+
+.btn-tools-canvas {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    width: 70%;
 }

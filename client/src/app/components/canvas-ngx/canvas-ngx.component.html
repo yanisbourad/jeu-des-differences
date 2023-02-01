@@ -1,10 +1,10 @@
-<div div class="Canvas-ngx" (click)="printData()">
-    <div class="canvas-wrapper">
-        <canvas #Canvas1 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
-        <input type="file" class="file-upload" (change)="onFileSelected($event)" #fileUpload />
-    </div>
-    <div class="canvas-wrapper">
-        <canvas #Canvas2 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
-        <input type="file" class="file-upload" (change)="onFileSelected2($event)" #fileUpload />
+<div class="Canvas-ngx">
+    <canvas #Canvas [attr.width]="width" [attr.height]="height"></canvas>
+    <input type="file" class="file-upload" (change)="onFileSelected($event)" accept=".bmp" #fileUpload />
+    <div class="Tools-Canvas">
+        <img src="./assets/img/UploadBackground.png" id="UploadBtn" alt="Upload Background" class="btn-tools-Canvas"
+            (click)="fileUpload.click()" />
+        <img src="./assets/img/ClearBackground.png" id="ClearBtn" class="btn-tools-Canvas" alt="Clear Background"
+            (click)="clearCanvas()" />
     </div>
 </div>

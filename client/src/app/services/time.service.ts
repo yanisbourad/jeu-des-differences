@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class TimeService {
     count: number = 0;
     countDown: number = 30; // from database or something else. The time must be transformed to second before being processed
-    time: number | undefined;
+    time: unknown;
 
     constructor() {}
 

@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
-<<<<<<< HEAD
-=======
 import { Point } from '../interfaces/point';
->>>>>>> sprint1-demo-branch
 import { ImageDiffService } from './image-diff.service';
 
 describe('ImageDiffService', () => {

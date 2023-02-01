@@ -36,23 +36,17 @@ export class ImageDiffService {
         this.radius = radius;
     }
 
-    clearService(): void {
-        this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
-        this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
-        this.setDiffPixels = new Set();
-        this.differenceMatrix = [];
-        this.drawingDifferenceArray = new Uint8ClampedArray([]);
-        this.hasBeenChanged = false;
-        this.imageMatrixSize = 0;
-        this.pixelNumberByImage = 0;
-        this.mapDistPoint = new Map();
-        this.listBfsInput = [];
-    }
     resetImageData(): void {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.differenceMatrix = [];
         this.drawingDifferenceArray = new Uint8ClampedArray([]);
+        this.setDiffPixels = new Set();
+        this.hasBeenChanged = false;
+        this.imageMatrixSize = 0;
+        this.pixelNumberByImage = 0;
+        this.mapDistPoint = new Map();
+        this.listBfsInput = [];
     }
 
     setImageData(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
@@ -118,7 +112,8 @@ export class ImageDiffService {
         }
         this.hasBeenChanged = !this.hasBeenChanged;
     }
-    defineDifferences(): number[][] {
+
+    defineDifferences(): void {
         // listDifferences is the list of independent differences
         const listDifferences: number[][] = [];
         while (this.setDiffPixels.size > 0) {
@@ -137,10 +132,9 @@ export class ImageDiffService {
             // after all the recursive calls has ended add the current diff to the diff list
             listDifferences.push(this.differenceMatrix);
         }
-
+        this.differenceMatrix = [];
         // clearing the service is needed to be able to read the next images
-        this.clearService();
-        return listDifferences;
+        this.resetImageData();
     }
 
     bfs(point: Point, distance: number, radius: number): void {
@@ -187,11 +181,13 @@ export class ImageDiffService {
         this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
     }
+
     getPositionsFromXY(x: number, y: number): number {
         return x + y * constants.defaultWidth;
         // position = this.getPositionsFromXY(3, 4);
         // drawingDifferenceArray[position];
     }
+
     getPositionFromAbsolute(x: number): Point {
         const y = Math.floor(x / constants.defaultWidth);
         const xPosition = x - y * constants.defaultWidth;

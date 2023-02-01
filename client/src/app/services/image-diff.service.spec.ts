@@ -14,6 +14,8 @@ describe('ImageDiffService', () => {
     let originalCanvasArray: Uint8ClampedArray;
     let modifiedCanvasArray: Uint8ClampedArray;
 
+    let radiusValue: number;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [ImageDiffService],
@@ -34,6 +36,11 @@ describe('ImageDiffService', () => {
     it('should return true, arrays are of the same length', () => {
         const res = service.haveSameSize(originalArrayData, modifiedArrayData);
         expect(res).toBeTruthy();
+    });
+
+    it('should allocate radius value', () => {
+        // set radius ?????????? a voir definition
+        expect(service.radius).toBe(radiusValue);
     });
 
     it('should return false, arrays are of the different length', () => {

@@ -22,6 +22,14 @@ export class TimeService {
     return this.countDown;
   }
 
+  addTime(time:number, classical:boolean):void{
+   (classical)? this.count += time : this.countDown += time;
+  }
+
+  decreaseTime(time:number):void{
+    this.countDown -= time;
+  }
+
   getCount():number{
     return this.count;
   }
@@ -33,5 +41,9 @@ export class TimeService {
   stopTimer(): void{
     clearInterval(this.time);
   }
+  setCountDown(time:number):void{
+    this.countDown = time;
+  }
+  
   }
 

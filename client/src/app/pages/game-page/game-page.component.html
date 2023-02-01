@@ -2,21 +2,13 @@
   <div class="header"><app-header></app-header></div>
   <div class="infos"> <!-- sera probablement un component-->
     <div class="left">
-      <p class="title">Mont Saint-Hilaire</p>
-      <p class="sub-title game-infos">Partie Classique en mode solo</p>
-      <p class="sub-title">Différences trouvées</p>
+      <p class="title"> Mont Saint-Hilaire </p>
+      <p class="sub-title game-infos">Partie Classique en mode {{gameInfos.mode}}</p>
+      <p class="sub-title">Différences trouvées-{{gameInfos.playerName}}</p>
       <div class="difficulty">
         <img *ngFor="let src of differences" class="differences-trouvees-img" src={{src}} alt="Indices restants"/>
       </div>
-      <!-- <div>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-        <img class="differences-trouvees-img" alt="Différences trouvées"/>
-      </div> logique pour différences ici -->
+      <div class="title">{{this.socket.getServerTime()}}</div>
     </div>
     <div class="middle">
       <div class="difficulty">
@@ -28,25 +20,24 @@
         </div>
         <p>Difficulté</p>
       </div>
-      <app-timer [isClassicMode]= true ></app-timer>
+      <app-timer></app-timer>
     </div>
     <div class="right">
       <p class="sub-title">Indices restants</p>
       <div>
-        <img class="indices-restants-img" alt="Indices restants"/>
-        <img class="indices-restants-img" alt="Indices restants"/>
-        <img class="indices-restants-img" alt="Indices restants"/>
+        <img *ngFor="let src of hints" src={{src}} class="indices-restants-img" alt="Indices restants"/>
       </div> <!-- logique pour indices ici-->
       <p class="sub-title">pénalité : 5s / indice</p>
-      <div><button mat-raised-button class="btn">Obtenir un indice </button></div>
+      <div><button mat-raised-button class="btn" [disabled]="hintUsed === gameInfos.hintNbr" (click)="getHint()">Obtenir un indice </button></div>
     </div>
   </div> <!-- fin infos-->
   <div class="mainView">
-    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
-    <canvas #Canvas [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+    <canvas #canvas1 (click)="mouseHitDetect($event)" [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
+    <canvas #canvas2 (click)="mouseHitDetect($event)" [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT"></canvas>
   </div>
   <div class="footer"> <button mat-raised-button class="giveUp btn" (click)="giveUp()"> Abandonner la partie </button></div>
   <div class="message"><app-message-area></app-message-area></div>
-  <button class="btn" (click)="clicked()"> Différence trouvée</button>
+  <button class="btn" (click)="diffFound()"> Différence trouvée</button>
   <button class="btn">{{differencesFound}}</button>
+  <app-play-area></app-play-area>
 </div>

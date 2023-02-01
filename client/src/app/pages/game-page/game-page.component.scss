@@ -109,7 +109,11 @@ canvas{
   height: auto;
   max-width: 38px;
   margin: 0px 0px 10px 10px;
-  content:url("../../../assets/img/hints.png");
+}
+ *:disabled { //trouver un moyen de changer ça je n'aime pas
+  border-color: #594975;
+  background-color: #594975 !important;
+  color:rgba(240, 248, 255, 0.732) !important
 }
 
 @media (min-width: 1920px) {
@@ -118,9 +122,9 @@ canvas{
   }
 }
 
-@media (max-width: 1920px) {
+@media (max-width: 2000px) {
   .container {
-      width: 1920px;
+      width: 2000px;
   }
 }
 

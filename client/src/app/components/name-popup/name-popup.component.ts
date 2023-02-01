@@ -11,7 +11,6 @@ export interface DialogData {
 })
 export class NamePopupComponent implements OnInit {
     constructor(public dialogRef: MatDialogRef<NamePopupComponent>, @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
-
     ngOnInit(): void {
         this.data.name = '';
     }

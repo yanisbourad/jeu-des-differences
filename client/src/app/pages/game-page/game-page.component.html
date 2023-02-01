@@ -4,7 +4,7 @@
         <div class="left">
             <p class="title">{{gameInformation.gameTitle}}</p>
             <p class="sub-title game-infos">{{gameInformation.gameMode}}</p>
-            <p class="sub-title">Différences trouvées</p>
+            <p class="sub-title">Différences trouvées - {{gameInformation.playerName}}</p>
             <div>
                 <img
                     *ngFor="let differences of differencesArray"

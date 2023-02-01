@@ -13,6 +13,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
+import { GameInfoComponent } from './components/game-info/game-info.component';
 
 /**
  * Main module that is used in main.ts.
@@ -21,7 +22,16 @@ import { MessageAreaComponent } from './components/message-area/message-area.com
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, PlayAreaComponent, HeaderComponent, GamePageComponent, TimerComponent, MessageAreaComponent],
+    declarations: [
+        AppComponent,
+        MainPageComponent,
+        PlayAreaComponent,
+        HeaderComponent,
+        GamePageComponent,
+        TimerComponent,
+        MessageAreaComponent,
+        GameInfoComponent,
+    ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class MessageAreaComponent implements OnInit {
     playerName: string = 'Daniel';
     eventMessageArray: string[] = new Array();
-
+    test:number[] = new Array(25)
     constructor() {}
     ngOnInit(): void {}
 }

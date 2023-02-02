@@ -29,7 +29,6 @@ export class DateService {
     }
 
     getCount():number{
-        console.log("count : " + this.count)
     return this.count;
     }
 

@@ -5,7 +5,7 @@ import { channel } from 'diagnostics_channel';
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
-@WebSocketGateway({path:'/', cors:true, transport: ['websocket']})
+@WebSocketGateway({namespace: '/api', cors:true, transport: ['websocket']})
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
 
@@ -89,6 +89,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     private emitTime() {
-        this.server.emit('clock', this.dateService.getCount());
+       this.server.emit('clock', this.dateService.getCount());
     } 
 }

@@ -46,7 +46,6 @@ export class SocketClientService {
     });
     this.socketClient.on("clock", (time: number) => {
       this.serverTime = time;
-      console.log(time);
     });
 
     // // Afficher le message envoyé à chaque émission de l'événement "clock" du serveur

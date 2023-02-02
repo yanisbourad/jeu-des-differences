@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import * as constants from '@app/configuration/const-time';
 import { Time } from '@app/interfaces/time';
 import { TimeService } from '@app/services/time.service';
-import * as constants from '@app/configuration/const-time';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',

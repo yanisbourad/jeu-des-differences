@@ -113,11 +113,11 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
-                    this.differencePixelArray.push(0, 0, 0, 0);
+                    this.differencePixelArray.push(255, 255, 255, 255);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);
-                    this.differencePixelArray.push(1, 1, 1, 1);
+                    this.differencePixelArray.push(0, 0, 0, 0);
                 }
             }
         }
@@ -129,6 +129,10 @@ export class ImageDiffService {
             this.drawingDifferenceArray = new Uint8ClampedArray(this.differencePixelArray);
         }
         this.hasBeenChanged = !this.hasBeenChanged;
+    }
+
+    getDifferencePixelToDraw(): Uint8ClampedArray {
+        return this.drawingDifferenceArray;
     }
 
     defineDifferences(): Set<number>[] {

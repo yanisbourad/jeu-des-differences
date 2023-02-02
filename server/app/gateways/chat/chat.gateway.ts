@@ -12,13 +12,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer()  server: Server;
 
     private readonly room = PRIVATE_ROOM_ID;
-    isClassicalMode: boolean = true;
+    // isClassicalMode: boolean = true;
     
     constructor(private readonly logger: Logger, private readonly dateService : DateService) {
         console.log("ChatGateway constructor");
-        // this.isClassicalMode = isClassicalMode;
-    
-        (this.isClassicalMode)? this.dateService.startTimer() : this.dateService.startCountDown();
+        // (this.isClassicalMode)? this.dateService.startTimer() : this.dateService.startCountDown();
     }
 
     handleConnection(socket: Socket) {
@@ -35,10 +33,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     message(_: Socket, message: string) {
         this.logger.log(`Message reçu : ${message}`);
     }
-    @SubscribeMessage(ChatEvents.isClassicalMode)
-    ClassicalMode(_: Socket, isClassicalMode: boolean) {
-        this.isClassicalMode = isClassicalMode;
-        this.logger.log(`isClassicalMode : ${isClassicalMode}`);
+    @SubscribeMessage(ChatEvents.Error)
+    error(socket: Socket) {
+        socket.emit(ChatEvents.Error, 'Erreur');  
+    }
+    @SubscribeMessage(ChatEvents.DifferenceFound)
+    differenceFound(socket: Socket) {
+        socket.emit(ChatEvents.DifferenceFound, 'Différence trouvée');  
+    }
+    @SubscribeMessage(ChatEvents.Hint)
+    hint(socket: Socket) {
+        socket.emit(ChatEvents.Hint, 'Indice utilisé');  
     }
 
     @SubscribeMessage(ChatEvents.Connect)
@@ -53,19 +58,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.server.emit(ChatEvents.Timer, this.dateService.startTimer());
     }
 
-    @SubscribeMessage(ChatEvents.CountDown)
-    countDown(_: Socket) {
-        this.server.emit(ChatEvents.CountDown, this.dateService.startCountDown());
-    }
-
-    @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word.length > WORD_MIN_LENGTH);
-    }
-
     @SubscribeMessage(ChatEvents.BroadcastAll)
     broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
+        this.server.emit(ChatEvents.MassMessage, `${message}`);
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
@@ -89,6 +84,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     private emitTime() {
-       this.server.emit('clock', this.dateService.getCount());
+       this.server.emit('clock', new Date().toLocaleTimeString());
     } 
 }

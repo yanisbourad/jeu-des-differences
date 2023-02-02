@@ -54,11 +54,7 @@ export class SocketClientService {
     // });
 
     // Gérer l'événement envoyé par le serveur : afficher le résultat de validation
-    this.socketClient.on('wordValidated', (isValid: boolean) => {
-      //const validationString = `Le mot est ${isValid ? "valide" : "invalide"}`;
-      // this.serverValidationResult = validationString;
-    });
-
+    
     // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un client connecté
     this.socketClient.on('massMessage', (broadcastMessage: string) => {
      this.serverMessages.push(broadcastMessage);

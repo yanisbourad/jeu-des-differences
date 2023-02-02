@@ -5,11 +5,11 @@ export enum ChatEvents {
     BroadcastAll = 'broadcastAll',
     JoinRoom = 'joinRoom',
     RoomMessage = 'roomMessage',
-    isClassicalMode = 'classical',
-    WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
     Timer = 'timer',
-    CountDown = 'countDown',
+    Hint = 'hint',
+    Error = 'error',
+    DifferenceFound = 'found'
 }

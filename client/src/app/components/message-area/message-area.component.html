@@ -8,8 +8,7 @@
         <div class="discussion-box">
             <p class="event-title">message d'événement</p>
             <hr>
-            <p *ngFor="let x of test " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
-
+            <p *ngFor="let message of chatBox " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
         </div>
     </div>
     <div class="container">

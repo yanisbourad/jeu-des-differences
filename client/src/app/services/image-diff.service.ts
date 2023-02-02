@@ -131,8 +131,8 @@ export class ImageDiffService {
         this.hasBeenChanged = !this.hasBeenChanged;
     }
 
-    getDifferencePixelToDraw(): Uint8ClampedArray {
-        return this.drawingDifferenceArray;
+    getDifferencePixelToDraw(): Set<number>[] {
+        return this.listDifferences;
     }
 
     defineDifferences(): Set<number>[] {

@@ -6,6 +6,7 @@ export const minLineWidth = 1;
 export const maxLineWidth = 10;
 export const defaultRadius = 3;
 export const defaultLineColor = '#000000';
+export const defaultBackgroundColor = '#ffffff';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const possibleRadius = [3, 6, 9, 15];
 

@@ -1,5 +1,5 @@
 export enum ChatEvents {
-    Connect = 'connect', 
+    Connect = 'connect',
     Message = 'message',
     Validate = 'validate',
     BroadcastAll = 'broadcastAll',
@@ -11,5 +11,5 @@ export enum ChatEvents {
     Hello = 'hello',
     Clock = 'clock',
     Timer = 'timer',
-    CountDown = 'countDown'
+    CountDown = 'countDown',
 }

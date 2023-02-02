@@ -11,5 +11,5 @@ export enum ChatEvents {
     Timer = 'timer',
     Hint = 'hint',
     Error = 'error',
-    DifferenceFound = 'found'
+    DifferenceFound = 'found',
 }

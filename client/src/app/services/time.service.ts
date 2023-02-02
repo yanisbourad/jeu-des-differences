@@ -9,6 +9,14 @@ export class TimeService {
     countDown: number = constants.SIXTY_SECOND; // from database or something else. The time must be transformed to second before being processed
     time: number | unknown; // need this to stop the time later on // is there another way?
 
+    addTime(time: number, classical: boolean): void {
+        classical ? (this.count += time) : (this.countDown += time);
+    }
+
+    decreaseTime(time: number): void {
+        this.countDown -= time;
+    }
+
     startTimer(): void {
         this.time = setInterval(() => {
             this.count++;
@@ -27,6 +35,10 @@ export class TimeService {
 
     getCountDown(): number {
         return this.countDown;
+    }
+
+    setCountDown(time: number): void {
+        this.countDown = time;
     }
 
     stopTimer(): void {

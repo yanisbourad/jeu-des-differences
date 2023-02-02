@@ -26,6 +26,8 @@ import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
+import { GameInfoComponent } from './components/game-info/game-info.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -42,7 +44,6 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
         GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
-        TimerComponent,
         GamePageComponent,
         MessageAreaComponent,
         ValidateCreateBtnComponent,
@@ -53,6 +54,7 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
         CardDisplayerComponent,
         NamePopupComponent,
         ConfigurationJeuPageComponent,
+        GameInfoComponent,
     ],
     imports: [
         AppMaterialModule,

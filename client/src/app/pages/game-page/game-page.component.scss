@@ -12,24 +12,15 @@
     "footer message"; 
 }
 .header { grid-area: header; }
-.infos { 
-  grid-area: infos; 
-  //background-color: #3b2957;
-  display: grid;
-  grid-template-columns: 1fr 0.6fr 1fr; 
-}
 .mainView { 
   grid-area: mainView;
- // background-color: #294457; 
   padding-left: 2%;
 }
 .footer { 
   grid-area: footer;
-  //background-color: #14d033;  
 }
 .message { 
   grid-area: message; 
-  //background-color: #81798e; 
 }
 .mat-raised-button{
   border-radius: 32px;
@@ -49,67 +40,15 @@
   background-color: #bd3c3c;
 }
 
-.middle{
-  //background-color: #bd3c3c;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding-top: 30px;
-}
-.left{
-  //background-color: #14d033;
-  padding-top: 30px;
-  padding-left: 30px;
-}
-.right{
-  //background-color: #39c4d0;
-  display: grid;
-  grid-template-rows: 0.4fr 1fr 1fr;
-  padding-top: 30px;
-  padding-left: 40%;
-}
-.game-infos{
-  color: rgba(255, 255, 255, 0.711);
-  margin-bottom: 30px;
-}
 .difficulty{
   color: rgba(255, 255, 255, 0.711);
   height: 50%;
 }
+
 canvas{
   background: rgba(85, 66, 116, 0.1);
   border: 2px solid rgb(252, 250, 250);
   margin: 30px ;
-}
-
-.differences-trouvees-img {
-  z-index: 1;
-  height: auto;
-  max-width: 36px;
-  margin-right: 10px;
-}
-.difficulty {
-  text-align: start;
-  font-size: 25px;
-  font-weight: 500;
-  color: white;
-}
-.difficulty-bar-img {
-  z-index: 1;
-  content:url("../../../assets/img/difficultyBar.png");
-}
-.difficulty-bar-indicator-img {
-  z-index: 1;
-  content:url("../../../assets/img/difficulty-bar-indicator.png");
-  margin: 10px 0px;
-}
-.indices-restants-img {
-  z-index: 1;
-  height: auto;
-  max-width: 38px;
-  margin: 0px 0px 10px 10px;
-  content:url("../../../assets/img/hints.png");
 }
 
 @media (min-width: 1920px) {

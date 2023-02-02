@@ -19,8 +19,8 @@ export class ValidateCreateBtnComponent {
         const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
         const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
         if (originalData && modifiedData) {
+            this.imageDifferenceService.resetImageData();
             this.imageDifferenceService.setPixelMatrix(originalData, modifiedData);
-            this.imageDifferenceService.getDifferenceMatrix();
             this.imageDifferenceService.setDifferenceDataToDraw();
             this.imageDifferenceService.defineDifferences();
             alert(`Differences detected from original image : ${this.imageDifferenceService.getDifferenceNumber()}`);

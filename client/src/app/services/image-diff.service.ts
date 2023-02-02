@@ -20,6 +20,8 @@ export class ImageDiffService {
     hasBeenChanged: boolean;
     setDiffPixels: Set<number>;
     differencePixelArray: number[];
+    currentDifferenceTemp: Set<number>;
+    listDifferences: Set<number>[];
     differenceMatrix: number[];
     pixelNumberByImage: number;
     mapDistPoint: Map<number, number>;
@@ -57,6 +59,7 @@ export class ImageDiffService {
         this.pixelNumberByImage = 0;
         this.mapDistPoint = new Map();
         this.listBfsInput = [];
+        this.listDifferences = [];
     }
 
     setImageData(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
@@ -128,9 +131,9 @@ export class ImageDiffService {
         this.hasBeenChanged = !this.hasBeenChanged;
     }
 
-    defineDifferences(): void {
+    defineDifferences(): Set<number>[] {
         // listDifferences is the list of independent differences
-        const listDifferences: number[][] = [];
+        this.listDifferences = [];
         while (this.setDiffPixels.size > 0) {
             // represent for each key of position the last smallest distance from a real diff
             this.mapDistPoint = new Map();
@@ -138,18 +141,18 @@ export class ImageDiffService {
             const position = [...this.setDiffPixels][0];
             const point: Point = this.getPositionFromAbsolute(position);
             // differenceMatrix is a Point[] representing one difference
-            this.differenceMatrix = [];
+            this.currentDifferenceTemp = new Set<number>();
             this.listBfsInput.push({ point, distance: 0 });
             while (this.listBfsInput.length > 0) {
                 const bfsInput = this.listBfsInput.pop();
                 if (bfsInput) this.bfs(bfsInput.point, bfsInput.distance, this.radius);
             }
             // after all the recursive calls has ended add the current diff to the diff list
-            listDifferences.push(this.differenceMatrix);
+            this.listDifferences.push(this.currentDifferenceTemp);
         }
-        this.differenceMatrix = [];
+        this.currentDifferenceTemp = new Set<number>();
         // clearing the service is needed to be able to read the next images
-        this.resetImageData();
+        return this.listDifferences;
     }
 
     bfs(point: Point, distance: number, radius: number): void {
@@ -158,13 +161,13 @@ export class ImageDiffService {
             return;
         }
         const position = this.getPositionsFromXY(point.x, point.y);
-        if (this.drawingDifferenceArray[position] === 1) {
+        if (this.differenceMatrix[position] === 1) {
             // if is a difference
             if (this.setDiffPixels.has(position)) {
                 // if the difference has never been visited before
                 this.setDiffPixels.delete(position);
                 // add this position to the differenceMatrix
-                this.differenceMatrix.push(position);
+                this.currentDifferenceTemp.add(position);
                 // next bfs will have a distance of 0
                 distance = 0;
             } else {
@@ -177,10 +180,11 @@ export class ImageDiffService {
             // if fist time reading this point
             if (!lastDistance) {
                 // adding it to the differenceMatrix
-                this.differenceMatrix.push(position);
+                this.currentDifferenceTemp.add(position);
                 // puts the lastDistance as unreachable
                 lastDistance = radius + 1;
             }
+
             if (distance < radius && distance < lastDistance) {
                 // if distance is the lower ever found
                 this.mapDistPoint.set(position, distance);
@@ -208,6 +212,6 @@ export class ImageDiffService {
     }
 
     getDifferenceNumber() {
-        return this.differenceNumber;
+        return this.listDifferences.length;
     }
 }

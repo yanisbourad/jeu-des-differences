@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Time } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
+import { TimeService } from '@app/services/time.service';
 
 @Component({
     selector: 'app-message-area',
@@ -6,11 +8,14 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./message-area.component.scss'],
 })
 export class MessageAreaComponent implements OnInit {
+    @Input() time: Time;
     playerName: string = 'Daniel';
     playerInitials: string = this.playerName[0];
     eventMessageArray: string[] = new Array();
     test: number[] = new Array(25);
-    constructor() {}
+    constructor(private readonly timeService: TimeService) {}
     ngOnInit(): void {}
-    getTimestamp(): void {}
+    getTimestamp(): number {
+        return this.timeService.getCount();
+    }
 }

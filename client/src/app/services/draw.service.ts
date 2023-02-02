@@ -67,6 +67,23 @@ export class DrawService {
         context.lineWidth = this.lineWidth;
         context.stroke();
     }
+
+    drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
+        differences.forEach((diff) => {
+            this.drawDiff(diff, canvas);
+        });
+    }
+
+    drawDiff(diff: Set<number>, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        // color pixels one by one and draw them
+        diff.forEach((index) => {
+            const x = index % this.width;
+            const y = Math.floor(index / this.width);
+            context.fillStyle = constants.defaultLineColor;
+            context.fillRect(x, y, 1, 1);
+        });
+    }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
     // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}

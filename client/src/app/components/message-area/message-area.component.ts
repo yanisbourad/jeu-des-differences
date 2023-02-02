@@ -7,8 +7,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MessageAreaComponent implements OnInit {
     playerName: string = 'Daniel';
+    playerInitials: string = this.playerName[0];
     eventMessageArray: string[] = new Array();
-    test:number[] = new Array(25)
+    test: number[] = new Array(25);
     constructor() {}
     ngOnInit(): void {}
+    getTimestamp(): void {}
 }

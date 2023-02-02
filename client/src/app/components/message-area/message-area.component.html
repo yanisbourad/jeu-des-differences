@@ -1,14 +1,14 @@
 <div class="message">
     <div class="container">
         <div class="player-circle">
-            <p class="player-initials">{{playerName[0] | uppercase}}</p>
+            <p class="player-initials">{{playerInitials | uppercase}}</p>
         </div>
     </div>
     <div class="container">
         <div class="discussion-box">
             <p class="event-title">message d'événement</p>
             <hr>
-            <p *ngFor="let x of test " class="event-message">12:25:30 - Différence trouvé par W</p>
+            <p *ngFor="let x of test " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
 
         </div>
     </div>

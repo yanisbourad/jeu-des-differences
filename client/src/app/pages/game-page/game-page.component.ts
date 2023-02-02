@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameInfos } from '@app/interfaces/gameInfos';
 import * as imagePath from 'src/app/utils/image-constantes';
 import { TimeService } from '@app/services/time.service';
-import { DrawService } from '@app/services/draw.service';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -37,7 +36,7 @@ export class GamePageComponent implements OnInit {
   hintUsed : number = 0;
 
   //in infos component change display depending of the game mode (solo, multijoueur, temps limite)
-  constructor( private readonly timeService: TimeService, private readonly drawService: DrawService, public readonly socket:SocketClientService) {}
+  constructor( private readonly timeService: TimeService, public readonly socket:SocketClientService) {}
 
   ngOnInit(): void {  
     //this.loadImage();
@@ -60,7 +59,7 @@ export class GamePageComponent implements OnInit {
     if (event.button === MouseButton.Left) {
         this.mousePosition = { x: event.offsetX, y: event.offsetY };
         this.diffFound();
-        this.drawService.drawWord("trouvé", event)
+       // this.drawService.drawWord("trouvé", event)
     }
 }
   generateDiff(): void{
@@ -86,11 +85,11 @@ export class GamePageComponent implements OnInit {
     const modified_image = new Image();
     original_image.src = '../../../assets/img/k3FhRA.jpg';
     createImageBitmap(original_image).then((imageBitmap) => {
-      this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
+     // this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
     });
     modified_image.src = '../../../assets/img/k3FhRA.jpg';
     createImageBitmap(modified_image).then((imageBitmap) => {
-      this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
+     // this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
     });
     }
 

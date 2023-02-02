@@ -1,0 +1,39 @@
+<div *ngFor="let card of cards">
+    <div id = "rectangle1">
+        <div id = "rectangle2">
+            <p>{{card.title}}</p>
+        </div>
+        <div class="gameImage">
+            <img src = {{card.image}}>
+        </div>
+        <div class = "rankingTable">
+            <table>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col" class="gameCategory"> Solo</th>
+                    <th scope="col" class="gameCategory"> 1 vs 1</th>
+                </tr>
+                <tr>
+                    <th scope="row" class= "ranking" style="color:#FFE600">1.</th>
+                    <td class="firstAndThird"> {{card.rankingSolo.time1}} {{card.rankingSolo.name1}}</td>
+                    <td class="firstAndThird">{{card.rankingMulti.time1}} {{card.rankingMulti.name1}} </td>
+                </tr>
+                <tr>
+                    <th scope="row"  class= "ranking" style="color:#E0ECEF">2.</th>
+                    <td class = "second"> {{card.rankingSolo.time2}} {{card.rankingSolo.name2}}</td>
+                    <td class = "second">{{card.rankingMulti.time2}} {{card.rankingMulti.name2}} </td>
+                </tr>
+                <tr>
+                    <th scope="row"  class= "ranking" style="color:#FF8B02">3.</th>
+                    <td class="firstAndThird"> {{card.rankingSolo.time3}} {{card.rankingSolo.name3}}</td>
+                    <td class="firstAndThird">{{card.rankingMulti.time3}} {{card.rankingMulti.name3}} </td>
+                </tr>
+            </table>
+        </div>
+        <button *ngIf = "changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()"> Jouer </button>
+        <button *ngIf = "changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>   
+
+        <button *ngIf = "changeButton() === 'Configuration'" class="playingButtons" id="playButton" (click)="openDialog()">Supprimer</button>
+        <button *ngIf = "changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>   
+    </div>
+</div>

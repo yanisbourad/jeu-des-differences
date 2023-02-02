@@ -3,11 +3,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { SelectionJeuPageComponent } from '@app/pages/selection-jeu-page/selection-jeu-page.component';
+import { ConfigurationJeuPageComponent } from '@app/pages/configuration-jeu-page/configuration-jeu-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
     { path: 'game', component: GamePageComponent },
+    { path: 'classique', component: SelectionJeuPageComponent },
+    { path: 'config', component: ConfigurationJeuPageComponent },
     // Here we can add the routes for the other pages //
 
     { path: 'game-create', component: GameCreationPageComponent },

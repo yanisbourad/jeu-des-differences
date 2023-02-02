@@ -1,0 +1,9 @@
+<div id = "card-display">
+    <mat-grid-list cols="4"  rowHeight= "665px" >
+        <div *ngFor = " let card of cards">
+            <mat-grid-tile> 
+                <app-game-card>{{card}}</app-game-card>
+            </mat-grid-tile>
+        </div>
+    </mat-grid-list>
+</div>

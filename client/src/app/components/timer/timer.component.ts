@@ -9,6 +9,7 @@ import { TimeService } from '@app/services/time.service';
 })
 export class TimerComponent implements OnInit {
     @Input() isClassicMode: boolean = false; // can be classique or temps limite
+    @Input() serverTime : number = 0;
     time: Time;
 
     constructor(private readonly timeService: TimeService) {

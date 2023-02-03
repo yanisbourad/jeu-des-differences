@@ -113,9 +113,9 @@ input {
         border: 2px solid #7b57b8;
     }
 }
-// .send-btn :not(:disabled) {
-//     background-color: #9845e7;
-// }
+.send-btn :not(:disabled) {
+    background-color: #9845e7;
+}
 
 .message {
     font-size: 16px;

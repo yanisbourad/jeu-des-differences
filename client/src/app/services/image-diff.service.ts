@@ -113,7 +113,7 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
-                    this.differencePixelArray.push(255, 255, 255, 255);
+                    this.differencePixelArray.push(1, 1, 1, 1);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);

@@ -4,7 +4,8 @@ import { Message } from '@common/message';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
+// eslint-disable-next-line no-restricted-imports
+import { Game } from '../../../../common/game';
 @Injectable({
     providedIn: 'root',
 })
@@ -21,6 +22,9 @@ export class CommunicationService {
         return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
     }
 
+    createGame(game: Game): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseUrl}/game-create`, game, { observe: 'response', responseType: 'text' });
+    }
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
         return () => of(result as T);
     }

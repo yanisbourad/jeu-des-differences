@@ -4,14 +4,17 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnectio
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
+import { PlayerService } from '@app/services/player/player-service';
+import { Player } from '../../../../client/src/app/interfaces/player';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() server: Server;
     timeStarted: boolean = false;
+  
     private readonly room = PRIVATE_ROOM_ID;
 
-    constructor(private readonly logger: Logger, private readonly timeService: TimeService) {}
+    constructor(private readonly logger: Logger, private readonly timeService: TimeService, private readonly playerService : PlayerService) {}
 
     @SubscribeMessage(ChatEvents.Message)
     message(_: Socket, message: string) {
@@ -64,8 +67,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
+    async joinRoom(socket: Socket, playerName: string) {
+        const roomName = "plaName" + ' room';
+        const player : Player =
+        {
+            playerName: "ayerName",
+            socketId: socket.id
+        }
+        if (await this.playerService.getRoomIndex(roomName) == -1){
+            await this.playerService.addRoom(roomName, player);
+            console.log("this.rooms");
+            console.log(await this.playerService.getRooms())
+            console.log(`Room ${roomName} created and ${playerName} joined it`);
+            socket.to(roomName).emit('time', "");
+            socket.join(roomName);
+        }
+        else{
+            console.log( "await this.playerService.getRooms()");
+            this.playerService.addPlayer(roomName, player);
+            socket.join(roomName);
+        }
     }
 
     @SubscribeMessage(ChatEvents.RoomMessage)

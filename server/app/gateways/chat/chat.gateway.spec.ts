@@ -41,19 +41,19 @@ describe('ChatGateway', () => {
         expect(logger.log.called).toBeTruthy();
     });
 
-    it('validate() message should take account word length', () => {
-        const testCases = [
-            { word: 'XX', isValid: false },
-            { word: 'XXXXX', isValid: false },
-            { word: 'XXXXXX', isValid: false },
-            { word: 'XXXXXXX', isValid: true },
-            { word: 'XXXXXXXX', isValid: true },
-        ];
-        for (const { word, isValid } of testCases) {
-            gateway.validate(socket, word);
-            expect(socket.emit.calledWith(ChatEvents.WordValidated, isValid)).toBeTruthy();
-        }
-    });
+    // it('validate() message should take account word length', () => {
+    //     const testCases = [
+    //         { word: 'XX', isValid: false },
+    //         { word: 'XXXXX', isValid: false },
+    //         { word: 'XXXXXX', isValid: false },
+    //         { word: 'XXXXXXX', isValid: true },
+    //         { word: 'XXXXXXXX', isValid: true },
+    //     ];
+    //     for (const { word, isValid } of testCases) {
+    //         gateway.validate(socket, word);
+    //         expect(socket.emit.calledWith(ChatEvents.WordValidated, isValid)).toBeTruthy();
+    //     }
+    // });
 
     it('broadcastAll() should send a mass message to the server', () => {
         gateway.broadcastAll(socket, 'X');

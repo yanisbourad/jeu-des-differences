@@ -23,6 +23,7 @@ export class GamePageComponent implements OnInit {
     ngOnInit(): void {
         this.socket.connect();
         this.socket.startTimer();
+        this.socket.joinRoom('test');
         console.log(this.socket.getServerTime());
     }
 

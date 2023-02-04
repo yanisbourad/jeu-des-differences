@@ -82,4 +82,9 @@ export class SocketClientService {
     addTime(time: number, isClassical: boolean) {
         this.socketClient.send('addTime', `${[time, isClassical]}`);
     }
+
+    // joinRoom
+    joinRoom(playerName: string) {
+        this.socketClient.send('joinRoom', playerName);
+    }
 }

@@ -1,17 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
+import { DELAY_BEFORE_EMITTING_TIME } from '@app/gateways/chat/chat.gateway.constants';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class TimeService {
     count: number = 0;
-    countDown: number = 30; // from database or something else. The time must be transformed to second before being processed
+    countDown: number = 0; // from database or something else. The time must be transformed to second before being processed
     time: number | unknown; // probably find something else
 
-    constructor() {}
-
-    addTime(time: number, classical: boolean): void {
-        classical ? (this.count += time) : (this.countDown += time);
+    addTime(time: number, isClassical: boolean): void {
+        if (isClassical) this.count += Number(time);
+        else this.countDown += Number(time);
     }
 
     decreaseTime(time: number): void {
@@ -21,13 +19,13 @@ export class TimeService {
     startTimer(): void {
         this.time = setInterval(() => {
             this.count++;
-        }, 1000);
+        }, DELAY_BEFORE_EMITTING_TIME);
     }
 
     startCountDown(): number {
         this.time = setInterval(() => {
             this.countDown--;
-        }, 1000);
+        }, DELAY_BEFORE_EMITTING_TIME);
         return this.countDown;
     }
 
@@ -45,5 +43,10 @@ export class TimeService {
 
     stopTimer(): void {
         clearInterval(this.time as number);
+    }
+
+    resetTimer(): void {
+        this.count = 0;
+        this.countDown = 0;
     }
 }

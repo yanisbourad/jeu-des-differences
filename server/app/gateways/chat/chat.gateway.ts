@@ -1,61 +1,61 @@
-import { DateService } from '@app/services/date/date.service';
+import { TimeService } from '@app/services/time/time.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
-import { channel } from 'diagnostics_channel';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
+import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
-@WebSocketGateway({namespace: '/api', cors:true, transport: ['websocket']})
+@WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-
-    @WebSocketServer()  server: Server;
-
+    @WebSocketServer() server: Server;
+    timeStarted: boolean = false;
     private readonly room = PRIVATE_ROOM_ID;
-    // isClassicalMode: boolean = true;
-    
-    constructor(private readonly logger: Logger, private readonly dateService : DateService) {
-        console.log("ChatGateway constructor");
-        // (this.isClassicalMode)? this.dateService.startTimer() : this.dateService.startCountDown();
-    }
 
-    handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello from serveur');  
-    }
-    
-    handleDisconnect(socket: Socket,) {
-        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
-    }
+    constructor(private readonly logger: Logger, private readonly timeService: TimeService) {}
 
     @SubscribeMessage(ChatEvents.Message)
     message(_: Socket, message: string) {
         this.logger.log(`Message reçu : ${message}`);
     }
+
     @SubscribeMessage(ChatEvents.Error)
     error(socket: Socket) {
-        socket.emit(ChatEvents.Error, 'Erreur');  
+        socket.emit(ChatEvents.Error, 'Erreur');
     }
+
     @SubscribeMessage(ChatEvents.DifferenceFound)
     differenceFound(socket: Socket) {
-        socket.emit(ChatEvents.DifferenceFound, 'Différence trouvée');  
+        socket.emit(ChatEvents.DifferenceFound, 'Différence trouvée');
     }
+
     @SubscribeMessage(ChatEvents.Hint)
     hint(socket: Socket) {
-        socket.emit(ChatEvents.Hint, 'Indice utilisé');  
+        socket.emit(ChatEvents.Hint, 'Indice utilisé');
     }
 
     @SubscribeMessage(ChatEvents.Connect)
     connect(_: Socket, message: string) {
         this.server.emit(ChatEvents.MassMessage, `: ${message}`);
-        this.logger.log(`connection au socket`);
+        this.logger.log('connection au socket');
     }
 
-    @SubscribeMessage(ChatEvents.Timer)
-    timer(_: Socket) {
-        this.logger.log("timer start")
-        this.server.emit(ChatEvents.Timer, this.dateService.startTimer());
+    @SubscribeMessage(ChatEvents.StartTimer)
+    startTimer() {
+        if (!this.timeStarted) {
+            this.timeService.startTimer();
+            this.timeStarted = true;
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.StopTimer)
+    stopTimer() {
+        this.timeService.stopTimer();
+    }
+
+    @SubscribeMessage(ChatEvents.AddTime)
+    addTime(_: Socket, data: [number, boolean]) {
+        this.logger.log(data);
+        this.timeService.addTime(data[0], data[1]);
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
@@ -73,10 +73,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(this.room)) {
             this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
-            console.log(message);
         }
     }
-    
+
+    handleConnection(socket: Socket) {
+        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
+        socket.emit(ChatEvents.Hello, 'Hello from serveur');
+    }
+
+    handleDisconnect(socket: Socket) {
+        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
+    }
+
     afterInit() {
         setInterval(() => {
             this.emitTime();
@@ -84,6 +92,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     private emitTime() {
-       this.server.emit('clock', new Date().toLocaleTimeString());
-    } 
+        this.server.emit('time', this.timeService.getCount());
+    }
 }

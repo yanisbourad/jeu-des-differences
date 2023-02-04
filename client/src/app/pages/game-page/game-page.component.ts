@@ -18,13 +18,14 @@ export class GamePageComponent implements OnInit {
     readonly ONE_QUARTER = 1 / 4;
     readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
-    constructor(private readonly drawService: DrawService, public gameService: GameService, public readonly socket: SocketClientService) {}
+    constructor(private readonly drawService: DrawService, public gameService: GameService, readonly socket: SocketClientService) {}
 
     ngOnInit(): void {
         this.socket.connect();
-        this.socket.classicalMode(true);
-        console.log(this.socket.getServerMessage() + " " + this.socket.getServerTime());
+        this.socket.startTimer();
+        console.log(this.socket.getServerTime());
     }
+
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };

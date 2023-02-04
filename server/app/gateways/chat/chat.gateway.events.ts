@@ -8,8 +8,11 @@ export enum ChatEvents {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-    Timer = 'timer',
+    StartTimer = 'startTimer',
+    StopTimer = 'stopTimer',
+    AddTime = 'addTime',
+    Time = 'time',
     Hint = 'hint',
     Error = 'error',
-    DifferenceFound = 'found'
+    DifferenceFound = 'found',
 }

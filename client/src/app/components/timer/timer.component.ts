@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Time } from '@app/interfaces/time';
-import { TimeService } from '@app/services/time.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
@@ -8,15 +8,15 @@ import { TimeService } from '@app/services/time.service';
 })
 export class TimerComponent implements OnInit {
     @Input() isClassicMode: boolean = false; // can be classique or temps limite
-    @Input() serverTime : number = 0;
+    @Input() serverTime: number = 0;
     time: Time;
 
-    constructor(private readonly timeService: TimeService) {
+    constructor(private readonly socketService: SocketClientService) {
         this.time = { minute: 0, second: 0 };
     }
 
     ngOnInit(): void {
-        this.isClassicMode ? this.timeService.startTimer() : this.timeService.startCountDown();
+        console.log('timer component');
     }
 
     formatTime(): string {
@@ -28,10 +28,9 @@ export class TimerComponent implements OnInit {
     }
 
     transformCountDown(): string {
-        this.time.second = this.timeService.getCountDown() % 60;
-        this.time.minute = Math.floor(this.timeService.getCountDown() / 60);
+        this.setTime();
         if (this.time.second === 0 && this.time.minute === 0) {
-            this.timeService.stopTimer();
+            this.socketService.stopTimer();
             return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
         } else {
             return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
@@ -39,8 +38,12 @@ export class TimerComponent implements OnInit {
     }
 
     transform(): string {
-        this.time.second = this.timeService.getCount() % 60;
-        this.time.minute = Math.floor(this.timeService.getCount() / 60);
+        this.setTime();
         return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
+    }
+
+    setTime(): void {
+        this.time.second = Number(this.socketService.getServerTime() % 60) | 0;
+        this.time.minute = Number(Math.floor(this.socketService.getServerTime() / 60)) | 0;
     }
 }

@@ -12,7 +12,6 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { HeaderComponent } from './components/header/header.component';
 import { BannerComponent } from './components/banner/banner.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
-import { PreviousNextComponent } from './components/previous-next/previous-next.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -36,7 +35,6 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
         HeaderComponent,
         BannerComponent,
         SelectionJeuPageComponent,
-        PreviousNextComponent,
         GameCardComponent,
         CardDisplayerComponent,
         NamePopupComponent,

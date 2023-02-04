@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { card } from '@app/interfaces/card';
 import { MatDialog } from '@angular/material/dialog';
-import { NamePopupComponent } from '../name-popup/name-popup.component';
 import { Router } from '@angular/router';
+import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
+import { card } from '@app/interfaces/card';
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',

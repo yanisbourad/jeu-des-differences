@@ -4,11 +4,12 @@ export enum ChatEvents {
     Validate = 'validate',
     BroadcastAll = 'broadcastAll',
     JoinRoom = 'joinRoom',
+    LeaveRoom = 'leaveRoom',
     RoomMessage = 'roomMessage',
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-    StartTimer = 'startTimer',
+    StartTimer = 'startTimer',//remove if unused
     StopTimer = 'stopTimer',
     AddTime = 'addTime',
     Time = 'time',

@@ -10,6 +10,7 @@ export class TimerComponent implements OnInit {
     @Input() isClassicMode: boolean = false; // can be classique or temps limite
     @Input() serverTime: number = 0;
     time: Time;
+    roomName: string = "test5 room";
 
     constructor(private readonly socketService: SocketClientService) {
         this.time = { minute: 0, second: 0 };
@@ -30,7 +31,7 @@ export class TimerComponent implements OnInit {
     transformCountDown(): string {
         this.setTime();
         if (this.time.second === 0 && this.time.minute === 0) {
-            this.socketService.stopTimer();
+          //  this.socketService.stopTimer();
             return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
         } else {
             return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
@@ -43,7 +44,8 @@ export class TimerComponent implements OnInit {
     }
 
     setTime(): void {
-        this.time.second = Number(this.socketService.getServerTime() % 60) | 0;
-        this.time.minute = Number(Math.floor(this.socketService.getServerTime() / 60)) | 0;
+        console.log('setTime', this.socketService.getRoomTime(this.roomName));
+        this.time.second = Number(this.socketService.getRoomTime(this.roomName) % 60) | 0;
+        this.time.minute = Number(Math.floor(this.socketService.getRoomTime(this.roomName) / 60)) | 0;
     }
 }

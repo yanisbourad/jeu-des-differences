@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
+import { RoomTime } from '@app/interfaces/room-time';
 
 @Injectable({
     providedIn: 'root',
@@ -9,7 +10,8 @@ export class SocketClientService {
     socket: Socket;
     serverMessages: string[] = [];
     roomMessages: string[] = [];
-    serverTime: number;
+
+    serverTime: RoomTime[] = [];
     serverMessage: string = '';
 
     constructor(private readonly socketClient: SocketClient) {}
@@ -25,12 +27,17 @@ export class SocketClientService {
         }
     }
 
-    getServerMessage(): string {
-        return this.serverMessage;
+    getRoomTime(roomName : string) : number {
+        console.log(this.serverTime)
+        return this.serverTime[this.getServerTimeIndex(roomName)].time;
+    } 
+
+    getServerTimeIndex(roomName:string): number {
+        return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
     }
 
-    getServerTime(): number {
-        return this.serverTime;
+    getServerMessage(): string {
+        return this.serverMessage;
     }
 
     configureBaseSocketFeatures() {
@@ -44,8 +51,13 @@ export class SocketClientService {
         // this.socketClient.on("clock", (time: number) => {
         //   this.serverTime = time;
         // });
-        this.socketClient.on('time', (time: number) => {
-            this.serverTime = time;
+        this.socketClient.on('time', (values :[string, number]) => {
+            if (this.getServerTimeIndex(values[0]) == -1 ){ 
+                this.serverTime.push({id:values[0], time:values[1]});
+            }else{
+                this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];       
+            }
+            console.log(this.serverTime)
         });
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('message', (message: string) => {
@@ -74,8 +86,9 @@ export class SocketClientService {
     }
 
     // stopTimer
-    stopTimer() {
-        this.socketClient.send('stopTimer');
+    stopTimer(roomName:string) {
+        this.socketClient.send('stopTimer', roomName);
+        console.log("stopTimer")
     }
 
     // addTime
@@ -87,4 +100,10 @@ export class SocketClientService {
     joinRoom(playerName: string) {
         this.socketClient.send('joinRoom', playerName);
     }
+
+    // leaveRoom
+    leaveRoom(playerName: string) {
+        this.socketClient.send('leaveRoom', playerName);
+    }
+
 }

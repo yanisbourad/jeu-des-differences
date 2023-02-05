@@ -18,13 +18,16 @@ export class GamePageComponent implements OnInit {
     readonly ONE_QUARTER = 1 / 4;
     readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
+    playerNames : string[] = ["test5", "test2"]
     constructor(private readonly drawService: DrawService, public gameService: GameService, readonly socket: SocketClientService) {}
 
     ngOnInit(): void {
         this.socket.connect();
-        this.socket.startTimer();
-        this.socket.joinRoom('test');
-        console.log(this.socket.getServerTime());
+        this.socket.joinRoom(this.playerNames[0]);
+        setInterval(() => {
+            this.socket.joinRoom(this.playerNames[1]);
+        }, 3000);
+        
     }
 
     mouseHitDetect(event: MouseEvent) {
@@ -37,6 +40,7 @@ export class GamePageComponent implements OnInit {
                 this.mousePosition.x <= this.DEFAULT_WIDTH * (1 - this.ONE_SIXTH) &&
                 this.mousePosition.x >= this.DEFAULT_WIDTH * this.ONE_SIXTH
             ) {
+                this.socket.stopTimer(("test5 room"));
                 this.gameService.playSuccessAudio();
                 this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
                 this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);

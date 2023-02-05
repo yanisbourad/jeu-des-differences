@@ -51,8 +51,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.StopTimer)
-    stopTimer() {
-        this.timeService.stopTimer();
+    stopTimer(_: Socket, roomName: string) {
+        if (this.timeService.timers[roomName]) {
+            this.timeService.stopTimer(this.timeService.timers[roomName]);
+        }
     }
 
     @SubscribeMessage(ChatEvents.AddTime)
@@ -68,7 +70,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     async joinRoom(socket: Socket, playerName: string) {
-        const roomName = "plaName" + ' room';
+        const roomName = playerName + ' room';
         const player : Player =
         {
             playerName: "ayerName",
@@ -76,16 +78,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         if (await this.playerService.getRoomIndex(roomName) == -1){
             await this.playerService.addRoom(roomName, player);
+            if (!this.timeService.timers[roomName]) {
+                let count = 0;
+                this.timeService.timers[roomName] = setInterval(() => {
+                  count++;
+                  socket.to(roomName).emit(ChatEvents.Time,  [roomName, count]);
+                }, DELAY_BEFORE_EMITTING_TIME);
+              }
             console.log("this.rooms");
             console.log(await this.playerService.getRooms())
             console.log(`Room ${roomName} created and ${playerName} joined it`);
-            socket.to(roomName).emit('time', "");
+           // socket.to(roomName).emit('time', "");
             socket.join(roomName);
         }
         else{
             console.log( "await this.playerService.getRooms()");
             this.playerService.addPlayer(roomName, player);
             socket.join(roomName);
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.LeaveRoom)
+    leaveRoom(socket: Socket, playerName: string) {
+        const roomName = playerName + ' room';
+        socket.leave(roomName);
+        if (this.timeService.timers[roomName]) {
+            this.timeService.stopTimer(this.timeService.timers[roomName]);
         }
     }
 
@@ -107,12 +125,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
+        // setInterval(() => {
+        //     this.emitTime();
+        // }, DELAY_BEFORE_EMITTING_TIME);
     }
 
     private emitTime() {
-        this.server.emit('time', this.timeService.getCount());
+       // this.server.emit('time', this.timeService.getCount());
     }
 }

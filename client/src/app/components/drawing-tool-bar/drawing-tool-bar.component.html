@@ -1,0 +1,26 @@
+<div class="drawing-tool-bar">
+    <h2>Customize</h2>
+    <div class="tool-parial" id="line-width">
+        <input type="range" (min)="(const.minLineWidth)" (max)="(const.maxLineWidth)" [(ngModel)]="lineWidth"
+            (change)="setLineWidth()" />
+        <p>{{ lineWidth }}</p>
+    </div>
+    <div class="tool-parial" id="line-color">
+        <input type="color" [(ngModel)]="lineColor" (change)="setLineColor()" />
+        <p>{{ lineColor }}</p>
+    </div>
+    <!-- A line to divide the tools from the validator -->
+    <div class="tool-parial" id="line"></div>
+
+    <!-- The validator -->
+    <div class="tool-parial" id="radius-tronslation">
+        <p>pencil lead radius</p>
+        <select [(ngModel)]="selectedRadius" (change)="setRadius()">
+            <option *ngFor="let radius of const.possibleRadius" [value]="radius">{{ radius }}</option>
+        </select>
+    </div>
+    <div class="tool-parial" id="validator">
+        <app-validate-create-btn (onBtnClick)="drawDifferenceImage()" color="{{ tic ? 'red' : 'green' }}"
+            text="{{ tic ? 'Validate' : 'Create' }}"></app-validate-create-btn>
+    </div>
+</div>

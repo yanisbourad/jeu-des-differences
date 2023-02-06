@@ -1,0 +1,124 @@
+.container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.player-circle {
+    background: #b8b7ff;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 5px;
+    overflow: hidden;
+    padding: 25px;
+    position: relative;
+}
+.player-initials {
+    text-align: center;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 77px;
+    color: #2c0064;
+}
+.discussion-box {
+    width: 379px;
+    height: 485px;
+    background: rgba(85, 66, 116, 0.3);
+    border-radius: 16px;
+    overflow-y: scroll;
+}
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: #423d4a;
+}
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+    height : 50px;
+  }
+   
+  /* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(153, 109, 185, 0.952); 
+    border-radius: 10px;
+    height : 50px;
+  }
+.event-title {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    color: #ababab;
+}
+hr {
+    width: 310px;
+    border: 1px solid #ababab;
+}
+.event-message {
+    margin-top: 10px;
+    display: block;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 20px;
+    color: white;
+    background: #458fff;
+    border-radius: 20px;
+}
+input {
+    box-sizing: border-box;
+    width: 331px;
+    height: 83px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    :not(:disabled) {
+        background: #2c2042;
+        border: 3px solid #2c2042;
+    }
+}
+::placeholder {
+    text-align: center;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    white-space: pre-line;
+    :not(:disabled) {
+        color: #a8a8a8;
+    }
+}
+.send-btn {
+    width: 177px;
+    height: 43px;
+    background: rgba(85, 66, 116, 0.1);
+    border-radius: 32px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: #ffffff;
+    :not(:disabled) {
+        border: 2px solid #7b57b8;
+    }
+}
+.send-btn :not(:disabled) {
+    background-color: #9845e7;
+}
+
+.message {
+    font-size: 16px;
+    line-height: 24px;
+    border-left: 1px solid white;
+}

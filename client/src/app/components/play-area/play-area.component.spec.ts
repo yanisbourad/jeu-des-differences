@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Point } from '@app/interfaces/point';
 
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
@@ -24,7 +24,7 @@ describe('PlayAreaComponent', () => {
     });
 
     it('mouseHitDetect should assign the mouse position to mousePosition variable', () => {
-        const expectedPosition: Vec2 = { x: 100, y: 200 };
+        const expectedPosition: Point = { x: 100, y: 200 };
         mouseEvent = {
             offsetX: expectedPosition.x,
             offsetY: expectedPosition.y,
@@ -36,7 +36,7 @@ describe('PlayAreaComponent', () => {
 
     /* eslint-disable @typescript-eslint/no-magic-numbers -- Add reason */
     it('mouseHitDetect should not change the mouse position if it is not a left click', () => {
-        const expectedPosition: Vec2 = { x: 0, y: 0 };
+        const expectedPosition: Point = { x: 0, y: 0 };
         mouseEvent = {
             offsetX: expectedPosition.x + 10,
             offsetY: expectedPosition.y + 10,

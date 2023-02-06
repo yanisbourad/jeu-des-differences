@@ -1,0 +1,14 @@
+<div class="container">
+    <div class="header"><app-header></app-header></div>
+    <app-game-info></app-game-info>
+    <div class="mainView">
+        <canvas #canvas1 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
+        <canvas #canvas2 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
+    </div>
+    <div class="footer">
+        <button mat-raised-button class="giveUp btn" (click)="giveUp()"> Abandonner la partie </button>
+    </div>
+    <div class="message">
+        <app-message-area></app-message-area>
+    </div>
+</div>

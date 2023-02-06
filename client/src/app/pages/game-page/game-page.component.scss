@@ -1,0 +1,70 @@
+.container {
+  display: grid; 
+  grid-template-columns: 2fr 0.6fr; 
+  grid-template-rows: 0.4fr 1fr 3fr 0.5fr; 
+  gap: 0px 0px; 
+  height: 100vh;
+  width: 100vw;
+  grid-template-areas: 
+    "header header"
+    "infos message"
+    "mainView message"
+    "footer message"; 
+}
+.header { grid-area: header; }
+.mainView { 
+  grid-area: mainView;
+  padding-left: 2%;
+}
+.footer { 
+  grid-area: footer;
+}
+.message { 
+  grid-area: message; 
+}
+.mat-raised-button{
+  border-radius: 32px;
+  border: 2px solid #7B57B8;
+}
+.giveUp{
+  display: flex;
+  margin-left: 42%;
+  backdrop-filter: blur(32px) brightness(100%);
+  border: 2px solid;
+  border-color: rgb(235, 88, 88);
+  border-radius: 32px;
+  background-color: #a77878df;
+  color: white;
+}
+.giveUp:hover{
+  background-color: #bd3c3c;
+}
+
+.difficulty{
+  color: rgba(255, 255, 255, 0.711);
+  height: 50%;
+}
+
+canvas{
+  background: rgba(85, 66, 116, 0.1);
+  border: 2px solid rgb(252, 250, 250);
+  margin: 30px ;
+}
+
+@media (min-width: 1920px) {
+  .container {
+      width: 1920px;
+  }
+}
+
+@media (max-width: 2000px) {
+  .container {
+      width: 2000px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+      width: 1920px;
+  }
+}

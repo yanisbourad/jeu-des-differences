@@ -1,0 +1,75 @@
+.drawing-tool-bar {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: 0 10px 10px 10px;
+    max-width: auto;
+    min-width: 300px;
+    border-radius: 20px;
+    background-color: #486ae6;
+}
+.drawing-tool-bar h2 {
+    display: flex;
+    justify-content: center;
+    color: #fff;
+    padding-top: 1em;
+    font-size: 1.5em;
+    height: 3em;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: #121265;
+}
+
+.tool-parial {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 90%;
+    margin: 2rem;
+    font-size: 1.5rem;
+    align-items: center;
+}
+
+.tool-parial p {
+    margin-left: 10px;
+    padding-top: 10px;
+}
+.tool-parial select {
+    height: 2rem;
+    width: 5rem;
+    font-size: 1rem;
+}
+#radius-tronslation {
+    display: flex;
+    justify-content: center;
+    flex: wrap;
+    max-width: 350%;
+}
+#radius-tronslation p {
+    margin-right: 10px;
+    width: auto;
+}
+#radius-tronslation select {
+    margin-right: 10px;
+    width: auto;
+}
+
+#line-width input {
+    height: 2rem;
+    width: 60%;
+    font-size: 1rem;
+}
+
+#line {
+    margin: 3rem;
+    width: auto;
+    height: 2px;
+    background-color: red;
+    border: 2px solid red;
+}
+
+#validator {
+    display: flex;
+    justify-content: center;
+    flex: initial;
+}

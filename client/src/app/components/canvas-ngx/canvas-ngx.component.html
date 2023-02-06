@@ -1,0 +1,10 @@
+<div class="Canvas-ngx">
+    <canvas #Canvas [attr.width]="width" [attr.height]="height"></canvas>
+    <input type="file" class="file-upload" (change)="onFileSelected($event)" accept=".bmp" #fileUpload />
+    <div class="Tools-Canvas">
+        <img src="./assets/img/UploadBackground.png" id="UploadBtn" alt="Upload Background" class="btn-tools-Canvas"
+            (click)="fileUpload.click()" />
+        <img src="./assets/img/ClearBackground.png" id="ClearBtn" class="btn-tools-Canvas" alt="Clear Background"
+            (click)="clearCanvas()" />
+    </div>
+</div>

@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class BannerComponent {
     width: string = '1920px';
     height: string = '1080px';
-    color: 'blue' | 'orange' | 'purple';
+    color: 'rgb(39,86,156)' | 'rgb(187,96,31)' | 'rgb(99,60,141)';
     text: 'Classique' | 'Temps limité' | 'Configuration';
     constructor(private router: Router) {}
 
@@ -17,18 +17,18 @@ export class BannerComponent {
         switch (this.router.url) {
             case '/classique': {
                 this.text = 'Classique';
-                this.color = 'blue';
-                return 'blue';
+                this.color = 'rgb(39,86,156)';
+                return 'rgb(39,86,156)';
             }
             case '/Tempslimite': {
                 this.text = 'Temps limité';
-                this.color = 'orange';
-                return 'orange';
+                this.color = 'rgb(187,96,31)';
+                return 'rgb(187,96,31)';
             }
             case '/config': {
                 this.text = 'Configuration';
-                this.color = 'purple';
-                return 'purple';
+                this.color = 'rgb(99,60,141)';
+                return 'rgb(99,60,141)';
             }
         }
         return 'white';

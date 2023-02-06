@@ -11,7 +11,8 @@ import { Player } from '../../../../client/src/app/interfaces/player';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() server: Server;
     timeStarted: boolean = false;
-  
+    hintUsed: boolean = false;
+    // isTimeStopped: boolean = false;
     private readonly room = PRIVATE_ROOM_ID;
 
     constructor(private readonly logger: Logger, private readonly timeService: TimeService, private readonly playerService : PlayerService) {}
@@ -52,15 +53,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StopTimer)
     stopTimer(_: Socket, roomName: string) {
+        console.log(roomName)
         if (this.timeService.timers[roomName]) {
-            this.timeService.stopTimer(this.timeService.timers[roomName]);
+           clearInterval(this.timeService.timers[roomName]);
         }
+       // this.timeService.isTimeStopped = true;
     }
 
     @SubscribeMessage(ChatEvents.AddTime)
-    addTime(_: Socket, data: [number, boolean]) {
-        this.logger.log(data);
-        this.timeService.addTime(data[0], data[1]);
+    addTime(_: Socket, time: number) {
+        this.timeService.timeAdded = time;
+        this.hintUsed = true;
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
@@ -73,22 +76,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const roomName = playerName + ' room';
         const player : Player =
         {
-            playerName: "ayerName",
+            playerName: playerName,
             socketId: socket.id
         }
         if (await this.playerService.getRoomIndex(roomName) == -1){
             await this.playerService.addRoom(roomName, player);
+            
             if (!this.timeService.timers[roomName]) {
                 let count = 0;
                 this.timeService.timers[roomName] = setInterval(() => {
+                  if (this.hintUsed){
+                    count += this.timeService.timeAdded;
+                    this.hintUsed = false;
+                  }  
                   count++;
                   socket.to(roomName).emit(ChatEvents.Time,  [roomName, count]);
                 }, DELAY_BEFORE_EMITTING_TIME);
               }
-            console.log("this.rooms");
-            console.log(await this.playerService.getRooms())
-            console.log(`Room ${roomName} created and ${playerName} joined it`);
-           // socket.to(roomName).emit('time', "");
+            // console.log(await this.playerService.getRooms())
+            // console.log(`Room ${roomName} created and ${playerName} joined it`);
             socket.join(roomName);
         }
         else{
@@ -103,7 +109,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const roomName = playerName + ' room';
         socket.leave(roomName);
         if (this.timeService.timers[roomName]) {
-            this.timeService.stopTimer(this.timeService.timers[roomName]);
+            clearInterval(this.timeService.timers[roomName]);
         }
     }
 
@@ -125,12 +131,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     afterInit() {
-        // setInterval(() => {
-        //     this.emitTime();
-        // }, DELAY_BEFORE_EMITTING_TIME);
-    }
-
-    private emitTime() {
-       // this.server.emit('time', this.timeService.getCount());
+        this.logger.log('Initialisation du socket');
     }
 }

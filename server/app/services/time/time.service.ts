@@ -6,6 +6,8 @@ export class TimeService {
     count: number = 0;
     countDown: number = 0; // from database or something else. The time must be transformed to second before being processed
     time: number | unknown; // probably find something else
+    timeAdded : number = 0;
+    isTimeStopped: boolean = false;
 
     timers: { [key: string]: any } = {};
 
@@ -13,8 +15,18 @@ export class TimeService {
         this.timers[id] = setInterval(callback, DELAY_BEFORE_EMITTING_TIME);
     }
 
-    stopTimer(id: string) {
-        clearInterval(this.timers[id]);
+    getTimeAdded(): number {
+        return this.timeAdded;
+    }
+
+    //add Time
+    addTime(id:string, time:number){
+        // clearInterval(this.timers[id]);
+        // let count = 0;
+        // this.timers[id] = setInterval(() => {
+        //   count++;
+        //   io.to(room).emit('timer', count);
+        // }, 1000 + time * 1000);
     }
 
     // setTimers(id: string, callback: (count: number) => void) {
@@ -39,10 +51,10 @@ export class TimeService {
     //     this.timerService.setTimer(this.timer2Id, () => console.log('Timer 2'), 2000);
     //   }
 
-    addTime(time: number, isClassical: boolean): void {
-        if (isClassical) this.count += Number(time);
-        else this.countDown += Number(time);
-    }
+    // addTime(time: number, isClassical: boolean): void {
+    //     if (isClassical) this.count += Number(time);
+    //     else this.countDown += Number(time);
+    // }
 
     decreaseTime(time: number): void {
         this.countDown -= time;

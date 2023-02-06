@@ -41,7 +41,7 @@ export class GameService {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
-                this.socket.addTime(this.gameInformation.hintsPenalty, this.gameInformation.isClassical);
+                this.socket.addTime(this.gameInformation.hintsPenalty);
             }
         }
     }

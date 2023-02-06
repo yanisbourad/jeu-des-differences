@@ -35,6 +35,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvas.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
+        this.drawService.clearCanvas(this.canvas.nativeElement);
         // push the canvas pointer to the difference Service
         this.saveCanvas();
     }

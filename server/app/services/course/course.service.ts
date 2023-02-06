@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 import { Course, CourseDocument } from '@app/model/database/course';
 import { CreateCourseDto } from '@app/model/dto/course/create-course.dto';

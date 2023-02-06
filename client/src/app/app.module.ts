@@ -20,6 +20,7 @@ import { NamePopupComponent } from './components/name-popup/name-popup.component
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/configuration-jeu-page.component';
+import { TimePopupComponent } from './components/time-popup/time-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -41,6 +42,7 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
         CardDisplayerComponent,
         NamePopupComponent,
         ConfigurationJeuPageComponent,
+        TimePopupComponent,
     ],
     imports: [
         AppMaterialModule,

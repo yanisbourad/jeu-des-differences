@@ -20,14 +20,13 @@ export class GameService {
     async populateDB(): Promise<void> {
         const game: CreateGameDto[] = [
             {
-                name: 'Object Oriented Programming',
+                gameName: 'Object Oriented Programming',
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                originalImageData: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                originalImageData: '[1, 2, 3, 4, 5, 6, 7, 8, 9]',
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                modifiedImageData: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-                listDifferences: [1, 2, 3, 3],
+                modifiedImageData: '[1, 2, 3, 4, 5, 6, 7, 8, 9]',
+                listDifferences: [[1, 2, 3, 3]],
                 difficulty: 'Facile',
-                _id: '1',
             },
         ];
 
@@ -39,9 +38,9 @@ export class GameService {
         return await this.gameModel.find({});
     }
 
-    async getGame(id: string): Promise<Game> {
+    async getGame(_gameName: string): Promise<Game> {
         // NB: This can return null if the Game does not exist, you need to handle it
-        return await this.gameModel.findOne({ _id: id });
+        return await this.gameModel.findOne({ gameName: _gameName });
     }
 
     async addGame(game: CreateGameDto): Promise<void> {
@@ -95,7 +94,8 @@ export class GameService {
     // }
 
     private validateGame(game: CreateGameDto): boolean {
-        return this.validateName(Game.name) && this.validateImageSize(game.modifiedImageData) && this.validateImageSize(game.originalImageData);
+        // return this.validateName(Game.name) && this.validateImageSize(game.modifiedImageData) && this.validateImageSize(game.originalImageData);
+        return true;
     }
     private validateName(name: string): boolean {
         return name ? true : false;

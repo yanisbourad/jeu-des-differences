@@ -2,7 +2,7 @@ import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameService } from '@app/services/game/game.service';
-import { Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -54,7 +54,7 @@ export class GameController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/create')
-    async createGame(@Param('game') game: CreateGameDto, @Res() response: Response) {
+    async createGame(@Body() game: CreateGameDto, @Res() response: Response) {
         try {
             const res = await this.gamesService.addGame(game);
             response.status(HttpStatus.OK).json(res);

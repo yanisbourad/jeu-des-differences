@@ -37,7 +37,7 @@ export class DateService {
     }
 
     stopTimer(): void {
-        clearInterval(this.time);
+        // clearInterval(this.time);
     }
 
     setCountDown(time: number): void {

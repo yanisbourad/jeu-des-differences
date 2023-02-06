@@ -2,29 +2,32 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 
-export type GameDocument = Game & Document;
-
+export type GameRecordDocument = GameRecord & Document;
 @Schema()
-export class Game {
+export class GameRecord {
     @ApiProperty()
     @Prop({ required: true })
     gameName: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    originalImageData: string;
+    typeGame: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    modifiedImageData: string;
+    time: number;
 
     @ApiProperty()
     @Prop({ required: true })
-    listDifferences: number[][];
+    playerName: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    difficulty: string;
+    dateStart: Date;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    playing: boolean;
 }
 
-export const gameSchema = SchemaFactory.createForClass(Game);
+export const gameRecordSchema = SchemaFactory.createForClass(GameRecord);

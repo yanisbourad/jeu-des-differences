@@ -9,6 +9,8 @@ export class CanvasHolderService {
 
     private canvasOriginal!: Uint8ClampedArray;
     private canvasModifier!: Uint8ClampedArray;
+    private canvasOriginalData!: string;
+    private canvasModifiedData!: string;
 
     setCanvas(canvasData: Uint8ClampedArray, canvasName: string): void {
         if (canvasName === this.originalCanvas) {
@@ -17,7 +19,21 @@ export class CanvasHolderService {
             this.canvasModifier = canvasData;
         }
     }
+    setCanvasData(canvasData: string, canvasName: string): void {
+        if (canvasName === this.originalCanvas) {
+            this.canvasOriginalData = canvasData;
+        } else if (canvasName === this.modifiedCanvas) {
+            this.canvasModifiedData = canvasData;
+        }
+    }
 
+    getCanvasUrlData(canvasName: string): string {
+        if (canvasName === this.originalCanvas) {
+            return this.canvasOriginalData;
+        } else if (canvasName === this.modifiedCanvas) {
+            return this.canvasModifiedData;
+        } else return '';
+    }
     getCanvasData(canvasName: string): Uint8ClampedArray | undefined {
         if (canvasName === this.originalCanvas) {
             return this.canvasOriginal;
@@ -29,6 +45,8 @@ export class CanvasHolderService {
     clearCanvas(): void {
         this.canvasOriginal = new Uint8ClampedArray();
         this.canvasModifier = new Uint8ClampedArray();
+        this.canvasOriginalData = '';
+        this.canvasModifiedData = '';
     }
 }
 

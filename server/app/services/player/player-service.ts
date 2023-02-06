@@ -6,16 +6,16 @@ import { Player } from '../../../../client/src/app/interfaces/player';
 export class PlayerService {
     rooms: Room[] = [];
     maxPlayers: number = 2;
-
-    async addRoom(roomName:string, host: Player): Promise<void> {
-        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0 });
+    
+    async addRoom(roomName:string, host: Player, startTime: Date): Promise<void> {
+        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0, startTime: startTime, penalty:5});
     }
 
     async getRoomIndex(roomName: string): Promise<number> {
         return this.rooms.findIndex((room) => room?.name == roomName);
     }
 
-    async addPlayer(roomName: string, player: Player): Promise<void> {
+    async addPlayer(roomName: string, player: Player, startTime: Date): Promise<void> {
         const rIndex = await this.getRoomIndex(roomName);
         if (
             this.rooms[rIndex].players.length < this.maxPlayers &&
@@ -25,7 +25,7 @@ export class PlayerService {
             this.rooms[rIndex].maxPlayers++;
         } else {
             console.log(this.rooms[rIndex].players.length)
-            await this.addRoom(roomName, player);
+            await this.addRoom(roomName, player, startTime);
             console.log('Room is full or player already in room');
         }
     }
@@ -37,5 +37,10 @@ export class PlayerService {
 
     async getRooms(): Promise<Room[]> {
         return this.rooms;
+    }
+
+    async getRoom(roomName: string): Promise<Room> {
+        const rIndex = await this.getRoomIndex(roomName);
+        return this.rooms[rIndex];
     }
 }

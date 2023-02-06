@@ -9,7 +9,7 @@ export enum ChatEvents {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-    StartTimer = 'startTimer',//remove if unused
+    ValidateTime = 'validateTime',//remove if unused
     StopTimer = 'stopTimer',
     AddTime = 'addTime',
     Time = 'time',

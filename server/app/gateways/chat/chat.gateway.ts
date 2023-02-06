@@ -6,16 +6,20 @@ import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.cons
 import { ChatEvents } from './chat.gateway.events';
 import { PlayerService } from '@app/services/player/player-service';
 import { Player } from '../../../../client/src/app/interfaces/player';
+import { DateService } from '@app/services/date/date.service';
+import { Room } from '../../../../client/src/app/interfaces/rooms';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() server: Server;
     timeStarted: boolean = false;
     hintUsed: boolean = false;
+    clientTime: number = 0;
     // isTimeStopped: boolean = false;
     private readonly room = PRIVATE_ROOM_ID;
 
-    constructor(private readonly logger: Logger, private readonly timeService: TimeService, private readonly playerService : PlayerService) {}
+    constructor(private readonly logger: Logger, private readonly timeService: TimeService, 
+        private readonly playerService : PlayerService, private readonly dateService: DateService) {}
 
     @SubscribeMessage(ChatEvents.Message)
     message(_: Socket, message: string) {
@@ -43,12 +47,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('connection au socket');
     }
 
-    @SubscribeMessage(ChatEvents.StartTimer)
-    startTimer() {
-        if (!this.timeStarted) {
-            this.timeService.startTimer();
-            this.timeStarted = true;
+    @SubscribeMessage(ChatEvents.Time)
+    async Time(socket:Socket, data: [time:number, roomName:string]) {
+        this.clientTime = data[0];
+        let room =  await this.playerService.getRoom(data[1]);
+        let startTime = room.startTime;
+        if(this.hintUsed){
+            this.dateService.penalty++;
+            this.hintUsed = false;
         }
+        let count = this.dateService.getElaspedTime(startTime);
+        if(this.validateServerClientTime(count)){
+            console.log("time is valid");
+           
+        }else{
+            console.log("time is not valid");
+            //socket.emit(ChatEvents.Time,  [room.name, count])
+            socket.emit(ChatEvents.Time,  [room.name, count])
+        }
+        console.log("elapsed time:" ,count, this.clientTime);
+        //send correct time 
+        console.log(data[1])
+        //socket.emit(ChatEvents.ValidateTime, this.dateService.getSeconds());
     }
 
     @SubscribeMessage(ChatEvents.StopTimer)
@@ -74,32 +94,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.JoinRoom)
     async joinRoom(socket: Socket, playerName: string) {
         const roomName = playerName + ' room';
+        let startTime = new Date;
+        let count = this.dateService.getElaspedTime(startTime);
+        console.log(startTime, this.dateService.currentTime())
         const player : Player =
         {
             playerName: playerName,
             socketId: socket.id
         }
+        socket.to(roomName).emit(ChatEvents.Time,  [roomName, count]);
         if (await this.playerService.getRoomIndex(roomName) == -1){
-            await this.playerService.addRoom(roomName, player);
+            await this.playerService.addRoom(roomName, player, startTime);
             
             if (!this.timeService.timers[roomName]) {
-                let count = 0;
-                this.timeService.timers[roomName] = setInterval(() => {
-                  if (this.hintUsed){
+
+                console.log(count);
+                //  this.timeService.timers[roomName] = setInterval(() => {
+                if (this.hintUsed){
                     count += this.timeService.timeAdded;
                     this.hintUsed = false;
-                  }  
-                  count++;
+                }  
+                //this.validateServerClientTime(socket,45, roomName );
+                 // count++;
+                //console.log(count)
                   socket.to(roomName).emit(ChatEvents.Time,  [roomName, count]);
-                }, DELAY_BEFORE_EMITTING_TIME);
               }
-            // console.log(await this.playerService.getRooms())
-            // console.log(`Room ${roomName} created and ${playerName} joined it`);
             socket.join(roomName);
         }
         else{
+            //this.validateServerClientTime(socket,45, roomName );
             console.log( "await this.playerService.getRooms()");
-            this.playerService.addPlayer(roomName, player);
+            this.playerService.addPlayer(roomName, player, startTime);
             socket.join(roomName);
         }
     }
@@ -132,5 +157,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     afterInit() {
         this.logger.log('Initialisation du socket');
+    }
+
+    validateServerClientTime(serverTime: number): boolean {
+        return serverTime == this.clientTime
+    //    if (this.clientTime === serverTime){
+    //         socket.to(roomName).emit(ChatEvents.Time,  [roomName, serverTime]);
+    //    }
+    //      else{
+    //         socket.to(roomName).emit(ChatEvents.Time,  [roomName, serverTime]);
+    //      }
     }
 }

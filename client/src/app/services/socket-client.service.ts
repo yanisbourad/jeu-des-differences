@@ -28,9 +28,9 @@ export class SocketClientService {
     }
 
     getRoomTime(roomName : string) : number {
+        //console.log("getRoomTime", roomName, this.serverTime[this.getServerTimeIndex(roomName)]?.time)
         return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
-    } 
-
+    }
     getServerTimeIndex(roomName:string): number {
         return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
     }
@@ -51,12 +51,14 @@ export class SocketClientService {
         //   this.serverTime = time;
         // });
         this.socketClient.on('time',  (values :[string, number]) => {
+            console.log("time", values)
             if (this.getServerTimeIndex(values[0]) == -1 ){ 
                 this.serverTime.push({id:values[0], time:values[1]});
             }else{
                 this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];       
             }
-            //console.log(this.serverTime)
+            console.log("getRoomTime", values[0], this.serverTime[this.getServerTimeIndex(values[0])]?.time)
+            console.log("serverTime", this.serverTime[this.getServerTimeIndex(values[0])].time)
         });
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('message', (message: string) => {
@@ -77,6 +79,11 @@ export class SocketClientService {
 
     disconnect() {
         this.socketClient.disconnect();
+    }
+
+    //sendTime to server
+    sendTime(time: number, roomName: string) {
+        this.socketClient.send('time', [time, roomName]);
     }
 
     // starttimer

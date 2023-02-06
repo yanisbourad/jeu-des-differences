@@ -5,4 +5,6 @@ export interface Room {
   host: Player
   players: Player[]
   maxPlayers : number
+  startTime: Date
+  penalty:number
 }

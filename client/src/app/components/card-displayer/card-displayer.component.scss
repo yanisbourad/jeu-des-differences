@@ -11,7 +11,7 @@
     top: 983px;
     }
     
-    .previous-next-button:hover{
+    .previous-next-button:hover:enabled{
         background-color: #9845e7;
       }
     
@@ -44,10 +44,3 @@
         padding-top: 25px;
         text-align:center;
     }
-      
-    // button:disabled,
-    // button[disabled]{
-    //   border: 1px solid #999999;
-    //   background-color: #cccccc;
-    //   color: #666666;
-    // }

@@ -22,7 +22,7 @@ export class CreateGameDto {
 
     @ApiProperty()
     @IsArray()
-    listDifferences: Set<number>[];
+    listDifferences: number[];
 
     @ApiProperty()
     @IsString()

@@ -1,10 +1,11 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Message } from '@common/message';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+
 // eslint-disable-next-line no-restricted-imports
+import { Game } from '../../../../common/game';
 @Injectable({
     providedIn: 'root',
 })
@@ -13,12 +14,15 @@ export class CommunicationService {
 
     constructor(private readonly http: HttpClient) {}
 
-    basicGet(): Observable<Message> {
-        return this.http.get<Message>(`${this.baseUrl}/example`).pipe(catchError(this.handleError<Message>('basicGet')));
+    getAllGames(): Observable<Game> {
+        return this.http.get<Game>(`${this.baseUrl}/game`).pipe(catchError(this.handleError<Game>('getAllGames')));
     }
 
-    basicPost(message: Message): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
+    getGameById(gameId: string): Observable<Game> {
+        return this.http.get<Game>(`${this.baseUrl}/game/${gameId}`).pipe(catchError(this.handleError<Game>('getGameById')));
+    }
+    createGame(game: Game): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseUrl}/game/create`, game, { observe: 'response', responseType: 'text' });
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {

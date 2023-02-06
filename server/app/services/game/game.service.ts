@@ -25,7 +25,7 @@ export class GameService {
                 originalImageData: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 modifiedImageData: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-                listDifferences: [new Set<number>()],
+                listDifferences: [1, 2, 3, 3],
                 difficulty: 'Facile',
                 _id: '1',
             },

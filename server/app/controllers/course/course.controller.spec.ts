@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Course } from '@app/model/database/course';
 import { CourseService } from '@app/services/course/course.service';
+import { HttpStatus } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Response } from 'express';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { CourseController } from './course.controller';
-import { Course } from '@app/model/database/course';
-import { Response } from 'express';
-import { HttpStatus } from '@nestjs/common';
 
 describe('CourseController', () => {
     let controller: CourseController;

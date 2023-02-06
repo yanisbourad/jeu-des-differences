@@ -32,22 +32,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     drawDifferencePixel() {
-        // this.ctx = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.drawService.clearCanvas(this.canvas.nativeElement);
         const differences = this.imageDifferenceService.getDifferencePixelToDraw();
         this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
-        console.log(differences);
-        // console.log(this.ctx);
-        // console.log(this.imageDifferenceService.getDifferencePixelToDraw());
-        // this.showPixel = false;
-        // this.showDifferentPixels = true;
-        // console.log(this.showDifferentPixels);
-        // const imageData = new ImageData(this.imageDifferenceService.getDifferencePixelToDraw(), 640, 480);
-        // console.log(imageData);
-        // // this.ctx.fillRect(25, 25, 100, 100);
-        // // this.ctx.clearRect(45, 45, 60, 60);
-        // // this.ctx.strokeRect(50, 50, 50, 50);
-
-        // this.ctx.putImageData(imageData, 0, 0);
     }
 }

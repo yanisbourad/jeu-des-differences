@@ -20,7 +20,7 @@ export class Game {
 
     @ApiProperty()
     @Prop({ required: true })
-    listDifferences: Set<number>[];
+    listDifferences: number[];
 
     @ApiProperty()
     @Prop({ required: true })

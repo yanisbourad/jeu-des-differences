@@ -42,9 +42,7 @@ export class DrawingToolBarComponent {
             this.showMessage = !this.showMessage;
             this.showDifference = this.imageDifferenceService.getDifferenceNumber();
             this.tic = !this.tic;
-            console.log('tool bar');
             this.onReadyToDraw.emit();
-            // this.imageDifferenceService.resetImageData();
         }
     }
 }

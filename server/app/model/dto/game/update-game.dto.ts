@@ -22,9 +22,9 @@ export class UpdateGameDto {
     @ApiProperty()
     @IsOptional()
     @IsArray()
-    listDifferences: Set<number>[];
+    listDifferences: number[];
 
     @ApiProperty()
     @IsString()
-    difficulty: 'Facile' | 'Difficile';
+    difficulty: string;
 }

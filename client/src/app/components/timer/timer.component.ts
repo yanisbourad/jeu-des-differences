@@ -20,9 +20,9 @@ export class TimerComponent implements OnInit {
 
     formatTime(): string {
         return (
-            (this.time.minute < constants.UNDER_TEN ? '0' + this.time.minute : this.time.minute) +
+            (this.time.minute < 10 ? '0' + this.time.minute : this.time.minute) +
             ':' +
-            (this.time.second < constants.UNDER_TEN ? '0' + this.time.second : this.time.second)
+            (this.time.second < 10 ? '0' + this.time.second : this.time.second)
         );
     }
 

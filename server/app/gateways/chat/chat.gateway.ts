@@ -26,7 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         let room = await this.playerService.getRoom(data[1]);
         let startTime = room.startTime;
         if (this.hintUsed) {
-            this.timeService.penalty++;
+            this.timeService.nHints++;
             this.hintUsed = false;
         }
         let count = this.timeService.getElaspedTime(startTime);

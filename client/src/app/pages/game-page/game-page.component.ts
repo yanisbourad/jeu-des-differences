@@ -20,7 +20,7 @@ export class GamePageComponent implements OnInit {
     readonly ONE_QUARTER = 1 / 4;
     readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
-    playerNames : string[] = ["test8", "test2"]
+    playerNames : string[] = ["test7", "test2"] // get from database
    
     constructor(private readonly drawService: DrawService, public gameService: GameService, 
         readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService) {}
@@ -30,13 +30,6 @@ export class GamePageComponent implements OnInit {
         this.socket.joinRoom(this.playerNames[0]);
         this.clientTimeService.startTimer();
     }
-
-    // reloadCurrentRoute(): void{
-    //     let currentUrl = this.router.url;
-    //     this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
-    //         this.router.navigate([currentUrl]);
-    //     });
-    //   }
 
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
@@ -48,7 +41,7 @@ export class GamePageComponent implements OnInit {
                 this.mousePosition.x <= this.DEFAULT_WIDTH * (1 - this.ONE_SIXTH) &&
                 this.mousePosition.x >= this.DEFAULT_WIDTH * this.ONE_SIXTH
             ) {
-                this.socket.stopTimer(("test8 room"));
+                this.clientTimeService.stopTimer();
                 this.gameService.playSuccessAudio();
                 this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
                 this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
@@ -58,7 +51,7 @@ export class GamePageComponent implements OnInit {
                 this.drawService.drawWords('Erreur', this.canvas2.nativeElement, this.mousePosition);
             }
         }
-}
+    }
         // async loadImage(): Promise<void> {
         //     const original_image = new Image();
         //     const modified_image = new Image();
@@ -72,7 +65,6 @@ export class GamePageComponent implements OnInit {
         //     });
         // }
    
-
     giveUp(): void {
         /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
         // if yes do

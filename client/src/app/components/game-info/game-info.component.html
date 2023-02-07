@@ -2,7 +2,7 @@
   <div class="left">
       <p class="title">{{gameService.gameInformation.gameTitle}}</p>
       <p class="sub-title game-infos">{{gameService.gameInformation.gameMode}}</p>
-      <p class="sub-title">Différences trouvées</p>
+      <p class="sub-title">Différences trouvées - NomJoueur</p>
       <div>
           <img
               *ngFor="let differences of gameService.differencesArray"
@@ -22,7 +22,7 @@
           </div>
           <p>Difficulté</p>
       </div>
-      <app-timer [isClassicMode]= true ></app-timer>
+      <app-timer></app-timer>
   </div>
   <div class="right">
       <p class="sub-title">Indices restants</p>

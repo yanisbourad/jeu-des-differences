@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { TimeService } from './time.service';
+import { SocketClientService } from './socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -23,6 +23,7 @@ export class GameService {
         isClassical: true,
     };
 
+
     nDifferencesNotFound: number = this.gameInformation.nDifferences;
     nDifferencesFound: number = 0;
     differencesArray: string[] = new Array(this.nDifferencesNotFound);
@@ -32,7 +33,7 @@ export class GameService {
     nHintsUsed: number = 0;
     hintsArray: string[] = new Array(this.nHintsUnused);
 
-    constructor(private readonly timeService: TimeService) {}
+    constructor(private readonly socket: SocketClientService) {}
 
     clickGetHints(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {
@@ -40,7 +41,7 @@ export class GameService {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
-                this.timeService.addTime(this.gameInformation.hintsPenalty, this.gameInformation.isClassical);
+                this.socket.addTime(this.gameInformation.hintsPenalty);
             }
         }
     }
@@ -61,7 +62,7 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            this.timeService.stopTimer();
+           // this.socket.stopTimer();
             this.isGameFinished = true;
         }
     }

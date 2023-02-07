@@ -1,15 +1,15 @@
+import { Message } from '@app/model/schema/message.schema';
+import { TimeService } from '@app/services/time/time.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DateService } from '@app/services/date/date.service';
 import { ExampleService } from './example.service';
-import { Message } from '@app/model/schema/message.schema';
 
 describe('ExampleService', () => {
     let service: ExampleService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ExampleService, DateService, Logger],
+            providers: [ExampleService, TimeService, Logger],
         }).compile();
 
         service = module.get<ExampleService>(ExampleService);

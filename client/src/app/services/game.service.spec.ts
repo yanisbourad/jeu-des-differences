@@ -3,14 +3,15 @@ import { TestBed } from '@angular/core/testing';
 import { GameService } from './game.service';
 
 describe('GameService', () => {
-    let service: GameService;
+    let gameService: GameService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(GameService);
+        gameService = TestBed.inject(GameService);
     });
 
     it('should be created', () => {
-        expect(service).toBeTruthy();
+        expect(gameService).toBeTruthy();
     });
+
 });

@@ -1,96 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { DELAY_BEFORE_EMITTING_TIME } from '@app/gateways/chat/chat.gateway.constants';
+import { TRANSFORM_TO_SECONDS } from '@app/gateways/chat/chat.gateway.constants';
 
 @Injectable()
 export class TimeService {
-    count: number = 0;
-    countDown: number = 0; // from database or something else. The time must be transformed to second before being processed
-    time: number | unknown; // probably find something else
-    timeAdded : number = 0;
-    isTimeStopped: boolean = false;
-
-    timers: { [key: string]: any } = {};
-
-    setTimer(id: string, callback: () => void) {
-        this.timers[id] = setInterval(callback, DELAY_BEFORE_EMITTING_TIME);
+    nHints: number = 0;
+    penalty: number = 0;
+    currentTime(): string {
+        return new Date().toString();
     }
-
-    getTimeAdded(): number {
-        return this.timeAdded;
-    }
-
-    //add Time
-    addTime(id:string, time:number){
-        // clearInterval(this.timers[id]);
-        // let count = 0;
-        // this.timers[id] = setInterval(() => {
-        //   count++;
-        //   io.to(room).emit('timer', count);
-        // }, 1000 + time * 1000);
-    }
-
-    // setTimers(id: string, callback: (count: number) => void) {
-    //     let count = 0;
-    //     this.timers[id] = setInterval(() => {
-    //       count++;
-    //       callback(count);
-    //     }, DELAY_BEFORE_EMITTING_TIME);
-    //   }
-    //startTimer1() {
-    //     this.timerService.setTimer(this.timer1Id, (count) => {
-    //       this.timer1Count = count;
-    //     }, 1000, 10);
-    //   }
-    
-
-    // startTimer1() {
-    //     this.timerService.setTimer(this.timer1Id, () => console.log('Timer 1'), 1000);
-    //   }
-    
-    // startTimer2() {
-    //     this.timerService.setTimer(this.timer2Id, () => console.log('Timer 2'), 2000);
-    //   }
-
-    // addTime(time: number, isClassical: boolean): void {
-    //     if (isClassical) this.count += Number(time);
-    //     else this.countDown += Number(time);
-    // }
-
-    decreaseTime(time: number): void {
-        this.countDown -= time;
-    }
-
-    startTimer(): void {
-        this.time = setInterval(() => {
-            this.count++;
-        }, DELAY_BEFORE_EMITTING_TIME);
-    }
-
-    startCountDown(): number {
-        this.time = setInterval(() => {
-            this.countDown--;
-        }, DELAY_BEFORE_EMITTING_TIME);
-        return this.countDown;
-    }
-
-    getCount(): number {
-        return this.count;
-    }
-
-    getCountDown(): number {
-        return this.countDown;
-    }
-
-    setCountDown(time: number): void {
-        this.countDown = time;
-    }
-
-    // stopTimer(): void {
-    //     clearInterval(this.time as number);
-    // }
-
-    resetTimer(): void {
-        this.count = 0;
-        this.countDown = 0;
+    getElaspedTime(startTime: Date): number {
+        let currentTime = new Date();
+        return Math.floor((currentTime.getTime() - startTime.getTime() + this.penalty * 
+            this.nHints * TRANSFORM_TO_SECONDS) / TRANSFORM_TO_SECONDS);
     }
 }

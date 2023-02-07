@@ -8,7 +8,7 @@ export class PlayerService {
     maxPlayers: number = 2;
     
     async addRoom(roomName:string, host: Player, startTime: Date): Promise<void> {
-        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0, startTime: startTime, penalty:5});
+        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0, startTime: startTime});
     }
 
     async getRoomIndex(roomName: string): Promise<number> {

@@ -1,17 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Time } from '@app/interfaces/time';
 import { ClientTimeService } from '@app/services/client-time.service';
-// import { SocketClientService } from '@app/services/socket-client.service';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnInit {
-    @Input() isClassicMode: boolean = false; // can be classique or temps limite
-    @Input() serverTime: number = 0;
     time: Time;
-    roomName: string = "test8 room";
+    roomName: string = "test7 room";
 
     constructor(public readonly clientTimeService: ClientTimeService) {
         this.time = { minute: 0, second: 0 };
@@ -29,23 +26,12 @@ export class TimerComponent implements OnInit {
         );
     }
 
-    transformCountDown(): string {
-        this.setTime();
-        if (this.time.second === 0 && this.time.minute === 0) {
-          //  this.socketService.stopTimer();
-            return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
-        } else {
-            return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
-        }
-    }
-
     transform(): string {
         this.setTime();
         return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
     }
 
    setTime(): void {
-        console.log('setTime', this.clientTimeService.getCount());
         this.time.second = Number(this.clientTimeService.getCount() % 60)|0;
         this.time.minute = Number(Math.floor(this.clientTimeService.getCount() / 60))|0;
     }

@@ -11,6 +11,8 @@ export class SocketClientService {
     serverMessages: string[] = [];
     serverTime: RoomTime[] = [];
     serverMessage: string = '';
+    hintsLeft:number = 0;
+    roomName: string;
 
     constructor(private readonly socketClient: SocketClient) {}
 
@@ -26,8 +28,11 @@ export class SocketClientService {
     }
 
     getRoomTime(roomName : string) : number {
-        //console.log("getRoomTime", roomName, this.serverTime[this.getServerTimeIndex(roomName)]?.time)
         return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
+    }
+
+    getRoomName(): string{
+        return this.roomName;
     }
 
     getServerTimeIndex(roomName:string): number {
@@ -38,7 +43,13 @@ export class SocketClientService {
         return this.serverMessage;
     }
 
+    getHintLeft(): number {
+        console.log("getHintLeft", this.hintsLeft)
+        return this.hintsLeft;
+    }
+
     configureBaseSocketFeatures() {
+
         this.socketClient.on('connect', () => {
             console.log('Connexion au serveur réussie');
         });
@@ -62,19 +73,33 @@ export class SocketClientService {
         this.socketClient.on('massMessage', (broadcastMessage: string) => {
             this.serverMessages.push(broadcastMessage);
         });
+
+        this.socketClient.on('nbrHint', (hintsLeft: number) => {
+            console.log("nbrHintbo", hintsLeft)
+            this.hintsLeft = hintsLeft;
+        });
     }
+
     disconnect() {
         this.socketClient.disconnect();
     }
-
+    //setRoomName
+    setRoomName(roomName: string) {
+        this.roomName = roomName;
+    }
     //sendTime to server
     sendTime(time: number, roomName: string) {
         this.socketClient.send('time', [time, roomName]);
     }
 
     // addTime
-    addTime(time: number): void {
-        this.socketClient.send('addTime', time);
+    addTime(time: number, roomName:string): void {
+        this.socketClient.send('addTime', [time, roomName]);
+    }
+
+    // send number of hints
+    sendNbrHint(Hints: number) {
+        this.socketClient.send('nbrHint', Hints);
     }
 
     // joinRoom
@@ -83,7 +108,13 @@ export class SocketClientService {
     }
 
     // leaveRoom
-    leaveRoom(playerName: string) {
-        this.socketClient.send('leaveRoom', playerName);
+    leaveRoom(roomName: string) {
+        console.log("leaveRoom", roomName)
+        this.socketClient.send('leaveRoom', roomName);
+    }
+
+    // send roomName
+    sendRoomName(roomName: string) {
+        this.socketClient.send('roomName', roomName);
     }
 }

@@ -5,4 +5,5 @@ export interface Room {
   players: Player[]
   maxPlayers : number
   startTime: Date
+  nHints: number
 }

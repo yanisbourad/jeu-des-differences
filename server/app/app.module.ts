@@ -1,16 +1,15 @@
-import { Logger, Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Course, courseSchema } from '@app/model/database/course';
 import { CourseController } from '@app/controllers/course/course.controller';
-import { CourseService } from '@app/services/course/course.service';
-import { DateController } from '@app/controllers/date/date.controller';
-import { DateService } from '@app/services/date/date.service';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { ExampleService } from '@app/services/example/example.service';
+import { TimeController } from '@app/controllers/date/time.controller';
 import { ExampleController } from '@app/controllers/example/example.controller';
-import { TimeService } from './services/time/time.service';
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { Course, courseSchema } from '@app/model/database/course';
+import { CourseService } from '@app/services/course/course.service';
+import { ExampleService } from '@app/services/example/example.service';
+import { Logger, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { PlayerService } from './services/player/player-service';
+import { TimeService } from './services/time/time.service';
 
 @Module({
     imports: [
@@ -24,7 +23,7 @@ import { PlayerService } from './services/player/player-service';
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
-    controllers: [CourseController, DateController, ExampleController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, TimeService, PlayerService],
+    controllers: [CourseController, TimeController, ExampleController],
+    providers: [ChatGateway, CourseService, ExampleService, Logger, TimeService, PlayerService],
 })
 export class AppModule {}

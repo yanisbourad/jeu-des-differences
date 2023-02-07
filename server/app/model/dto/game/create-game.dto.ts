@@ -16,7 +16,7 @@ export class CreateGameDto {
 
     @ApiProperty()
     @IsArray()
-    listDifferences: number[][];
+    listDifferences: string[];
 
     @ApiProperty()
     @IsString()

@@ -22,7 +22,7 @@ export class UpdateGameDto {
     @ApiProperty()
     @IsOptional()
     @IsArray()
-    listDifferences: number[][];
+    listDifferences: string[];
 
     @ApiProperty()
     @IsString()

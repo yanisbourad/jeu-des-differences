@@ -8,7 +8,7 @@ export interface GameCreate {
     difficulty: string;
     originalImageData: string;
     modifiedImageData: string;
-    listDifferences: number[][];
+    listDifferences: string[];
 }
 
 export interface GameRecord {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
+// import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -32,28 +33,47 @@ export class GameService {
     nHintsUnused: number = this.gameInformation.nHints;
     nHintsUsed: number = 0;
     hintsArray: string[] = new Array(this.nHintsUnused);
+    roomName:string
+    playerName: string = "JAYJAY"
 
-    constructor(private readonly socket: SocketClientService) {}
+    constructor(private readonly socket: SocketClientService) {
+       
+    }
 
     clickGetHints(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            if (this.nHintsUsed < this.nHintsUnused) {
+            if (this.socket.getHintLeft() < this.nHintsUnused) {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
-                this.socket.addTime(this.gameInformation.hintsPenalty);
+                this.socket.addTime(this.gameInformation.hintsPenalty, this.roomName);
             }
         }
+    }
+
+    //generateUniqueRoomName
+    generatePlayerRoomName(): string {
+        return this.playerName + "room";
     }
 
     displayIcons(): void {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
         }
-        for (let i = 0; i < this.nHintsUnused; i++) {
-            this.hintsArray[i] = this.path.hintUnused;
+        console.log("HERE NBR HINTS",this.socket.getHintLeft())
+        if(this.socket.getHintLeft() <= this.nHintsUnused)
+        {
+            for (let i = 0; i < (this.nHintsUnused-this.socket.getHintLeft()); i++) {
+                this.hintsArray[i] = this.path.hintUsed;
+            }
+            this.nHintsUnused = 0;
+        }else{
+            for (let i = 0; i < this.nHintsUnused; i++) {
+                this.hintsArray[i] = this.path.hintUnused;
+            }
         }
     }
+    
 
     clickDifferencesFound(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {

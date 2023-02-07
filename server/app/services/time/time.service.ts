@@ -8,6 +8,7 @@ export class TimeService {
     currentTime(): string {
         return new Date().toString();
     }
+    
     getElaspedTime(startTime: Date): number {
         let currentTime = new Date();
         return Math.floor((currentTime.getTime() - startTime.getTime() + this.penalty * 

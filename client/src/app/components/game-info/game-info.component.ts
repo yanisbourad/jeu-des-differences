@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game.service';
-
 @Component({
     selector: 'app-game-info',
     templateUrl: './game-info.component.html',

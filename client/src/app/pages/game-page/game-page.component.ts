@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-// import { Router } from '@angular/router';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
@@ -11,7 +11,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit {
+export class GamePageComponent implements OnInit, AfterViewInit {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
@@ -20,15 +20,23 @@ export class GamePageComponent implements OnInit {
     readonly ONE_QUARTER = 1 / 4;
     readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
-    playerNames : string[] = ["test7", "test2"] // get from database
+    roomName : string
    
     constructor(private readonly drawService: DrawService, public gameService: GameService, 
-        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService) {}
+        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService, private readonly router: Router) {
+       }
+    ngAfterViewInit(): void {
+        this.socket.connect();
+        this.socket.setRoomName(this.roomName);
+        this.socket.sendRoomName(this.roomName);
+        this.socket.joinRoom(this.gameService.playerName);
+        this.clientTimeService.startTimer();
+        this.socket.sendNbrHint(this.gameService.nHintsUnused)
+        this.gameService.displayIcons();
+    }
 
     ngOnInit(): void {
-        this.socket.connect();
-        this.socket.joinRoom(this.playerNames[0]);
-        this.clientTimeService.startTimer();
+        this.roomName = this.gameService.generatePlayerRoomName();
     }
 
     mouseHitDetect(event: MouseEvent) {
@@ -66,6 +74,20 @@ export class GamePageComponent implements OnInit {
         // }
    
     giveUp(): void {
+
+        //redirect to homepage
+        console.log("roomName", this.socket.getRoomName())
+        //alert("êtes vous certain(e) de vouloir abandonner la partie? Cette action est irréversible.")
+        this.socket.leaveRoom(this.socket.getRoomName());
+        this.router.navigate(['/home']);
+
+
+        // this.router.navigate(['/home']);
+        this.socket.disconnect();
+        // this.socket.sendNbrHint(this.gameService.nHintsUnused)
+        // this.socket.sendNbrHint(this.gameService.nHintsUnused)
+    
+
         /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
         // if yes do
             // stop game

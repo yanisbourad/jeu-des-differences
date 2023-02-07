@@ -7,4 +7,6 @@ export enum ChatEvents {
     Hello = 'hello',
     AddTime = 'addTime',
     Time = 'time',
+    NbrHint = 'nbrHint',
+    SendRoomName = 'roomName'
 }

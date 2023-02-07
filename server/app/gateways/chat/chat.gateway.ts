@@ -11,6 +11,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer() server: Server;
     hintUsed: boolean = false;
     clientTime: number = 0;
+    nHints:number = 0
+    roomName: string = '';
 
     constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly timeService: TimeService) {}
 
@@ -20,13 +22,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('connection au socket');
     }
 
+
+    @SubscribeMessage(ChatEvents.NbrHint)
+    NbrHint(_: Socket, hints: number) {
+       this.nHints = hints;
+    }
+
+    @SubscribeMessage(ChatEvents.SendRoomName)
+    RoomName(_: Socket, roomName: string) {
+       this.roomName = roomName;
+    }
+
     @SubscribeMessage(ChatEvents.Time)
     async Time(socket: Socket, data: [time: number, roomName: string]) {
         this.clientTime = data[0];
         let room = await this.playerService.getRoom(data[1]);
         let startTime = room.startTime;
         if (this.hintUsed) {
-            this.timeService.penalty++;
+            this.timeService.nHints++;
             this.hintUsed = false;
         }
         let count = this.timeService.getElaspedTime(startTime);
@@ -36,31 +49,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.AddTime)
-    addTime(_: Socket, time: number) {
-        this.timeService.penalty = time;
+    async addTime(socket: Socket, data:[ number,string]) {
         this.hintUsed = true;
+        this.timeService.penalty = data[0];
+        let room = await this.playerService.getRoom(data[1]);
+        if(room.nHints != 0){
+            room.nHints--;
+            this.nHints++;
+            socket.emit(ChatEvents.NbrHint, room.nHints);
+        }
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     async joinRoom(socket: Socket, playerName: string) {
-        const roomName = playerName + ' room'; // to get from database
         let startTime = new Date();
+        let DEFAULT_HINTS = 3;
         const player: Player = {
             playerName: playerName,
             socketId: socket.id,
         };
-        if ((await this.playerService.getRoomIndex(roomName)) == -1) {
-            await this.playerService.addRoom(roomName, player, startTime);
-            socket.join(roomName);
+        if ((await this.playerService.getRoomIndex(this.roomName)) == -1) {
+            await this.playerService.addRoom(this.roomName, player, startTime, DEFAULT_HINTS);
+            socket.emit(ChatEvents.NbrHint, DEFAULT_HINTS);
+            socket.join(this.roomName);
         } else {
-            this.playerService.addPlayer(roomName, player, startTime);
-            socket.join(roomName);
+            this.playerService.addPlayer(this.roomName, player, startTime, DEFAULT_HINTS);
+            socket.join(this.roomName);
         }
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
-    leaveRoom(socket: Socket, playerName: string) {
-        const roomName = playerName + ' room'; // to get from database
+    leaveRoom(socket: Socket, roomName: string) {
+        this.playerService.removeRoom(roomName);
         socket.leave(roomName);
     }
 
@@ -71,6 +91,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
+        this.playerService.removeRoom(this.roomName);
+        socket.leave(this.roomName);
     }
 
     afterInit() {

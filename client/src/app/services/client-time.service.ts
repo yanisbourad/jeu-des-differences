@@ -6,16 +6,16 @@ import {DELAY_BEFORE_EMITTING_TIME} from'../../../../server/app/gateways/chat/ch
 })
 export class ClientTimeService {
 
-  roomName: string = "test7 room"; // from database or something else
   count: number = 0;
   time: number | unknown;
 
-  constructor(public readonly socketService: SocketClientService) {}
+  constructor(public readonly socketService: SocketClientService) {
+  }
 
   startTimer(): void {
       this.time = setInterval(() => {
-        this.count = this.socketService.getRoomTime(this.roomName);
-        this.socketService.sendTime(this.count, this.roomName);
+        this.count = this.socketService.getRoomTime(this.socketService.getRoomName());
+        this.socketService.sendTime(this.count, this.socketService.getRoomName());
         this.count++;
       }, DELAY_BEFORE_EMITTING_TIME);
   }
@@ -26,5 +26,9 @@ export class ClientTimeService {
 
   stopTimer(): void {
       clearInterval(this.time as number);
+  }
+
+  resetTimer(): void {
+      this.count = 0;
   }
 }

@@ -8,8 +8,6 @@ import { ClientTimeService } from '@app/services/client-time.service';
 })
 export class TimerComponent implements OnInit {
     time: Time;
-    roomName: string = "test7 room";
-
     constructor(public readonly clientTimeService: ClientTimeService) {
         this.time = { minute: 0, second: 0 };
     }

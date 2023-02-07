@@ -4,8 +4,8 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class CanvasHolderService {
-    originalCanvas: string = 'Original';
-    modifiedCanvas: string = 'Modified';
+    originalCanvas: string = 'Image Originale';
+    modifiedCanvas: string = 'Image Modifiée';
 
     private canvasOriginal!: Uint8ClampedArray;
     private canvasModifier!: Uint8ClampedArray;
@@ -31,8 +31,3 @@ export class CanvasHolderService {
         this.canvasModifier = new Uint8ClampedArray();
     }
 }
-
-// this.canvasHolderServiceService.setCanvas(this.canvasOriginal, this.canvasHolderServiceService.originalCanvas);
-// this.canvasHolderServiceService.setCanvas(this.canvasModifier, this.canvasHolderServiceService.modifierCanvas);
-// this.canvasHolderServiceService.getCanvasData(this.canvasHolderServiceService.originalCanvas);
-// this.canvasHolderServiceService.getCanvasData(this.canvasHolderServiceService.modifierCanvas);

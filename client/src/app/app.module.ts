@@ -26,6 +26,7 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
+import { DifferencePopupComponent } from './components/difference-popup/difference-popup.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -53,6 +54,7 @@ import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-
         CardDisplayerComponent,
         NamePopupComponent,
         ConfigurationJeuPageComponent,
+        DifferencePopupComponent,
     ],
     imports: [
         AppMaterialModule,

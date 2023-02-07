@@ -50,6 +50,10 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.drawService.drawImage(img, this.canvas.nativeElement);
         this.saveCanvas();
     }
+    // putNewImag(img) {
+    // this.drawService.drawImage(img, this.canvas.nativeElement);
+    // this.saveCanvas();
+    // }
 
     getPoint(e: MouseEvent): Point | undefined {
         const canvasBound = this.canvas.nativeElement.getBoundingClientRect();

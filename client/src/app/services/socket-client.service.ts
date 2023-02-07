@@ -9,8 +9,6 @@ import { RoomTime } from '@app/interfaces/room-time';
 export class SocketClientService {
     socket: Socket;
     serverMessages: string[] = [];
-    roomMessages: string[] = [];
-
     serverTime: RoomTime[] = [];
     serverMessage: string = '';
 
@@ -31,6 +29,7 @@ export class SocketClientService {
         //console.log("getRoomTime", roomName, this.serverTime[this.getServerTimeIndex(roomName)]?.time)
         return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
     }
+
     getServerTimeIndex(roomName:string): number {
         return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
     }
@@ -47,36 +46,23 @@ export class SocketClientService {
         this.socketClient.on('hello', (message: string) => {
             this.serverMessage = message;
         });
-        // this.socketClient.on("clock", (time: number) => {
-        //   this.serverTime = time;
-        // });
+
         this.socketClient.on('time',  (values :[string, number]) => {
-            console.log("time", values)
             if (this.getServerTimeIndex(values[0]) == -1 ){ 
                 this.serverTime.push({id:values[0], time:values[1]});
             }else{
                 this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];       
             }
-            console.log("getRoomTime", values[0], this.serverTime[this.getServerTimeIndex(values[0])]?.time)
-            console.log("serverTime", this.serverTime[this.getServerTimeIndex(values[0])].time)
         });
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('message', (message: string) => {
             this.serverMessages.push(message);
         });
-        // Gérer l'événement envoyé par le serveur : afficher le résultat de validation
-
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un client connecté
         this.socketClient.on('massMessage', (broadcastMessage: string) => {
             this.serverMessages.push(broadcastMessage);
         });
-
-        // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un membre de la salle
-        this.socketClient.on('roomMessage', (roomMessage: string) => {
-            this.roomMessages.push(roomMessage);
-        });
     }
-
     disconnect() {
         this.socketClient.disconnect();
     }
@@ -84,18 +70,6 @@ export class SocketClientService {
     //sendTime to server
     sendTime(time: number, roomName: string) {
         this.socketClient.send('time', [time, roomName]);
-    }
-
-    // starttimer
-    startTimer() {
-        this.socketClient.send('startTimer');
-    }
-
-    // stopTimer
-    stopTimer(roomName:string) {
-        this.socketClient.send('stopTimer', roomName);
-        console.log("stopTimer")
-        console.log(this.serverTime)
     }
 
     // addTime
@@ -112,5 +86,4 @@ export class SocketClientService {
     leaveRoom(playerName: string) {
         this.socketClient.send('leaveRoom', playerName);
     }
-
 }

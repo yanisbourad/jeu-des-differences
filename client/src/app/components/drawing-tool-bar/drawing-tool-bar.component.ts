@@ -37,9 +37,9 @@ export class DrawingToolBarComponent {
         this.imageDifferenceService.setRadius = this.selectedRadius;
     }
 
-    drawDifferenceImage() {
+    drawDifferenceImage2() {
         if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
-            this.showMessage = !this.showMessage;
+            // this.showMessage = !this.showMessage;
             this.showDifference = this.imageDifferenceService.getDifferenceNumber();
             this.tic = !this.tic;
             this.onReadyToDraw.emit();

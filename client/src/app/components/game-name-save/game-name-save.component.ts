@@ -10,7 +10,10 @@ import { GameDatabaseService } from '@app/services/game-database.sercice';
 export class GameNameSaveComponent {
     gameName: string;
     level: string;
-    constructor(public dialogRef: MatDialogRef<GameNameSaveComponent>, private readonly gameDataBase: GameDatabaseService) {}
+    constructor(public dialogRef: MatDialogRef<GameNameSaveComponent>, private readonly gameDataBase: GameDatabaseService) {
+        this.gameName = 'No Name';
+        this.level = 'facile';
+    }
 
     getGameData() {
         this.gameDataBase.saveGame(this.gameName);

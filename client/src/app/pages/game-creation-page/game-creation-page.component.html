@@ -3,8 +3,10 @@
     <div class="body">
         <div id="drawing-column">
             <app-canvas-ngx class="Canvas-ngx" [type]="originalCanvas"></app-canvas-ngx>
-            <div class="switch-canvas">
-                <img src="" />
+            <div class="swapping-canvas">
+                <img alt="swapping" src="./assets/img/SwappingCanvas.png" />
+                <input type="file" class="file-upload" accept=".bmp" #fileUpload />
+                <img alt="swapping" src="./assets/img/UploadBackground.png" />
             </div>
             <app-canvas-ngx class=" Canvas-ngx" [type]="modifiedCanvas"></app-canvas-ngx>
         </div>

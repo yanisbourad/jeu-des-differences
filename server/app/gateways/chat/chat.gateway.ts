@@ -1,63 +1,83 @@
+import { PlayerService } from '@app/services/player/player-service';
+import { TimeService } from '@app/services/time/time.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
+import { Player } from '../../../../client/src/app/interfaces/player';
 import { ChatEvents } from './chat.gateway.events';
-
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-    @WebSocketServer() private server: Server;
+    @WebSocketServer() server: Server;
+    hintUsed: boolean = false;
+    clientTime: number = 0;
 
-    private readonly room = PRIVATE_ROOM_ID;
+    constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly timeService: TimeService) {}
 
-    constructor(private readonly logger: Logger) {}
-
-    @SubscribeMessage(ChatEvents.Message)
-    message(_: Socket, message: string) {
-        this.logger.log(`Message reçu : ${message}`);
+    @SubscribeMessage(ChatEvents.Connect)
+    connect(_: Socket, message: string) {
+        this.server.emit(ChatEvents.MassMessage, `: ${message}`);
+        this.logger.log('connection au socket');
     }
 
-    @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word.length > WORD_MIN_LENGTH);
-    }
-
-    @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
-    }
-
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
-    }
-
-    @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
-        // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
+    @SubscribeMessage(ChatEvents.Time)
+    async Time(socket: Socket, data: [time: number, roomName: string]) {
+        this.clientTime = data[0];
+        let room = await this.playerService.getRoom(data[1]);
+        let startTime = room.startTime;
+        if (this.hintUsed) {
+            this.timeService.nHints++;
+            this.hintUsed = false;
+        }
+        let count = this.timeService.getElaspedTime(startTime);
+        if (!this.validateServerClientTime(count)) {
+            socket.emit(ChatEvents.Time, [room.name, count]);
         }
     }
 
-    afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
+    @SubscribeMessage(ChatEvents.AddTime)
+    addTime(_: Socket, time: number) {
+        this.timeService.penalty = time;
+        this.hintUsed = true;
+    }
+
+    @SubscribeMessage(ChatEvents.JoinRoom)
+    async joinRoom(socket: Socket, playerName: string) {
+        const roomName = playerName + ' room'; // to get from database
+        let startTime = new Date();
+        const player: Player = {
+            playerName: playerName,
+            socketId: socket.id,
+        };
+        if ((await this.playerService.getRoomIndex(roomName)) == -1) {
+            await this.playerService.addRoom(roomName, player, startTime);
+            socket.join(roomName);
+        } else {
+            this.playerService.addPlayer(roomName, player, startTime);
+            socket.join(roomName);
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.LeaveRoom)
+    leaveRoom(socket: Socket, playerName: string) {
+        const roomName = playerName + ' room'; // to get from database
+        socket.leave(roomName);
     }
 
     handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello World!');
+        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
+        socket.emit(ChatEvents.Hello, 'Hello from serveur');
     }
 
     handleDisconnect(socket: Socket) {
-        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
     }
 
-    private emitTime() {
-        this.server.emit(ChatEvents.Clock, new Date().toLocaleTimeString());
+    afterInit() {
+        this.logger.log('Initialisation du socket');
+    }
+
+    validateServerClientTime(serverTime: number): boolean {
+        return serverTime === this.clientTime;
     }
 }

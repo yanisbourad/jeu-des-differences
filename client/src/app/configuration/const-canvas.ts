@@ -8,8 +8,7 @@ export const defaultRadius = 3;
 export const defaultLineColor = '#000000';
 export const defaultBackgroundColor = '#ffffff';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-export const possibleRadius = [3, 6, 9, 15];
-
+export const possibleRadius = [0, 3, 6, 9, 15];
 export const nextPixelStartIndex = 4;
 export const incrementValue = 1;
 export const desiredBitDepth = 24;

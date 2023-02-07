@@ -1,21 +1,20 @@
 <div class="message">
     <div class="container">
         <div class="player-circle">
-            <p class="player-initials">W</p>
+            <p class="player-initials">{{playerInitials | uppercase}}</p>
         </div>
     </div>
     <div class="container">
         <div class="discussion-box">
             <p class="event-title">message d'événement</p>
             <hr>
-            <p class="event-message">12:25:30 - Différence trouvé par W</p>
-            <p class="event-message">12:25:35 - Différence trouvé par W</p>
+            <p *ngFor="let message of chatBox " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
         </div>
     </div>
     <div class="container">
-        <input type="text" placeholder="Écrire à Melvice G…">
+        <input type="text" placeholder="Écrire à {{playerName}}…" disabled>
     </div>
     <div class="container">
-        <button mat-raised-button class="send-btn">Envoyer</button>
+        <button disabled mat-raised-button class="send-btn">Envoyer</button>
     </div>
 </div>

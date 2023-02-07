@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
+import { Vec2 } from '@app/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -100,5 +101,12 @@ export class DrawService {
     }
     getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
         return canvas.getContext('2d') as CanvasRenderingContext2D;
+    }
+
+    drawWords(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
+        const context = this.getContext(canvas);
+        context.font = '20px system-ui';
+        context.fillStyle = 'red';
+        context.fillText(word, position.x, position.y);
     }
 }

@@ -7,29 +7,24 @@ export type GameDocument = Game & Document;
 @Schema()
 export class Game {
     @ApiProperty()
-    @Prop({ required: true })
-    name: string;
+    @Prop({ required: true, unique: true })
+    gameName: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    originalImageData: number[];
+    originalImageData: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    modifiedImageData: number[];
+    modifiedImageData: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    listDifferences: number[];
+    listDifferences: string[];
 
     @ApiProperty()
     @Prop({ required: true })
     difficulty: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    @ApiProperty()
-    _id?: string;
 }
 
 export const gameSchema = SchemaFactory.createForClass(Game);

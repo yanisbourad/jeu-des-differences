@@ -1,0 +1,76 @@
+.infos{
+  display: grid;
+  grid-template-columns: 1fr 0.6fr 1fr; 
+}
+
+.middle{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 30px;
+}
+.left{
+  padding-top: 30px;
+  padding-left: 30px;
+}
+.right{
+  display: grid;
+  grid-template-rows: 0.4fr 1fr 1fr;
+  padding-top: 30px;
+  padding-left: 40%;
+}
+.game-infos{
+  color: rgba(255, 255, 255, 0.711);
+  margin-bottom: 30px;
+}
+.differences-trouvees-img {
+  z-index: 1;
+  height: auto;
+  max-width: 36px;
+  margin-right: 10px;
+}
+.difficulty {
+  text-align: start;
+  font-size: 25px;
+  font-weight: 500;
+  color: white;
+}
+.difficulty-bar-img {
+  z-index: 1;
+  content:url("../../../assets/img/difficultyBar.png");
+}
+.difficulty-bar-indicator-img {
+  z-index: 1;
+  content:url("../../../assets/img/difficulty-bar-indicator.png");
+  margin: 10px 0px;
+}
+.indices-restants-img {
+  z-index: 1;
+  height: auto;
+  max-width: 38px;
+  margin: 0px 0px 10px 10px;
+}
+.btn {
+  margin-top: 1%;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 32px;
+  border: 2px solid #7B57B8;
+  :not(:disabled) {
+    border: 2px solid #7B57B8;
+    background: rgba(85, 66, 116, 0.1);
+    color: white;
+  }
+}
+.mat-raised-button.mat-button-disabled{
+  border: 2px solid #7b57b891;
+  background: rgba(85, 66, 116, 0.1);
+  color: rgba(255, 255, 255, 0.571);
+  cursor:default;
+}
+
+.btn:not(:disabled):hover{
+  background-color: #9845e7;
+}

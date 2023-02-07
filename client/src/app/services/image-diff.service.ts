@@ -218,4 +218,27 @@ export class ImageDiffService {
     getDifferenceNumber() {
         return this.listDifferences.length;
     }
+
+    getOriginalImageData(): number[] {
+        return this.originalImageData;
+    }
+
+    getModifiedImageData(): number[] {
+        return this.modifiedImageData;
+    }
+
+    getDifferences(): string[] {
+        return this.listDifferences.map((set) => Array.from(set).join(','));
+    }
+
+    getDifficulty(): string {
+        let count = 0;
+        this.listDifferences.forEach((a: Set<number>) => {
+            count += a.size;
+        });
+        const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
+
+        if (this.listDifferences.length >= 7 && count / totalSurface < 0.15) return 'Difficile';
+        return 'Facile';
+    }
 }

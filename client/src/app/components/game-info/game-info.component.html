@@ -1,0 +1,45 @@
+<div class="infos">
+  <div class="left">
+      <p class="title">{{gameService.gameInformation.gameTitle}}</p>
+      <p class="sub-title game-infos">{{gameService.gameInformation.gameMode}}</p>
+      <p class="sub-title">Différences trouvées - NomJoueur</p>
+      <div>
+          <img
+              *ngFor="let differences of gameService.differencesArray"
+              class="differences-trouvees-img"
+              src={{differences}}
+              alt="Differences trouvées"
+          />
+      </div>
+  </div>
+  <div class="middle">
+      <div class="difficulty">
+          <div>
+              <img class="difficulty-bar-img" alt="Bar"/>
+          </div>
+          <div>
+              <img class="difficulty-bar-indicator-img" alt="Bar"/>
+          </div>
+          <p>Difficulté</p>
+      </div>
+      <app-timer></app-timer>
+  </div>
+  <div class="right">
+      <p class="sub-title">Indices restants</p>
+      <div>
+          <img
+              *ngFor="let hint of gameService.hintsArray"
+              class="indices-restants-img"
+              src={{hint}}
+              alt="Indices restants"
+          />
+      </div>
+      <p class="sub-title">pénalité : 5s / indice</p>
+      <div>
+          <button *ngIf="!this.gameService.isGameFinished && this.gameService.nHintsUsed < this.gameService.nHintsUnused" 
+          mat-raised-button class="btn" (click)="getHint()">Obtenir un indice</button>
+          <button *ngIf="this.gameService.isGameFinished || this.gameService.nHintsUsed === this.gameService.nHintsUnused" 
+          disabled mat-raised-button class="btn">Obtenir un indice</button>
+      </div>
+  </div>
+</div>

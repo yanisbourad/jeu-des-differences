@@ -7,22 +7,22 @@ export class UpdateGameDto {
     @IsOptional()
     @IsString()
     @MaxLength(GAME_NAME_MAX_LENGTH)
-    name?: string;
+    gameName?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    originalImageData: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    modifiedImageData: string;
 
     @ApiProperty()
     @IsOptional()
     @IsArray()
-    originalImageData: number[];
-
-    @ApiProperty()
-    @IsOptional()
-    @IsArray()
-    modifiedImageData: number[];
-
-    @ApiProperty()
-    @IsOptional()
-    @IsArray()
-    listDifferences: number[];
+    listDifferences: string[];
 
     @ApiProperty()
     @IsString()

@@ -1,11 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { DateService } from '@app/services/date/date.service';
-import { ApiOkResponse } from '@nestjs/swagger';
 import { Message } from '@app/model/schema/message.schema';
+import { TimeService } from '@app/services/time/time.service';
+import { Controller, Get } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('date')
-export class DateController {
-    constructor(private readonly dateService: DateService) {}
+export class TimeController {
+    constructor(private readonly timeService: TimeService) {}
 
     @Get('/')
     @ApiOkResponse({
@@ -15,7 +15,7 @@ export class DateController {
     dateInfo(): Message {
         return {
             title: 'Time',
-            body: this.dateService.currentTime(),
+            body: this.timeService.currentTime(),
         };
     }
 }

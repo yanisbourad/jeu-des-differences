@@ -16,6 +16,7 @@ import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component
 import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
+import { GameInfoComponent } from './components/game-info/game-info.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
 import { NamePopupComponent } from './components/name-popup/name-popup.component';
@@ -26,7 +27,6 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
-import { DifferencePopupComponent } from './components/difference-popup/difference-popup.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -43,7 +43,6 @@ import { DifferencePopupComponent } from './components/difference-popup/differen
         GameCreationPageComponent,
         CanvasNgxComponent,
         DrawingToolBarComponent,
-        TimerComponent,
         GamePageComponent,
         MessageAreaComponent,
         ValidateCreateBtnComponent,
@@ -54,7 +53,7 @@ import { DifferencePopupComponent } from './components/difference-popup/differen
         CardDisplayerComponent,
         NamePopupComponent,
         ConfigurationJeuPageComponent,
-        DifferencePopupComponent,
+        GameInfoComponent,
     ],
     imports: [
         AppMaterialModule,

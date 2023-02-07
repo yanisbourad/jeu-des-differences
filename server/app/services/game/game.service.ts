@@ -66,28 +66,26 @@ export class GameService {
         }
         try {
             await this.gameModel.create(game);
+            const basRecords: GameRecord[] = [];
             for (let i = 0; i < 3; i++) {
-                this.gameRecordModel
-                    .create({
-                        gameName: game.gameName,
-                        typeGame: 'multi',
-                        time: 600 + i, // 10min in seconds
-                        playerName: 'Sharmila',
-                        dateStart: new Date(),
-                        playing: false,
-                    })
-                    .then();
-                this.gameRecordModel
-                    .create({
-                        gameName: game.gameName,
-                        typeGame: 'solo',
-                        time: 600 + i, // 10min in seconds
-                        playerName: 'Ania',
-                        dateStart: new Date(),
-                        playing: false,
-                    })
-                    .then();
+                basRecords.push({
+                    gameName: game.gameName,
+                    typeGame: 'multi',
+                    time: 600 + i * 50, // 10min in seconds
+                    playerName: 'Sharmila',
+                    dateStart: new Date(),
+                    playing: false,
+                });
+                basRecords.push({
+                    gameName: game.gameName,
+                    typeGame: 'solo',
+                    time: 600 + i * 40, // 10min in seconds
+                    playerName: 'Ania',
+                    dateStart: new Date(),
+                    playing: false,
+                });
             }
+            this.gameRecordModel.insertMany(basRecords);
         } catch (error) {
             return Promise.reject(`Failed to insert Game: ${error}`);
         }

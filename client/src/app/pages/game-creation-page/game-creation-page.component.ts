@@ -1,22 +1,14 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { DrawService } from '@app/services/draw.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit {
-    @ViewChild('dd', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
-    showPixel: boolean = true;
-    ctx: CanvasRenderingContext2D;
-    showDifferentPixels: boolean = true;
-    constructor(
-        private readonly canvasHolderService: CanvasHolderService,
-        private readonly imageDifferenceService: ImageDiffService,
-        private readonly drawService: DrawService,
-    ) {}
+    constructor(public dialog: MatDialog, private readonly canvasHolderService: CanvasHolderService) {}
 
     get originalCanvas(): string {
         return this.canvasHolderService.originalCanvas;
@@ -30,10 +22,11 @@ export class GameCreationPageComponent implements OnInit {
     goBack(): void {
         this.canvasHolderService.clearCanvas();
     }
-
-    drawDifferencePixel() {
-        this.drawService.clearCanvas(this.canvas.nativeElement);
-        const differences = this.imageDifferenceService.getDifferencePixelToDraw();
-        this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
+    openCanvas(): void {
+        const dialogRef = this.dialog.open(DifferencePopupComponent, {
+            height: '480x',
+            width: '640px',
+        });
+        dialogRef.afterClosed().subscribe();
     }
 }

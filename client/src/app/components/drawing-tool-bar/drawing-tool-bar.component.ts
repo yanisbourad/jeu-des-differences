@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
@@ -8,9 +8,13 @@ import { ImageDiffService } from '@app/services/image-diff.service';
     styleUrls: ['./drawing-tool-bar.component.scss'],
 })
 export class DrawingToolBarComponent {
+    // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+    @Output() onReadyToDraw = new EventEmitter();
     lineWidth: number = constants.defaultLineWidth;
     lineColor: string = constants.defaultLineColor;
     selectedRadius: number = constants.possibleRadius[0];
+    showMessage: boolean = false;
+    showDifference: number = 0;
     tic: boolean = false;
 
     constructor(
@@ -34,11 +38,11 @@ export class DrawingToolBarComponent {
     }
 
     drawDifferenceImage() {
-        // const originalData = this.canvasHolder.getCanvasData(this.canvasHolder.originalCanvas);
-        // const modifiedData = this.canvasHolder.getCanvasData(this.canvasHolder.modifiedCanvas);
         if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
+            this.showMessage = !this.showMessage;
+            this.showDifference = this.imageDifferenceService.getDifferenceNumber();
             this.tic = !this.tic;
-            this.imageDifferenceService.resetImageData();
+            this.onReadyToDraw.emit();
         }
     }
 }

@@ -35,6 +35,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvas.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
+        this.drawService.clearCanvas(this.canvas.nativeElement);
         // push the canvas pointer to the difference Service
         this.saveCanvas();
     }
@@ -111,7 +112,9 @@ export class CanvasNgxComponent implements AfterViewInit {
         if (!ctx) return;
         const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
         const canvasData = imageData.data;
+        const canvasDataStr = ctx.canvas.toDataURL();
         if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
+        if (canvasDataStr) this.canvasHolderService.setCanvasData(canvasDataStr, this.type);
     }
 
     // TODO: create a test for this method

@@ -92,7 +92,8 @@ export class DrawService {
 
     clearCanvas(canvas: HTMLCanvasElement) {
         const context = this.getContext(canvas);
-        context.clearRect(0, 0, this.width, this.height);
+        context.fillStyle = constants.defaultBackgroundColor;
+        context.fillRect(0, 0, this.width, this.height);
     }
     validateDrawing(selectedRadius: number) {
         // TODO: check if the drawing is valid

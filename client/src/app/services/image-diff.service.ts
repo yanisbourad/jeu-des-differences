@@ -113,11 +113,11 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
-                    this.differencePixelArray.push(0, 0, 0, 0);
+                    this.differencePixelArray.push(1, 1, 1, 1);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);
-                    this.differencePixelArray.push(1, 1, 1, 1);
+                    this.differencePixelArray.push(0, 0, 0, 0);
                 }
             }
         }
@@ -129,6 +129,10 @@ export class ImageDiffService {
             this.drawingDifferenceArray = new Uint8ClampedArray(this.differencePixelArray);
         }
         this.hasBeenChanged = !this.hasBeenChanged;
+    }
+
+    getDifferencePixelToDraw(): Set<number>[] {
+        return this.listDifferences;
     }
 
     defineDifferences(): Set<number>[] {
@@ -213,5 +217,28 @@ export class ImageDiffService {
 
     getDifferenceNumber() {
         return this.listDifferences.length;
+    }
+
+    getOriginalImageData(): number[] {
+        return this.originalImageData;
+    }
+
+    getModifiedImageData(): number[] {
+        return this.modifiedImageData;
+    }
+
+    getDifferences(): number[][] {
+        return this.listDifferences.map((set) => Array.from(set));
+    }
+
+    getDifficulty(): string {
+        let count = 0;
+        this.getDifferences().forEach((a: number[]) => {
+            count += a.length;
+        });
+        const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
+
+        if (this.listDifferences.length >= 7 && count / totalSurface < 0.15) return 'Difficile';
+        return 'Facile';
     }
 }

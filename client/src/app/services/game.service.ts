@@ -23,7 +23,6 @@ export class GameService {
         isClassical: true,
     };
 
-
     nDifferencesNotFound: number = this.gameInformation.nDifferences;
     nDifferencesFound: number = 0;
     differencesArray: string[] = new Array(this.nDifferencesNotFound);
@@ -62,7 +61,7 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-           // this.socket.stopTimer();
+            // this.socket.stopTimer();
             this.isGameFinished = true;
         }
     }

@@ -1,6 +1,9 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
+// eslint-disable-next-line no-restricted-imports
+import { GameNameSaveComponent } from '../game-name-save/game-name-save.component';
 
 @Component({
     selector: 'app-difference-popup',
@@ -16,7 +19,13 @@ export class DifferencePopupComponent implements AfterViewInit {
     showMessage: boolean = false;
     showDifference: number = 0;
 
-    constructor(private readonly imageDifferenceService: ImageDiffService, private readonly drawService: DrawService) {}
+    // eslint-disable-next-line max-params
+    constructor(
+        public dialog: MatDialog,
+        public dialogRef: MatDialogRef<DifferencePopupComponent>,
+        private readonly imageDifferenceService: ImageDiffService,
+        private readonly drawService: DrawService,
+    ) {}
 
     ngAfterViewInit(): void {
         this.showDifferentPixels = true;
@@ -30,5 +39,12 @@ export class DifferencePopupComponent implements AfterViewInit {
         }
     }
 
-    openName() {}
+    openName() {
+        this.dialogRef.close();
+        const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
+            height: '480x',
+            width: '500px',
+        });
+        dialogRefGame.afterClosed().subscribe();
+    }
 }

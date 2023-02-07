@@ -15,15 +15,25 @@ export class GamePageComponent implements OnInit {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
-    readonly DEFAULT_WIDTH = 640;
-    readonly DEFAULT_HEIGHT = 480;
-    readonly ONE_QUARTER = 1 / 4;
-    readonly ONE_SIXTH = 1 / 6;
+    readonly DEFAULT_WIDTH: number;
+    readonly DEFAULT_HEIGHT: number;
+    readonly ONE_QUARTER: number;
+    readonly ONE_SIXTH: number;
     mousePosition: Vec2 = { x: 0, y: 0 };
-    playerNames : string[] = ["test7", "test2"] // get from database
-   
-    constructor(private readonly drawService: DrawService, public gameService: GameService, 
-        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService) {}
+    playerNames: string[] = ['test7', 'test2']; // get from database
+
+    // eslint-disable-next-line max-params
+    constructor(
+        private readonly drawService: DrawService,
+        public gameService: GameService,
+        readonly socket: SocketClientService,
+        readonly clientTimeService: ClientTimeService,
+    ) {
+        this.DEFAULT_WIDTH = 640;
+        this.DEFAULT_HEIGHT = 480;
+        this.ONE_QUARTER = 0.25;
+        this.ONE_SIXTH = 0.17;
+    }
 
     ngOnInit(): void {
         this.socket.connect();
@@ -52,19 +62,19 @@ export class GamePageComponent implements OnInit {
             }
         }
     }
-        // async loadImage(): Promise<void> {
-        //     const original_image = new Image();
-        //     const modified_image = new Image();
-        //     original_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(original_image).then((imageBitmap) => {
-        //     this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
-        //     });
-        //     modified_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(modified_image).then((imageBitmap) => {
-        //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
-        //     });
-        // }
-   
+    // async loadImage(): Promise<void> {
+    //     const original_image = new Image();
+    //     const modified_image = new Image();
+    //     original_image.src = '../../../assets/img/k3FhRA.jpg';
+    //     createImageBitmap(original_image).then((imageBitmap) => {
+    //     this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
+    //     });
+    //     modified_image.src = '../../../assets/img/k3FhRA.jpg';
+    //     createImageBitmap(modified_image).then((imageBitmap) => {
+    //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
+    //     });
+    // }
+
     giveUp(): void {
         /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
         // if yes do

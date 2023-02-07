@@ -27,6 +27,8 @@ export class ImageDiffService {
     mapDistPoint: Map<number, number>;
     listBfsInput: BfsInput[] = [];
     differenceNumber;
+    upperLimitDifficultyLevel: number;
+    ratioLimitDifficultyLevel: number;
     private imageMatrixSize: number;
 
     constructor() {
@@ -41,6 +43,8 @@ export class ImageDiffService {
         this.mapDistPoint = new Map();
         this.imageMatrixSize = 0;
         this.differenceNumber = 0;
+        this.upperLimitDifficultyLevel = 7;
+        this.ratioLimitDifficultyLevel = 0.15;
     }
 
     set setRadius(radius: number) {
@@ -238,7 +242,8 @@ export class ImageDiffService {
         });
         const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
 
-        if (this.listDifferences.length >= 7 && count / totalSurface < 0.15) return 'Difficile';
+        if (this.listDifferences.length >= this.upperLimitDifficultyLevel && count / totalSurface < this.ratioLimitDifficultyLevel)
+            return 'Difficile';
         return 'Facile';
     }
 }

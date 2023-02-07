@@ -12,13 +12,12 @@ import { ImageDiffService } from './image-diff.service';
     providedIn: 'root',
 })
 export class GameDatabaseService {
+    twoHundredOkResponse: number;
     private readonly baseUrl: string = environment.serverUrl;
 
-    constructor(
-        private readonly http: HttpClient,
-        private readonly imageDiff: ImageDiffService,
-        private readonly canvasHolder: CanvasHolderService,
-    ) {}
+    constructor(private readonly http: HttpClient, private readonly imageDiff: ImageDiffService, private readonly canvasHolder: CanvasHolderService) {
+        this.twoHundredOkResponse = 200;
+    }
 
     getAllGames(): Observable<GameInfo> {
         return this.http.get<GameInfo>(`${this.baseUrl}/game`).pipe(catchError(this.handleError<GameInfo>('getAllGames')));
@@ -40,7 +39,7 @@ export class GameDatabaseService {
             difficulty: this.imageDiff.getDifficulty(),
         };
         this.createGame(game).subscribe((response) => {
-            if (response.status === 200) {
+            if (response.status === this.twoHundredOkResponse) {
                 alert('Game saved!');
             } else {
                 alert('Error: Game not saved!');

@@ -13,5 +13,4 @@ describe('GameService', () => {
     it('should be created', () => {
         expect(gameService).toBeTruthy();
     });
-
 });

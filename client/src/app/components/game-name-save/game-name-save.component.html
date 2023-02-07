@@ -1,12 +1,12 @@
 <div class="form-group">
-    <p>Entrer le nom du Jeu SVP</p>
-    <div>
+    <p class="index">Entrer le nom du Jeu SVP</p>
+    <div class="input-block">
         <label for="game-name">Nom du Jeu</label>
         <input name="game-name" type="text" placeholder="Papa Docker">
     </div>
     <p>Niveau du Jeu : {{level}}</p>
     <div class="btn-block">
-        <button class="btn" (click)="closeOnAbort()">Annuler</button>
-        <button class="btn" (click)="getGameData()">Submit</button>
+        <button class="btn cancel" (click)="closeOnAbort()">Annuler</button>
+        <button class="btn accept" (click)="getGameData()">Submit</button>
     </div>
 </div>

@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { DateService } from '@app/services/date/date.service';
+import { TimeService } from '@app/services/time/time.service';
 import { Message } from '@common/message';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class ExampleService {
     private clientMessages: Message[];
 
-    constructor(private readonly dateService: DateService, private readonly logger: Logger) {
+    constructor(private readonly dateService: TimeService, private readonly logger: Logger) {
         this.clientMessages = [];
     }
 

@@ -27,6 +27,7 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
+import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -54,6 +55,7 @@ import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-
         NamePopupComponent,
         ConfigurationJeuPageComponent,
         GameInfoComponent,
+        GameNameSaveComponent,
     ],
     imports: [
         AppMaterialModule,

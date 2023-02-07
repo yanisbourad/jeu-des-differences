@@ -29,7 +29,7 @@ import { TimeService } from './services/time/time.service';
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
         MongooseModule.forFeature([{ name: GameRecord.name, schema: gameRecordSchema }]),
     ],
-    controllers: [CourseController, TimeController, ExampleController],
-    providers: [ChatGateway, CourseService, ExampleService, Logger, TimeService, PlayerService],
+    controllers: [CourseController, TimeController, ExampleController, GameController],
+    providers: [ChatGateway, CourseService, ExampleService, GameService, Logger, TimeService, PlayerService],
 })
 export class AppModule {}

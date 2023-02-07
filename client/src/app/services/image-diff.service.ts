@@ -227,14 +227,14 @@ export class ImageDiffService {
         return this.modifiedImageData;
     }
 
-    getDifferences(): number[][] {
-        return this.listDifferences.map((set) => Array.from(set));
+    getDifferences(): string[] {
+        return this.listDifferences.map((set) => Array.from(set).join(','));
     }
 
     getDifficulty(): string {
         let count = 0;
-        this.getDifferences().forEach((a: number[]) => {
-            count += a.length;
+        this.listDifferences.forEach((a: Set<number>) => {
+            count += a.size;
         });
         const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
 

@@ -21,7 +21,7 @@ export class GameService {
     gameInformation: GameInformation = {
         gameTitle: 'Titre du jeu',
         gameMode: 'Partie Classique en mode solo',
-        gameDifficulty: 'Facile',
+        gameDifficulty: 'Difficile',
         nDifferences: 8,
         nHints: 3,
         hintsPenalty: 5,
@@ -109,6 +109,7 @@ export class GameService {
         // display modal
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type, time],
+            disableClose: true,
             minWidth: '250px',
             minHeight: '250px',
             panelClass: 'custom-dialog-container',

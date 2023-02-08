@@ -2,7 +2,7 @@ import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/co
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { DrawService } from './draw.service';
-// import { ClientTimeService } from './client-time.service';
+import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -38,7 +38,12 @@ export class GameService {
     playerName: string = "JAYJAY";
     isplaying: boolean = false;
     private renderer: Renderer2;
-    constructor(private readonly socket: SocketClientService, private readonly drawService: DrawService, rendererFactory: RendererFactory2) {
+    constructor(
+        private readonly socket: SocketClientService,
+        private readonly drawService: DrawService,
+        rendererFactory: RendererFactory2,
+        private readonly clientTimeService: ClientTimeService,
+    ) {
        this.roomName = this.generatePlayerRoomName();
        this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -105,7 +110,7 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            //this.clientTimeService.stopTimer();
+            this.clientTimeService.stopTimer();
             this.isGameFinished = true;
         }
     }

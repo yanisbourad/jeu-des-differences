@@ -8,6 +8,6 @@
     </mat-dialog-content>
     <mat-dialog-actions id= "popup-button">
         <button mat-button id = "cancel-button" (click)="onNoClick()">Annuler</button>
-        <button mat-button id = "confirmation-button" [mat-dialog-close]="data.name" cdkFocusInitial [disabled]="data.name===''" routerLink="/game" >Continuer</button>
+        <button [disabled]="this.data.name === ''" mat-button id = "confirmation-button" [mat-dialog-close]="data.name" cdkFocusInitial routerLink="/game" >Continuer</button>
     </mat-dialog-actions>
 </div>

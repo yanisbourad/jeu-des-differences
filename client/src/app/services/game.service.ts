@@ -21,12 +21,12 @@ export class GameService {
     gameInformation: GameInformation = {
         gameTitle: 'Titre du jeu',
         gameMode: 'Partie Classique en mode solo',
+        gameDifficulty: 'Facile',
         nDifferences: 8,
         nHints: 3,
         hintsPenalty: 5,
         isClassical: true,
     };
-
 
     nDifferencesNotFound: number = this.gameInformation.nDifferences;
     nDifferencesFound: number = 0;

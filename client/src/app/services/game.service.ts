@@ -4,6 +4,8 @@ import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { DrawService } from './draw.service';
 import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
     providedIn: 'root',
@@ -42,6 +44,7 @@ export class GameService {
         private readonly socket: SocketClientService,
         private readonly drawService: DrawService,
         rendererFactory: RendererFactory2,
+        public dialog: MatDialog,
         private readonly clientTimeService: ClientTimeService,
     ) {
        this.roomName = this.generatePlayerRoomName();
@@ -81,11 +84,11 @@ export class GameService {
             // const img = new Image();
             let visible = true;
             let blinkCount = 0;
-            const original_image = new Image();
+            const originalImage = new Image();
             //const modified_image = new Image();
-            original_image.src = '../../../assets/img/k3FhRA.jpg';
-            console.log(original_image.src)
-            createImageBitmap(original_image).then((imageBitmap) => {
+            // original_image.src = '../../../assets/img/k3FhRA.jpg';
+            // console.log(original_image.src)
+            createImageBitmap(originalImage).then((imageBitmap) => {
              this.drawService.drawImage(imageBitmap, canvas.nativeElement);
             });
             // modified_image.src = '../../../assets/img/k3FhRA.jpg';
@@ -102,7 +105,24 @@ export class GameService {
               }
             }, 125);
           }
-
+    displayGameEnded(msg: string, type: string, time: number) {
+        // display modal
+        this.dialog.open(MessageDialogComponent, {
+            data: [msg, type, time],
+            minWidth: '250px',
+            minHeight: '250px',
+            panelClass: 'custom-dialog-container',
+        });
+        // to put when number of difference found equal max difference
+        // this.clientTimeService.stopTimer();
+        // console.log(this.clientTimeService.getCount())
+        // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
+    }
+    reinitializeGame(): void {
+        this.isGameFinished = false;
+        this.nDifferencesFound = 0;
+        this.nHintsUsed = 0;
+    }
     clickDifferencesFound(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {
             this.nDifferencesFound++;
@@ -112,6 +132,9 @@ export class GameService {
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
             this.clientTimeService.stopTimer();
             this.isGameFinished = true;
+            this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
+            // Hard reset variables
+            this.reinitializeGame();
         }
     }
 

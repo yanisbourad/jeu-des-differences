@@ -53,8 +53,8 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             const differenceDataSet: Set<number>[] = this.imageDiffService.defineDifferences();
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
-            // Need real data
-            if (differenceDataSet.some((set) => set.has(distMousePosition))) {
+            // Need real data and added '!' for testing purposes
+            if (!differenceDataSet.some((set) => set.has(distMousePosition))) {
                 // this.clientTimeService.stopTimer();
                 this.gameService.playSuccessAudio();
                 this.gameService.blinkDifference(this.canvas1);
@@ -92,19 +92,19 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         });
     }
 
-    displayGameEnded(msg: string, type: string, time: number) {
-        // display modal
-        this.dialog.open(MessageDialogComponent, {
-            data: [msg, type, time],
-            minWidth: '250px',
-            minHeight: '250px',
-            panelClass: 'custom-dialog-container',
-        });
-        // to put when number of difference found equal max difference
-        // this.clientTimeService.stopTimer();
-        // console.log(this.clientTimeService.getCount())
-        // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
-    }
+    // displayGameEnded(msg: string, type: string, time: number) {
+    //     // display modal
+    //     this.dialog.open(MessageDialogComponent, {
+    //         data: [msg, type, time],
+    //         minWidth: '250px',
+    //         minHeight: '250px',
+    //         panelClass: 'custom-dialog-container',
+    //     });
+    //     // to put when number of difference found equal max difference
+    //     // this.clientTimeService.stopTimer();
+    //     // console.log(this.clientTimeService.getCount())
+    //     // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
+    // }
 
     giveUp(): void {
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');

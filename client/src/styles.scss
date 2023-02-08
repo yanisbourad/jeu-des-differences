@@ -116,3 +116,11 @@ body {
     width: fit-content;
     white-space: nowrap;
   }
+
+  .custom-dialog-container{
+    mat-dialog-container{
+        border: 2px solid #ffffff;
+        background: #4a415c;
+        color: white;
+    }
+  }

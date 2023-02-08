@@ -1,20 +1,20 @@
 .container {
   display: grid; 
-  grid-template-columns: 2fr 0.6fr; 
+  grid-template-columns: 2fr; 
   grid-template-rows: 0.4fr 1fr 3fr 0.5fr; 
   gap: 0px 0px; 
   height: 100vh;
   width: 100vw;
   grid-template-areas: 
     "header header"
-    "infos message"
-    "mainView message"
-    "footer message"; 
+    "infos infos"
+    "mainView mainView"
+    "footer footer"; 
 }
 .header { grid-area: header; }
 .mainView { 
   grid-area: mainView;
-  padding-left: 2%;
+  padding-left: 12%;
 }
 .footer { 
   grid-area: footer;
@@ -39,7 +39,6 @@
 .giveUp:hover{
   background-color: #bd3c3c;
 }
-
 .difficulty{
   color: rgba(255, 255, 255, 0.711);
   height: 50%;

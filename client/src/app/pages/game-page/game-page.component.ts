@@ -1,11 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+// import { Router } from '@angular/router';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+import {MessageDialogComponent} from '@app/components/message-dialog/message-dialog.component'
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
@@ -23,9 +25,12 @@ export class GamePageComponent implements OnInit, AfterViewInit {
     roomName : string
    
     constructor(private readonly drawService: DrawService, public gameService: GameService, 
-        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService, private readonly router: Router) {
+        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService
+        ,public dialog: MatDialog) {
+            
        }
     ngAfterViewInit(): void {
+       // this.gameService.isplaying = true;
         this.socket.connect();
         this.socket.setRoomName(this.roomName);
         this.socket.sendRoomName(this.roomName);
@@ -51,6 +56,7 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             ) {
                 this.clientTimeService.stopTimer();
                 this.gameService.playSuccessAudio();
+                this.gameService.blinkDifference(this.canvas1);
                 this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
                 this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
             } else {
@@ -60,6 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             }
         }
     }
+
         // async loadImage(): Promise<void> {
         //     const original_image = new Image();
         //     const modified_image = new Image();
@@ -72,28 +79,33 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
         //     });
         // }
-   
-    giveUp(): void {
+    
+    displayGiveUp(msg: string, type: string) {
+        // display modal
+            this.dialog.open(MessageDialogComponent, {
+              data: [msg,type],
+              minWidth: '250px',
+              minHeight:'150px',
+              panelClass: 'custom-dialog-container'
+            });
+          }
 
-        //redirect to homepage
-        console.log("roomName", this.socket.getRoomName())
-        //alert("êtes vous certain(e) de vouloir abandonner la partie? Cette action est irréversible.")
-        this.socket.leaveRoom(this.socket.getRoomName());
-        this.router.navigate(['/home']);
-
-
-        // this.router.navigate(['/home']);
-        this.socket.disconnect();
-        // this.socket.sendNbrHint(this.gameService.nHintsUnused)
-        // this.socket.sendNbrHint(this.gameService.nHintsUnused)
+    displayGameEnded(msg: string, type: string, time:number) {
+    // display modal
+        this.dialog.open(MessageDialogComponent, {
+            data: [msg,type,time],
+            minWidth: '250px',
+            minHeight:'250px',
+            panelClass: 'custom-dialog-container'
+        });
+        // to put when number of difference found equal max difference  
+        // this.clientTimeService.stopTimer();
+        // console.log(this.clientTimeService.getCount())
+        // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount()); 
+        }
     
 
-        /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
-        // if yes do
-            // stop game
-            // save infos???
-            // redirect user to main page
-        // else close modal and continue the game
-        */
+    giveUp(): void {
+        this.displayGiveUp("Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.", "giveUp");
     }
 }

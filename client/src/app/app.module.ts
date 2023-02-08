@@ -14,6 +14,7 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -31,6 +32,7 @@ import { GameInfoComponent } from './components/game-info/game-info.component';
         TimerComponent,
         MessageAreaComponent,
         GameInfoComponent,
+        MessageDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

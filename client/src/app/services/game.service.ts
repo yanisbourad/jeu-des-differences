@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
+import { DrawService } from './draw.service';
 // import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
 
@@ -33,19 +34,23 @@ export class GameService {
     nHintsUnused: number = this.gameInformation.nHints;
     nHintsUsed: number = 0;
     hintsArray: string[] = new Array(this.nHintsUnused);
-    roomName:string
-    playerName: string = "JAYJAY"
+    roomName:string;
+    playerName: string = "JAYJAY";
+    isplaying: boolean = false;
+    private renderer: Renderer2;
+    constructor(private readonly socket: SocketClientService, private readonly drawService: DrawService, rendererFactory: RendererFactory2) {
+       this.roomName = this.generatePlayerRoomName();
+       this.renderer = rendererFactory.createRenderer(null, null);
 
-    constructor(private readonly socket: SocketClientService) {
-       
     }
 
     clickGetHints(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            if (this.socket.getHintLeft() < this.nHintsUnused) {
+            if (this.socket.getHintLeft() <= this.nHintsUnused) {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
+                console.log(this.roomName)
                 this.socket.addTime(this.gameInformation.hintsPenalty, this.roomName);
             }
         }
@@ -60,20 +65,38 @@ export class GameService {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
         }
-        console.log("HERE NBR HINTS",this.socket.getHintLeft())
-        if(this.socket.getHintLeft() <= this.nHintsUnused)
-        {
-            for (let i = 0; i < (this.nHintsUnused-this.socket.getHintLeft()); i++) {
-                this.hintsArray[i] = this.path.hintUsed;
-            }
-            this.nHintsUnused = 0;
-        }else{
-            for (let i = 0; i < this.nHintsUnused; i++) {
-                this.hintsArray[i] = this.path.hintUnused;
-            }
-        }
-    }
+
+        for (let i = 0; i < this.nHintsUnused; i++) {
+            this.hintsArray[i] = this.path.hintUnused;
+        }        
+    };
     
+    async blinkDifference(canvas: ElementRef<HTMLCanvasElement>): Promise<void>{
+            // const ctx = canvas.nativeElement.getContext('2d');
+            // const img = new Image();
+            let visible = true;
+            let blinkCount = 0;
+            const original_image = new Image();
+            //const modified_image = new Image();
+            original_image.src = '../../../assets/img/k3FhRA.jpg';
+            console.log(original_image.src)
+            createImageBitmap(original_image).then((imageBitmap) => {
+             this.drawService.drawImage(imageBitmap, canvas.nativeElement);
+            });
+            // modified_image.src = '../../../assets/img/k3FhRA.jpg';
+            // createImageBitmap(modified_image).then((imageBitmap) => {
+            // this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
+            // })
+            const intervalId = setInterval(() => {
+              visible = !visible;
+              this.renderer.setStyle(canvas.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
+              blinkCount++;
+          
+              if (blinkCount === 8) {
+                clearInterval(intervalId);
+              }
+            }, 125);
+          }
 
     clickDifferencesFound(): void {
         if (this.nDifferencesFound < this.nDifferencesNotFound) {
@@ -82,7 +105,7 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-           // this.socket.stopTimer();
+            //this.clientTimeService.stopTimer();
             this.isGameFinished = true;
         }
     }

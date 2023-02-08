@@ -42,6 +42,12 @@ export class DrawService {
         this.context.stroke();
     }
 
+    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.drawImage(image, 0, 0, 640, 480);
+    }
+
+
     drawWord(word: string) {
         const startPosition: Vec2 = { x: 175, y: 100 };
         const step = 20;

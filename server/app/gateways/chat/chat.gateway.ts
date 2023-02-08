@@ -79,20 +79,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
-    leaveRoom(socket: Socket, roomName: string) {
-        this.playerService.removeRoom(roomName);
+    async leaveRoom(socket: Socket, roomName: string) {
+      //  this.playerService.removeRoom(roomName);
+        let room = await this.playerService.getRoom(roomName);
+        room.startTime = null;
+        this.playerService.removePlayer(roomName, socket.id);
+        console.log('leave room',this.playerService.rooms)
         socket.leave(roomName);
     }
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
         socket.emit(ChatEvents.Hello, 'Hello from serveur');
+        socket.emit(ChatEvents.NbrHint, 3);
     }
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
         this.playerService.removeRoom(this.roomName);
         socket.leave(this.roomName);
+        this.timeService.resetTime();
     }
 
     afterInit() {

@@ -44,7 +44,6 @@ export class SocketClientService {
     }
 
     getHintLeft(): number {
-        console.log("getHintLeft", this.hintsLeft)
         return this.hintsLeft;
     }
 
@@ -111,6 +110,7 @@ export class SocketClientService {
     leaveRoom(roomName: string) {
         console.log("leaveRoom", roomName)
         this.socketClient.send('leaveRoom', roomName);
+        this.disconnect();
     }
 
     // send roomName

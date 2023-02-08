@@ -30,6 +30,11 @@ export class PlayerService {
         }
     }
 
+    async deleteRoom(roomName:string):Promise<void>{
+        const rIndex = await this.getRoomIndex(roomName);
+        this.rooms.splice(rIndex, 1);
+        console.log(this.rooms)
+    }
     async removeRoom(roomName: string): Promise<void> {
         const rIndex = await this.getRoomIndex(roomName);
         this.rooms.splice(rIndex, 1);

@@ -3,21 +3,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MessageDialogComponent } from './message-dialog.component';
 
 describe('MessageDialogComponent', () => {
-  let component: MessageDialogComponent;
-  let fixture: ComponentFixture<MessageDialogComponent>;
+    let component: MessageDialogComponent;
+    let fixture: ComponentFixture<MessageDialogComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ MessageDialogComponent ]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [MessageDialogComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(MessageDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(MessageDialogComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

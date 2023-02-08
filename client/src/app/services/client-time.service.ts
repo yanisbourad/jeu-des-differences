@@ -5,11 +5,10 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class ClientTimeService {
-  count: number = 0;
-  time: number | unknown;
+    count: number = 0;
+    time: number | unknown;
 
-    constructor(readonly socketService: SocketClientService) {
-  }
+    constructor(readonly socketService: SocketClientService) {}
 
     startTimer(): void {
         this.time = setInterval(() => {
@@ -19,15 +18,15 @@ export class ClientTimeService {
         }, DELAY_BEFORE_EMITTING_TIME);
     }
 
-  getCount(): number {
-      return this.count;
-  }
+    getCount(): number {
+        return this.count;
+    }
 
-  stopTimer(): void {
-      clearInterval(this.time as number);
-  }
+    stopTimer(): void {
+        clearInterval(this.time as number);
+    }
 
-  resetTimer(): void {
-      this.count = 0;
-  }
+    resetTimer(): void {
+        this.count = 0;
+    }
 }

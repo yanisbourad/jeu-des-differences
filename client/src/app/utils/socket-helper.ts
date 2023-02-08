@@ -1,6 +1,6 @@
-type CallbackSignature = (params: any) => {}
+type CallbackSignature = (params: unknown) => {};
 
-//from Angular socket.io exemple on gitLab
+// from Angular socket.io exemple on gitLab
 export class SocketTestHelper {
     on(event: string, callback: CallbackSignature): void {
         if (!this.callbacks.has(event)) {
@@ -10,13 +10,15 @@ export class SocketTestHelper {
         this.callbacks.get(event)!.push(callback);
     }
 
-    emit(event: string, ...params: any): void {
+    emit(event: string, ...params: unknown): void {
         return;
     }
 
-    disconnect(): void { return; }
+    disconnect(): void {
+        return;
+    }
 
-    peerSideEmit(event: string, params?: any) {
+    peerSideEmit(event: string, params?: unknown) {
         if (!this.callbacks.has(event)) {
             return;
         }

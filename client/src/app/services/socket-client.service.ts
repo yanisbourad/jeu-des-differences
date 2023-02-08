@@ -12,7 +12,7 @@ export class SocketClientService {
     serverMessages: string[] = [];
     serverTime: RoomTime[] = [];
     serverMessage: string = '';
-    hintsLeft:number = 0;
+    hintsLeft: number = 0;
     roomName: string;
 
     constructor(private readonly socketClient: SocketClient) {
@@ -30,15 +30,15 @@ export class SocketClientService {
         }
     }
 
-    getRoomTime(roomName : string) : number {
+    getRoomTime(roomName: string): number {
         return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
     }
 
-    getRoomName(): string{
+    getRoomName(): string {
         return this.roomName;
     }
 
-    getServerTimeIndex(roomName:string): number {
+    getServerTimeIndex(roomName: string): number {
         return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
     }
 
@@ -51,7 +51,6 @@ export class SocketClientService {
     }
 
     configureBaseSocketFeatures() {
-
         this.socketClient.on('connect', () => {
             console.log('Connexion au serveur réussie');
         });
@@ -77,7 +76,7 @@ export class SocketClientService {
         });
 
         this.socketClient.on('nbrHint', (hintsLeft: number) => {
-            console.log("nbrHintbo", hintsLeft)
+            console.log('nbrHintbo', hintsLeft);
             this.hintsLeft = hintsLeft;
         });
     }
@@ -85,17 +84,17 @@ export class SocketClientService {
     disconnect() {
         this.socketClient.disconnect();
     }
-    //setRoomName
+    // setRoomName
     setRoomName(roomName: string) {
         this.roomName = roomName;
     }
-    //sendTime to server
+    // sendTime to server
     sendTime(time: number, roomName: string) {
         this.socketClient.send('time', [time, roomName]);
     }
 
     // addTime
-    addTime(time: number, roomName:string): void {
+    addTime(time: number, roomName: string): void {
         this.socketClient.send('addTime', [time, roomName]);
     }
 
@@ -111,7 +110,7 @@ export class SocketClientService {
 
     // leaveRoom
     leaveRoom(roomName: string) {
-        console.log("leaveRoom", roomName)
+        console.log('leaveRoom', roomName);
         this.socketClient.send('leaveRoom', roomName);
         this.disconnect();
     }

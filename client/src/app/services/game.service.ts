@@ -36,8 +36,8 @@ export class GameService {
     nHintsUnused: number = this.gameInformation.nHints;
     nHintsUsed: number = 0;
     hintsArray: string[] = new Array(this.nHintsUnused);
-    roomName:string;
-    playerName: string = "JAYJAY";
+    roomName: string;
+    playerName: string = 'JAYJAY';
     isplaying: boolean = false;
     private renderer: Renderer2;
     constructor(
@@ -47,9 +47,8 @@ export class GameService {
         public dialog: MatDialog,
         private readonly clientTimeService: ClientTimeService,
     ) {
-       this.roomName = this.generatePlayerRoomName();
-       this.renderer = rendererFactory.createRenderer(null, null);
-
+        this.roomName = this.generatePlayerRoomName();
+        this.renderer = rendererFactory.createRenderer(null, null);
     }
 
     clickGetHints(): void {
@@ -58,15 +57,15 @@ export class GameService {
                 this.nHintsUsed++;
                 this.hintsArray.shift();
                 this.hintsArray.push(this.path.hintUsed);
-                console.log(this.roomName)
+                console.log(this.roomName);
                 this.socket.addTime(this.gameInformation.hintsPenalty, this.roomName);
             }
         }
     }
 
-    //generateUniqueRoomName
+    // generateUniqueRoomName
     generatePlayerRoomName(): string {
-        return this.playerName + "room";
+        return this.playerName + 'room';
     }
 
     displayIcons(): void {
@@ -76,35 +75,35 @@ export class GameService {
 
         for (let i = 0; i < this.nHintsUnused; i++) {
             this.hintsArray[i] = this.path.hintUnused;
-        }        
-    };
-    
-    async blinkDifference(canvas: ElementRef<HTMLCanvasElement>): Promise<void>{
-            // const ctx = canvas.nativeElement.getContext('2d');
-            // const img = new Image();
-            let visible = true;
-            let blinkCount = 0;
-            const originalImage = new Image();
-            //const modified_image = new Image();
-            // original_image.src = '../../../assets/img/k3FhRA.jpg';
-            // console.log(original_image.src)
-            createImageBitmap(originalImage).then((imageBitmap) => {
-             this.drawService.drawImage(imageBitmap, canvas.nativeElement);
-            });
-            // modified_image.src = '../../../assets/img/k3FhRA.jpg';
-            // createImageBitmap(modified_image).then((imageBitmap) => {
-            // this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
-            // })
-            const intervalId = setInterval(() => {
-              visible = !visible;
-              this.renderer.setStyle(canvas.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-              blinkCount++;
-          
-              if (blinkCount === 8) {
+        }
+    }
+
+    async blinkDifference(canvas: ElementRef<HTMLCanvasElement>): Promise<void> {
+        // const ctx = canvas.nativeElement.getContext('2d');
+        // const img = new Image();
+        let visible = true;
+        let blinkCount = 0;
+        const originalImage = new Image();
+        // const modified_image = new Image();
+        // original_image.src = '../../../assets/img/k3FhRA.jpg';
+        // console.log(original_image.src)
+        createImageBitmap(originalImage).then((imageBitmap) => {
+            this.drawService.drawImage(imageBitmap, canvas.nativeElement);
+        });
+        // modified_image.src = '../../../assets/img/k3FhRA.jpg';
+        // createImageBitmap(modified_image).then((imageBitmap) => {
+        // this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
+        // })
+        const intervalId = setInterval(() => {
+            visible = !visible;
+            this.renderer.setStyle(canvas.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
+            blinkCount++;
+
+            if (blinkCount === 8) {
                 clearInterval(intervalId);
-              }
-            }, 125);
-          }
+            }
+        }, 125);
+    }
     displayGameEnded(msg: string, type: string, time: number) {
         // display modal
         this.dialog.open(MessageDialogComponent, {
@@ -133,7 +132,7 @@ export class GameService {
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
             this.clientTimeService.stopTimer();
             this.isGameFinished = true;
-            this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
+            this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.clientTimeService.getCount());
             // Hard reset variables
             this.reinitializeGame();
         }

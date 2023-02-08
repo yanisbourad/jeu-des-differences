@@ -8,18 +8,18 @@
     background: rgba(103, 91, 124, 0.28);
     border-bottom: 1px solid rgba(209, 207, 207, 0.47);
 }
-.logo{
+.logo {
     height: 50px;
     margin-bottom: 0px;
     margin-top: 2px;
     min-width: 50px;
 }
 
-.logo-center{
+.logo-center {
     display: flex;
     align-items: center;
 }
-.icon-display{
+.icon-display {
     transform: scale(1.4);
     -webkit-transform: scale(1.4);
     -moz-transform: scale(1.4);
@@ -27,6 +27,6 @@
     -o-transform: scale(1.4);
     margin-right: 10px;
 }
-.display-button{
+.display-button {
     margin-right: 30px;
 }

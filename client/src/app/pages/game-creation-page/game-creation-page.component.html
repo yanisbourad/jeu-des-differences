@@ -1,0 +1,30 @@
+<div class="game-creation-page">
+    <app-header [iconUsed]="false" class="navigation"></app-header>
+    <div class="body">
+        <div id="drawing-column">
+            <app-canvas-ngx class="Canvas-ngx" [type]="originalCanvas"></app-canvas-ngx>
+            <div class="switch-canvas">
+                <img src="" />
+            </div>
+            <app-canvas-ngx class=" Canvas-ngx" [type]="modifiedCanvas"></app-canvas-ngx>
+        </div>
+
+        <div id="tools-column">
+            <app-drawing-tool-bar></app-drawing-tool-bar>
+        </div>
+    </div>
+    <div>
+        <div id="return-container">
+            <div class="draw-difference">
+                <button class="btn" routerLink="/config" id="classique">
+                    Retour aux configurations
+                </button>
+            </div>
+            <div class="draw-difference tools">
+                <app-validate-create-btn text="Creer" color="green" (onBtnClick)="openCanvas()">
+                </app-validate-create-btn>
+            </div>
+        </div>
+    </div>
+
+</div>

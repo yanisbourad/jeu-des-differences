@@ -1,20 +1,23 @@
 import { Injectable } from '@angular/core';
+import { RoomTime } from '@app/interfaces/room-time';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
-import { RoomTime } from '@app/interfaces/room-time';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SocketClientService {
     socket: Socket;
+    timeIndexValue: number;
     serverMessages: string[] = [];
     serverTime: RoomTime[] = [];
     serverMessage: string = '';
     hintsLeft:number = 0;
     roomName: string;
 
-    constructor(private readonly socketClient: SocketClient) {}
+    constructor(private readonly socketClient: SocketClient) {
+        this.timeIndexValue = -1;
+    }
 
     get socketId() {
         return this.socketClient.socket.id ? this.socketClient.socket.id : '';
@@ -57,11 +60,11 @@ export class SocketClientService {
             this.serverMessage = message;
         });
 
-        this.socketClient.on('time',  (values :[string, number]) => {
-            if (this.getServerTimeIndex(values[0]) == -1 ){ 
-                this.serverTime.push({id:values[0], time:values[1]});
-            }else{
-                this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];       
+        this.socketClient.on('time', (values: [string, number]) => {
+            if (this.getServerTimeIndex(values[0]) === this.timeIndexValue) {
+                this.serverTime.push({ id: values[0], time: values[1] });
+            } else {
+                this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];
             }
         });
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur

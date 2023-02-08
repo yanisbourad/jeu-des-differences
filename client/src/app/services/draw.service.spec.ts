@@ -1,76 +1,64 @@
 import { TestBed } from '@angular/core/testing';
-import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-import { DrawService } from '@app/services/draw.service';
+import * as constants from '@app/configuration/const-canvas';
+import { Point } from '@app/interfaces/point';
+import { DrawService } from './draw.service';
 
 describe('DrawService', () => {
     let service: DrawService;
-    let ctxStub: CanvasRenderingContext2D;
-
-    const CANVAS_WIDTH = 500;
-    const CANVAS_HEIGHT = 500;
+    let canvas: HTMLCanvasElement;
+    let point: Point;
+    let lastPoint: Point;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(DrawService);
-        ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        service.context = ctxStub;
+        canvas = document.createElement('canvas');
+        point = { x: 50, y: 50 };
+        lastPoint = { x: 25, y: 25 };
     });
 
-    it('should be created', () => {
+    it('should create an instance', () => {
         expect(service).toBeTruthy();
     });
 
-    it(' width should return the width of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_WIDTH);
+    it('should set the canvas size', () => {
+        expect(service.width).toBe(constants.defaultWidth);
+        expect(service.height).toBe(constants.defaultHeight);
     });
 
-    it(' height should return the height of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_HEIGHT);
+    it('should set the color', () => {
+        service.setColor = 'red';
+        expect(service.getColor).toBe('red');
     });
 
-    it(' drawWord should call fillText on the canvas', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('test');
-        expect(fillTextSpy).toHaveBeenCalled();
+    it('should set the line width', () => {
+        service.setLineWidth = 0;
+        expect(service.getLineWidth).toBe(0);
     });
 
-    it(' drawWord should not call fillText if word is empty', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('');
-        expect(fillTextSpy).toHaveBeenCalledTimes(0);
+    // TODO: fix this test with a real image
+    it('should draw an image on the canvas', async () => {
+        // read the image file as a data URL.
+        const resp = await fetch('http://filesamples.com/samples/image/bmp/sample_640%C3%97426.bmp');
+        if (!resp.ok) {
+            return alert(resp.status);
+        }
+        const blob = await resp.blob();
+        const bmp = await createImageBitmap(blob);
+        service.drawImage(bmp, canvas);
     });
 
-    it(' drawWord should call fillText as many times as letters in a word', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        const word = 'test';
-        service.drawWord(word);
-        expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
+    it('should draw a line on the canvas', () => {
+        service.drawLine(point, lastPoint, canvas);
     });
 
-    it(' drawWord should color pixels on the canvas', () => {
-        let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawWord('test');
-        imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const afterSize = imageData.filter((x) => x !== 0).length;
-        expect(afterSize).toBeGreaterThan(beforeSize);
+    it('should clear the canvas', () => {
+        service.drawLine(point, lastPoint, canvas);
+        service.clearCanvas(canvas);
     });
 
-    it(' drawGrid should call moveTo and lineTo 4 times', () => {
-        const expectedCallTimes = 4;
-        const moveToSpy = spyOn(service.context, 'moveTo').and.callThrough();
-        const lineToSpy = spyOn(service.context, 'lineTo').and.callThrough();
-        service.drawGrid();
-        expect(moveToSpy).toHaveBeenCalledTimes(expectedCallTimes);
-        expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
-    });
-
-    it(' drawGrid should color pixels on the canvas', () => {
-        let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawGrid();
-        imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const afterSize = imageData.filter((x) => x !== 0).length;
-        expect(afterSize).toBeGreaterThan(beforeSize);
+    it('should validate drawing', () => {
+        const selectedRadius = 3;
+        expect(service.validateDrawing(selectedRadius)).toBe(true);
     });
 });

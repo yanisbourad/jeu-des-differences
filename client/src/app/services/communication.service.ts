@@ -4,7 +4,7 @@ import { Message } from '@common/message';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
+// eslint-disable-next-line no-restricted-imports
 @Injectable({
     providedIn: 'root',
 })

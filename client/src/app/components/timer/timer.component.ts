@@ -29,7 +29,7 @@ export class TimerComponent implements OnInit {
         return this.time.second < 10 || this.time.minute < 10 ? this.formatTime() : this.time.minute + ':' + this.time.second;
     }
 
-   setTime(): void {
+    setTime(): void {
         this.time.second = Number(this.clientTimeService.getCount() % 60)|0;
         this.time.minute = Number(Math.floor(this.clientTimeService.getCount() / 60))|0;
     }

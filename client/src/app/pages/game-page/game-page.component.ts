@@ -68,7 +68,6 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             }
         }
     }
-
     // async loadImage(): Promise<void> {
     //     const original_image = new Image();
     //     const modified_image = new Image();

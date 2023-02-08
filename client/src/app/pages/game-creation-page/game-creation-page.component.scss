@@ -1,0 +1,82 @@
+.game-creation-page {
+    display: flex;
+    margin: 0 auto;
+    justify-content: center;
+    flex-direction: column;
+    border: 1px solid black;
+    background: linear-gradient(#765fa0, #3b2957);
+    height: 100%;
+    width: 100%;
+}
+
+.body {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    height: 100%;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+#drawing-column {
+    display: flex;
+    justify-content: space-evenly;
+    min-width: 1400px;
+    width: 70%;
+    height: 50%;
+    margin-inline: auto;
+    padding: 1rem;
+}
+
+.Canvas-ngx {
+    width: 50%;
+    height: 100%;
+}
+
+#tools-column {
+    width: 100%;
+    height: 100%;
+    float: right;
+}
+
+.btn:hover {
+    background-color: #9845e7;
+}
+
+#return-container {
+    display: flex;
+    justify-content: center;
+    border: 1px solid black;
+    margin: 30px;
+    padding-right: 40%;
+}
+
+.btn {
+    margin: 2px;
+    font-size: 20px;
+    padding: 10px;
+    align-items: flex-start;
+    border: 2px solid;
+    border-color: rgb(166, 151, 220);
+    border-radius: 32px;
+    background-color: #4959c2;
+}
+
+.draw-difference {
+    display: flex;
+    margin: 0 auto;
+    justify-content: center;
+    height: 100%;
+    border: 1px solid white;
+}
+
+.tools {
+    width: 640px;
+}
+
+.switch-canvas {
+    background-color: white;
+    width: 20px;
+    height: 20px;
+    margin-top: 20%;
+}

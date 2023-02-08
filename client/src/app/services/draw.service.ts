@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
+import * as constants from '@app/configuration/const-canvas';
+import { Point } from '@app/interfaces/point';
 import { Vec2 } from '@app/interfaces/vec2';
-
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 500;
-export const DEFAULT_HEIGHT = 500;
 
 @Injectable({
     providedIn: 'root',
 })
 export class DrawService {
-    context: CanvasRenderingContext2D;
-    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Point = { x: constants.defaultWidth, y: constants.defaultHeight };
+    private color: string = 'black';
+    private lineWidth: number = 3;
 
     get width(): number {
         return this.canvasSize.x;
@@ -20,55 +19,94 @@ export class DrawService {
         return this.canvasSize.y;
     }
 
-    // TODO : pas de valeurs magiques!! Faudrait avoir une meilleure manière de le faire
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
-    drawGrid() {
-        this.context.beginPath();
-        this.context.strokeStyle = 'black';
-        this.context.lineWidth = 3;
+    get getColor(): string {
+        return this.color;
+    }
 
-        this.context.moveTo((this.width * 3) / 10, (this.height * 4) / 10);
-        this.context.lineTo((this.width * 7) / 10, (this.height * 4) / 10);
+    get getLineWidth(): number {
+        return this.lineWidth;
+    }
 
-        this.context.moveTo((this.width * 3) / 10, (this.height * 6) / 10);
-        this.context.lineTo((this.width * 7) / 10, (this.height * 6) / 10);
+    set setColor(color: string) {
+        this.color = color;
+    }
 
-        this.context.moveTo((this.width * 4) / 10, (this.height * 3) / 10);
-        this.context.lineTo((this.width * 4) / 10, (this.height * 7) / 10);
-
-        this.context.moveTo((this.width * 6) / 10, (this.height * 3) / 10);
-        this.context.lineTo((this.width * 6) / 10, (this.height * 7) / 10);
-
-        this.context.stroke();
+    set setLineWidth(width: number) {
+        this.lineWidth = width;
     }
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, 640, 480);
+        context.drawImage(image, 0, 0, this.width, this.height);
     }
 
-
-    drawWord(word: string) {
-        const startPosition: Vec2 = { x: 175, y: 100 };
-        const step = 20;
-        this.context.font = '20px system-ui';
-        for (let i = 0; i < word.length; i++) {
-            this.context.fillText(word[i], startPosition.x + step * i, startPosition.y);
-        }
+    drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        const imageData = new ImageData(data, this.width, this.height);
+        context.putImageData(imageData, 0, 0);
     }
 
-    drawWords(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
+    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.beginPath();
+        context.moveTo(lastPoint.x, lastPoint.y);
+        context.lineTo(point.x, point.y);
+        context.strokeStyle = this.color;
+        context.lineWidth = this.lineWidth;
+        context.stroke();
+    }
+
+    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        context.beginPath();
+        context.moveTo(lastPoint.x, lastPoint.y);
+        context.lineTo(point.x, point.y);
+        // do a circular cap on the line
+        context.lineCap = 'round';
+        context.strokeStyle = this.color;
+        context.lineWidth = this.lineWidth;
+        context.stroke();
+    }
+
+    drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
+        differences.forEach((diff) => {
+            this.drawDiff(diff, canvas);
+        });
+    }
+
+    drawDiff(diff: Set<number>, canvas: HTMLCanvasElement): void {
+        const context = this.getContext(canvas);
+        // color pixels one by one and draw them
+        diff.forEach((index) => {
+            const x = index % this.width;
+            const y = Math.floor(index / this.width);
+            context.fillStyle = constants.defaultLineColor;
+            context.fillRect(x, y, 1, 1);
+        });
+    }
+    // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
+
+    // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
+
+    // drawTriangle(canvas: HTMLCanvasElement) {}
+
+    clearCanvas(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        context.fillStyle = constants.defaultBackgroundColor;
+        context.fillRect(0, 0, this.width, this.height);
+    }
+    validateDrawing(selectedRadius: number) {
+        // TODO: check if the drawing is valid
+        return selectedRadius ? true : false;
+    }
+    getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+        return canvas.getContext('2d') as CanvasRenderingContext2D;
+    }
+
+    drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
         const context = this.getContext(canvas);
         context.font = '20px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
-        setTimeout(() => { // clear the word after 1 sec
-            const width = context.measureText(word).width;
-            context.clearRect(position.x, position.y - 40, width, 40);
-          }, 1000);
-    }
-
-    getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-        return canvas.getContext('2d') as CanvasRenderingContext2D;
     }
 }

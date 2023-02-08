@@ -58,13 +58,13 @@ export class GamePageComponent implements OnInit, AfterViewInit {
                 // this.clientTimeService.stopTimer();
                 this.gameService.playSuccessAudio();
                 this.gameService.blinkDifference(this.canvas1);
-                this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
+                this.drawService.drawWord('Trouvé', this.canvas1.nativeElement, this.mousePosition);
+                this.drawService.drawWord('Trouvé', this.canvas2.nativeElement, this.mousePosition);
                 this.gameService.clickDifferencesFound();
             } else {
                 this.gameService.playFailureAudio();
-                this.drawService.drawWords('Erreur', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Erreur', this.canvas2.nativeElement, this.mousePosition);
+                this.drawService.drawWord('Erreur', this.canvas1.nativeElement, this.mousePosition);
+                this.drawService.drawWord('Erreur', this.canvas2.nativeElement, this.mousePosition);
             }
         }
     }

@@ -17,13 +17,12 @@
             <p>
                 Difficulté : 
                 <span *ngIf="gameService.gameInformation.gameDifficulty === 'Facile'" class="difficulty-easy">
-                    {{gameService.gameInformation.gameDifficulty}} 😌
+                    {{gameService.gameInformation.gameDifficulty}}
                 </span>
                 <span *ngIf="gameService.gameInformation.gameDifficulty === 'Difficile'" class="difficulty-hard">
-                   {{gameService.gameInformation.gameDifficulty}} 👹
+                   {{gameService.gameInformation.gameDifficulty}}
                 </span>
             </p>
-          
       </div>
       <app-timer></app-timer>
   </div>

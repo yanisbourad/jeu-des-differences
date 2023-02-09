@@ -207,6 +207,11 @@ export class ImageDiffService {
         this.listBfsInput.push({ point: { x: point.x - 1, y: point.y }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
+
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y + 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y + 1 }, distance });
     }
 
     getPositionsFromXY(x: number, y: number): number {

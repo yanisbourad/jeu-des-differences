@@ -1,5 +1,5 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -35,7 +35,7 @@ export class GameDatabaseService {
         return this.http.post(`${this.baseUrl}/game/create`, game, { observe: 'response', responseType: 'text' });
     }
 
-    saveGame(_gameName: string) {
+    saveGame(_gameName: string): EventEmitter<boolean> {
         const game: GameCreate = {
             gameName: _gameName,
             originalImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.originalCanvas),
@@ -43,13 +43,20 @@ export class GameDatabaseService {
             listDifferences: this.imageDiff.getDifferences(),
             difficulty: this.imageDiff.getDifficulty(),
         };
-        this.createGame(game).subscribe((response) => {
-            if (response.status === this.twoHundredOkResponse) {
-                alert('Game saved!');
-            } else {
-                alert('Error: Game not saved!');
-            }
-        });
+        const isSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
+        try {
+            this.createGame(game).subscribe((response) => {
+                if (response.status === this.twoHundredOkResponse) {
+                    isSaved.emit(true);
+                } else {
+                    isSaved.emit(false);
+                }
+            });
+        } catch (err) {
+            isSaved.emit(false);
+        }
+
+        return isSaved;
     }
 
     deleteGame(gameName: string): Observable<HttpResponse<string>> {

@@ -42,7 +42,7 @@ export class DifferencePopupComponent implements AfterViewInit {
     openName() {
         this.dialogRef.close();
         const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
-            height: '480x',
+            height: '600x',
             width: '500px',
         });
         dialogRefGame.afterClosed().subscribe();

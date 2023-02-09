@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -22,13 +23,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2 = { x: 0, y: 0 };
     roomName: string;
     errorPenalty: boolean = false;
-    unfundedDifference: Set<number>[];
+    unfoundedDifference: Set<number>[];
+    playername: string;
+    gameName: string;
+
     constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
         readonly clientTimeService: ClientTimeService,
         public dialog: MatDialog,
+        public routeur: Router,
+        public route : ActivatedRoute,
     ) {}
     ngOnDestroy(): void {
         this.clientTimeService.stopTimer();
@@ -44,25 +50,35 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clientTimeService.startTimer();
         this.socket.sendNbrHint(this.gameService.nHintsUnused);
         this.gameService.displayIcons();
-        this.unfundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+        this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
         this.drawService.setColor = 'yellow';
     }
+    
+    getRouteurParams(){
+        this.route.params.subscribe(params => {
+            this.gameName =params['gameName'];
+            this.playername = params['player'];
+        });
+    }
 
+  
     ngOnInit(): void {
         this.roomName = this.gameService.generatePlayerRoomName();
-        this.gameService.getGame('test');
         this.gameService.displayIcons();
+        this.getRouteurParams();
+        this.gameService.getGame(this.gameName);
+        this.gameService.playerName = this.playername;
     }
 
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
-            const diff = this.unfundedDifference.find((set) => set.has(distMousePosition));
+            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
                 this.drawDifference(diff);
                 // remove difference found from unfundedDifference
-                this.unfundedDifference = this.unfundedDifference.filter((set) => set !== diff);
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
                 this.displayWord('Trouvé');
             } else {
                 this.errorPenalty = true;

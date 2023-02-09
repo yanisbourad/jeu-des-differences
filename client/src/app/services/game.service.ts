@@ -32,13 +32,12 @@ export class GameService {
     nHintsUsed: number;
     hintsArray: string[];
     roomName: string;
-    playerName: string = 'JAYJAY';
+    playerName: string;
     isplaying: boolean = false;
     private renderer: Renderer2;
 
     constructor(
         private readonly socket: SocketClientService,
-        // private readonly drawService: DrawService,
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,
         private readonly clientTimeService: ClientTimeService,
@@ -55,7 +54,6 @@ export class GameService {
         };
         this.roomName = this.generatePlayerRoomName();
         this.renderer = rendererFactory.createRenderer(null, null);
-        // this.defineVariables();
     }
 
     clickGetHints(): void {

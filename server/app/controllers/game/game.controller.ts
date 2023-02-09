@@ -70,15 +70,6 @@ export class GameController {
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
-    // @Post('/update')
-    // async updateGame(@Param('game') game: UpdateGameDto, @Res() response: Response) {
-    //     try {
-    //         const res = await this.gamesService.modifyGame(game);
-    //         response.status(HttpStatus.OK).json(res);
-    //     } catch (error) {
-    //         response.status(HttpStatus.NOT_FOUND).send(error.message);
-    //     }
-    // }
 
     @ApiOkResponse({
         description: 'Delete game',

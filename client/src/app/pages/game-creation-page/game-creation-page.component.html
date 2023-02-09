@@ -1,5 +1,8 @@
 <div class="game-creation-page">
     <app-header [iconUsed]="false" class="navigation"></app-header>
+    <div class="warning">
+        <h2>Veuillez seulement téléverser des images dans un format bitmap (BMP) 24-bit de taille 640x480 pixels</h2>
+    </div>
     <div class="body">
         <div id="drawing-column">
             <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas"></app-canvas-ngx>
@@ -23,7 +26,8 @@
                 </button>
             </div>
             <div class="draw-difference tools">
-                <app-validate-create-btn text="Creer" color="green" (onBtnClick)="openCanvas()">
+                <app-validate-create-btn text="Lancer validation de differences" color="green"
+                    (onBtnClick)="openCanvas()">
                 </app-validate-create-btn>
             </div>
         </div>

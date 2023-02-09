@@ -13,6 +13,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
+
 export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
@@ -40,7 +41,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.socket.connect();
         this.socket.setRoomName(this.roomName);
         this.socket.sendRoomName(this.roomName);
-        this.socket.joinRoom(this.gameService.playerName); // to validate tomorow!!
+        this.socket.joinRoom(this.gameService.playerName); // to validate tomorow!! same problem with timer sometimes start with the last game time
         this.clientTimeService.startTimer();
         this.socket.sendNbrHint(this.gameService.nHintsUnused);
         this.gameService.displayIcons();
@@ -80,9 +81,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
             setTimeout(() => {
                 this.errorPenalty = false;
-            }, 1000)
-
-            
+            }, 1000) 
         }else {
             this.gameService.playSuccessAudio();
             this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
@@ -110,11 +109,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.drawService.clearDiff(this.canvas1.nativeElement);
             this.drawService.clearDiff(this.canvas2.nativeElement);
         }, 1000);
-    }
-
-    async loadImage(): Promise<void> {
-        await this.drawService.drawImageFromUrl(this.gameService.game.originalImageData, this.canvas1.nativeElement);
-        await this.drawService.drawImageFromUrl(this.gameService.game.modifiedImageData, this.canvas2.nativeElement);
     }
 
     displayGiveUp(msg: string, type: string) {

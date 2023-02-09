@@ -80,7 +80,7 @@ export class DrawService {
         diff.forEach((index) => {
             const x = index % this.width;
             const y = Math.floor(index / this.width);
-            context.fillStyle = constants.defaultLineColor;
+            context.fillStyle = this.color;
             context.fillRect(x, y, 1, 1);
         });
     }

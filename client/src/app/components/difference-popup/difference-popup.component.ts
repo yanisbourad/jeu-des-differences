@@ -30,6 +30,7 @@ export class DifferencePopupComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.showDifferentPixels = true;
         if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
+            console.log(this.imageDifferenceService.getDifferenceNumber());
             this.showDifference = this.imageDifferenceService.getDifferenceNumber();
             this.showDifferentPixels = true;
             this.drawService.clearCanvas(this.canvas.nativeElement);
@@ -42,9 +43,13 @@ export class DifferencePopupComponent implements AfterViewInit {
     openName() {
         this.dialogRef.close();
         const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
+            disableClose: true,
             height: '600x',
             width: '500px',
         });
         dialogRefGame.afterClosed().subscribe();
+    }
+    closeOnAbort() {
+        this.dialogRef.close();
     }
 }

@@ -2,10 +2,16 @@
     <div class="header"><app-header></app-header></div>
     <app-game-info></app-game-info>
     <div class="mainView">
-        <canvas #canvas1 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
-        <canvas #canvas2 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
+        <div class="superposeImageCanvas">
+            <img [src]="this.gameService.game.originalImageData" [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" />
+            <canvas #canvas1 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
+        </div>
+        <div class="superposeImageCanvas">
+            <img [src]="this.gameService.game.modifiedImageData" [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" />
+            <canvas #canvas2 [attr.width]="DEFAULT_WIDTH" [attr.height]="DEFAULT_HEIGHT" (click)="mouseHitDetect($event)"></canvas>
+        </div>
     </div>
     <div class="footer">
-        <button mat-raised-button class="giveUp btn" (click)="giveUp()"> Abandonner la partie </button>
+        <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
     </div>
 </div>

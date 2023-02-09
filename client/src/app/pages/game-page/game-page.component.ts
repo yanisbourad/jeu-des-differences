@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-// import { Router } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -45,6 +44,8 @@ export class GamePageComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.roomName = this.gameService.generatePlayerRoomName();
+        this.gameService.getGame('Game name 1');
+        this.gameService.displayIcons();
     }
 
     mouseHitDetect(event: MouseEvent) {
@@ -97,6 +98,10 @@ export class GamePageComponent implements OnInit, AfterViewInit {
     //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
     //     });
     // }
+    async loadImage(): Promise<void> {
+        await this.drawService.drawImageFromUrl(this.gameService.game.originalImageData, this.canvas1.nativeElement);
+        await this.drawService.drawImageFromUrl(this.gameService.game.modifiedImageData, this.canvas2.nativeElement);
+    }
 
     displayGiveUp(msg: string, type: string) {
         // display modal
@@ -107,20 +112,6 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             panelClass: 'custom-dialog-container',
         });
     }
-
-    // displayGameEnded(msg: string, type: string, time: number) {
-    //     // display modal
-    //     this.dialog.open(MessageDialogComponent, {
-    //         data: [msg, type, time],
-    //         minWidth: '250px',
-    //         minHeight: '250px',
-    //         panelClass: 'custom-dialog-container',
-    //     });
-    //     // to put when number of difference found equal max difference
-    //     // this.clientTimeService.stopTimer();
-    //     // console.log(this.clientTimeService.getCount())
-    //     // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
-    // }
 
     giveUp(): void {
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');

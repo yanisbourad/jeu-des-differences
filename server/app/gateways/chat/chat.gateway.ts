@@ -34,16 +34,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Time)
     async Time(socket: Socket, data: [time: number, roomName: string]) {
+        // if (!socket.connected) {
+        //     socket.emit(ChatEvents.Time, [0, data[1]]);
+        //     return;
+        // }
         this.clientTime = data[0];
-        const room = await this.playerService.getRoom(data[1]);
-        const startTime = room.startTime;
+        const room = await this.playerService?.getRoom(data[1]);
+        const startTime = (room)? room.startTime : null ;
         if (this.hintUsed) {
             this.timeService.nHints++;
             this.hintUsed = false;
         }
-        const count = this.timeService.getElaspedTime(startTime);
+       const count = this.timeService.getElaspedTime(startTime);
         if (!this.validateServerClientTime(count)) {
-            socket.emit(ChatEvents.Time, [room.name, count]);
+            if(room){
+                socket.emit(ChatEvents.Time, [room.name, count]);
+            }
         }
     }
 
@@ -79,11 +85,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket, roomName: string) {
-        //  this.playerService.removeRoom(roomName);
         const room = await this.playerService.getRoom(roomName);
         room.startTime = null;
         this.playerService.removePlayer(roomName, socket.id);
-        console.log('leave room', this.playerService.rooms);
         socket.leave(roomName);
     }
 

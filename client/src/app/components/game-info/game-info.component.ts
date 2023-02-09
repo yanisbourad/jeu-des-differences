@@ -10,9 +10,7 @@ export class GameInfoComponent implements OnInit, AfterViewInit{
     ngAfterViewInit(): void {
         setTimeout( ()=>{
             this.gameService.displayIcons();
-        }, 95);
-        // setTimeout( ()=>{
-            //   }, 1000);
+        }, 250);
         }
     ngOnInit(): void {
     }

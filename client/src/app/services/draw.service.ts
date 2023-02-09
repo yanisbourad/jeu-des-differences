@@ -80,7 +80,7 @@ export class DrawService {
         diff.forEach((index) => {
             const x = index % this.width;
             const y = Math.floor(index / this.width);
-            context.fillStyle = constants.defaultLineColor;
+            context.fillStyle = this.color;
             context.fillRect(x, y, 1, 1);
         });
     }
@@ -104,6 +104,12 @@ export class DrawService {
         context.fillStyle = constants.defaultBackgroundColor;
         context.fillRect(0, 0, this.width, this.height);
     }
+
+    clearDiff(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        context.clearRect(0, 0, this.width, this.height);
+    }
+
     validateDrawing(selectedRadius: number) {
         // TODO: check if the drawing is valid
         return selectedRadius ? true : false;

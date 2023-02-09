@@ -55,8 +55,6 @@ export class GameService {
         };
         this.roomName = this.generatePlayerRoomName();
         this.renderer = rendererFactory.createRenderer(null, null);
-        this.getGame('Game name 1');
-
         //this.defineVariables();
     }
 
@@ -105,27 +103,21 @@ export class GameService {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
         }
-        console.log(this.differencesArray)
+        console.log(this.differencesArray);
         for (let i = 0; i < this.nHintsUnused; i++) {
             this.hintsArray[i] = this.path.hintUnused;
         }
     }
 
-    async blinkDifference(canvas: ElementRef<HTMLCanvasElement>): Promise<void> {
-        // const ctx = canvas.nativeElement.getContext('2d');
-        // const img = new Image();
+    async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
         let visible = true;
         let blinkCount = 0;
-        // const originalImage = new Image();
-        // originalImage.src = '';
-        // createImageBitmap(originalImage).then((imageBitmap) => {
-        //     this.drawService.drawImage(imageBitmap, canvas.nativeElement);
-        // });
         const intervalId = setInterval(() => {
             visible = !visible;
-            this.renderer.setStyle(canvas.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-            blinkCount++;
+            this.renderer.setStyle(canvas1.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
+            this.renderer.setStyle(canvas2.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
 
+            blinkCount++;
             if (blinkCount === 8) {
                 clearInterval(intervalId);
             }

@@ -34,7 +34,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         readonly clientTimeService: ClientTimeService,
         public dialog: MatDialog,
         public routeur: Router,
-        public route : ActivatedRoute,
+        public route: ActivatedRoute,
     ) {}
     ngOnDestroy(): void {
         this.clientTimeService.stopTimer();
@@ -53,15 +53,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
         this.drawService.setColor = 'yellow';
     }
-    
-    getRouteurParams(){
-        this.route.params.subscribe(params => {
-            this.gameName =params['gameName'];
+
+    getRouteurParams() {
+        this.route.params.subscribe((params) => {
+            this.gameName = params['gameName'];
             this.playername = params['player'];
         });
     }
 
-  
     ngOnInit(): void {
         this.roomName = this.gameService.generatePlayerRoomName();
         this.gameService.displayIcons();

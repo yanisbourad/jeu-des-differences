@@ -6,7 +6,7 @@ import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.sercice';
 import { GameCreate } from '@common/game';
 import { ClientTimeService } from './client-time.service';
-import { DrawService } from './draw.service';
+// import { DrawService } from './draw.service';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -38,7 +38,7 @@ export class GameService {
 
     constructor(
         private readonly socket: SocketClientService,
-        private readonly drawService: DrawService,
+        // private readonly drawService: DrawService,
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,
         private readonly clientTimeService: ClientTimeService,
@@ -116,11 +116,11 @@ export class GameService {
         // const img = new Image();
         let visible = true;
         let blinkCount = 0;
-        const originalImage = new Image();
-        originalImage.src = '../../../assets/img/k3FhRA.jpg';
-        createImageBitmap(originalImage).then((imageBitmap) => {
-            this.drawService.drawImage(imageBitmap, canvas.nativeElement);
-        });
+        // const originalImage = new Image();
+        // originalImage.src = '';
+        // createImageBitmap(originalImage).then((imageBitmap) => {
+        //     this.drawService.drawImage(imageBitmap, canvas.nativeElement);
+        // });
         const intervalId = setInterval(() => {
             visible = !visible;
             this.renderer.setStyle(canvas.nativeElement, 'visibility', visible ? 'visible' : 'hidden');

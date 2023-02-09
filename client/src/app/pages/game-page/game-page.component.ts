@@ -81,8 +81,10 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < 5; i++) {
             this.drawService.setColor = 'red';
             this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+            this.drawService.drawDiff(diff, this.canvas2.nativeElement);
             setTimeout(() => {
                 this.drawService.clearCanvas(this.canvas1.nativeElement);
+                this.drawService.clearCanvas(this.canvas2.nativeElement);
             }, 1000);
         }
     }

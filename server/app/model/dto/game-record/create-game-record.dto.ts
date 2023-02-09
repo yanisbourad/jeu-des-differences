@@ -12,7 +12,7 @@ export class CreateGameRecordDto {
 
     @ApiProperty()
     @IsNumber()
-    time: number;
+    time: string;
 
     @ApiProperty()
     @IsString()

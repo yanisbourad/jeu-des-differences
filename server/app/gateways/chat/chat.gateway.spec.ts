@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Logger } from '@nestjs/common';
-import { SinonStubbedInstance, createStubInstance, match} from 'sinon';
-import { Socket, Server} from 'socket.io';
+import { SinonStubbedInstance, createStubInstance, match } from 'sinon';
+import { Socket, Server } from 'socket.io';
 import { ChatEvents } from './chat.gateway.events';
 import { DELAY_BEFORE_EMITTING_TIME } from './chat.gateway.constants';
 
@@ -37,15 +37,16 @@ describe('ChatGateway', () => {
     });
 
     it('joinRoom() should join the socket room', () => {
-       // gateway.joinRoom(socket);
+        // gateway.joinRoom(socket);
         expect(socket.join.calledOnce).toBeTruthy();
     });
 
-    it('afterInit() should emit time after 1s', () => { // to customize for us
+    it('afterInit() should emit time after 1s', () => {
+        // to customize for us
         jest.useFakeTimers();
         gateway.afterInit();
         jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-        expect(server.emit.calledWith(ChatEvents.Time, match.any)).toBeTruthy();//i changed clock to time
+        expect(server.emit.calledWith(ChatEvents.Time, match.any)).toBeTruthy(); // i changed clock to time
     });
 
     it('hello message should be sent on connection', () => {

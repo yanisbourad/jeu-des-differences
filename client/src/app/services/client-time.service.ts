@@ -5,7 +5,6 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class ClientTimeService {
-    roomName: string = 'test7 room'; // from database or something else
     count: number = 0;
     time: number | unknown;
 
@@ -13,8 +12,7 @@ export class ClientTimeService {
 
     startTimer(): void {
         this.time = setInterval(() => {
-            this.count = this.socketService.getRoomTime(this.roomName);
-            this.socketService.sendTime(this.count, this.roomName);
+            this.socketService.sendTime(this.count);
             this.count++;
         }, DELAY_BEFORE_EMITTING_TIME);
     }
@@ -25,5 +23,9 @@ export class ClientTimeService {
 
     stopTimer(): void {
         clearInterval(this.time as number);
+    }
+
+    resetTimer(): void {
+        this.count = 0;
     }
 }

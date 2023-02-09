@@ -6,6 +6,14 @@ import * as constants from '@app/configuration/const-canvas';
 })
 export class BitmapService {
     context: CanvasRenderingContext2D;
+
+    async handleFileSelect(e: Event): Promise<ImageBitmap> {
+        const newImage = this.getFile(e);
+        if (!(await this.validateBitmap(newImage)).valueOf()) return new ImageBitmap();
+        const img = await this.fileToImageBitmap(newImage);
+        if (!this.validateSize(img)) return new ImageBitmap();
+        return img;
+    }
     getFile(e: Event): File {
         const target = e.target as HTMLInputElement;
         if (target.files === null) {

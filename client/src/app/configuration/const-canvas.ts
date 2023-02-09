@@ -4,7 +4,7 @@ export const defaultHeight = 480;
 export const defaultLineWidth = 5;
 export const minLineWidth = 1;
 export const maxLineWidth = 10;
-export const defaultRadius = 3;
+export const defaultRadius = 0;
 export const defaultLineColor = '#000000';
 export const defaultBackgroundColor = '#ffffff';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers

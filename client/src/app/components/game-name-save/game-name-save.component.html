@@ -1,8 +1,8 @@
 <div class="form-group">
-    <p class="index">Entrer le nom du Jeu SVP</p>
+    <p class="index">Entrer le nom du Jeu SVP {{showFeedback}}</p>
     <div class="input-block">
-        <label for="game-name">Nom du Jeu</label>
-        <input name="game-name" type="text" placeholder="Papa Docker">
+        <label for="gamename">Nom du Jeu</label>
+        <input name="gameName" [(ngModel)]="gameName" id="gameName" type="text" placeholder="Papa Docker">
     </div>
     <p>Niveau du Jeu : {{level}}</p>
     <div class="btn-block">

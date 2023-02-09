@@ -187,13 +187,13 @@ export class ImageDiffService {
             let lastDistance = this.mapDistPoint.get(position);
             // if fist time reading this point
             if (!lastDistance) {
-                // adding it to the differenceMatrix
-                this.currentDifferenceTemp.add(position);
                 // puts the lastDistance as unreachable
                 lastDistance = radius + 1;
             }
 
-            if (distance < radius && distance < lastDistance) {
+            if (distance < radius - 1 && distance < lastDistance) {
+                // adding it to the differenceMatrix
+                this.currentDifferenceTemp.add(position);
                 // if distance is the lower ever found
                 this.mapDistPoint.set(position, distance);
                 // next bfs should have a distance greater than the parent
@@ -207,6 +207,11 @@ export class ImageDiffService {
         this.listBfsInput.push({ point: { x: point.x - 1, y: point.y }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
+
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y + 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y + 1 }, distance });
     }
 
     getPositionsFromXY(x: number, y: number): number {

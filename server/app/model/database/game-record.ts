@@ -15,7 +15,7 @@ export class GameRecord {
 
     @ApiProperty()
     @Prop({ required: true })
-    time: number;
+    time: String;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -24,10 +24,6 @@ export class GameRecord {
     @ApiProperty()
     @Prop({ required: true })
     dateStart: Date;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    playing: boolean;
 }
 
 export const gameRecordSchema = SchemaFactory.createForClass(GameRecord);

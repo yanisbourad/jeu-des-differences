@@ -12,6 +12,8 @@ export class SocketClientService {
     serverMessages: string[] = [];
     serverTime: RoomTime[] = [];
     serverMessage: string = '';
+    hintsLeft: number = 0;
+    roomName: string;
 
     constructor(private readonly socketClient: SocketClient) {
         this.timeIndexValue = -1;
@@ -25,20 +27,30 @@ export class SocketClientService {
         if (!this.socketClient.isSocketAlive()) {
             this.socketClient.connect();
             this.configureBaseSocketFeatures();
+            //console.log(this.serverTime, "severtime")
         }
     }
 
     getRoomTime(roomName: string): number {
-        // console.log("getRoomTime", roomName, this.serverTime[this.getServerTimeIndex(roomName)]?.time)
-        return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
+        return this.serverTime[this.getServerTimeIndex()]?.time;
     }
 
-    getServerTimeIndex(roomName: string): number {
-        return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
+    getRoomName(): string {
+        console.log(this.socketId)
+        console.log(this.serverTime, 'severtime')
+        return this.socketId;
+    }
+
+    getServerTimeIndex(): number {
+        return this.serverTime.findIndex((roomTime) => roomTime.id === this.socketId);
     }
 
     getServerMessage(): string {
         return this.serverMessage;
+    }
+
+    getHintLeft(): number {
+        return this.hintsLeft;
     }
 
     configureBaseSocketFeatures() {
@@ -46,15 +58,19 @@ export class SocketClientService {
             console.log('Connexion au serveur réussie');
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
-        this.socketClient.on('hello', (message: string) => {
-            this.serverMessage = message;
+        this.socketClient.on('hello', (data:string) => {
+            this.serverMessage = data[0];
+            console.log( this.socketId);
         });
 
         this.socketClient.on('time', (values: [string, number]) => {
-            if (this.getServerTimeIndex(values[0]) === this.timeIndexValue) {
+            console.log(values, 'time');
+            if (this.getServerTimeIndex() === this.timeIndexValue) {
                 this.serverTime.push({ id: values[0], time: values[1] });
+                console.log(this.serverTime, 'severtime')
             } else {
-                this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];
+                this.serverTime[this.getServerTimeIndex()].time = values[1];
+                console.log(this.serverTime, 'severtime')
             }
         });
         // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur
@@ -65,19 +81,33 @@ export class SocketClientService {
         this.socketClient.on('massMessage', (broadcastMessage: string) => {
             this.serverMessages.push(broadcastMessage);
         });
+
+        this.socketClient.on('nbrHint', (hintsLeft: number) => {
+            this.hintsLeft = hintsLeft;
+        });
     }
+
     disconnect() {
         this.socketClient.disconnect();
     }
 
+    // // setRoomName
+    // setRoomName(roomName: string) {
+    //     this.roomName = roomName;
+    // }
     // sendTime to server
-    sendTime(time: number, roomName: string) {
-        this.socketClient.send('time', [time, roomName]);
+    sendTime(time: number) {
+        this.socketClient.send('time', time);
     }
 
     // addTime
-    addTime(time: number): void {
-        this.socketClient.send('addTime', time);
+    addTime(time: number, roomName: string): void {
+        this.socketClient.send('addTime', [time, roomName]);
+    }
+
+    // send number of hints
+    sendNbrHint(Hints: number) {
+        this.socketClient.send('nbrHint', Hints);
     }
 
     // joinRoom
@@ -86,7 +116,14 @@ export class SocketClientService {
     }
 
     // leaveRoom
-    leaveRoom(playerName: string) {
-        this.socketClient.send('leaveRoom', playerName);
+    leaveRoom(roomName: string) {
+        console.log('leaveRoom', roomName);
+        this.socketClient.send('leaveRoom', roomName);
+        this.disconnect();
     }
+
+    // send roomName
+    // sendRoomName(roomName: string) {
+    //     this.socketClient.send('roomName', roomName);
+    // }
 }

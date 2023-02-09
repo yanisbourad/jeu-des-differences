@@ -67,12 +67,13 @@ export class CardDisplayerComponent implements OnInit {
 
     constructor(private readonly gameDataBase: GameDatabaseService) {
         this.currentPage = 0;
+    
     }
-    ngOnInit(): void {
+     ngOnInit():void {
         this.getAllCards();
     }
 
-    getAllCards(): void {
+     getAllCards() {
         this.gameDataBase.getAllGames().subscribe((res: GameInfo[]) => {
             this.allCards = res;
         });
@@ -89,7 +90,7 @@ export class CardDisplayerComponent implements OnInit {
     }
 
     getCurrentPageCards(): GameInfo[] {
-        console.log(this.allCards[0].rankingSolo[0]);
+        //console.log(this.allCards[0].rankingSolo[0]);
         const startIndex: number = this.cardByPage * this.currentPage;
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);

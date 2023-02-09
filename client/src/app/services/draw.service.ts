@@ -37,7 +37,7 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, this.width, this.height);
+        context.drawImage(image, 0, 0, 640, 480);
     }
 
     drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
@@ -89,6 +89,15 @@ export class DrawService {
             context.fillRect(x, y, 1, 1);
         });
     }
+
+    async drawImageFromUrl(data: string, canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        const img = new Image();
+        img.src = data;
+        img.onload = async () => {
+            context.drawImage(img, 0, 0);
+        };
+    }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 
     // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
@@ -100,6 +109,12 @@ export class DrawService {
         context.fillStyle = constants.defaultBackgroundColor;
         context.fillRect(0, 0, this.width, this.height);
     }
+
+    clearDiff(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        context.clearRect(0, 0, this.width, this.height);
+    }
+
     validateDrawing(selectedRadius: number) {
         // TODO: check if the drawing is valid
         return selectedRadius ? true : false;
@@ -108,10 +123,15 @@ export class DrawService {
         return canvas.getContext('2d') as CanvasRenderingContext2D;
     }
 
-    drawWords(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
+    drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
         const context = this.getContext(canvas);
         context.font = '20px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
+        // setTimeout(() => {
+        //     // clear the word after 1 sec
+        //     const width = context.measureText(word).width;
+        //     context.clearRect(position.x, position.y - 40, width, 40);
+        // }, 1000);
     }
 }

@@ -19,8 +19,8 @@ export class GameDatabaseService {
         this.twoHundredOkResponse = 200;
     }
 
-    getAllGames(): Observable<GameInfo> {
-        return this.http.get<GameInfo>(`${this.baseUrl}/game`).pipe(catchError(this.handleError<GameInfo>('getAllGames')));
+    getAllGames(): Observable<GameInfo[]> {
+        return this.http.get<GameInfo[]>(`${this.baseUrl}/game`).pipe(catchError(this.handleError<GameInfo[]>('getAllGames')));
     }
 
     getGameByName(gameName: string): Observable<GameInfo> {

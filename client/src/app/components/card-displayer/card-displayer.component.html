@@ -1,9 +1,18 @@
-<div id = "card-display">
-    <mat-grid-list cols="4"  rowHeight= "665px" >
-        <div *ngFor = " let card of cards">
-            <mat-grid-tile> 
-                <app-game-card>{{card}}</app-game-card>
+<div id="card-display">
+    <mat-grid-list cols="4" rowHeight="670px">
+        <div *ngFor="let card of getCurrentPageCards()">
+            <mat-grid-tile>
+                <app-game-card [card]="card">{{ card }}</app-game-card>
             </mat-grid-tile>
         </div>
     </mat-grid-list>
+</div>
+
+<div class="button">
+    <button [disabled]="this.currentPage === 0" class="previous-next-button" (click)="goToPrevious()">
+        <mat-icon alt="page précédente">navigate_before</mat-icon>
+    </button>
+    <button [disabled]="this.currentPage === this.allPages" class="previous-next-button" (click)="goToNext()">
+        <mat-icon alt="prochaine page">navigate_next</mat-icon>
+    </button>
 </div>

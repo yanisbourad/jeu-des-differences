@@ -8,9 +8,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 })
 export class TimerComponent implements OnInit {
     time: Time;
-    roomName: string = "test7 room";
-
-    constructor(public readonly clientTimeService: ClientTimeService) {
+    constructor(readonly clientTimeService: ClientTimeService) {
         this.time = { minute: 0, second: 0 };
     }
 
@@ -32,7 +30,7 @@ export class TimerComponent implements OnInit {
     }
 
     setTime(): void {
-        this.time.second = Number(this.clientTimeService.getCount() % 60)|0;
-        this.time.minute = Number(Math.floor(this.clientTimeService.getCount() / 60))|0;
+        this.time.second = Number(this.clientTimeService.getCount() % 60) | 0;
+        this.time.minute = Number(Math.floor(this.clientTimeService.getCount() / 60)) | 0;
     }
 }

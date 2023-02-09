@@ -13,31 +13,7 @@ export class GameService {
         @InjectModel(Game.name) public gameModel: Model<GameDocument>,
         @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
         private readonly logger: Logger,
-    ) {
-        this.start();
-    }
-    async start() {
-        if ((await this.gameModel.countDocuments()) === 0) {
-            await this.populateDB();
-        }
-    }
-
-    async populateDB(): Promise<void> {
-        const game: CreateGameDto[] = [
-            {
-                gameName: 'Object Oriented Programming',
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                originalImageData: '[1, 2, 3, 4, 5, 6, 7, 8, 9]',
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                modifiedImageData: '[1, 2, 3, 4, 5, 6, 7, 8, 9]',
-                listDifferences: ['[1, 2, 3, 3]', '[4, 5, 6, 6]', '[7, 8, 9, 9]'],
-                difficulty: 'Facile',
-            },
-        ];
-
-        this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
-        await this.gameModel.insertMany(game);
-    }
+    ) {}
 
     async getAllGames(): Promise<unknown> {
         const games = await this.gameModel.find().exec();
@@ -61,9 +37,6 @@ export class GameService {
     }
 
     async addGame(game: CreateGameDto): Promise<void> {
-        if (!this.validateGame(game)) {
-            return Promise.reject('Invalid Game');
-        }
         try {
             await this.gameModel.create(game);
             const basRecords: GameRecord[] = [];
@@ -74,7 +47,6 @@ export class GameService {
                     time: 600 + i * 50, // 10min in seconds
                     playerName: 'Sharmila',
                     dateStart: new Date(),
-                    playing: false,
                 });
                 basRecords.push({
                     gameName: game.gameName,
@@ -82,7 +54,6 @@ export class GameService {
                     time: 600 + i * 40, // 10min in seconds
                     playerName: 'Ania',
                     dateStart: new Date(),
-                    playing: false,
                 });
             }
             this.gameRecordModel.insertMany(basRecords);
@@ -138,15 +109,4 @@ export class GameService {
     //         return Promise.reject(`Failed to get data: ${error}`);
     //     }
     // }
-
-    private validateGame(game: CreateGameDto): boolean {
-        // return this.validateName(Game.name) && this.validateImageSize(game.modifiedImageData) && this.validateImageSize(game.originalImageData);
-        return true;
-    }
-    private validateName(name: string): boolean {
-        return name ? true : false;
-    }
-    private validateImageSize(imageData: number[]): boolean {
-        return imageData ? true : false;
-    }
 }

@@ -3,7 +3,6 @@
     margin: 0 auto;
     justify-content: center;
     flex-direction: column;
-    border: 1px solid black;
     background: linear-gradient(#765fa0, #3b2957);
     height: 100%;
     width: 100%;
@@ -21,8 +20,8 @@
 #drawing-column {
     display: flex;
     justify-content: space-evenly;
-    min-width: 1400px;
-    width: 70%;
+    min-width: 1500px;
+    width: 80%;
     height: 50%;
     margin-inline: auto;
     padding: 1rem;
@@ -46,7 +45,6 @@
 #return-container {
     display: flex;
     justify-content: center;
-    border: 1px solid black;
     margin: 30px;
     padding-right: 40%;
 }
@@ -67,16 +65,20 @@
     margin: 0 auto;
     justify-content: center;
     height: 100%;
-    border: 1px solid white;
 }
 
 .tools {
     width: 640px;
 }
 
-.switch-canvas {
-    background-color: white;
-    width: 20px;
+.swapping-canvas {
+    width: 10%;
     height: 20px;
     margin-top: 20%;
+    margin-left: 20px;
+    margin-right: 10px;
+}
+
+.file-upload {
+    display: none;
 }

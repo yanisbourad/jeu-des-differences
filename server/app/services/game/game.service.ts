@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { Game, GameDocument } from '@app/model/database/game';
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
-import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 
 @Injectable()
 export class GameService {
@@ -69,6 +68,8 @@ export class GameService {
             });
             if (res.deletedCount === 0) {
                 return Promise.reject('Could not find Game');
+            } else {
+                await this.gameRecordModel.deleteMany({ gameName: _name });
             }
         } catch (error) {
             return Promise.reject(`Failed to delete Game: ${error}`);
@@ -83,30 +84,4 @@ export class GameService {
             return Promise.reject(`Failed to delete all Games: ${error}`);
         }
     }
-
-    async modifyGame(game: UpdateGameDto): Promise<void> {
-        const filterQuery = { name: Game.name };
-        // Can also use replaceOne if we want to replace the entire object
-        try {
-            const res = await this.gameModel.updateOne(filterQuery, game);
-            if (res.matchedCount === 0) {
-                return Promise.reject('Could not find Game');
-            }
-        } catch (error) {
-            return Promise.reject(`Failed to update document: ${error}`);
-        }
-    }
-
-    // async getGameName(_name: string): Promise<string> {
-    //     const filterQuery = {  name: _name };
-    //     // Only get the Name and not any of the other fields
-    //     try {
-    //         const res = await this.gameModel.findOne(filterQuery, {
-    //             difficulty: 1,
-    //         });
-    //         return res.difficulty;
-    //     } catch (error) {
-    //         return Promise.reject(`Failed to get data: ${error}`);
-    //     }
-    // }
 }

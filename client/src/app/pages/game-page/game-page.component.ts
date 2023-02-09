@@ -1,14 +1,13 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 // import { Router } from '@angular/router';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { ImageDiffService } from '@app/services/image-diff.service';
 
 @Component({
     selector: 'app-game-page',
@@ -23,14 +22,13 @@ export class GamePageComponent implements OnInit, AfterViewInit {
     readonly DEFAULT_HEIGHT = 480;
     mousePosition: Vec2 = { x: 0, y: 0 };
     roomName: string;
-
+    unfundedDifference: Set<number>[];
     constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
         readonly clientTimeService: ClientTimeService,
         public dialog: MatDialog,
-        private readonly imageDiffService: ImageDiffService,
     ) {}
 
     ngAfterViewInit(): void {
@@ -42,6 +40,7 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         this.clientTimeService.startTimer();
         this.socket.sendNbrHint(this.gameService.nHintsUnused);
         this.gameService.displayIcons();
+        this.unfundedDifference = this.getSetDifference(this.gameService.game.differences);
     }
 
     ngOnInit(): void {
@@ -50,12 +49,16 @@ export class GamePageComponent implements OnInit, AfterViewInit {
 
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
-            const differenceDataSet: Set<number>[] = this.imageDiffService.defineDifferences();
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
             // Need real data and added '!' for testing purposes
-            if (!differenceDataSet.some((set) => set.has(distMousePosition))) {
+            const diff = this.unfundedDifference.find((set) => set.has(distMousePosition));
+            if (diff) {
                 // this.clientTimeService.stopTimer();
+                // flash difference found
+                this.flashDifference(diff);
+                // remove difference found from unfundedDifference
+                this.unfundedDifference = this.unfundedDifference.filter((set) => set !== diff);
                 this.gameService.playSuccessAudio();
                 this.gameService.blinkDifference(this.canvas1);
                 this.drawService.drawWord('Trouvé', this.canvas1.nativeElement, this.mousePosition);
@@ -66,6 +69,20 @@ export class GamePageComponent implements OnInit, AfterViewInit {
                 this.drawService.drawWord('Erreur', this.canvas1.nativeElement, this.mousePosition);
                 this.drawService.drawWord('Erreur', this.canvas2.nativeElement, this.mousePosition);
             }
+        }
+    }
+
+    getSetDifference(differencesStr: string[]): Set<number>[] {
+        return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
+    }
+
+    flashDifference(diff: Set<number>) {
+        for (let i = 0; i < 5; i++) {
+            this.drawService.setColor = 'red';
+            this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+            setTimeout(() => {
+                this.drawService.clearCanvas(this.canvas1.nativeElement);
+            }, 1000);
         }
     }
     // async loadImage(): Promise<void> {

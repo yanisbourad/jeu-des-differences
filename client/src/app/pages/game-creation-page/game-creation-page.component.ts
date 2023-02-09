@@ -1,6 +1,8 @@
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
 import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
+import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
 @Component({
     selector: 'app-game-creation-page',
@@ -8,6 +10,9 @@ import { CanvasHolderService } from '@app/services/canvas-holder.service';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit {
+    @ViewChild('originalCanvasComponent') private originalCanvasComponent: CanvasNgxComponent;
+    @ViewChild('modifiedCanvasComponent', { static: false }) private modifiedCanvasComponent: CanvasNgxComponent;
+    @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
     reposition: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
@@ -15,6 +20,7 @@ export class GameCreationPageComponent implements OnInit {
         private renderer: Renderer2,
         private element: ElementRef,
         private readonly canvasHolderService: CanvasHolderService,
+        private readonly bitmapService: BitmapService,
     ) {}
 
     get originalCanvas(): string {
@@ -52,5 +58,12 @@ export class GameCreationPageComponent implements OnInit {
             width: '640px',
         });
         dialogRef.afterClosed().subscribe();
+    }
+    loadImage(e: Event): void {
+        this.bitmapService.handleFileSelect(e).then((img) => {
+            this.originalCanvasComponent.loadImage(img);
+            this.modifiedCanvasComponent.loadImage(img);
+        });
+        this.fileUpload.nativeElement.value = '';
     }
 }

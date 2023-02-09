@@ -14,7 +14,7 @@ export interface GameCreate {
 export interface GameRecord {
     gameName: string;
     typeGame: string;
-    time: number;
+    time: String;
     playerName: string;
     dateStart: Date;
 }

@@ -7,7 +7,7 @@ import { GameDatabaseService } from '@app/services/game-database.sercice';
 import { GameCreate } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 // import { DrawService } from './draw.service';
-import { SocketClientService } from './socket-client.service';
+// import { SocketClientService } from './socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -31,13 +31,12 @@ export class GameService {
     nHintsUnused: number;
     nHintsUsed: number;
     hintsArray: string[];
-    roomName: string;
+    //roomName: string;
     playerName: string;
     isplaying: boolean = false;
     private renderer: Renderer2;
 
     constructor(
-        private readonly socket: SocketClientService,
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,
         private readonly clientTimeService: ClientTimeService,
@@ -52,39 +51,42 @@ export class GameService {
             hintsPenalty: 0,
             isClassical: false,
         };
-        this.roomName = this.generatePlayerRoomName();
+       // this.roomName = this.generatePlayerRoomName();
         this.renderer = rendererFactory.createRenderer(null, null);
     }
 
-    clickGetHints(): void {
-        if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            if (this.socket.getHintLeft() <= this.nHintsUnused) {
-                this.nHintsUsed++;
-                this.hintsArray.shift();
-                this.hintsArray.push(this.path.hintUsed);
-                console.log(this.roomName);
-                this.socket.addTime(this.gameInformation.hintsPenalty, this.roomName);
-            }
-        }
-    }
+    // clickGetHints(): void {
+    //     if (this.nDifferencesFound < this.nDifferencesNotFound) {
+    //         if (this.socket.getHintLeft() <= this.nHintsUnused) {
+    //             this.nHintsUsed++;
+    //             this.hintsArray.shift();
+    //             this.hintsArray.push(this.path.hintUsed);
+    //             this.socket.addTime(this.gameInformation.hintsPenalty, this.roomName);
+    //         }
+    //     }
+    // }
+
     defineVariables(): void {
-        ///  this.getGame('Game name 1');
-        this.gameInformation.gameTitle = this.game.gameName;
-        this.gameInformation.gameDifficulty = this.game.difficulty;
-        this.gameInformation.nDifferences = this.game.listDifferences.length;
+        this.gameInformation = {
+            gameTitle: this.game.gameName,
+            gameMode: 'Partie Classique en mode solo',
+            gameDifficulty: this.game.difficulty,
+            nDifferences: this.game.listDifferences.length,
+            nHints: 3,
+            hintsPenalty: 5,
+            isClassical: false,
+        };
         this.nDifferencesNotFound = this.gameInformation.nDifferences;
         this.nHintsUnused = this.gameInformation.nHints;
-        this.gameInformation.nHints = 3;
-        this.gameInformation.hintsPenalty = 5;
         this.differencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
-        this.roomName = this.generatePlayerRoomName();
+       // this.roomName = this.generatePlayerRoomName();
         this.isplaying = false;
     }
     // generateUniqueRoomName
-    generatePlayerRoomName(): string {
-        return this.playerName + 'room';
-    }
+    // generatePlayerRoomName(): string {
+    //     return this.playerName + 'room';
+    // }
 
     // getgame from database serveur
     getGame(gameName: string): void {
@@ -121,6 +123,7 @@ export class GameService {
             }
         }, 125);
     }
+    
     displayGameEnded(msg: string, type: string, time: number) {
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type, time],

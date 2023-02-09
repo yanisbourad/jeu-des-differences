@@ -12,8 +12,7 @@ export class ClientTimeService {
 
     startTimer(): void {
         this.time = setInterval(() => {
-            this.count = this.socketService.getRoomTime(this.socketService.getRoomName());
-            this.socketService.sendTime(this.count, this.socketService.getRoomName());
+            this.socketService.sendTime(this.count);
             this.count++;
         }, DELAY_BEFORE_EMITTING_TIME);
     }

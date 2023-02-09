@@ -89,6 +89,7 @@ export class CardDisplayerComponent implements OnInit {
     }
 
     getCurrentPageCards(): GameInfo[] {
+        console.log(this.allCards[0].rankingSolo[0]);
         const startIndex: number = this.cardByPage * this.currentPage;
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);

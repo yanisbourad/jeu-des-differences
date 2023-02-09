@@ -7,7 +7,7 @@ export type GameDocument = Game & Document;
 @Schema()
 export class Game {
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: true, unique: true })
     gameName: string;
 
     @ApiProperty()
@@ -20,7 +20,7 @@ export class Game {
 
     @ApiProperty()
     @Prop({ required: true })
-    listDifferences: number[][];
+    listDifferences: string[];
 
     @ApiProperty()
     @Prop({ required: true })

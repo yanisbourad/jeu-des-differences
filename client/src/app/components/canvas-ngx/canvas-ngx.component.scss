@@ -16,10 +16,20 @@
     display: none;
 }
 
-.Tools-Canvas {
+.Originale {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
+    margin: auto;
+    margin-top: 3%;
+    width: 70%;
+}
+
+.Modifiée {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
     align-items: center;
     margin: auto;
     margin-top: 3%;
@@ -33,4 +43,15 @@
     align-items: center;
     margin: 0 auto;
     width: 70%;
+}
+
+.canvas-type {
+    font-size: 1.5em;
+    color: black;
+    background-color: rgb(142, 136, 199);
+    border: 1px solid red;
+    margin-right: 20px;
+    margin-left: 20px;
+    padding: 10px;
+    border-radius: 10px;
 }

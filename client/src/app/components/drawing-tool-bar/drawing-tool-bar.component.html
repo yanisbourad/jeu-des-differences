@@ -1,5 +1,5 @@
 <div class="drawing-tool-bar">
-    <h2>Customize</h2>
+    <h2>Personnaliser</h2>
     <div class="tool-parial" id="line-width">
         <input type="range" (min)="(const.minLineWidth)" (max)="(const.maxLineWidth)" [(ngModel)]="lineWidth"
             (change)="setLineWidth()" />
@@ -14,14 +14,9 @@
 
     <!-- The validator -->
     <div class="tool-parial" id="radius-tronslation">
-        <p>pencil lead radius</p>
+        <p>Rayon d'élargissment</p>
         <select [(ngModel)]="selectedRadius" (change)="setRadius()">
             <option *ngFor="let radius of const.possibleRadius" [value]="radius">{{ radius }}</option>
         </select>
-    </div>
-    <p *ngIf="showMessage" class="feedback-message"> Differences detected from original image : {{showDifference}}</p>
-    <div class="tool-parial" id="validator">
-        <app-validate-create-btn (onBtnClick)="drawDifferenceImage()" color="{{ tic ? 'red' : 'green' }}"
-            text="{{ tic ? 'Validate' : 'Create' }}"></app-validate-create-btn>
     </div>
 </div>

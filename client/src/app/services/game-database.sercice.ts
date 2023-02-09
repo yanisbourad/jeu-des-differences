@@ -17,7 +17,7 @@ export class GameDatabaseService {
     constructor(
         private readonly http: HttpClient,
         private readonly imageDiff: ImageDiffService,
-        private readonly canvaseHolder: CanvasHolderService,
+        private readonly canvasHolder: CanvasHolderService,
     ) {}
 
     getAllGames(): Observable<GameInfo[]> {
@@ -34,8 +34,8 @@ export class GameDatabaseService {
     saveGame(_gameName: string) {
         const game: GameCreate = {
             gameName: _gameName,
-            originalImageData: this.canvaseHolder.getCanvasUrlData(this.canvaseHolder.originalCanvas),
-            modifiedImageData: this.canvaseHolder.getCanvasUrlData(this.canvaseHolder.modifiedCanvas),
+            originalImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.originalCanvas),
+            modifiedImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.modifiedCanvas),
             listDifferences: this.imageDiff.getDifferences(),
             difficulty: this.imageDiff.getDifficulty(),
         };
@@ -46,6 +46,14 @@ export class GameDatabaseService {
                 alert('Error: Game not saved!');
             }
         });
+    }
+
+    deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/delete/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
+
+    deleteAllGames(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/delete-all`, { observe: 'response', responseType: 'text' });
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {

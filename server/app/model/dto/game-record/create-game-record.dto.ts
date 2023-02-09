@@ -1,10 +1,9 @@
-import { GAME_NAME_MAX_LENGTH } from '@app/model/dto/game/game.dto.constants';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
 
 export class CreateGameRecordDto {
+    @ApiProperty()
     @IsString()
-    @MaxLength(GAME_NAME_MAX_LENGTH)
     gameName: string;
 
     @ApiProperty()

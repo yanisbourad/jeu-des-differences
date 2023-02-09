@@ -76,7 +76,6 @@ export class SocketClientService {
         });
 
         this.socketClient.on('nbrHint', (hintsLeft: number) => {
-            console.log('nbrHintbo', hintsLeft);
             this.hintsLeft = hintsLeft;
         });
     }
@@ -84,6 +83,7 @@ export class SocketClientService {
     disconnect() {
         this.socketClient.disconnect();
     }
+
     // setRoomName
     setRoomName(roomName: string) {
         this.roomName = roomName;

@@ -50,7 +50,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.roomName = this.gameService.generatePlayerRoomName();
-        this.gameService.getGame('gdgdgd');
+        this.gameService.getGame('test');
         this.gameService.displayIcons();
     }
 
@@ -58,11 +58,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
-            // Need real data and added '!' for testing purposes
             const diff = this.unfundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
                 this.drawDifference(diff);
                 // remove difference found from unfundedDifference
+                this.unfundedDifference = this.unfundedDifference.filter((set) => set !== diff);
                 this.displayWord('Trouvé');
             } else {
                 this.errorPenalty = true;

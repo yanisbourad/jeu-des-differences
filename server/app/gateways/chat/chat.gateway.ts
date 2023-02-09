@@ -53,6 +53,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+
+
     @SubscribeMessage(ChatEvents.AddTime)
     async addTime(socket: Socket, data: [number, string]) {
         this.hintUsed = true;
@@ -92,7 +94,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
+        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);// maybe use to disconnect
         socket.emit(ChatEvents.Hello, 'Hello from serveur');
         socket.emit(ChatEvents.NbrHint, 3);
     }

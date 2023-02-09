@@ -1,14 +1,13 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-// import { Router } from '@angular/router';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { ImageDiffService } from '@app/services/image-diff.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
     selector: 'app-game-page',
@@ -41,11 +40,12 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         this.socket.joinRoom(this.gameService.playerName);
         this.clientTimeService.startTimer();
         this.socket.sendNbrHint(this.gameService.nHintsUnused);
-        this.gameService.displayIcons();
     }
 
     ngOnInit(): void {
         this.roomName = this.gameService.generatePlayerRoomName();
+        this.gameService.getGame('Game name 1');
+        this.gameService.displayIcons();
     }
 
     mouseHitDetect(event: MouseEvent) {
@@ -54,7 +54,7 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
             // Need real data and added '!' for testing purposes
-            if (!differenceDataSet.some((set) => set.has(distMousePosition))) {
+            if (differenceDataSet.some((set) => set.has(distMousePosition))) {
                 // this.clientTimeService.stopTimer();
                 this.gameService.playSuccessAudio();
                 this.gameService.blinkDifference(this.canvas1);
@@ -68,18 +68,11 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             }
         }
     }
-    // async loadImage(): Promise<void> {
-    //     const original_image = new Image();
-    //     const modified_image = new Image();
-    //     original_image.src = '../../../assets/img/k3FhRA.jpg';
-    //     createImageBitmap(original_image).then((imageBitmap) => {
-    //     this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
-    //     });
-    //     modified_image.src = '../../../assets/img/k3FhRA.jpg';
-    //     createImageBitmap(modified_image).then((imageBitmap) => {
-    //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
-    //     });
-    // }
+
+    async loadImage(): Promise<void> {
+        await this.drawService.drawImageFromUrl(this.gameService.game.originalImageData, this.canvas1.nativeElement);
+        await this.drawService.drawImageFromUrl(this.gameService.game.modifiedImageData, this.canvas2.nativeElement);
+    }
 
     displayGiveUp(msg: string, type: string) {
         // display modal
@@ -90,20 +83,6 @@ export class GamePageComponent implements OnInit, AfterViewInit {
             panelClass: 'custom-dialog-container',
         });
     }
-
-    // displayGameEnded(msg: string, type: string, time: number) {
-    //     // display modal
-    //     this.dialog.open(MessageDialogComponent, {
-    //         data: [msg, type, time],
-    //         minWidth: '250px',
-    //         minHeight: '250px',
-    //         panelClass: 'custom-dialog-container',
-    //     });
-    //     // to put when number of difference found equal max difference
-    //     // this.clientTimeService.stopTimer();
-    //     // console.log(this.clientTimeService.getCount())
-    //     // this.displayGameEnded("Félicitation, vous avez terminée la partie", "finished", this.clientTimeService.getCount());
-    // }
 
     giveUp(): void {
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');

@@ -37,7 +37,7 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, this.width, this.height);
+        context.drawImage(image, 0, 0, 640, 480);
     }
 
     drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
@@ -83,6 +83,15 @@ export class DrawService {
             context.fillStyle = constants.defaultLineColor;
             context.fillRect(x, y, 1, 1);
         });
+    }
+
+    async drawImageFromUrl(data: string, canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        const img = new Image();
+        img.src = data;
+        img.onload = async () => {
+            context.drawImage(img, 0, 0);
+        };
     }
     // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
 

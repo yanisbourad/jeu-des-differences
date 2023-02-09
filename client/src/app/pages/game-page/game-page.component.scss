@@ -1,69 +1,88 @@
 .container {
-  display: grid; 
-  grid-template-columns: 2fr; 
-  grid-template-rows: 0.4fr 1fr 3fr 0.5fr; 
-  gap: 0px 0px; 
-  height: 100vh;
-  width: 100vw;
-  grid-template-areas: 
-    "header header"
-    "infos infos"
-    "mainView mainView"
-    "footer footer"; 
+    display: grid;
+    grid-template-columns: 2fr;
+    grid-template-rows: 0.4fr 1fr 3fr 0.5fr;
+    gap: 0px 0px;
+    height: 100vh;
+    width: 100vw;
+    grid-template-areas:
+        'header header'
+        'infos infos'
+        'mainView mainView'
+        'footer footer';
 }
-.header { grid-area: header; }
-.mainView { 
-  grid-area: mainView;
-  padding-left: 12%;
+.header {
+    grid-area: header;
 }
-.footer { 
-  grid-area: footer;
+.mainView {
+    grid-area: mainView;
+    padding-left: 12%;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
 }
-.message { 
-  grid-area: message; 
+.footer {
+    grid-area: footer;
 }
-.mat-raised-button{
-  border-radius: 32px;
-  border: 2px solid #7B57B8;
+.message {
+    grid-area: message;
 }
-.giveUp{
-  display: flex;
-  margin-left: 42%;
-  backdrop-filter: blur(32px) brightness(100%);
-  border: 2px solid;
-  border-color: rgb(235, 88, 88);
-  border-radius: 32px;
-  background-color: #a77878df;
-  color: white;
+.mat-raised-button {
+    border-radius: 32px;
+    border: 2px solid #7b57b8;
 }
-.giveUp:hover{
-  background-color: #bd3c3c;
+.giveUp {
+    display: flex;
+    margin-left: 42%;
+    backdrop-filter: blur(32px) brightness(100%);
+    border: 2px solid;
+    border-color: rgb(235, 88, 88);
+    border-radius: 32px;
+    background-color: #a77878df;
+    color: white;
 }
-.difficulty{
-  color: rgba(255, 255, 255, 0.711);
-  height: 50%;
+.giveUp:hover {
+    background-color: #bd3c3c;
+}
+.difficulty {
+    color: rgba(255, 255, 255, 0.711);
+    height: 50%;
 }
 
-canvas{
-  background: rgba(85, 66, 116, 0.1);
-  border: 2px solid rgb(252, 250, 250);
-  margin: 30px ;
+canvas {
+    background: rgba(85, 66, 116, 0.1);
+    border: 2px solid rgb(252, 250, 250);
+    margin: 30px;
 }
 
 @media (min-width: 1920px) {
-  .container {
-      width: 1920px;
-  }
+    .container {
+        width: 1920px;
+    }
 }
 
 @media (max-width: 2000px) {
-  .container {
-      width: 2000px;
-  }
+    .container {
+        width: 2000px;
+    }
 }
 
 @media (min-width: 1920px) {
-  .container {
-      width: 1920px;
-  }
+    .container {
+        width: 1920px;
+    }
+}
+
+.superposeImageCanvas {
+    width: 640px;
+    height: 480px;
+    img {
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    canvas {
+        position: relative !important;
+        top: -108% !important;
+        left: -5% !important;
+    }
 }

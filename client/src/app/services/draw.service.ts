@@ -117,10 +117,10 @@ export class DrawService {
         context.font = '20px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
-        setTimeout(() => {
-            // clear the word after 1 sec
-            const width = context.measureText(word).width;
-            context.clearRect(position.x, position.y - 40, width, 40);
-        }, 1000);
+        // setTimeout(() => {
+        //     // clear the word after 1 sec
+        //     const width = context.measureText(word).width;
+        //     context.clearRect(position.x, position.y - 40, width, 40);
+        // }, 1000);
     }
 }

@@ -39,7 +39,7 @@ export class GamePageComponent implements OnInit, AfterViewInit {
         this.clientTimeService.startTimer();
         this.socket.sendNbrHint(this.gameService.nHintsUnused);
         this.gameService.displayIcons();
-        this.unfundedDifference = this.getSetDifference(this.gameService.game.differences);
+        this.unfundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
     }
 
     ngOnInit(): void {

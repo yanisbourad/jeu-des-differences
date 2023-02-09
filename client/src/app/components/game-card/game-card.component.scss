@@ -3,13 +3,13 @@
     width: 448px;
     background-color: #292736;
     border-radius: 25px;
-    border: 2px solid #A8A8A8;
+    border: 3px solid #A8A8A8;
 }
 #rectangle2{
     background-color: #584577;
     width: 448px;
     height: 58px;
-    border-radius: 14% 14% 0% 0%;
+    border-radius: 25px 25px 0% 0%;
 }
 p{
     font-family:  Helvetica;
@@ -21,9 +21,9 @@ p{
     font-weight: bold;
     color: white ; 
 }
-.gameImage{
-    width: 150px;
-    height: 150px;
+.gameImage img{
+    width: 100%;
+    height: 300px;
     position: relative;
 }
 .ranking{
@@ -75,7 +75,7 @@ p{
 }
 .rankingTable{
     position:relative;
-    margin-top : 45%;
+    margin-top : 0%;
     margin-left : 2%;
 }
 #playButton{

@@ -40,6 +40,11 @@ export class DrawService {
         context.drawImage(image, 0, 0, this.width, this.height);
     }
 
+    drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
+        this.drawImage(image, canvas1);
+        this.drawImage(image, canvas2);
+    }
+
     drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
         const imageData = new ImageData(data, this.width, this.height);

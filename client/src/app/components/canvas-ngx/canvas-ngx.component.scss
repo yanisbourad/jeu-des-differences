@@ -16,20 +16,11 @@
     display: none;
 }
 
-.Originale {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    margin: auto;
-    margin-top: 3%;
-    width: 70%;
-}
-
+.Originale,
 .Modifiée {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     margin: auto;
     margin-top: 3%;

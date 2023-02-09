@@ -13,7 +13,6 @@ import { SocketClientService } from '@app/services/socket-client.service';
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-
 export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
@@ -56,7 +55,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     mouseHitDetect(event: MouseEvent) {
-        
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
@@ -65,24 +63,24 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (diff) {
                 this.drawDifference(diff);
                 // remove difference found from unfundedDifference
-                this.displayWord("Trouvé")
+                this.displayWord('Trouvé');
             } else {
                 this.errorPenalty = true;
-                this.displayWord("Erreur")
+                this.displayWord('Erreur');
             }
             this.clearCanvas();
         }
     }
 
     displayWord(word: string): void {
-        if (word === "Erreur"){
+        if (word === 'Erreur') {
             this.gameService.playFailureAudio();
             this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
             this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
             setTimeout(() => {
                 this.errorPenalty = false;
-            }, 1000) 
-        }else {
+            }, 1000);
+        } else {
             this.gameService.playSuccessAudio();
             this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
             this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);

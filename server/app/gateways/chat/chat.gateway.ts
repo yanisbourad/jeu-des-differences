@@ -40,14 +40,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // }
         this.clientTime = data[0];
         const room = await this.playerService?.getRoom(data[1]);
-        const startTime = (room)? room.startTime : null ;
+        const startTime = room ? room.startTime : null;
         if (this.hintUsed) {
             this.timeService.nHints++;
             this.hintUsed = false;
         }
-       const count = this.timeService.getElaspedTime(startTime);
+        const count = this.timeService.getElaspedTime(startTime);
         if (!this.validateServerClientTime(count)) {
-            if(room){
+            if (room) {
                 socket.emit(ChatEvents.Time, [room.name, count]);
             }
         }

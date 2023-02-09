@@ -10,9 +10,11 @@ export class TimeService {
     }
 
     getElaspedTime(startTime: Date): number {
-        if(startTime){
+        if (startTime) {
             const currentTime = new Date();
-            return Math.floor((currentTime.getTime() - startTime.getTime() + this.penalty * this.nHints * TRANSFORM_TO_SECONDS) / TRANSFORM_TO_SECONDS);
+            return Math.floor(
+                (currentTime.getTime() - startTime.getTime() + this.penalty * this.nHints * TRANSFORM_TO_SECONDS) / TRANSFORM_TO_SECONDS,
+            );
         }
         return 0;
     }

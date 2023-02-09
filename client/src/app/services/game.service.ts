@@ -55,7 +55,7 @@ export class GameService {
         };
         this.roomName = this.generatePlayerRoomName();
         this.renderer = rendererFactory.createRenderer(null, null);
-        //this.defineVariables();
+        // this.defineVariables();
     }
 
     clickGetHints(): void {
@@ -88,10 +88,10 @@ export class GameService {
         return this.playerName + 'room';
     }
 
-    //getgame from database serveur
+    // getgame from database serveur
     getGame(gameName: string): void {
         this.gameDataBase.getGameByName(gameName).subscribe((res: GameCreate) => {
-            //console.log(res, "you are here!!")
+            // console.log(res, "you are here!!")
             this.game = res;
             // console.log(this.game)
             this.defineVariables();

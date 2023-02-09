@@ -5,13 +5,13 @@
     </div>
     <div class="body">
         <div id="drawing-column">
-            <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas"></app-canvas-ngx>
+            <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas" #originalCanvasComponent></app-canvas-ngx>
             <div class="swapping-canvas">
                 <img alt="swapping" src="./assets/img/SwappingCanvas.png" (click)="swapImages()" />
-                <input type="file" class="file-upload" accept=".bmp" #fileUpload />
-                <img alt="swapping" src="./assets/img/UploadBackground.png" />
+                <input type="file" class="file-upload" accept=".bmp" #fileUpload (change)="loadImage($event)"/>
+                <img alt="fileUpload" src="./assets/img/UploadBackground.png" (click)="fileUpload.click()"/>
             </div>
-            <app-canvas-ngx class=" Canvas-ngx modified" [type]="modifiedCanvas"></app-canvas-ngx>
+            <app-canvas-ngx class=" Canvas-ngx modified" [type]="modifiedCanvas" #modifiedCanvasComponent></app-canvas-ngx>
         </div>
 
         <div id="tools-column">

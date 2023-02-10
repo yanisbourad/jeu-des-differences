@@ -13,6 +13,9 @@ export class GameService {
     key: string;
     rootPath = join(process.cwd(), 'assets', 'games');
 
+    get getKey() {
+        return this.key;
+    }
     constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
         if (!fs.existsSync(this.rootPath)) {
             fs.mkdirSync(this.rootPath);

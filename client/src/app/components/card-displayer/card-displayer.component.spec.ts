@@ -15,7 +15,9 @@ describe('CardDisplayerComponent', () => {
         fixture.detectChanges();
     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
+    it('should call getAllCards on ngOnInit', () => {
+        spyOn(component, 'getAllCards');
+        component.ngOnInit();
+        expect(component.getAllCards).toHaveBeenCalled();
     });
 });

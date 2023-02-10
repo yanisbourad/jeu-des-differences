@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-time-popup',
@@ -9,7 +10,7 @@ export class TimePopupComponent implements OnInit {
   @Input() timer1:number = 30; 
   @Input() timer2:number = 25; 
   @Input() timer3:number = 5; 
-  constructor() { }
+  constructor(public dialogRef : MatDialogRef<TimePopupComponent>) { }
 
   ngOnInit(): void {
   }
@@ -31,5 +32,8 @@ export class TimePopupComponent implements OnInit {
   decrementTime3(){
     this.timer3-= 5;
   }
+  onNoClick(): void {
+    this.dialogRef.close();
+}
 
 }

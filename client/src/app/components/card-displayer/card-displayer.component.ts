@@ -21,7 +21,7 @@ export class CardDisplayerComponent implements OnInit {
         this.getAllCards();
     }
 
-    getAllCards(): void {
+    getAllCards() {
         this.gameDataBase.getAllGames().subscribe((res: GameInfo[]) => {
             this.allCards = res;
         });

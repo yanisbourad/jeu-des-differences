@@ -127,7 +127,7 @@ export class GameService {
     }
 
     private deleteDirectory(dirName: string): void {
-        fs.rmdir(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
+        fs.rm(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }

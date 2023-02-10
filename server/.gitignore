@@ -4,7 +4,7 @@
 
 # games
 /assets/games
-
+/assets/key.text
 # Logs
 logs
 *.log

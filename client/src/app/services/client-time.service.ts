@@ -1,30 +1,27 @@
 import { Injectable } from '@angular/core';
-import { SocketClientService } from './socket-client.service';
-import {DELAY_BEFORE_EMITTING_TIME} from'../../../../server/app/gateways/chat/chat.gateway.constants'
+import { DELAY_BEFORE_EMITTING_TIME } from '../../../../server/app/gateways/chat/chat.gateway.constants';
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class ClientTimeService {
+    count: number = 0;
+    time: number | unknown;
 
-  roomName: string = "test7 room"; // from database or something else
-  count: number = 0;
-  time: number | unknown;
+    startTimer(): void {
+        this.time = setInterval(() => {
+            this.count++;
+        }, DELAY_BEFORE_EMITTING_TIME);
+    }
 
-  constructor(public readonly socketService: SocketClientService) {}
+    getCount(): number {
+        return this.count;
+    }
 
-  startTimer(): void {
-      this.time = setInterval(() => {
-        this.count = this.socketService.getRoomTime(this.roomName);
-        this.socketService.sendTime(this.count, this.roomName);
-        this.count++;
-      }, DELAY_BEFORE_EMITTING_TIME);
-  }
+    stopTimer(): void {
+        clearInterval(this.time as number);
+    }
 
-  getCount(): number {
-      return this.count;
-  }
-
-  stopTimer(): void {
-      clearInterval(this.time as number);
-  }
+    resetTimer(): void {
+        this.count = 0;
+    }
 }

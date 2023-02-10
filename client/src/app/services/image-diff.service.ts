@@ -27,6 +27,8 @@ export class ImageDiffService {
     mapDistPoint: Map<number, number>;
     listBfsInput: BfsInput[] = [];
     differenceNumber;
+    upperLimitDifficultyLevel: number;
+    ratioLimitDifficultyLevel: number;
     private imageMatrixSize: number;
 
     constructor() {
@@ -41,6 +43,8 @@ export class ImageDiffService {
         this.mapDistPoint = new Map();
         this.imageMatrixSize = 0;
         this.differenceNumber = 0;
+        this.upperLimitDifficultyLevel = 7;
+        this.ratioLimitDifficultyLevel = 0.15;
     }
 
     set setRadius(radius: number) {
@@ -84,6 +88,7 @@ export class ImageDiffService {
                 this.originalPixelMatrix.green.push(this.originalImageData[i + 1]);
                 this.originalPixelMatrix.blue.push(this.originalImageData[i + 2]);
                 this.originalPixelMatrix.alpha.push(this.originalImageData[i + 3]);
+
                 this.modifiedPixelMatrix.red.push(this.modifiedImageData[i]);
                 this.modifiedPixelMatrix.green.push(this.modifiedImageData[i + 1]);
                 this.modifiedPixelMatrix.blue.push(this.modifiedImageData[i + 2]);
@@ -113,11 +118,11 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
-                    this.differencePixelArray.push(1, 1, 1, 1);
+                    // this.differencePixelArray.push(1, 1, 1, 1);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);
-                    this.differencePixelArray.push(0, 0, 0, 0);
+                    // this.differencePixelArray.push(0, 0, 0, 0);
                 }
             }
         }
@@ -183,13 +188,13 @@ export class ImageDiffService {
             let lastDistance = this.mapDistPoint.get(position);
             // if fist time reading this point
             if (!lastDistance) {
-                // adding it to the differenceMatrix
-                this.currentDifferenceTemp.add(position);
                 // puts the lastDistance as unreachable
                 lastDistance = radius + 1;
             }
 
-            if (distance < radius && distance < lastDistance) {
+            if (distance < radius - 1 && distance < lastDistance) {
+                // adding it to the differenceMatrix
+                this.currentDifferenceTemp.add(position);
                 // if distance is the lower ever found
                 this.mapDistPoint.set(position, distance);
                 // next bfs should have a distance greater than the parent
@@ -203,6 +208,11 @@ export class ImageDiffService {
         this.listBfsInput.push({ point: { x: point.x - 1, y: point.y }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
         this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
+
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y + 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y - 1 }, distance });
+        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y + 1 }, distance });
     }
 
     getPositionsFromXY(x: number, y: number): number {
@@ -238,7 +248,8 @@ export class ImageDiffService {
         });
         const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
 
-        if (this.listDifferences.length >= 7 && count / totalSurface < 0.15) return 'Difficile';
+        if (this.listDifferences.length >= this.upperLimitDifficultyLevel && count / totalSurface < this.ratioLimitDifficultyLevel)
+            return 'Difficile';
         return 'Facile';
     }
 }

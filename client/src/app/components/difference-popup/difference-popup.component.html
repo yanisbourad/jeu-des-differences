@@ -1,10 +1,11 @@
 <div class="container" min-width="800px">
-    <p class="feedback-message"> Differences detectées dans les deux images : {{showDifference}}
+    <p class="feedback-message"> Differences detectées : {{showDifference}} {{showMessage}}
     </p>
     <div class="image-pixel">
         <canvas #dd width="640" height="480"></canvas>
     </div>
     <div class="btn-block">
-        <button (click)="openName()">Valider</button>
+        <button class="btn cancel" (click)="closeOnAbort()">Annuler</button>
+        <button class="btn validate" (click)="openName()">Valider</button>
     </div>
 </div>

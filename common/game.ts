@@ -1,9 +1,9 @@
-export interface GameInfo extends GameCreate {
+export interface GameInfo extends Game {
     rankingMulti: GameRecord[];
     rankingSolo: GameRecord[];
 }
 
-export interface GameCreate {
+export interface Game {
     gameName: string;
     difficulty: string;
     originalImageData: string;
@@ -14,10 +14,9 @@ export interface GameCreate {
 export interface GameRecord {
     gameName: string;
     typeGame: string;
-    time: number;
+    time: String;
     playerName: string;
-    dateStart: Date;
-    playing: boolean;
+    dateStart: string;
 }
 
 export interface TimeConfig {

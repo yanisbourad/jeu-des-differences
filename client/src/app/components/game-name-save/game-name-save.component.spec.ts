@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimePopupComponent } from './time-popup.component';
+import { GameNameSaveComponent } from './game-name-save.component';
 
-describe('TimePopupComponent', () => {
-    let component: TimePopupComponent;
-    let fixture: ComponentFixture<TimePopupComponent>;
+describe('GameNameSaveComponent', () => {
+    let component: GameNameSaveComponent;
+    let fixture: ComponentFixture<GameNameSaveComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TimePopupComponent],
+            declarations: [GameNameSaveComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(TimePopupComponent);
+        fixture = TestBed.createComponent(GameNameSaveComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

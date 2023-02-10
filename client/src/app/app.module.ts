@@ -19,6 +19,7 @@ import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { NamePopupComponent } from './components/name-popup/name-popup.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
@@ -27,6 +28,7 @@ import { TimePopupComponent } from './components/time-popup/time-popup.component
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
+import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -54,6 +56,8 @@ import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-
         ConfigurationJeuPageComponent,
         TimePopupComponent,
         GameInfoComponent,
+        GameNameSaveComponent,
+        MessageDialogComponent,
     ],
     imports: [
         AppMaterialModule,

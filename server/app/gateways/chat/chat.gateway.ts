@@ -1,5 +1,4 @@
 import { PlayerService } from '@app/services/player/player-service';
-import { TimeService } from '@app/services/time/time.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -9,75 +8,56 @@ import { ChatEvents } from './chat.gateway.events';
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() server: Server;
-    hintUsed: boolean = false;
-    clientTime: number = 0;
+    socketId: string = '';
 
-    constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly timeService: TimeService) {}
+    constructor(private readonly logger: Logger, private readonly playerService: PlayerService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
-    connect(_: Socket, message: string) {
+    connect(socket: Socket, message: string) {
         this.server.emit(ChatEvents.MassMessage, `: ${message}`);
         this.logger.log('connection au socket');
     }
 
-    @SubscribeMessage(ChatEvents.Time)
-    async Time(socket: Socket, data: [time: number, roomName: string]) {
-        this.clientTime = data[0];
-        let room = await this.playerService.getRoom(data[1]);
-        let startTime = room.startTime;
-        if (this.hintUsed) {
-            this.timeService.nHints++;
-            this.hintUsed = false;
-        }
-        let count = this.timeService.getElaspedTime(startTime);
-        if (!this.validateServerClientTime(count)) {
-            socket.emit(ChatEvents.Time, [room.name, count]);
-        }
-    }
-
-    @SubscribeMessage(ChatEvents.AddTime)
-    addTime(_: Socket, time: number) {
-        this.timeService.penalty = time;
-        this.hintUsed = true;
-    }
-
     @SubscribeMessage(ChatEvents.JoinRoom)
     async joinRoom(socket: Socket, playerName: string) {
-        const roomName = playerName + ' room'; // to get from database
-        let startTime = new Date();
+        const startTime = new Date();
         const player: Player = {
-            playerName: playerName,
+            playerName,
             socketId: socket.id,
         };
-        if ((await this.playerService.getRoomIndex(roomName)) == -1) {
-            await this.playerService.addRoom(roomName, player, startTime);
-            socket.join(roomName);
+        if (( await this.playerService.getRoomIndex(socket.id) === -1  )) {
+            await this.playerService.addRoom(player.socketId, player, startTime);
+            socket.join(player.socketId);
         } else {
-            this.playerService.addPlayer(roomName, player, startTime);
-            socket.join(roomName);
+            this.playerService.addPlayer(player.socketId, player, startTime);
+            socket.join(player.socketId);
         }
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
-    leaveRoom(socket: Socket, playerName: string) {
-        const roomName = playerName + ' room'; // to get from database
-        socket.leave(roomName);
+    async leaveRoom(socket: Socket) {
+        this.playerService.removeRoom(socket.id);
+        socket.leave(socket.id);
     }
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
+        this.socketId = socket.id;
         socket.emit(ChatEvents.Hello, 'Hello from serveur');
     }
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
+        this.playerService.removeRoom(socket.id);
+        socket.leave(socket.id);
     }
 
-    afterInit() {
-        this.logger.log('Initialisation du socket');
+    getSocketId(){
+        return this.socketId;
     }
 
-    validateServerClientTime(serverTime: number): boolean {
-        return serverTime === this.clientTime;
+    afterInit(){
+        this.logger.log('Init');
     }
+    
 }

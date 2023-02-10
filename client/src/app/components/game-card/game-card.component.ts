@@ -12,14 +12,13 @@ import { NamePopupComponent } from '@app/components/name-popup/name-popup.compon
 export class GameCardComponent {
     @Input() card!: GameInfo;
     name: string;
-    gameName : string;
+    gameName: string;
     typePage: 'Classique' | 'Configuration';
 
     constructor(public dialog: MatDialog, private router: Router) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
-            data: { name: this.name, 
-                gameName : this.card.gameName},
+            data: { name: this.name, gameName: this.card.gameName },
         });
 
         dialogRef.afterClosed().subscribe((result) => {

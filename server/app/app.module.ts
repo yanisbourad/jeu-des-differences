@@ -1,20 +1,16 @@
 import { CourseController } from '@app/controllers/course/course.controller';
-import { TimeController } from '@app/controllers/date/time.controller';
-import { ExampleController } from '@app/controllers/example/example.controller';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Course, courseSchema } from '@app/model/database/course';
 import { CourseService } from '@app/services/course/course.service';
-import { ExampleService } from '@app/services/example/example.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GameRecordController } from './controllers/game-record/game-record.constroller';
 import { GameController } from './controllers/game/game.controller';
-import { Game, gameSchema } from './model/database/game';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
+import { GameRecordService } from './services/game-record/game-record.service';
 import { GameService } from './services/game/game.service';
 import { PlayerService } from './services/player/player-service';
-import { TimeService } from './services/time/time.service';
-
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -26,10 +22,9 @@ import { TimeService } from './services/time/time.service';
             }),
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
-        MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
         MongooseModule.forFeature([{ name: GameRecord.name, schema: gameRecordSchema }]),
     ],
-    controllers: [CourseController, TimeController, ExampleController, GameController],
-    providers: [ChatGateway, CourseService, ExampleService, GameService, Logger, TimeService, PlayerService],
+    controllers: [CourseController, GameRecordController, GameController],
+    providers: [ChatGateway, CourseService, GameService, GameRecordService, Logger, PlayerService],
 })
 export class AppModule {}

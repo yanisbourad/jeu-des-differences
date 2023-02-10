@@ -1,77 +1,136 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-// import { Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit {
+export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
-    readonly ONE_QUARTER = 1 / 4;
-    readonly ONE_SIXTH = 1 / 6;
     mousePosition: Vec2 = { x: 0, y: 0 };
-    playerNames : string[] = ["test7", "test2"] // get from database
-   
-    constructor(private readonly drawService: DrawService, public gameService: GameService, 
-        readonly socket: SocketClientService, public readonly clientTimeService: ClientTimeService) {}
+    errorPenalty: boolean = false;
+    unfoundedDifference: Set<number>[];
+    playername: string;
+    gameName: string;
+
+    constructor(
+        private readonly drawService: DrawService,
+        public gameService: GameService,
+        readonly socket: SocketClientService,
+        readonly clientTimeService: ClientTimeService,
+        public dialog: MatDialog,
+        public routeur: Router,
+        public route: ActivatedRoute,
+    ) {}
+    ngOnDestroy(): void {
+        this.clientTimeService.stopTimer();
+        this.socket.disconnect();
+        this.clientTimeService.resetTimer();
+        this.socket.leaveRoom();
+    }
+
+    ngAfterViewInit(): void {
+        this.socket.connect();
+        this.socket.joinRoom(this.gameService.playerName);
+        this.clientTimeService.startTimer();
+        this.gameService.displayIcons();
+        this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+        this.drawService.setColor = 'yellow';
+    }
+
+    getRouteurParams() {
+        this.route.params.subscribe((params) => {
+            this.gameName = params['gameName'];
+            this.playername = params['player'];
+        });
+    }
 
     ngOnInit(): void {
-        this.socket.connect();
-        this.socket.joinRoom(this.playerNames[0]);
-        this.clientTimeService.startTimer();
+        this.gameService.displayIcons();
+        this.getRouteurParams();
+        this.gameService.getGame(this.gameName);
+        this.gameService.playerName = this.playername;
     }
 
     mouseHitDetect(event: MouseEvent) {
-        if (event.button === MouseButton.Left) {
+        if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            // Testing mouse click arbitrary interval
-            if (
-                this.mousePosition.y <= this.DEFAULT_HEIGHT * (1 - this.ONE_QUARTER) &&
-                this.mousePosition.y >= this.DEFAULT_HEIGHT * this.ONE_QUARTER &&
-                this.mousePosition.x <= this.DEFAULT_WIDTH * (1 - this.ONE_SIXTH) &&
-                this.mousePosition.x >= this.DEFAULT_WIDTH * this.ONE_SIXTH
-            ) {
-                this.clientTimeService.stopTimer();
-                this.gameService.playSuccessAudio();
-                this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
+            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
+            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            if (diff) {
+                this.drawDifference(diff);
+                // remove difference found from unfundedDifference
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+                this.displayWord('Trouvé');
             } else {
-                this.gameService.playFailureAudio();
-                this.drawService.drawWords('Erreur', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Erreur', this.canvas2.nativeElement, this.mousePosition);
+                this.errorPenalty = true;
+                this.displayWord('Erreur');
             }
+            this.clearCanvas();
         }
     }
-        // async loadImage(): Promise<void> {
-        //     const original_image = new Image();
-        //     const modified_image = new Image();
-        //     original_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(original_image).then((imageBitmap) => {
-        //     this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
-        //     });
-        //     modified_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(modified_image).then((imageBitmap) => {
-        //     this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
-        //     });
-        // }
-   
+
+    displayWord(word: string): void {
+        if (word === 'Erreur') {
+            this.gameService.playFailureAudio();
+            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
+            setTimeout(() => {
+                this.errorPenalty = false;
+            }, 1000);
+        } else {
+            this.gameService.playSuccessAudio();
+            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
+            this.gameService.clickDifferencesFound();
+            this.blinkCanvas();
+        }
+    }
+
+    getSetDifference(differencesStr: string[]): Set<number>[] {
+        return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
+    }
+
+    drawDifference(diff: Set<number>) {
+        this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+        this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+    }
+
+    blinkCanvas() {
+        this.gameService.blinkDifference(this.canvas1, this.canvas2);
+    }
+
+    clearCanvas() {
+        setTimeout(() => {
+            this.drawService.clearDiff(this.canvas1.nativeElement);
+            this.drawService.clearDiff(this.canvas2.nativeElement);
+        }, 1000);
+    }
+
+    displayGiveUp(msg: string, type: string) {
+        // display modal
+        this.dialog.open(MessageDialogComponent, {
+            data: [msg, type],
+            minWidth: '250px',
+            minHeight: '150px',
+            panelClass: 'custom-dialog-container',
+        });
+    }
+
     giveUp(): void {
-        /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
-        // if yes do
-            // stop game
-            // save infos???
-            // redirect user to main page
-        // else close modal and continue the game
-        */
+        this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
 }

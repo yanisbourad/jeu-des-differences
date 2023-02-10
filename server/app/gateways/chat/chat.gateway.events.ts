@@ -5,6 +5,4 @@ export enum ChatEvents {
     LeaveRoom = 'leaveRoom',
     MassMessage = 'massMessage',
     Hello = 'hello',
-    AddTime = 'addTime',
-    Time = 'time',
 }

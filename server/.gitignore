@@ -2,6 +2,9 @@
 /out
 /node_modules
 
+# games
+/assets/games
+/assets/key.text
 # Logs
 logs
 *.log

@@ -36,14 +36,11 @@
   font-weight: 500;
   color: white;
 }
-.difficulty-bar-img {
-  z-index: 1;
-  content:url("../../../assets/img/difficultyBar.png");
+.difficulty-easy {
+  color: #87ff87;
 }
-.difficulty-bar-indicator-img {
-  z-index: 1;
-  content:url("../../../assets/img/difficulty-bar-indicator.png");
-  margin: 10px 0px;
+.difficulty-hard {
+  color: #BA2921;
 }
 .indices-restants-img {
   z-index: 1;

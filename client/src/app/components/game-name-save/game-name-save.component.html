@@ -1,0 +1,13 @@
+<div class="form-group">
+    <p class="index">Entrer le nom du Jeu SVP {{showFeedback}}</p>
+    <div class="input-block">
+        <label for="gamename">Nom du Jeu</label>
+        <input name="gameName" [(ngModel)]="gameName" id="gameName" type="text" placeholder="Papa Docker" required
+            minlength="2" appForbiddenName="   ">
+    </div>
+    <p>Niveau du Jeu : {{level}}</p>
+    <div class="btn-block">
+        <button class="btn cancel" (click)="closeOnAbort()">Annuler</button>
+        <button class="btn accept" (click)="getGameData()">Submit</button>
+    </div>
+</div>

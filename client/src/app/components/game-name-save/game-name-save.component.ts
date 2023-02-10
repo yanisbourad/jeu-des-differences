@@ -28,7 +28,7 @@ export class GameNameSaveComponent {
 
     validateGameName(name: string): boolean {
         const len = name.trim() === '';
-        if (!len && (name.length > this.lowerLengthNameLimit || name.length < this.upperLengthNameLimit)) return true;
+        if (!len && name.length > this.lowerLengthNameLimit && name.length < this.upperLengthNameLimit) return true;
         return false;
     }
 

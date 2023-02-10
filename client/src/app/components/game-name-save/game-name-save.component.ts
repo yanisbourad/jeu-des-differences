@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { GameDatabaseService } from '@app/services/game-database.sercice';
 import { ImageDiffService } from '@app/services/image-diff.service';
 
@@ -14,10 +15,12 @@ export class GameNameSaveComponent {
     showFeedback: string;
     lowerLengthNameLimit: number;
     upperLengthNameLimit: number;
+    // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<GameNameSaveComponent>,
         private readonly gameDataBase: GameDatabaseService,
         private differenceService: ImageDiffService,
+        private router: Router,
     ) {
         this.gameName = '';
         this.showFeedback = '';
@@ -38,9 +41,10 @@ export class GameNameSaveComponent {
                 if (!res) {
                     alert('/"Nom indisponible: Entrer un autre nom SVP!/"');
                 } else {
-                    this.dialogRef.close();
                     this.level = '';
                     this.showFeedback = '';
+                    this.dialogRef.close();
+                    this.router.navigate(['/config']);
                 }
             });
             this.gameName = '';

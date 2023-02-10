@@ -21,7 +21,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly DEFAULT_WIDTH = 640;
     readonly DEFAULT_HEIGHT = 480;
     mousePosition: Vec2 = { x: 0, y: 0 };
-   // roomName: string;
     errorPenalty: boolean = false;
     unfoundedDifference: Set<number>[];
     playername: string;
@@ -40,15 +39,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clientTimeService.stopTimer();
         this.socket.disconnect();
         this.clientTimeService.resetTimer();
+        this.socket.leaveRoom();
     }
 
     ngAfterViewInit(): void {
         this.socket.connect();
-       // this.socket.setRoomName(this.roomName);
-        //this.socket.sendRoomName(this.roomName);
-        this.socket.joinRoom(this.gameService.playerName); // to validate tomorow!! same problem with timer sometimes start with the last game time
+        this.socket.joinRoom(this.gameService.playerName);
         this.clientTimeService.startTimer();
-        this.socket.sendNbrHint(this.gameService.nHintsUnused);
         this.gameService.displayIcons();
         this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
         this.drawService.setColor = 'yellow';
@@ -62,12 +59,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-       // this.roomName = this.gameService.generatePlayerRoomName();
         this.gameService.displayIcons();
         this.getRouteurParams();
         this.gameService.getGame(this.gameName);
         this.gameService.playerName = this.playername;
-        console.log(this.socket.socketId, "this is my socket id")
     }
 
     mouseHitDetect(event: MouseEvent) {

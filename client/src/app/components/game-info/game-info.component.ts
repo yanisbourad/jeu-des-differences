@@ -1,4 +1,4 @@
-import {Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 @Component({
     selector: 'app-game-info',
@@ -8,12 +8,9 @@ import { GameService } from '@app/services/game.service';
 export class GameInfoComponent implements OnInit {
     constructor(public gameService: GameService) {}
 
-    ngOnInit(): void {   
+    ngOnInit(): void {
         setTimeout(() => {
             this.gameService.displayIcons();
         }, 250);
     }
-    // getHint() {
-//     this.gameService.clickGetHints();
-    // }
 }

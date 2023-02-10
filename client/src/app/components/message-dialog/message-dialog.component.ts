@@ -24,10 +24,10 @@ export class MessageDialogComponent {
         this.type = data[1];
         this.formatTime = data[2];
     }
-   
+
     redirection(): void {
         this.router.navigate(['/home']);
-        this.socket.leaveRoom(this.socket.getRoomName());
+        this.socket.leaveRoom();
         this.clientTimeService.resetTimer();
     }
 }

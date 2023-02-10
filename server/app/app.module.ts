@@ -10,7 +10,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameRecordController } from './controllers/game-record/game-record.constroller';
 import { GameController } from './controllers/game/game.controller';
-import { Game, gameSchema } from './model/database/game';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
 import { GameRecordService } from './services/game-record/game-record.service';
 import { GameService } from './services/game/game.service';
@@ -27,7 +26,6 @@ import { TimeService } from './services/time/time.service';
             }),
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
-        MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
         MongooseModule.forFeature([{ name: GameRecord.name, schema: gameRecordSchema }]),
     ],
     controllers: [CourseController, GameRecordController, TimeController, ExampleController, GameController],

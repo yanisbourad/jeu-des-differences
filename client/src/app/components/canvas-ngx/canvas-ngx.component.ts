@@ -112,7 +112,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         if (!ctx) return;
         const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
         const canvasData = imageData.data;
-        const canvasDataStr = ctx.canvas.toDataURL();
+        const canvasDataStr = ctx.canvas.toDataURL('image/bmp');
         if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
         if (canvasDataStr) this.canvasHolderService.setCanvasData(canvasDataStr, this.type);
     }

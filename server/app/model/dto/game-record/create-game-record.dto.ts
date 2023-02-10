@@ -20,5 +20,5 @@ export class CreateGameRecordDto {
 
     @ApiProperty()
     @IsDate()
-    dateStart: Date;
+    dateStart: string;
 }

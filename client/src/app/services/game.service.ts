@@ -4,7 +4,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.sercice';
-import { GameCreate } from '@common/game';
+import { Game } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 // import { DrawService } from './draw.service';
 import { SocketClientService } from './socket-client.service';
@@ -20,7 +20,7 @@ export class GameService {
         hintUsed: '../../../assets/img/hint-used.png',
     };
 
-    game: GameCreate;
+    game: Game;
     gameInformation: GameInformation;
 
     nDifferencesNotFound: number;
@@ -88,7 +88,7 @@ export class GameService {
 
     // getgame from database serveur
     getGame(gameName: string): void {
-        this.gameDataBase.getGameByName(gameName).subscribe((res: GameCreate) => {
+        this.gameDataBase.getGameByName(gameName).subscribe((res: Game) => {
             // console.log(res, "you are here!!")
             this.game = res;
             // console.log(this.game)

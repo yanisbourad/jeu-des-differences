@@ -88,6 +88,7 @@ export class ImageDiffService {
                 this.originalPixelMatrix.green.push(this.originalImageData[i + 1]);
                 this.originalPixelMatrix.blue.push(this.originalImageData[i + 2]);
                 this.originalPixelMatrix.alpha.push(this.originalImageData[i + 3]);
+
                 this.modifiedPixelMatrix.red.push(this.modifiedImageData[i]);
                 this.modifiedPixelMatrix.green.push(this.modifiedImageData[i + 1]);
                 this.modifiedPixelMatrix.blue.push(this.modifiedImageData[i + 2]);
@@ -117,11 +118,11 @@ export class ImageDiffService {
                     this.originalPixelMatrix.alpha[i] === this.modifiedPixelMatrix.alpha[i]
                 ) {
                     this.differenceMatrix.push(0);
-                    this.differencePixelArray.push(1, 1, 1, 1);
+                    // this.differencePixelArray.push(1, 1, 1, 1);
                 } else {
                     this.setDiffPixels.add(i);
                     this.differenceMatrix.push(1);
-                    this.differencePixelArray.push(0, 0, 0, 0);
+                    // this.differencePixelArray.push(0, 0, 0, 0);
                 }
             }
         }

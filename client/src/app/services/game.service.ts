@@ -4,7 +4,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.sercice';
-import { GameCreate } from '@common/game';
+import { GameCreate, GameRecord } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 // import { DrawService } from './draw.service';
 // import { SocketClientService } from './socket-client.service';
@@ -44,14 +44,14 @@ export class GameService {
     ) {
         this.gameInformation = {
             gameTitle: '',
-            gameMode: 'Partie Classique en mode solo',
+            gameMode: 'solo',
             gameDifficulty: '',
             nDifferences: 0,
             nHints: 3,
             hintsPenalty: 0,
             isClassical: false,
         };
-       // this.roomName = this.generatePlayerRoomName();
+        // this.roomName = this.generatePlayerRoomName();
         this.renderer = rendererFactory.createRenderer(null, null);
     }
 
@@ -69,7 +69,7 @@ export class GameService {
     defineVariables(): void {
         this.gameInformation = {
             gameTitle: this.game.gameName,
-            gameMode: 'Partie Classique en mode solo',
+            gameMode: 'solo',
             gameDifficulty: this.game.difficulty,
             nDifferences: this.game.listDifferences.length,
             nHints: 3,
@@ -80,7 +80,7 @@ export class GameService {
         this.nHintsUnused = this.gameInformation.nHints;
         this.differencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
-       // this.roomName = this.generatePlayerRoomName();
+        // this.roomName = this.generatePlayerRoomName();
         this.isplaying = false;
     }
     // generateUniqueRoomName
@@ -123,8 +123,8 @@ export class GameService {
             }
         }, 125);
     }
-    
-    displayGameEnded(msg: string, type: string, time: number) {
+
+    displayGameEnded(msg: string, type: string, time: string) {
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type, time],
             disableClose: true,
@@ -153,10 +153,32 @@ export class GameService {
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
             this.clientTimeService.stopTimer();
             this.isGameFinished = true;
-            this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.clientTimeService.getCount());
+            this.saveGameRecord();
+            this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
             // Hard reset variables
             this.reinitializeGame();
         }
+    }
+
+    saveGameRecord(): void {
+        const gameRecord: GameRecord = {
+            gameName: this.gameInformation.gameTitle,
+            typeGame: this.gameInformation.gameMode,
+            playerName: this.playerName,
+            dateStart: new Date().getTime().toString(),
+            time: this.getGameTime(),
+        };
+        this.gameDataBase.createGameRecord(gameRecord).subscribe((res) => {
+            console.log(res);
+        });
+        //console.log(gameRecord)
+    }
+
+    getGameTime(): string {
+        /// possibly a getter
+        const minutes = Math.floor(this.clientTimeService.getCount() / 60);
+        const seconds = this.clientTimeService.getCount() - minutes * 60;
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
     playSuccessAudio(): void {

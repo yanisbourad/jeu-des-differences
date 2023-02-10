@@ -43,16 +43,16 @@ export class GameService {
                 basRecords.push({
                     gameName: game.gameName,
                     typeGame: 'multi',
-                    time: 600 + i * 50, // 10min in seconds
+                    time: '15:20', // 10min in seconds
                     playerName: 'Sharmila',
-                    dateStart: new Date(),
+                    dateStart: new Date().getTime().toString(),
                 });
                 basRecords.push({
                     gameName: game.gameName,
                     typeGame: 'solo',
-                    time: 600 + i * 40, // 10min in seconds
+                    time: '12:50', // 10min in seconds
                     playerName: 'Ania',
-                    dateStart: new Date(),
+                    dateStart: new Date().getTime().toString(),
                 });
             }
             this.gameRecordModel.insertMany(basRecords);

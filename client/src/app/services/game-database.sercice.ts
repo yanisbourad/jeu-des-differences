@@ -28,7 +28,6 @@ export class GameDatabaseService {
     }
 
     createGameRecord(gameRecord: GameRecord): Observable<HttpResponse<string>> {
-        console.log(`${this.baseUrl}/gameRecord/create`);
         return this.http.post(`${this.baseUrl}/gameRecord/create`, gameRecord, { observe: 'response', responseType: 'text' });
     }
 

@@ -9,6 +9,8 @@ import { Game, GameInfo } from './../../../../common/game';
 @Controller('file')
 export class GameService {
     gamesNames: string[];
+    // key to encrypt the game name in the database to avoid other servers to access the game records
+    key: string;
     rootPath = join(process.cwd(), 'assets', 'games');
 
     constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
@@ -16,18 +18,26 @@ export class GameService {
             fs.mkdirSync(this.rootPath);
         }
         this.gamesNames = fs.readdirSync(this.rootPath);
+        this.loadKeyForThisServer();
+    }
+    loadKeyForThisServer() {
+        const pathKey = join(process.cwd(), 'assets', 'key.text');
+        if (fs.existsSync(pathKey)) {
+            this.key = fs.readFileSync(pathKey, 'utf8');
+        } else {
+            // generate a new key randomly
+            this.key = (+new Date()).toString(5);
+            fs.writeFileSync(pathKey, this.key, 'utf8');
+        }
     }
 
     async getAllGames(): Promise<GameInfo[]> {
         const it = this.gamesNames.map(async (gameName) => {
             const game = this.getGame(gameName);
+            const name = gameName + this.key;
             if (game) {
-                const recordsSolo = await this.gameRecordModel.find({ gameName: game.gameName, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
-                const recordsMulti = await this.gameRecordModel
-                    .find({ gameName: game.gameName, typeGame: 'multi' })
-                    .sort({ time: 1 })
-                    .limit(3)
-                    .exec();
+                const recordsSolo = await this.gameRecordModel.find({ gameName: name, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
+                const recordsMulti = await this.gameRecordModel.find({ gameName: name, typeGame: 'multi' }).sort({ time: 1 }).limit(3).exec();
                 return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
             }
         });
@@ -54,17 +64,18 @@ export class GameService {
             }
             this.createFile(game.gameName, 'info.json', JSON.stringify(game));
             this.gamesNames.push(game.gameName);
+            const name = game.gameName + this.key;
             const basRecords: GameRecord[] = [];
             for (let i = 0; i < 3; i++) {
                 basRecords.push({
-                    gameName: game.gameName,
+                    gameName: name,
                     typeGame: 'multi',
                     time: '15:20', // 10min in seconds
                     playerName: 'Sharmila',
                     dateStart: new Date().getTime().toString(),
                 });
                 basRecords.push({
-                    gameName: game.gameName,
+                    gameName: name,
                     typeGame: 'solo',
                     time: '12:50', // 10min in seconds
                     playerName: 'Ania',
@@ -84,7 +95,8 @@ export class GameService {
             }
             this.deleteDirectory(_name);
             this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
-            await this.gameRecordModel.deleteMany({ gameName: _name });
+            const name = _name + this.key;
+            await this.gameRecordModel.deleteMany({ gameName: name });
         } catch (error) {
             throw Error(`Failed to delete Game: ${error}`);
         }
@@ -94,8 +106,10 @@ export class GameService {
         try {
             this.gamesNames.forEach(async (_gameName) => {
                 this.deleteDirectory(_gameName);
-                await this.gameRecordModel.deleteMany({ gameName: _gameName });
+                const name = _gameName + this.key;
+                await this.gameRecordModel.deleteMany({ gameName: name });
             });
+            this.gamesNames = [];
         } catch (error) {
             return Promise.reject(`Failed to delete all Games: ${error}`);
         }
@@ -113,7 +127,7 @@ export class GameService {
     }
 
     private deleteDirectory(dirName: string): void {
-        fs.rmdir(join(process.cwd(), `${this.rootPath}/${dirName}`), { recursive: true }, (err) => {
+        fs.rmdir(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }

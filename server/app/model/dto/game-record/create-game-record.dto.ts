@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateGameRecordDto {
     @ApiProperty()
@@ -11,7 +11,7 @@ export class CreateGameRecordDto {
     typeGame: string;
 
     @ApiProperty()
-    @IsNumber()
+    @IsString()
     time: string;
 
     @ApiProperty()
@@ -19,6 +19,6 @@ export class CreateGameRecordDto {
     playerName: string;
 
     @ApiProperty()
-    @IsDate()
+    @IsString()
     dateStart: string;
 }

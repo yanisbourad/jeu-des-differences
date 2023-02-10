@@ -13,13 +13,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     clientTime: number = 0;
     nHints: number = 0;
     roomName: string = '';
+    socketId: string = '';
 
     constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly timeService: TimeService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
-    connect(_: Socket, message: string) {
+    connect(socket: Socket, message: string) {
         this.server.emit(ChatEvents.MassMessage, `: ${message}`);
         this.logger.log('connection au socket');
+        //this.socketId = socket.id;
     }
 
     @SubscribeMessage(ChatEvents.NbrHint)
@@ -28,32 +30,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.SendRoomName)
-    RoomName(_: Socket, roomName: string) {
-        this.roomName = roomName;
+    RoomName(socket: Socket) {
+        this.roomName = socket.id;
     }
 
     @SubscribeMessage(ChatEvents.Time)
-    async Time(socket: Socket, data: [time: number, roomName: string]) {
-        // if (!socket.connected) {
-        //     socket.emit(ChatEvents.Time, [0, data[1]]);
-        //     return;
-        // }
-        this.clientTime = data[0];
-        const room = await this.playerService?.getRoom(data[1]);
+    async Time(socket: Socket,time: number) {
+        this.clientTime = time;
+        const room = await this.playerService?.getRoom(socket.id);
         const startTime = room ? room.startTime : null;
-        if (this.hintUsed) {
+        if (this.hintUsed) { // to remove cause hints not to implement in sprint 1
             this.timeService.nHints++;
             this.hintUsed = false;
         }
-        const count = this.timeService.getElaspedTime(startTime);
-        if (!this.validateServerClientTime(count)) {
-            if (room) {
-                socket.emit(ChatEvents.Time, [room.name, count]);
-            }
-        }
+        //console.log(this.getSocketId(), "socket")
+       console.log('time: ', this.timeService.getElaspedTime(startTime))
+        // , 'clientTime: ', this.clientTime)
+        // const count = this.timeService.getElaspedTime(startTime);
+        // console.log(count)
+        // if (room) {
+        //     console.log(room.name)
+        //     socket.emit(ChatEvents.Time, [room.name, this.clientTime]);
+        // }    
     }
-
-
 
     @SubscribeMessage(ChatEvents.AddTime)
     async addTime(socket: Socket, data: [number, string]) {
@@ -75,13 +74,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             playerName,
             socketId: socket.id,
         };
-        if ((await this.playerService.getRoomIndex(this.roomName)) == -1) {
-            await this.playerService.addRoom(this.roomName, player, startTime, DEFAULT_HINTS);
+        console.log('player: ', player)
+        if (( await this.playerService.getRoomIndex(socket.id) === -1  )) {
+            await this.playerService.addRoom(player.socketId, player, startTime, DEFAULT_HINTS);
             socket.emit(ChatEvents.NbrHint, DEFAULT_HINTS);
-            socket.join(this.roomName);
+            socket.join(player.socketId);
         } else {
-            this.playerService.addPlayer(this.roomName, player, startTime, DEFAULT_HINTS);
-            socket.join(this.roomName);
+            this.playerService.addPlayer(player.socketId, player, startTime, DEFAULT_HINTS);
+            socket.join(player.socketId);
         }
     }
 
@@ -95,6 +95,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);// maybe use to disconnect
+        this.socketId = socket.id;
         socket.emit(ChatEvents.Hello, 'Hello from serveur');
         socket.emit(ChatEvents.NbrHint, 3);
     }
@@ -108,6 +109,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     afterInit() {
         this.logger.log('Initialisation du socket');
+    }
+
+    getSocketId(){
+        return this.socketId;
     }
 
     validateServerClientTime(serverTime: number): boolean {

@@ -75,19 +75,19 @@
     width: 10%;
     height: 20px;
     margin-top: 20%;
-    margin-left: 20px;
-    margin-right: 10px;
+}
+
+.warning h2 {
+    display: flex;
+    justify-content: center;
+    padding-top: 25px;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.7em;
+    font-weight: bold;
+    color: rgb(58, 3, 3);
 }
 
 .file-upload {
     display: none;
-}
-
-.warning {
-    display: flex;
-    justify-content: center;
-    padding-top: 20px;
-    font-size: 1.5px;
-    font-weight: bold;
-    color: rgb(243, 223, 223);
 }

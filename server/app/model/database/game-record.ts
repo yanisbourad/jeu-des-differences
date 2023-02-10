@@ -23,7 +23,7 @@ export class GameRecord {
 
     @ApiProperty()
     @Prop({ required: true })
-    dateStart: Date;
+    dateStart: string;
 }
 
 export const gameRecordSchema = SchemaFactory.createForClass(GameRecord);

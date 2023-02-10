@@ -36,8 +36,9 @@ export class GameRecordController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/create')
-    async createGameRecord(@Body() gameRecord: CreateGameRecordDto, @Res() response: Response) {
+    async createGameRecord(@Body() gameRecord: any, @Res() response: Response) {
         try {
+            console.log(gameRecord)
             const res = await this.gamesRecordService.addGameRecord(gameRecord);
             response.status(HttpStatus.OK).json(res);
         } catch (error) {

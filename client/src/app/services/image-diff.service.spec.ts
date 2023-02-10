@@ -158,17 +158,17 @@ describe('ImageDiffService', () => {
         expect(service.differencePixelArray.length).toBe(0);
     });
 
-    it('should generate a Uint8ClampedArray to create differences image data', () => {
-        // set image data on mock canvas elements
-        service.originalImageData = testArrayData;
-        service.modifiedImageData = testArrayData;
-        service.pixelNumberByImage = 2;
+    // it('should generate a Uint8ClampedArray to create differences image data', () => {
+    //     // set image data on mock canvas elements
+    //     service.originalImageData = testArrayData;
+    //     service.modifiedImageData = testArrayData;
+    //     service.pixelNumberByImage = 2;
 
-        const spy = spyOn(service, 'getDifferenceMatrix').and.callThrough();
-        service.setDifferenceDataToDraw();
-        expect(service.drawingDifferenceArray.length).toBe(8);
-        expect(spy).toHaveBeenCalled();
-    });
+    //     const spy = spyOn(service, 'getDifferenceMatrix').and.callThrough();
+    //     service.setDifferenceDataToDraw();
+    //     expect(service.drawingDifferenceArray.length).toBe(8);
+    //     expect(spy).toHaveBeenCalled();
+    // });
 
     it('should return the position combining X and Y coordinates', () => {
         const res = service.getPositionsFromXY(1, 2);

@@ -8,7 +8,7 @@ export class PlayerService {
     maxPlayers: number = 2;
 
     async addRoom(roomName: string, host: Player, startTime: Date, nHints: number): Promise<void> {
-        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0, startTime, nHints });
+        this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 0, startTime, nHints});
     }
 
     async getRoomIndex(roomName: string): Promise<number> {
@@ -58,5 +58,15 @@ export class PlayerService {
     async getRoom(roomName: string): Promise<Room> {
         const rIndex = await this.getRoomIndex(roomName);
         return this.rooms[rIndex];
+    }
+
+    async getPlayers(roomName: string): Promise<Player[]> {
+        const rIndex = await this.getRoomIndex(roomName);
+        return this.rooms[rIndex].players;
+    }
+
+    async getHost(roomName: string): Promise<Player> {
+        const rIndex = await this.getRoomIndex(roomName);
+        return this.rooms[rIndex].host;
     }
 }

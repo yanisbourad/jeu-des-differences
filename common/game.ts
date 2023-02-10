@@ -16,7 +16,7 @@ export interface GameRecord {
     typeGame: string;
     time: String;
     playerName: string;
-    dateStart: Date;
+    dateStart: string;
 }
 
 export interface TimeConfig {

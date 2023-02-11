@@ -3,6 +3,6 @@ export enum ChatEvents {
     Message = 'message',
     JoinRoom = 'joinRoom',
     LeaveRoom = 'leaveRoom',
-    MassMessage = 'massMessage',
+    MassMessage = 'massMessage', // maybe remove if not used
     Hello = 'hello',
 }

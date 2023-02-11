@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Player } from '../../../../client/src/app/interfaces/player';
+import { INDEX_NOT_FOUND } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
@@ -14,7 +15,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Connect)
     connect(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `: ${message}`);
+        this.server.emit(ChatEvents.Message, `: ${message}`);
         this.logger.log('connection au socket');
     }
 
@@ -25,13 +26,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             playerName,
             socketId: socket.id,
         };
-        if (( await this.playerService.getRoomIndex(socket.id) === -1  )) {
+        if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
             await this.playerService.addRoom(player.socketId, player, startTime);
-            socket.join(player.socketId);
         } else {
             this.playerService.addPlayer(player.socketId, player, startTime);
-            socket.join(player.socketId);
         }
+        socket.join(player.socketId);
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
@@ -52,12 +52,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(socket.id);
     }
 
-    getSocketId(){
+    getSocketId() {
         return this.socketId;
     }
 
-    afterInit(){
+    afterInit() {
         this.logger.log('Init');
     }
-    
 }

@@ -9,8 +9,10 @@ import { ClientTimeService } from './client-time.service';
 export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
+
     roomName: string;
 
+    //timer ??
     constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
     get socketId() {
@@ -40,9 +42,9 @@ export class SocketClientService {
         this.socketClient.on('hello', (message: string) => {
             this.serverMessage = message;
         });
-        // Afficher le message envoyé lors de la déconnexion avec le serveur
-        this.socketClient.on('massMessage', (message: string) => {
-            this.serverMessage = message;
+        // Afficher le message envoyé lors de la connexion au socket
+        this.socketClient.on('message', (message: string) => {
+            this.serverMessage = message; 
         });
     }
 

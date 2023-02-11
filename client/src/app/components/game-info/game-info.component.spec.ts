@@ -19,4 +19,15 @@ describe('GameInfoComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-});
+    it('should call displayIcons after timeout', () => {    
+        const gameService = TestBed.get(component);    
+        spyOn(gameService, 'displayIcons');    
+    
+        component.ngOnInit();    
+    
+        setTimeout(() => {      
+          expect(gameService.displayIcons).toHaveBeenCalled();    
+        }, 250);   }); 
+    });
+
+

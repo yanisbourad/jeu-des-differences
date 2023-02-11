@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-// TODO: move this constant to common
 import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
 @Injectable({
     providedIn: 'root',

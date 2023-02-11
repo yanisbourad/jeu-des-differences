@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerService } from './player-service';
 
-describe('DateService', () => {
+describe('PlayerService', () => {
     let service: PlayerService;
 
     beforeEach(async () => {
@@ -15,4 +15,17 @@ describe('DateService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
+
+    // it('should add player to the room', () => {});
+    /**
+to test : 
+     
+        addRoom 
+        getRoomIndex
+        addPlayer
+        removeRoom
+        getRooms
+        getRoom
+     
+     */
 });

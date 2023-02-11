@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { CreateGameRecordDto } from '@app/model/dto/game-record/create-game-record.dto';
-import { GameService } from '../game/game.service';
+import { GameService } from '@app/services/game/game.service';
 @Injectable()
 export class GameRecordService {
     constructor(

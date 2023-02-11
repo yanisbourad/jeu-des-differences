@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { Logger } from '@nestjs/common';
-import { SinonStubbedInstance, createStubInstance, match } from 'sinon';
-import { Socket, Server } from 'socket.io';
-import { ChatEvents } from './chat.gateway.events';
 import { PlayerService } from '@app/services/player/player-service';
+import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createStubInstance, match, SinonStubbedInstance } from 'sinon';
+import { Server, Socket } from 'socket.io';
 import { INDEX_NOT_FOUND } from './chat.gateway.constants';
+import { ChatEvents } from './chat.gateway.events';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;

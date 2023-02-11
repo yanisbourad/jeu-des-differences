@@ -1,8 +1,8 @@
 import { PlayerService } from '@app/services/player/player-service';
+import { Player } from '@common/player';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Player } from '../../../../client/src/app/interfaces/player';
 import { INDEX_NOT_FOUND } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })

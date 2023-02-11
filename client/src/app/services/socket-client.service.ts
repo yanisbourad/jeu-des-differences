@@ -12,7 +12,7 @@ export class SocketClientService {
 
     roomName: string;
 
-    //timer ??
+    // timer ??
     constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
     get socketId() {
@@ -36,7 +36,8 @@ export class SocketClientService {
 
     configureBaseSocketFeatures() {
         this.socketClient.on('connect', () => {
-            console.log('Connexion au serveur réussie');
+            this.roomName = this.getRoomName();
+            this.joinRoom(this.roomName);
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('hello', (message: string) => {
@@ -44,7 +45,7 @@ export class SocketClientService {
         });
         // Afficher le message envoyé lors de la connexion au socket
         this.socketClient.on('message', (message: string) => {
-            this.serverMessage = message; 
+            this.serverMessage = message;
         });
     }
 

@@ -1,9 +1,11 @@
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import * as constants from '@app/configuration/const-game';
+import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { GameDatabaseService } from '@app/services/game-database.sercice';
+import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
@@ -33,7 +35,6 @@ export class GameService {
     nHintsUsed: number;
     hintsArray: string[];
     playerName: string;
-    isplaying: boolean = false;
     private renderer: Renderer2;
 
     constructor(
@@ -48,7 +49,7 @@ export class GameService {
             gameMode: 'solo',
             gameDifficulty: '',
             nDifferences: 0,
-            nHints: 3,
+            nHints: constants.NUMBER_OF_HINTS,
             hintsPenalty: 0,
             isClassical: false,
         };
@@ -61,18 +62,16 @@ export class GameService {
             gameMode: 'solo',
             gameDifficulty: this.game.difficulty,
             nDifferences: this.game.listDifferences.length,
-            nHints: 3,
-            hintsPenalty: 5,
+            nHints: constants.NUMBER_OF_HINTS,
+            hintsPenalty: constants.HINTS_PENALTY,
             isClassical: false,
         };
         this.nDifferencesNotFound = this.gameInformation.nDifferences;
         this.nHintsUnused = this.gameInformation.nHints;
         this.differencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
-        this.isplaying = false;
     }
 
-    // getgame from database serveur
     getGame(gameName: string): void {
         this.gameDataBase.getGameByName(gameName).subscribe((res: Game) => {
             this.game = res;
@@ -81,11 +80,9 @@ export class GameService {
     }
 
     displayIcons(): void {
-        console.log(this.nDifferencesNotFound, this.nDifferencesFound, this.nHintsUnused, this.nHintsUsed);
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
         }
-        console.log(this.differencesArray);
         for (let i = 0; i < this.nHintsUnused; i++) {
             this.hintsArray[i] = this.path.hintUnused;
         }
@@ -100,10 +97,10 @@ export class GameService {
             this.renderer.setStyle(canvas2.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
 
             blinkCount++;
-            if (blinkCount === 8) {
+            if (blinkCount === constantsTime.BLINKING_COUNT) {
                 clearInterval(intervalId);
             }
-        }, 125);
+        }, constantsTime.BLINKING_TIMEOUT);
     }
 
     displayGameEnded(msg: string, type: string, time: string) {
@@ -147,15 +144,13 @@ export class GameService {
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),
         };
-        this.gameDataBase.createGameRecord(gameRecord).subscribe((res) => {
-            console.log(res);
-        });
+        this.gameDataBase.createGameRecord(gameRecord).subscribe();
     }
 
     getGameTime(): string {
-        const minutes = Math.floor(this.clientTimeService.getCount() / 60);
-        const seconds = this.clientTimeService.getCount() - minutes * 60;
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        const minutes = Math.floor(this.clientTimeService.getCount() / constantsTime.SIXTY_SECOND);
+        const seconds = this.clientTimeService.getCount() - minutes * constantsTime.SIXTY_SECOND;
+        return `${minutes}:${seconds < constantsTime.UNDER_TEN ? '0' : ''}${seconds}`;
     }
 
     playSuccessAudio(): void {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DELAY_BEFORE_EMITTING_TIME } from '../../../../server/app/gateways/chat/chat.gateway.constants';
+import { delayBeforeEmittingTime } from '@app/configuration/const-time';
 @Injectable({
     providedIn: 'root',
 })
@@ -10,7 +10,7 @@ export class ClientTimeService {
     startTimer(): void {
         this.time = setInterval(() => {
             this.count++;
-        }, DELAY_BEFORE_EMITTING_TIME);
+        }, delayBeforeEmittingTime);
     }
 
     getCount(): number {

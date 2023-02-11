@@ -2,6 +2,7 @@
 export const defaultWidth = 640;
 export const defaultHeight = 480;
 export const defaultLineWidth = 5;
+export const defaultLineCap = 'round';
 export const minLineWidth = 1;
 export const maxLineWidth = 10;
 export const defaultRadius = 0;

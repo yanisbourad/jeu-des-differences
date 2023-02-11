@@ -16,7 +16,7 @@ describe('PlayerService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should add player to the room', () => {});
+    // it('should add player to the room', () => {});
     /**
 to test : 
      

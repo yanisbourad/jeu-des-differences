@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { GameService } from '@app/services/game.service';
 
 import { GameInfoComponent } from './game-info.component';
 
@@ -19,15 +20,14 @@ describe('GameInfoComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should call displayIcons after timeout', () => {    
-        const gameService = TestBed.get(component);    
-        spyOn(gameService, 'displayIcons');    
-    
-        component.ngOnInit();    
-    
-        setTimeout(() => {      
-          expect(gameService.displayIcons).toHaveBeenCalled();    
-        }, 250);   }); 
+    it('should call displayIcons after timeout', () => {
+        const gameService = TestBed.inject(GameService);
+        spyOn(gameService, 'displayIcons');
+
+        component.ngOnInit();
+        const timeout = 250;
+        setTimeout(() => {
+            expect(gameService.displayIcons).toHaveBeenCalled();
+        }, timeout);
     });
-
-
+});

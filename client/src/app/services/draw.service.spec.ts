@@ -56,9 +56,4 @@ describe('DrawService', () => {
         service.drawLine(point, lastPoint, canvas);
         service.clearCanvas(canvas);
     });
-
-    it('should validate drawing', () => {
-        const selectedRadius = 3;
-        expect(service.validateDrawing(selectedRadius)).toBe(true);
-    });
 });

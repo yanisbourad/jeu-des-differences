@@ -15,7 +15,7 @@ export class GameRecord {
 
     @ApiProperty()
     @Prop({ required: true })
-    time: String;
+    time: string;
 
     @ApiProperty()
     @Prop({ required: true })

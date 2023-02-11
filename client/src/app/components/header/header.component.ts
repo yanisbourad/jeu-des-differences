@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
-
 import { MatDialog } from '@angular/material/dialog';
-import { TimePopupComponent } from '../time-popup/time-popup.component';
+import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 
 @Component({
     selector: 'app-header',
@@ -18,6 +17,6 @@ export class HeaderComponent {
             height: '774px',
             width: '1107px',
         });
-        dialogRef.afterClosed().subscribe(() => {});
+        dialogRef.afterClosed().subscribe();
     }
 }

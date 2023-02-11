@@ -34,7 +34,8 @@ export class SocketClientService {
 
     configureBaseSocketFeatures() {
         this.socketClient.on('connect', () => {
-            console.log('Connexion au serveur réussie');
+            this.roomName = this.getRoomName();
+            this.joinRoom(this.roomName);
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('hello', (message: string) => {

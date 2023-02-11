@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameDatabaseService } from '@app/services/game-database.sercice';
+import { GameDatabaseService } from '@app/services/game-database.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 
 @Component({

@@ -14,6 +14,7 @@ export class MessageDialogComponent {
     type: string;
     formatTime: string;
 
+    // TODO: reduce the number of constructor parameters
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,

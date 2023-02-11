@@ -1,6 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -33,6 +33,10 @@ export class GameDatabaseService {
 
     createGame(game: Game): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}/game/create`, game, { observe: 'response', responseType: 'text' });
+    }
+
+    async validateGameName(gameName: string): Promise<Observable<boolean>> {
+        return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`).pipe(catchError(this.handleError<boolean>('validateGameName')));
     }
 
     saveGame(_gameName: string): EventEmitter<boolean> {

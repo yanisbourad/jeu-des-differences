@@ -1,18 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import * as constants from '@app/configuration/const-game';
 
 @Component({
     selector: 'app-message-area',
     templateUrl: './message-area.component.html',
     styleUrls: ['./message-area.component.scss'],
 })
-export class MessageAreaComponent implements OnInit {
+export class MessageAreaComponent {
     date: Date = new Date();
     playerName: string = 'Daniel';
     playerInitials: string = this.playerName[0];
-    chatBoxDemo: number = 26;
+    chatBoxDemo: number = constants.chatBoxDemo;
     chatBox: number[] = new Array(this.chatBoxDemo);
-    constructor() {}
-    ngOnInit(): void {}
     getTimestamp(): string {
         return this.date.toLocaleTimeString();
     }

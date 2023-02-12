@@ -1,7 +1,4 @@
-import { CourseController } from '@app/controllers/course/course.controller';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { Course, courseSchema } from '@app/model/database/course';
-import { CourseService } from '@app/services/course/course.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -21,10 +18,9 @@ import { PlayerService } from './services/player/player-service';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
         MongooseModule.forFeature([{ name: GameRecord.name, schema: gameRecordSchema }]),
     ],
-    controllers: [CourseController, GameRecordController, GameController],
-    providers: [ChatGateway, CourseService, GameService, GameRecordService, Logger, PlayerService],
+    controllers: [GameRecordController, GameController],
+    providers: [ChatGateway, GameService, GameRecordService, Logger, PlayerService],
 })
 export class AppModule {}

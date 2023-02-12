@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as constants from '@app/configuration/const-game';
 import { GameService } from '@app/services/game.service';
 @Component({
     selector: 'app-game-info',
@@ -11,6 +12,6 @@ export class GameInfoComponent implements OnInit {
     ngOnInit(): void {
         setTimeout(() => {
             this.gameService.displayIcons();
-        }, 250);
+        }, constants.waitingTime);
     }
 }

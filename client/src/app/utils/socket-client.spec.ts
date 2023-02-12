@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Socket } from 'socket.io-client';
-import { SocketTestHelper } from './socket-helper';
 import { SocketClient } from './socket-client';
+import { SocketTestHelper } from './socket-helper';
 
 // from Angular socket.io exemple on gitLab
 describe('SocketClientService', () => {
@@ -43,7 +43,9 @@ describe('SocketClientService', () => {
 
     it('should call socket.on with an event', () => {
         const event = 'helloWorld';
-        const action = () => {};
+        const action = () => {
+            alert('hello world');
+        };
         const spy = spyOn(service.socket, 'on');
         service.on(event, action);
         expect(spy).toHaveBeenCalled();

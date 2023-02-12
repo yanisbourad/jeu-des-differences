@@ -70,7 +70,7 @@ import { GameNameSaveComponent } from './components/game-name-save/game-name-sav
         MatDialogModule,
         MatFormFieldModule,
     ],
-    providers: [],
+    providers: [MatDialogModule],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

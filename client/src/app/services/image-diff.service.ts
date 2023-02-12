@@ -192,7 +192,7 @@ export class ImageDiffService {
                 lastDistance = radius + 1;
             }
 
-            if (distance < radius - 1 && distance < lastDistance) {
+            if (distance < radius && distance < lastDistance) {
                 // adding it to the differenceMatrix
                 this.currentDifferenceTemp.add(position);
                 // if distance is the lower ever found
@@ -204,15 +204,14 @@ export class ImageDiffService {
                 return;
             }
         }
-        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y }, distance });
-        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y }, distance });
-        this.listBfsInput.push({ point: { x: point.x, y: point.y + 1 }, distance });
-        this.listBfsInput.push({ point: { x: point.x, y: point.y - 1 }, distance });
 
-        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y + 1 }, distance });
-        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y - 1 }, distance });
-        this.listBfsInput.push({ point: { x: point.x + 1, y: point.y - 1 }, distance });
-        this.listBfsInput.push({ point: { x: point.x - 1, y: point.y + 1 }, distance });
+        // Adding the 8 neighbors of the current point
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                this.listBfsInput.push({ point: { x: point.x + i, y: point.y + j }, distance });
+            }
+        }
     }
 
     getPositionsFromXY(x: number, y: number): number {

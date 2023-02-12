@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameDatabaseService } from '@app/services/game-database.sercice';
+import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 // import { Router } from '@angular/router';
 @Component({

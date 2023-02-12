@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
@@ -26,6 +26,7 @@ export class DifferencePopupComponent implements AfterViewInit {
         public dialogRef: MatDialogRef<DifferencePopupComponent>,
         private readonly imageDifferenceService: ImageDiffService,
         private readonly drawService: DrawService,
+        private changeDetectorRef: ChangeDetectorRef,
     ) {
         this.showValidation = false;
         this.lowerLimitDifferenceAllowed = 2;
@@ -47,6 +48,7 @@ export class DifferencePopupComponent implements AfterViewInit {
             this.showValidation = false;
             this.showMessage = '(valide entre 3 et 9)';
         }
+        this.changeDetectorRef.detectChanges();
     }
 
     openName() {

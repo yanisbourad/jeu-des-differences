@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class CanvasHolderService {
-    originalCanvas: string = 'Image Originale';
+    originalCanvas: string = 'Image Original';
     modifiedCanvas: string = 'Image Modifiée';
 
     private canvasOriginal!: Uint8ClampedArray;

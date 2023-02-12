@@ -3,6 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
+import * as constants from '@app/configuration/const-canvas';
+import * as constantsTime from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
@@ -18,14 +20,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
-    readonly DEFAULT_WIDTH = 640;
-    readonly DEFAULT_HEIGHT = 480;
     mousePosition: Vec2 = { x: 0, y: 0 };
     errorPenalty: boolean = false;
     unfoundedDifference: Set<number>[];
+
+    // TODO: use camelCase
     playername: string;
+
     gameName: string;
 
+    // TODO: reduce the number of parameters
     constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,
@@ -35,6 +39,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public routeur: Router,
         public route: ActivatedRoute,
     ) {}
+
+    get width(): number {
+        return constants.defaultWidth;
+    }
+
+    get height(): number {
+        return constants.defaultHeight;
+    }
+
     ngOnDestroy(): void {
         this.clientTimeService.stopTimer();
         this.socket.disconnect();
@@ -68,7 +81,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.DEFAULT_WIDTH;
+            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
                 this.drawDifference(diff);
@@ -90,7 +103,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
             setTimeout(() => {
                 this.errorPenalty = false;
-            }, 1000);
+            }, constantsTime.BLINKING_TIME);
         } else {
             this.gameService.playSuccessAudio();
             this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
@@ -117,7 +130,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
             this.drawService.clearDiff(this.canvas1.nativeElement);
             this.drawService.clearDiff(this.canvas2.nativeElement);
-        }, 1000);
+        }, constantsTime.BLINKING_TIME);
     }
 
     displayGiveUp(msg: string, type: string) {

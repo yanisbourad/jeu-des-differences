@@ -114,10 +114,29 @@ export class GameService {
     }
 
     reinitializeGame(): void {
-        this.isGameFinished = false;
+        this.nDifferencesNotFound = 0;
+        this.nHintsUnused = 0;
         this.nDifferencesFound = 0;
-        this.nHintsUsed = 0;
+        this.differencesArray = [];
+        this.playerName = '';
+        this.nDifferencesFound = 0;
         this.socket.leaveRoom();
+        this.game = {
+            gameName: '',
+            difficulty: '',
+            originalImageData: '',
+            modifiedImageData: '',
+            listDifferences: [],
+        };
+        this.gameInformation = {
+            gameTitle: '',
+            gameMode: 'solo',
+            gameDifficulty: '',
+            nDifferences: 0,
+            nHints: constants.NUMBER_OF_HINTS,
+            hintsPenalty: 0,
+            isClassical: false,
+        };
     }
 
     clickDifferencesFound(): void {
@@ -144,7 +163,7 @@ export class GameService {
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),
         };
-        this.gameDataBase.createGameRecord(gameRecord).subscribe();
+            this.gameDataBase.createGameRecord(gameRecord).subscribe();
     }
 
     getGameTime(): string {

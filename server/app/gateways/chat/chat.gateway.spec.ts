@@ -89,11 +89,11 @@ describe('ChatGateway', () => {
         expect(logger.log.calledOnce).toBeTruthy();
     });
 
-    it('socket disconnection should call removeRoom() from playerService and leave room', () => {
+    it('socket disconnection should call removeRoom() from playerService and leave room', async () => {
         jest.spyOn(playerService, 'removeRoom').mockImplementation(async () => {
             return Promise.resolve();
         });
-        gateway.handleDisconnect(socket);
+        await gateway.handleDisconnect(socket);
         expect(playerService.removeRoom).toHaveBeenCalled();
         expect(socket.leave.calledOnce).toBeTruthy();
     });

@@ -28,15 +28,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         };
         if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
             await this.playerService.addRoom(player.socketId, player, startTime);
+            socket.join(player.socketId);
         } else {
             this.playerService.addPlayer(player.socketId, player, startTime);
+            socket.join(player.socketId);
         }
-        socket.join(player.socketId);
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
-        this.playerService.removeRoom(socket.id);
+        await this.playerService.removeRoom(socket.id);
         socket.leave(socket.id);
     }
 
@@ -46,9 +47,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.emit(ChatEvents.Hello, 'Hello from serveur');
     }
 
-    handleDisconnect(socket: Socket) {
+    async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
-        this.playerService.removeRoom(socket.id);
+        await this.playerService.removeRoom(socket.id);
         socket.leave(socket.id);
     }
 

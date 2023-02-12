@@ -63,14 +63,6 @@ export class GameDatabaseService {
         return isSaved;
     }
 
-    deleteGame(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete/${gameName}`, { observe: 'response', responseType: 'text' });
-    }
-
-    deleteAllGames(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete-all`, { observe: 'response', responseType: 'text' });
-    }
-
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
         return () => of(result as T);
     }

@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 // eslint-disable-next-line no-restricted-imports
-import { GameCreate, GameInfo, GameRecord } from '../../../../common/game';
+import { Game, GameInfo, GameRecord } from '../../../../common/game';
 import { CanvasHolderService } from './canvas-holder.service';
 import { ImageDiffService } from './image-diff.service';
 @Injectable({
@@ -31,12 +31,16 @@ export class GameDatabaseService {
         return this.http.post(`${this.baseUrl}/gameRecord/create`, gameRecord, { observe: 'response', responseType: 'text' });
     }
 
-    createGame(game: GameCreate): Observable<HttpResponse<string>> {
+    createGame(game: Game): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}/game/create`, game, { observe: 'response', responseType: 'text' });
     }
 
+    async validateGameName(gameName: string): Promise<Observable<boolean>> {
+        return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`).pipe(catchError(this.handleError<boolean>('validateGameName')));
+    }
+
     saveGame(_gameName: string): EventEmitter<boolean> {
-        const game: GameCreate = {
+        const game: Game = {
             gameName: _gameName,
             originalImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.originalCanvas),
             modifiedImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.modifiedCanvas),
@@ -57,14 +61,6 @@ export class GameDatabaseService {
         }
 
         return isSaved;
-    }
-
-    deleteGame(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete/${gameName}`, { observe: 'response', responseType: 'text' });
-    }
-
-    deleteAllGames(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete-all`, { observe: 'response', responseType: 'text' });
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {

@@ -1,7 +1,7 @@
 <div class="container">
   <h1 mat-dialog-title > {{message}}</h1>
   <div mat-dialog-content *ngIf="this.type === 'finished'">
-    <h1 class="time">  Vous avez fini la partie en : {{formatTime()}} minutes </h1>
+    <h1 class="time">  Vous avez fini la partie en : {{formatTime}} minutes </h1>
   </div>
   <div mat-dialog-actions >
     <button class={{type}} mat-raised-button mat-dialog-close color="primary" (click)="redirection()">Ok</button>

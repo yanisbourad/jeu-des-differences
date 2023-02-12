@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameDatabaseService } from '@app/services/game-database.sercice';
+import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 // import { Router } from '@angular/router';
 @Component({
@@ -13,57 +13,6 @@ export class CardDisplayerComponent implements OnInit {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     cardByPage: number = 4;
     allCards: GameInfo[];
-    // allCards: card[] = [
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    //     {
-    //         title: 'Mont Saint Michel',
-    //         difficulty: 0,
-    //         rankingSolo: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         rankingMulti: { name1: 'Ania', time1: 1.03, name2: 'Yanis', time2: 4.03, name3: 'Daniel', time3: 6.5 },
-    //         image: '../../../assets/imagePaysage.jpeg',
-    //     },
-    // ]; // toutes les cartes
 
     constructor(private readonly gameDataBase: GameDatabaseService) {
         this.currentPage = 0;
@@ -89,7 +38,6 @@ export class CardDisplayerComponent implements OnInit {
     }
 
     getCurrentPageCards(): GameInfo[] {
-        console.log(this.allCards[0].rankingSolo[0]);
         const startIndex: number = this.cardByPage * this.currentPage;
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);

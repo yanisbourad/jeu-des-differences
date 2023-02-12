@@ -1,7 +1,7 @@
 import { GameRecord } from '@app/model/database/game-record';
 import { CreateGameRecordDto } from '@app/model/dto/game-record/create-game-record.dto';
 import { GameRecordService } from '@app/services/game-record/game-record.service';
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -9,24 +9,6 @@ import { Response } from 'express';
 @Controller('gameRecord')
 export class GameRecordController {
     constructor(private readonly gamesRecordService: GameRecordService) {}
-
-    @ApiOkResponse({
-        description: 'Returns all GamesRecord',
-        type: GameRecord,
-        isArray: true,
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/')
-    async allGamesRecord(@Res() response: Response) {
-        try {
-            const allGamesRecord = await this.gamesRecordService.getAllGameRecord();
-            response.status(HttpStatus.OK).json(allGamesRecord);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
 
     @ApiOkResponse({
         description: 'Create gameRecord',

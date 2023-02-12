@@ -10,11 +10,11 @@ import { CanvasHolderService } from '@app/services/canvas-holder.service';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit {
-    @ViewChild('originalCanvasComponent') private originalCanvasComponent: CanvasNgxComponent;
-    @ViewChild('modifiedCanvasComponent', { static: false }) private modifiedCanvasComponent: CanvasNgxComponent;
-    @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
+    @ViewChild('originalCanvasComponent') originalCanvasComponent: CanvasNgxComponent;
+    @ViewChild('modifiedCanvasComponent') modifiedCanvasComponent: CanvasNgxComponent;
+    @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef<HTMLInputElement>;
     reposition: boolean = false;
-    // eslint-disable-next-line max-params
+
     constructor(
         public dialog: MatDialog,
         private renderer: Renderer2,
@@ -32,9 +32,7 @@ export class GameCreationPageComponent implements OnInit {
     ngOnInit(): void {
         this.canvasHolderService.clearCanvas();
     }
-    goBack(): void {
-        this.canvasHolderService.clearCanvas();
-    }
+
     handleSwapping(element1Id: string, element2Id: string): void {
         const element1Image = this.element.nativeElement.querySelector(element1Id);
         const middleButtons = this.element.nativeElement.querySelector('.swapping-canvas');

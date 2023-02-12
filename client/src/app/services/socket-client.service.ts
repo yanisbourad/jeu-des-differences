@@ -1,23 +1,19 @@
 import { Injectable } from '@angular/core';
-import { RoomTime } from '@app/interfaces/room-time';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
+import { ClientTimeService } from './client-time.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SocketClientService {
     socket: Socket;
-    timeIndexValue: number;
-    serverMessages: string[] = [];
-    serverTime: RoomTime[] = [];
     serverMessage: string = '';
-    hintsLeft: number = 0;
+
     roomName: string;
 
-    constructor(private readonly socketClient: SocketClient) {
-        this.timeIndexValue = -1;
-    }
+    // timer ??
+    constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
     get socketId() {
         return this.socketClient.socket.id ? this.socketClient.socket.id : '';
@@ -30,77 +26,31 @@ export class SocketClientService {
         }
     }
 
-    getRoomTime(roomName: string): number {
-        return this.serverTime[this.getServerTimeIndex(roomName)]?.time;
-    }
-
     getRoomName(): string {
-        return this.roomName;
-    }
-
-    getServerTimeIndex(roomName: string): number {
-        return this.serverTime.findIndex((roomTime) => roomTime.id === roomName);
+        return this.socketId;
     }
 
     getServerMessage(): string {
         return this.serverMessage;
     }
 
-    getHintLeft(): number {
-        return this.hintsLeft;
-    }
-
     configureBaseSocketFeatures() {
         this.socketClient.on('connect', () => {
-            console.log('Connexion au serveur réussie');
+            console.log('connection au socket');
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('hello', (message: string) => {
             this.serverMessage = message;
         });
-
-        this.socketClient.on('time', (values: [string, number]) => {
-            if (this.getServerTimeIndex(values[0]) === this.timeIndexValue) {
-                this.serverTime.push({ id: values[0], time: values[1] });
-            } else {
-                this.serverTime[this.getServerTimeIndex(values[0])].time = values[1];
-            }
-        });
-        // Gérer l'événement envoyé par le serveur : afficher le message envoyé lors de la connexion avec le serveur
+        // Afficher le message envoyé lors de la connexion au socket
         this.socketClient.on('message', (message: string) => {
-            this.serverMessages.push(message);
-        });
-        // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un client connecté
-        this.socketClient.on('massMessage', (broadcastMessage: string) => {
-            this.serverMessages.push(broadcastMessage);
-        });
-
-        this.socketClient.on('nbrHint', (hintsLeft: number) => {
-            this.hintsLeft = hintsLeft;
+            this.serverMessage = message;
         });
     }
 
     disconnect() {
+        this.timer.stopTimer();
         this.socketClient.disconnect();
-    }
-
-    // setRoomName
-    setRoomName(roomName: string) {
-        this.roomName = roomName;
-    }
-    // sendTime to server
-    sendTime(time: number, roomName: string) {
-        this.socketClient.send('time', [time, roomName]);
-    }
-
-    // addTime
-    addTime(time: number, roomName: string): void {
-        this.socketClient.send('addTime', [time, roomName]);
-    }
-
-    // send number of hints
-    sendNbrHint(Hints: number) {
-        this.socketClient.send('nbrHint', Hints);
     }
 
     // joinRoom
@@ -109,14 +59,8 @@ export class SocketClientService {
     }
 
     // leaveRoom
-    leaveRoom(roomName: string) {
-        console.log('leaveRoom', roomName);
-        this.socketClient.send('leaveRoom', roomName);
+    leaveRoom() {
+        this.socketClient.send('leaveRoom');
         this.disconnect();
-    }
-
-    // send roomName
-    sendRoomName(roomName: string) {
-        this.socketClient.send('roomName', roomName);
     }
 }

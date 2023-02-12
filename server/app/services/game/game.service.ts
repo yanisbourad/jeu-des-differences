@@ -1,87 +1,140 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-
-import { Game, GameDocument } from '@app/model/database/game';
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
-import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
-
+import { Controller, Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as fs from 'fs';
+import { Model } from 'mongoose';
+import { join } from 'path';
+import { Game, GameInfo } from './../../../../common/game';
 @Injectable()
+@Controller('file')
 export class GameService {
-    constructor(
-        @InjectModel(Game.name) public gameModel: Model<GameDocument>,
-        @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
-        private readonly logger: Logger,
-    ) {}
+    gamesNames: string[];
+    // key to encrypt the game name in the database to avoid other servers to access the game records
+    key: string;
+    rootPath = join(process.cwd(), 'assets', 'games');
 
-    async getAllGames(): Promise<unknown> {
-        const games = await this.gameModel.find().exec();
-        const gamesWithRecords = await Promise.all(
-            games.map(async (game) => {
-                const recordsSolo = await this.gameRecordModel.find({ gameName: game.gameName, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
-                const recordsMulti = await this.gameRecordModel
-                    .find({ gameName: game.gameName, typeGame: 'multi' })
-                    .sort({ time: 1 })
-                    .limit(3)
-                    .exec();
-                return { ...game.toObject(), rankingSolo: recordsSolo, rankingMulti: recordsMulti };
-            }),
-        );
-        return gamesWithRecords;
+    constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
+        if (!fs.existsSync(this.rootPath)) {
+            fs.mkdirSync(this.rootPath);
+        }
+        this.gamesNames = fs.readdirSync(this.rootPath);
+        this.loadKeyForThisServer();
     }
 
-    async getGame(_gameName: string): Promise<Game> {
+    get getKey() {
+        return this.key;
+    }
+    loadKeyForThisServer() {
+        const pathKey = join(process.cwd(), 'assets', 'key.text');
+        if (fs.existsSync(pathKey)) {
+            this.key = fs.readFileSync(pathKey, 'utf8');
+        } else {
+            // generate a new key randomly
+            this.key = (+new Date()).toString();
+            fs.writeFileSync(pathKey, this.key, 'utf8');
+        }
+    }
+
+    async getAllGames(): Promise<GameInfo[]> {
+        const it = this.gamesNames.map(async (gameName) => {
+            const game = this.getGame(gameName);
+            const name = gameName + this.key;
+            if (game) {
+                const recordsSolo = await this.gameRecordModel.find({ gameName: name, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
+                const recordsMulti = await this.gameRecordModel.find({ gameName: name, typeGame: 'multi' }).sort({ time: 1 }).limit(3).exec();
+                return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
+            }
+        });
+        while (!it);
+        return Promise.all(it);
+    }
+
+    isValidGameName(gameName: string): boolean {
+        return !this.gamesNames.includes(gameName);
+    }
+
+    getGame(_gameName: string): Game {
         // NB: This can return null if the Game does not exist, you need to handle it
-        return await this.gameModel.findOne({ gameName: _gameName });
+        if (!this.gamesNames.includes(_gameName)) {
+            throw Error(`Failed to get Game: ${_gameName} does not exist`);
+        }
+        return JSON.parse(this.getFile(_gameName, 'info.json')) as Game;
     }
 
-    async addGame(game: CreateGameDto): Promise<void> {
+    async addGame(game: Game): Promise<void> {
         try {
-            await this.gameModel.create(game);
+            if (this.gamesNames.includes(game.gameName)) {
+                throw Error(`Failed to insert Game: ${game.gameName} already exists`);
+            }
+            this.createFile(game.gameName, 'info.json', JSON.stringify(game));
+            this.gamesNames.push(game.gameName);
+            const name = game.gameName + this.key;
             const basRecords: GameRecord[] = [];
             for (let i = 0; i < 3; i++) {
                 basRecords.push({
-                    gameName: game.gameName,
+                    gameName: name,
                     typeGame: 'multi',
-                    time: 600 + i * 50, // 10min in seconds
+                    time: '15:20', // 10min in seconds
                     playerName: 'Sharmila',
-                    dateStart: new Date(),
+                    dateStart: new Date().getTime().toString(),
                 });
                 basRecords.push({
-                    gameName: game.gameName,
+                    gameName: name,
                     typeGame: 'solo',
-                    time: 600 + i * 40, // 10min in seconds
+                    time: '12:50', // 10min in seconds
                     playerName: 'Ania',
-                    dateStart: new Date(),
+                    dateStart: new Date().getTime().toString(),
                 });
             }
             this.gameRecordModel.insertMany(basRecords);
         } catch (error) {
-            return Promise.reject(`Failed to insert Game: ${error}`);
+            throw Error(`Failed to insert Game: ${error}`);
         }
     }
 
     async deleteGame(_name: string): Promise<void> {
         try {
-            const res = await this.gameModel.deleteOne({
-                name: _name,
-            });
-            if (res.deletedCount === 0) {
-                return Promise.reject('Could not find Game');
-            } else {
-                await this.gameRecordModel.deleteMany({ gameName: _name });
+            if (!this.gamesNames.includes(_name)) {
+                throw Error(`Failed to delete Game: ${_name} does not exists`);
             }
+            this.deleteDirectory(_name);
+            this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
+            const name = _name + this.key;
+            await this.gameRecordModel.deleteMany({ gameName: name });
         } catch (error) {
-            return Promise.reject(`Failed to delete Game: ${error}`);
+            throw Error(`Failed to delete Game: ${error}`);
         }
     }
 
     async deleteAllGames(): Promise<void> {
         try {
-            await this.gameModel.deleteMany({});
-            await this.gameRecordModel.deleteMany({});
+            this.gamesNames.forEach(async (_gameName) => {
+                this.deleteDirectory(_gameName);
+                const name = _gameName + this.key;
+                await this.gameRecordModel.deleteMany({ gameName: name });
+            });
+            this.gamesNames = [];
         } catch (error) {
             return Promise.reject(`Failed to delete all Games: ${error}`);
         }
+    }
+
+    private createFile(dirName: string, fileName: string, data: string): void {
+        if (!fs.existsSync(`${this.rootPath}/${dirName}`)) {
+            fs.mkdirSync(`${this.rootPath}/${dirName}`);
+        }
+        fs.writeFileSync(`${this.rootPath}/${dirName}/${fileName}`, data, 'utf8');
+    }
+
+    private getFile(dirName: string, fileName: string): string {
+        return fs.readFileSync(`${this.rootPath}/${dirName}/${fileName}`, 'utf8');
+    }
+
+    private deleteDirectory(dirName: string): void {
+        fs.rm(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+        });
     }
 }

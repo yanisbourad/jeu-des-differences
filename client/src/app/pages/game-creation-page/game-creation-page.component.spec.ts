@@ -1,43 +1,50 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
+import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
+import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
-
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasHolderService: CanvasHolderService;
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent],
-        }).compileComponents();
+    let bitmapService: BitmapService;
 
-        canvasHolderService = TestBed.inject(CanvasHolderService);
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [MatDialogModule],
+            declarations: [GameCreationPageComponent, CanvasNgxComponent, DifferencePopupComponent],
+            providers: [CanvasHolderService, BitmapService],
+        });
+
         fixture = TestBed.createComponent(GameCreationPageComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        canvasHolderService = TestBed.inject(CanvasHolderService);
+        bitmapService = TestBed.inject(BitmapService);
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should clear service canvas holder when ngOnInit is called', () => {
-        canvasHolderService.originalCanvas = '';
-        canvasHolderService.modifiedCanvas = '';
-        component.ngOnInit();
-        expect(canvasHolderService.originalCanvas).toBeDefined();
-        expect(canvasHolderService.modifiedCanvas).toBeDefined();
+
+    it('should return originalCanvas from CanvasHolderService', () => {
+        expect(component.originalCanvas).toBeTruthy();
     });
-    it('should clear service canvas holder when goBack is called', () => {
-        canvasHolderService.originalCanvas = '';
-        canvasHolderService.modifiedCanvas = '';
-        component.goBack();
-        expect(canvasHolderService.getCanvasData).toBeDefined();
+
+    it('should return modifiedCanvas from CanvasHolderService', () => {
+        spyOn(canvasHolderService, 'setCanvas');
+        expect(component.modifiedCanvas).toBe('modifiedCanvas');
     });
-    it('should return the original canvas from the service', () => {
-        const expectedOriginal = canvasHolderService.originalCanvas;
-        expect(component.originalCanvas).toBe(expectedOriginal);
-        const expectedModified = canvasHolderService.modifiedCanvas;
-        expect(component.modifiedCanvas).toBe(expectedModified);
+
+    it('should call handleFileSelect from BitmapService', () => {
+        spyOn(bitmapService, 'handleFileSelect');
+        spyOn(component.originalCanvasComponent, 'loadImage');
+        spyOn(component.modifiedCanvasComponent, 'loadImage');
+        component.loadImage({} as Event);
+        expect(bitmapService.handleFileSelect).toHaveBeenCalled();
+        expect(component.originalCanvasComponent.loadImage).toHaveBeenCalled();
+        expect(component.modifiedCanvasComponent.loadImage).toHaveBeenCalled();
     });
 });

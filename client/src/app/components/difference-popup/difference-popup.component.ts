@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
@@ -14,10 +14,11 @@ export class DifferencePopupComponent implements AfterViewInit {
     @ViewChild('dd', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
     showPixel: boolean = true;
     ctx: CanvasRenderingContext2D;
-    showDifferentPixels: boolean;
-    showValidation: boolean;
-    showMessage: boolean = false;
+    showValidation: boolean = false;
+    showMessage: string = '';
     showDifference: number = 0;
+    lowerLimitDifferenceAllowed;
+    upperLimitDifferenceAllowed;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -25,29 +26,41 @@ export class DifferencePopupComponent implements AfterViewInit {
         public dialogRef: MatDialogRef<DifferencePopupComponent>,
         private readonly imageDifferenceService: ImageDiffService,
         private readonly drawService: DrawService,
-    ) {}
+        private changeDetectorRef: ChangeDetectorRef,
+    ) {
+        this.showValidation = false;
+        this.lowerLimitDifferenceAllowed = 2;
+        this.upperLimitDifferenceAllowed = 10;
+    }
 
     ngAfterViewInit(): void {
-        this.showDifferentPixels = true;
-        if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
-            console.log(this.imageDifferenceService.getDifferenceNumber());
-            this.showDifference = this.imageDifferenceService.getDifferenceNumber();
-            this.showDifferentPixels = true;
+        this.showDifference = this.imageDifferenceService.getDifferenceNumber();
+        if (this.showDifference !== 0) {
             this.drawService.clearCanvas(this.canvas.nativeElement);
             const differences = this.imageDifferenceService.getDifferencePixelToDraw();
             this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
-            this.showValidation = true;
         }
+
+        if (this.showDifference > this.lowerLimitDifferenceAllowed && this.showDifference < this.upperLimitDifferenceAllowed) {
+            this.showMessage = '';
+            this.showValidation = true;
+        } else {
+            this.showValidation = false;
+            this.showMessage = '(valide entre 3 et 9)';
+        }
+        this.changeDetectorRef.detectChanges();
     }
 
     openName() {
-        this.dialogRef.close();
-        const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
-            disableClose: true,
-            height: '600x',
-            width: '500px',
-        });
-        dialogRefGame.afterClosed().subscribe();
+        if (this.showValidation) {
+            this.dialogRef.close();
+            const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
+                disableClose: true,
+                height: '600x',
+                width: '500px',
+            });
+            dialogRefGame.afterClosed().subscribe();
+        }
     }
     closeOnAbort() {
         this.dialogRef.close();

@@ -8,8 +8,8 @@ import { Vec2 } from '@app/interfaces/vec2';
 })
 export class DrawService {
     private canvasSize: Point = { x: constants.defaultWidth, y: constants.defaultHeight };
-    private color: string = 'black';
-    private lineWidth: number = 3;
+    private color: string = constants.defaultLineColor;
+    private lineWidth: number = constants.defaultLineWidth;
 
     get width(): number {
         return this.canvasSize.x;
@@ -37,40 +37,12 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, 640, 480);
+        context?.drawImage(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
     }
 
     drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
         this.drawImage(image, canvas1);
         this.drawImage(image, canvas2);
-    }
-
-    drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        const imageData = new ImageData(data, this.width, this.height);
-        context.putImageData(imageData, 0, 0);
-    }
-
-    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.beginPath();
-        context.moveTo(lastPoint.x, lastPoint.y);
-        context.lineTo(point.x, point.y);
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.stroke();
-    }
-
-    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.beginPath();
-        context.moveTo(lastPoint.x, lastPoint.y);
-        context.lineTo(point.x, point.y);
-        // do a circular cap on the line
-        context.lineCap = 'round';
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.stroke();
     }
 
     drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
@@ -90,20 +62,6 @@ export class DrawService {
         });
     }
 
-    async drawImageFromUrl(data: string, canvas: HTMLCanvasElement) {
-        const context = this.getContext(canvas);
-        const img = new Image();
-        img.src = data;
-        img.onload = async () => {
-            context.drawImage(img, 0, 0);
-        };
-    }
-    // drawLine(linePoints: Vec2[], canvas: HTMLCanvasElement) {}
-
-    // drawCube(cubePoints: Vec2[], canvas: HTMLCanvasElement) {}
-
-    // drawTriangle(canvas: HTMLCanvasElement) {}
-
     clearCanvas(canvas: HTMLCanvasElement) {
         const context = this.getContext(canvas);
         context.fillStyle = constants.defaultBackgroundColor;
@@ -115,12 +73,9 @@ export class DrawService {
         context.clearRect(0, 0, this.width, this.height);
     }
 
-    validateDrawing(selectedRadius: number) {
-        // TODO: check if the drawing is valid
-        return selectedRadius ? true : false;
-    }
     getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-        return canvas.getContext('2d') as CanvasRenderingContext2D;
+        const context = canvas.getContext('2d', CanvasRenderingContext2D) as CanvasRenderingContext2D;
+        return context;
     }
 
     drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
@@ -128,10 +83,5 @@ export class DrawService {
         context.font = '20px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
-        // setTimeout(() => {
-        //     // clear the word after 1 sec
-        //     const width = context.measureText(word).width;
-        //     context.clearRect(position.x, position.y - 40, width, 40);
-        // }, 1000);
     }
 }

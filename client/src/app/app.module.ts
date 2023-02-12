@@ -1,7 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
@@ -72,7 +72,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
         MatFormFieldModule,
         OverlayModule,
     ],
-    providers: [MatDialog],
+    providers: [MatDialog, MatDialogModule],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

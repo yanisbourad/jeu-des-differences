@@ -37,7 +37,7 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
+        context?.drawImage(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
     }
 
     drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
@@ -74,7 +74,8 @@ export class DrawService {
     }
 
     getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-        return canvas.getContext('2d') as CanvasRenderingContext2D;
+        const context = canvas.getContext('2d', CanvasRenderingContext2D) as CanvasRenderingContext2D;
+        return context;
     }
 
     drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {

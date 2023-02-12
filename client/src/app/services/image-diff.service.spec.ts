@@ -34,7 +34,8 @@ describe('ImageDiffService', () => {
     });
 
     it('should allocate radius value', () => {
-        // set radius ?????????? a voir definition
+        radiusValue = 5;
+        service.setRadius = radiusValue;
         expect(service.radius).toBe(radiusValue);
     });
 
@@ -127,10 +128,10 @@ describe('ImageDiffService', () => {
 
         const spy = spyOn(service, 'areEmpty').and.callThrough();
         service.getDifferenceMatrix();
-        expect(service.differencePixelArray.length).toBe(8);
-        expect(service.differencePixelArray[0]).toBe(0);
-        expect(service.differencePixelArray[4]).toBe(0);
         expect(service.differenceMatrix.length).toBe(2);
+        expect(service.differenceMatrix[0]).toBe(0);
+        expect(service.differenceMatrix[1]).toBe(0);
+        // expect(service.differenceMatrix.length).toBe(2);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -143,8 +144,8 @@ describe('ImageDiffService', () => {
         const spy = spyOn(service, 'areEmpty').and.callThrough();
         service.readData();
         service.getDifferenceMatrix();
-        expect(service.differencePixelArray[0]).toBe(1);
-        expect(service.differencePixelArray[4]).toBe(1);
+        expect(service.differenceMatrix[0]).toBe(1);
+        expect(service.differenceMatrix[1]).toBe(1);
         expect(service.differenceMatrix.length).toBe(2);
         expect(spy).toHaveBeenCalled();
     });
@@ -155,7 +156,7 @@ describe('ImageDiffService', () => {
         service.modifiedImageData = [1, 2, 3, 4, 5, 6, 7, 8];
         service.getDifferenceMatrix();
         expect(service.differenceMatrix.length).toBe(0);
-        expect(service.differencePixelArray.length).toBe(0);
+        // expect(service.differencePixelArray.length).toBe(0);
     });
 
     // it('should generate a Uint8ClampedArray to create differences image data', () => {
@@ -179,5 +180,24 @@ describe('ImageDiffService', () => {
         const res = service.getPositionFromAbsolute(1);
         expect(res.x).toBe(1 - 640 * Math.floor(1 / 640));
         expect(res.y).toBe(Math.floor(1 / 640));
+    });
+
+    it('should return Facile as game level', () => {
+        service.listDifferences = [];
+        const set1 = new Set<number>().add(1).add(2);
+        const set2 = new Set<number>().add(1).add(2).add(3);
+        service.listDifferences.push(set1, set2);
+        const res: string = service.getDifficulty();
+        expect(res).toBe('Facile');
+    });
+
+    it('should return Difficile as game level', () => {
+        service.listDifferences = [];
+        const set1 = new Set<number>().add(1).add(2);
+        const set2 = new Set<number>().add(1).add(2).add(3);
+        const set3 = new Set<number>().add(1).add(2).add(3).add(4);
+        service.listDifferences.push(set1, set3, set1, set2, set2, set3, set1);
+        const res: string = service.getDifficulty();
+        expect(res).toBe('Difficile');
     });
 });

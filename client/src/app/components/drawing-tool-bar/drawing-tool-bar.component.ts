@@ -38,9 +38,9 @@ export class DrawingToolBarComponent {
     }
 
     drawDifferenceImage2() {
-        if (this.imageDifferenceService.getDifferenceNumber() !== 0) {
+        if (this.imageDifferenceService.listDifferences.length !== 0) {
             // this.showMessage = !this.showMessage;
-            this.showDifference = this.imageDifferenceService.getDifferenceNumber();
+            this.showDifference = this.imageDifferenceService.listDifferences.length;
             this.tic = !this.tic;
             this.onReadyToDraw.emit();
         }

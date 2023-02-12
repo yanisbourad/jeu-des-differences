@@ -45,33 +45,6 @@ export class DrawService {
         this.drawImage(image, canvas2);
     }
 
-    drawFromData(data: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        const imageData = new ImageData(data, this.width, this.height);
-        context.putImageData(imageData, 0, 0);
-    }
-
-    drawVec(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.beginPath();
-        context.moveTo(lastPoint.x, lastPoint.y);
-        context.lineTo(point.x, point.y);
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.stroke();
-    }
-
-    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.beginPath();
-        context.moveTo(lastPoint.x, lastPoint.y);
-        context.lineTo(point.x, point.y);
-        context.lineCap = constants.defaultLineCap;
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.stroke();
-    }
-
     drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
         differences.forEach((diff) => {
             this.drawDiff(diff, canvas);
@@ -87,15 +60,6 @@ export class DrawService {
             context.fillStyle = this.color;
             context.fillRect(x, y, 1, 1);
         });
-    }
-
-    async drawImageFromUrl(data: string, canvas: HTMLCanvasElement) {
-        const context = this.getContext(canvas);
-        const img = new Image();
-        img.src = data;
-        img.onload = async () => {
-            context.drawImage(img, 0, 0);
-        };
     }
 
     clearCanvas(canvas: HTMLCanvasElement) {

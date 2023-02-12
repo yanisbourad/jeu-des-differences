@@ -35,6 +35,10 @@ export class GameDatabaseService {
         return this.http.post(`${this.baseUrl}/game/create`, game, { observe: 'response', responseType: 'text' });
     }
 
+    async validateGameName(gameName: string): Promise<Observable<boolean>> {
+        return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`).pipe(catchError(this.handleError<boolean>('validateGameName')));
+    }
+
     saveGame(_gameName: string): EventEmitter<boolean> {
         const game: Game = {
             gameName: _gameName,
@@ -57,14 +61,6 @@ export class GameDatabaseService {
         }
 
         return isSaved;
-    }
-
-    deleteGame(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete/${gameName}`, { observe: 'response', responseType: 'text' });
-    }
-
-    deleteAllGames(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game/delete-all`, { observe: 'response', responseType: 'text' });
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {

@@ -50,7 +50,7 @@ export class GameService {
     }
 
     isValidGameName(gameName: string): boolean {
-        return this.gamesNames.includes(gameName);
+        return !this.gamesNames.includes(gameName);
     }
 
     getGame(_gameName: string): Game {

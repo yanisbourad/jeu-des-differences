@@ -26,7 +26,7 @@ describe('GameInfoComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should call loading method', () => {
+    it('ngOnInit should call displayIcons in the service', () => {
         component.ngOnInit();
         expect(component.ngOnInit).toHaveBeenCalled();
         expect(gameServiceSpy.displayIcons).toHaveBeenCalled();

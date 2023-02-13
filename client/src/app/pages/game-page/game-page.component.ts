@@ -20,17 +20,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
-    mousePosition: Vec2 = { x: 0, y: 0 };
-    errorPenalty: boolean = false;
+    mousePosition: Vec2;
+    errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
-
-    // TODO: use camelCase
-    playername: string;
-
+    playerName: string;
     gameName: string;
 
     // TODO: reduce the number of parameters
-    constructor(
+    constructor (
         private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
@@ -38,7 +35,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public dialog: MatDialog,
         public routeur: Router,
         public route: ActivatedRoute,
-    ) {}
+    ) {
+        this.mousePosition = { x: 0, y: 0 };
+        this.errorPenalty = false;
+    }
 
     get width(): number {
         return constants.defaultWidth;
@@ -67,7 +67,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     getRouteurParams() {
         this.route.params.subscribe((params) => {
             this.gameName = params['gameName'];
-            this.playername = params['player'];
+            this.playerName = params['player'];
         });
     }
 
@@ -75,7 +75,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.displayIcons();
         this.getRouteurParams();
         this.gameService.getGame(this.gameName);
-        this.gameService.playerName = this.playername;
+        this.gameService.playerName = this.playerName;
     }
 
     mouseHitDetect(event: MouseEvent) {

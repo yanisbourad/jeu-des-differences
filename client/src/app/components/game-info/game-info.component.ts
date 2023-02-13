@@ -10,13 +10,8 @@ export class GameInfoComponent implements OnInit {
     constructor(public gameService: GameService) {}
 
     ngOnInit(): void {
-        this.loading();   
-    }
-    
-    loading(): void{
         setTimeout(() => {
             this.gameService.displayIcons();
         }, constants.WAITING_TIME);
     }
-    
 }

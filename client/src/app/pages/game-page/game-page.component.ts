@@ -25,8 +25,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     unfoundedDifference: Set<number>[];
 
     // TODO: use camelCase
-    playername: string;
-    
+    playerName: string;
+
     gameName: string;
 
     // TODO: reduce the number of parameters
@@ -79,7 +79,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.getGame(this.gameName);
         this.gameService.displayIcons();
         this.loading();
-        this.gameService.playerName = this.playername;
+        this.gameService.playerName = this.playerName;
     }
     
     loading(): void{

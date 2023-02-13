@@ -14,13 +14,13 @@ describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
     let card: GameInfo;
-    card = { gameName: 'My Game' };
+    // card = { gameName: 'My Game' };
     let matDialog: MatDialog;
     let router : Router;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCardComponent],
-            imports: [ OverlayModule, MatDialogModule, RouterTestingModule ],
+            // imports: [ OverlayModule, MatDialogModule, RouterTestingModule ],
             providers : [MatDialog, GameInfoComponent],
         }).compileComponents();
         matDialog = TestBed.inject(MatDialog);

@@ -1,14 +1,28 @@
 import { TestBed } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
+import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from './draw.service';
 describe('DrawService', () => {
     let service: DrawService;
     let canvas: HTMLCanvasElement;
+    let image: ImageBitmap;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(DrawService);
         canvas = document.createElement('canvas');
+
+        // read the image file as a data URL
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', './assets/image_empty.bmp');
+        xhr.responseType = 'blob';
+        xhr.onload = () => {
+            const blob = xhr.response;
+            createImageBitmap(blob).then((bmp) => {
+                image = bmp;
+            });
+        };
+        xhr.send();
     });
 
     it('should create an instance', () => {
@@ -36,46 +50,20 @@ describe('DrawService', () => {
     });
 
     it('should draw an image on the canvas', () => {
-        // read the image file as a data URL
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', './assets/image_empty.bmp');
-        xhr.responseType = 'blob';
-        xhr.onload = () => {
-            const blob = xhr.response;
-            createImageBitmap(blob).then((bmp) => {
-                const spy = spyOn(service, 'getContext');
-                service.drawImage(bmp, canvas);
-                expect(bmp).toBeTruthy();
-                const canvas2 = document.createElement('canvas').getContext('2d');
-                canvas2?.drawImage(bmp, 0, 0, constants.defaultWidth, constants.defaultHeight);
-                // expect(canvas2?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight)).toEqual(
-                //     canvas.getContext('2d')?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight),
-                // );
-                expect(spy).toHaveBeenCalled();
-            });
-        };
-        xhr.send();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'drawImage');
+        service.drawImage(image, canvas);
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledOnceWith(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
     });
 
     it('should draw an image on multiple canvas', () => {
         // read the image file as a data URL
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'assets/image_empty.bmp');
-        xhr.responseType = 'blob';
-        xhr.onload = () => {
-            const blob = xhr.response;
-            createImageBitmap(blob).then((bmp) => {
-                const spy = spyOn(service, 'drawImage');
-                // const canvas2 = document.createElement('canvas');
-                // create a new canvas element
-                const canvas2 = document.createElement('canvas');
-                service.drawImageOnMultipleCanvas(bmp, canvas, canvas2);
-                canvas.toDataURL();
-                expect(canvas.toDataURL()).toEqual(canvas2.toDataURL());
-                expect(spy).toHaveBeenCalled();
-            });
-        };
-        xhr.send();
+        const spy = spyOn(service, 'drawImage');
+        service.drawImageOnMultipleCanvas(image, canvas, canvas);
+        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spy).toHaveBeenCalledWith(image, canvas);
+        expect(spy).toHaveBeenCalledWith(image, canvas);
     });
 
     it('should draw all differences', () => {
@@ -87,12 +75,35 @@ describe('DrawService', () => {
     });
 
     it('should draw a difference', () => {
-        const spy = spyOn(service, 'getContext');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const diff = new Set([1, 2, 3, 4]);
-        service.clearCanvas(canvas);
         service.drawDiff(diff, canvas);
-        expect(spy).toHaveBeenCalledOnceWith(canvas);
-        expect(true).toBeTruthy();
+        expect(spy).toHaveBeenCalledTimes(diff.size);
+    });
+
+    it('should clear the canvas', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        service.clearCanvas(canvas);
+        expect(spy).toHaveBeenCalledOnceWith(0, 0, service.width, service.height);
+    });
+
+    it('should clear the difference', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'clearRect');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        service.clearDiff(canvas);
+        expect(spy).toHaveBeenCalledOnceWith(0, 0, service.width, service.height);
+    });
+
+    it('should draw a word', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillText');
+        const position: Vec2 = { x: 0, y: 0 };
+        service.drawWord('test', canvas, position);
+        expect(spy).toHaveBeenCalledOnceWith('test', 0, 0);
     });
 });

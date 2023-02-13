@@ -47,14 +47,14 @@ export class BitmapService {
             alert('Not a bitmap file');
             return false;
         }
-        if (bitDepth !== constants.desiredBitDepth) {
-            alert(`Incorrect bit depth: expected ${constants.desiredBitDepth} but got ${bitDepth}`);
+        if (bitDepth !== constants.DESIRED_BIT_DEPTH) {
+            alert(`Incorrect bit depth: expected ${constants.DESIRED_BIT_DEPTH} but got ${bitDepth}`);
             return false;
         }
         return true;
     }
     validateSize(imageBitmap: ImageBitmap) {
-        if (imageBitmap.width !== constants.defaultWidth || imageBitmap.height !== constants.defaultHeight) {
+        if (imageBitmap.width !== constants.DEFAULT_WIDTH || imageBitmap.height !== constants.DEFAULT_HEIGHT) {
             alert('Image size is not correct');
             return false;
         }

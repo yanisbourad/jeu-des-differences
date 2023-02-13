@@ -7,9 +7,9 @@ import { Vec2 } from '@app/interfaces/vec2';
     providedIn: 'root',
 })
 export class DrawService {
-    private canvasSize: Point = { x: constants.defaultWidth, y: constants.defaultHeight };
-    private color: string = constants.defaultLineColor;
-    private lineWidth: number = constants.defaultLineWidth;
+    private canvasSize: Point = { x: constants.DEFAULT_WIDTH, y: constants.DEFAULT_HEIGHT };
+    private color: string = constants.DEFAULT_LINE_COLOR;
+    private lineWidth: number = constants.DEFAULT_LINE_WIDTH;
 
     get width(): number {
         return this.canvasSize.x;
@@ -37,7 +37,7 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context?.drawImage(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
+        context?.drawImage(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
     }
 
     drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
@@ -64,7 +64,7 @@ export class DrawService {
 
     clearCanvas(canvas: HTMLCanvasElement) {
         const context = this.getContext(canvas);
-        context.fillStyle = constants.defaultBackgroundColor;
+        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
         context.fillRect(0, 0, this.width, this.height);
     }
 

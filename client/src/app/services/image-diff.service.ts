@@ -35,7 +35,7 @@ export class ImageDiffService {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.setDiffPixels = new Set();
-        this.radius = constants.defaultRadius;
+        this.radius = constants.DEFAULT_RADIUS;
         this.differencePixelArray = [];
         this.differenceMatrix = [];
         this.pixelNumberByImage = 0;
@@ -83,7 +83,7 @@ export class ImageDiffService {
     readData(): void {
         if (!this.areEmpty()) {
             this.imageMatrixSize = this.originalImageData.length;
-            for (let i = 0; i < this.imageMatrixSize; i = i + constants.nextPixelStartIndex) {
+            for (let i = 0; i < this.imageMatrixSize; i = i + constants.NEXT_PIXEL_START_INDEX) {
                 this.originalPixelMatrix.red.push(this.originalImageData[i]);
                 this.originalPixelMatrix.green.push(this.originalImageData[i + 1]);
                 this.originalPixelMatrix.blue.push(this.originalImageData[i + 2]);
@@ -165,7 +165,7 @@ export class ImageDiffService {
     }
 
     bfs(point: Point, distance: number, radius: number): void {
-        if (point.x < 0 || point.y < 0 || point.x >= constants.defaultWidth || point.y >= constants.defaultHeight) {
+        if (point.x < 0 || point.y < 0 || point.x >= constants.DEFAULT_WIDTH || point.y >= constants.DEFAULT_HEIGHT) {
             // Point is outside of borderers
             return;
         }
@@ -215,12 +215,12 @@ export class ImageDiffService {
     }
 
     getPositionsFromXY(x: number, y: number): number {
-        return x + y * constants.defaultWidth;
+        return x + y * constants.DEFAULT_WIDTH;
     }
 
     getPositionFromAbsolute(x: number): Point {
-        const y = Math.floor(x / constants.defaultWidth);
-        const xPosition = x - y * constants.defaultWidth;
+        const y = Math.floor(x / constants.DEFAULT_WIDTH);
+        const xPosition = x - y * constants.DEFAULT_WIDTH;
         return { x: xPosition, y };
     }
 
@@ -245,7 +245,7 @@ export class ImageDiffService {
         this.listDifferences.forEach((a: Set<number>) => {
             count += a.size;
         });
-        const totalSurface: number = constants.defaultWidth * constants.defaultHeight;
+        const totalSurface: number = constants.DEFAULT_WIDTH * constants.DEFAULT_HEIGHT;
 
         if (this.listDifferences.length >= this.upperLimitDifficultyLevel && count / totalSurface < this.ratioLimitDifficultyLevel)
             return 'Difficile';

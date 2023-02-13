@@ -10,8 +10,8 @@ export class MessageAreaComponent {
     date: Date = new Date();
     playerName: string = 'Daniel';
     playerInitials: string = this.playerName[0];
-    chatBoxDemo: number = constants.chatBoxDemo;
-    chatBox: number[] = new Array(this.chatBoxDemo);
+    CHAT_BOX_DEMO: number = constants.CHAT_BOX_DEMO;
+    chatBox: number[] = new Array(this.CHAT_BOX_DEMO);
     getTimestamp(): string {
         return this.date.toLocaleTimeString();
     }

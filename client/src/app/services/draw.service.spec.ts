@@ -16,8 +16,8 @@ describe('DrawService', () => {
     });
 
     it('should set the canvas size', () => {
-        expect(service.width).toBe(constants.defaultWidth);
-        expect(service.height).toBe(constants.defaultHeight);
+        expect(service.width).toBe(constants.DEFAULT_WIDTH);
+        expect(service.height).toBe(constants.DEFAULT_HEIGHT);
     });
 
     it('should set the color', () => {
@@ -47,9 +47,9 @@ describe('DrawService', () => {
                 service.drawImage(bmp, canvas);
                 expect(bmp).toBeTruthy();
                 const canvas2 = document.createElement('canvas').getContext('2d');
-                canvas2?.drawImage(bmp, 0, 0, constants.defaultWidth, constants.defaultHeight);
-                expect(canvas2?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight)).toEqual(
-                    canvas.getContext('2d')?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight),
+                canvas2?.drawImage(bmp, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+                expect(canvas2?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT)).toEqual(
+                    canvas.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT),
                 );
                 expect(spy).toHaveBeenCalled();
             });

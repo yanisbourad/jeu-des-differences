@@ -26,6 +26,10 @@ export class CanvasNgxComponent implements AfterViewInit {
     get height(): number {
         return constants.defaultHeight;
     }
+
+    get canvasNative(): HTMLCanvasElement {
+        return this.canvas.nativeElement;
+    }
     ngAfterViewInit(): void {
         this.drawService.clearCanvas(this.canvas.nativeElement);
         this.saveCanvas();
@@ -37,9 +41,8 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     async onFileSelected(e: Event) {
-        this.bitmap.handleFileSelect(e).then((image: ImageBitmap) => {
-            this.loadImage(image);
-        });
+        const image = await this.bitmap.handleFileSelect(e);
+        this.loadImage(image);
         this.fileUpload.nativeElement.value = '';
     }
 

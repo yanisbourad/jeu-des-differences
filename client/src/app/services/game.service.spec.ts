@@ -4,12 +4,13 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GameInformation } from '@app/interfaces/game-information';
 // import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { SocketClientService } from './socket-client.service';
-import { Game } from '@common/game';
+import { Game, GameInfo } from '@common/game';
 import { GameDatabaseService } from './game-database.service';
 import { ClientTimeService } from './client-time.service';
 import { GameService } from './game.service';
 import SpyObj = jasmine.SpyObj;
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { of } from 'rxjs/internal/observable/of';
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
@@ -21,6 +22,7 @@ describe('GameService', () => {
     // let path: ImagePath;
     let game: Game;
     let gameInformation: GameInformation;
+    let gameInfo: GameInfo;
     let nDifferencesNotFound: number;
     // let nDifferencesFound: number;
     let differencesArray: string[];
@@ -34,7 +36,7 @@ describe('GameService', () => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['']);
     });
 
@@ -70,6 +72,16 @@ describe('GameService', () => {
             hintsPenalty: 0,
             isClassical: false,
         };
+
+        gameInfo = {
+            gameName: 'Test Game',
+            difficulty: 'easy',
+            originalImageData: 'string',
+            modifiedImageData: 'string',
+            listDifferences: ['1', '2', '3'],
+            rankingMulti: [],
+            rankingSolo: [],
+        };
     });
 
     it('should be created', () => {
@@ -91,5 +103,18 @@ describe('GameService', () => {
         expect(nHintsUnused).toBe(0);
         expect(differencesArray.length).toBe(3);
         expect(hintsArray.length).toBe(0);
+    });
+
+    it('getGame should retrieve the game from the server and call defineVariables', () => {
+        const mockGame = gameInfo;
+        gameDataBaseSpy.getGameByName.and.returnValue(of(gameInfo));
+        const defineVariablesSpy = spyOn(gameService, 'defineVariables');
+
+        gameService.getGame(mockGame.gameName);
+
+        expect(gameDataBaseSpy.getGameByName).toHaveBeenCalledWith(mockGame.gameName);
+        expect(gameService.game).toEqual(mockGame);
+        expect(gameDataBaseSpy.getGameByName).toHaveBeenCalled();
+        expect(defineVariablesSpy).toHaveBeenCalled();
     });
 });

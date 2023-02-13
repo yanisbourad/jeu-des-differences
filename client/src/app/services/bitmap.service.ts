@@ -7,13 +7,14 @@ import * as constants from '@app/configuration/const-canvas';
 export class BitmapService {
     context: CanvasRenderingContext2D;
 
-    async handleFileSelect(e: Event): Promise<ImageBitmap> {
+    async handleFileSelect(e: Event): Promise<ImageBitmap | undefined> {
         const newImage = this.getFile(e);
-        if (!(await this.validateBitmap(newImage)).valueOf()) return new ImageBitmap();
+        if (!(await this.validateBitmap(newImage)).valueOf()) return undefined;
         const img = await this.fileToImageBitmap(newImage);
-        if (!this.validateSize(img)) return new ImageBitmap();
+        if (!this.validateSize(img)) return undefined;
         return img;
     }
+
     getFile(e: Event): File {
         const target = e.target as HTMLInputElement;
         if (target.files === null) {
@@ -21,6 +22,7 @@ export class BitmapService {
         }
         return target.files[0];
     }
+
     async fileToImageBitmap(file: File): Promise<ImageBitmap> {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -54,10 +56,10 @@ export class BitmapService {
         return true;
     }
     validateSize(imageBitmap: ImageBitmap) {
-        if (imageBitmap.width !== constants.defaultWidth || imageBitmap.height !== constants.defaultHeight) {
-            alert('Image size is not correct');
-            return false;
+        if (imageBitmap.width === constants.defaultWidth && imageBitmap.height === constants.defaultHeight) {
+            return true;
         }
-        return true;
+        alert('Image size is not correct');
+        return false;
     }
 }

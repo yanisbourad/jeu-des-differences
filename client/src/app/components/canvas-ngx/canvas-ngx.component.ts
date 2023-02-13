@@ -42,7 +42,7 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     async onFileSelected(e: Event) {
         const image = await this.bitmap.handleFileSelect(e);
-        this.loadImage(image);
+        if (image) this.loadImage(image);
         this.fileUpload.nativeElement.value = '';
     }
 

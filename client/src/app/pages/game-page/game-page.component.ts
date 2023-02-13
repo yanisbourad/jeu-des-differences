@@ -66,7 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
     }
-    
+
     getRouteurParams() {
         this.route.params.subscribe((params) => {
             this.gameName = params['gameName'];
@@ -81,9 +81,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading();
         this.gameService.playerName = this.playerName;
     }
-    
-    loading(): void{
-        setTimeout(()=>{ 
+
+    loading(): void {
+        setTimeout(() => {
             this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
         }, 500)
     }

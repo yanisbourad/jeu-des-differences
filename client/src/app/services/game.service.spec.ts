@@ -37,7 +37,7 @@ describe('GameService', () => {
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
-        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['']);
+        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
     });
 
     beforeEach(() => {
@@ -58,7 +58,7 @@ describe('GameService', () => {
         gameService = TestBed.inject(GameService);
         game = {
             gameName: 'Test Game',
-            difficulty: 'easy',
+            difficulty: 'Facile',
             originalImageData: 'string',
             modifiedImageData: 'string',
             listDifferences: ['1', '2', '3'],
@@ -66,7 +66,7 @@ describe('GameService', () => {
         gameInformation = {
             gameTitle: 'Test Game',
             gameMode: 'solo',
-            gameDifficulty: 'easy',
+            gameDifficulty: 'Facile',
             nDifferences: 3,
             nHints: 3,
             hintsPenalty: 0,
@@ -74,7 +74,7 @@ describe('GameService', () => {
         };
         gameInfo = {
             gameName: 'Test Game',
-            difficulty: 'easy',
+            difficulty: 'Facile',
             originalImageData: 'string',
             modifiedImageData: 'string',
             listDifferences: ['1', '2', '3'],
@@ -153,4 +153,34 @@ describe('GameService', () => {
         expect(mockDialog).toHaveBeenCalled();
     });
 
+    it('reinitializeGame should reinitialize the game', () => {
+        gameService.nDifferencesNotFound = 3;
+        gameService.nHintsUnused = 3;
+        gameService.nDifferencesFound = 3;
+        gameService.differencesArray = new Array(3);
+        gameService.playerName = 'player';
+        gameService.nDifferencesFound = 3;
+        gameService.game = game;
+        gameService.gameInformation = gameInformation;
+        gameService.reinitializeGame();
+        expect(gameService.nDifferencesNotFound).toBe(0);
+        expect(gameService.nHintsUnused).toBe(0);
+        expect(gameService.nDifferencesFound).toBe(0);
+        expect(gameService.differencesArray.length).toBe(0);
+        expect(gameService.playerName).toBe('');
+        expect(gameService.nDifferencesFound).toBe(0);
+        expect(socketClientServiceSpy.leaveRoom).toHaveBeenCalled();
+        expect(gameService.game.gameName).toBe('');
+        expect(gameService.game.difficulty).toBe('');
+        expect(gameService.game.originalImageData).toBe('');
+        expect(gameService.game.modifiedImageData).toBe('');
+        expect(gameService.game.listDifferences).toEqual([]);
+        expect(gameService.gameInformation.gameTitle).toBe('');
+        expect(gameService.gameInformation.gameMode).toBe('solo');
+        expect(gameService.gameInformation.gameDifficulty).toBe('');
+        expect(gameService.gameInformation.nDifferences).toBe(0);
+        expect(gameService.gameInformation.nHints).toBe(3);
+        expect(gameService.gameInformation.hintsPenalty).toBe(0);
+        expect(gameService.gameInformation.isClassical).toBe(false);
+    });
 });

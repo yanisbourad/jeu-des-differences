@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
 import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
@@ -88,18 +88,18 @@ describe('CanvasNgxComponent', () => {
         expect(bitmapService.handleFileSelect).toHaveBeenCalledOnceWith(event);
     });
 
-    it('should loadImage when file is selected', fakeAsync(() => {
+    it('should loadImage when file is selected', async () => {
         const spy = spyOn(component, 'loadImage');
         // create a new event on change file selection
         const event = new Event('change');
-        const file = new File([], 'test.bmp', { type: 'image/bmp' });
+        const blob = await (await fetch('./assets/image_empty.bmp')).blob();
+        const file = new File([blob], 'test.bmp', { type: 'image/bmp' });
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });
         component.onFileSelected(event);
-        tick(1);
         expect(spy).toHaveBeenCalledTimes(1);
-    }));
+    });
 
     it('should save canvas', () => {
         canvasHolderService.setCanvas.calls.reset();

@@ -1,6 +1,6 @@
 import { RendererFactory2 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
@@ -142,5 +142,15 @@ describe('GameService', () => {
         expect(gameService.hintsArray.length).toBe(1);
     });
 
+    it('displayGameEnded should open a dialog', () => {
+        const msg = 'message';
+        const type = 'type';
+        const time = '00:00';
+        gameService.displayGameEnded(msg, type, time);
+        const mockDialog = matDialogSpy.open.and.returnValue({
+            afterClosed: () => of(true),
+        } as MatDialogRef<MessageDialogComponent>);
+        expect(mockDialog).toHaveBeenCalled();
+    });
 
 });

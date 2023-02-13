@@ -23,8 +23,8 @@ describe('ClientTimeService', () => {
         setTimeout(() => {
             service.count++
           }, DELAY_BEFORE_EMITTING_TIME);
-          expect(service.getCount()).toBe(1);
         jasmine.clock().tick(DELAY_BEFORE_EMITTING_TIME);
+        expect(service.getCount()).toBe(1);
         jasmine.clock().uninstall();
     });
 

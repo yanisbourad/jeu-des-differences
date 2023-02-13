@@ -12,6 +12,6 @@ export class GameInfoComponent implements OnInit {
     ngOnInit(): void {
         setTimeout(() => {
             this.gameService.displayIcons();
-        }, constants.waitingTime);
+        }, constants.WAITING_TIME);
     }
 }

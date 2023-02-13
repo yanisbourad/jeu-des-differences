@@ -59,27 +59,15 @@ describe('SocketClientService', () => {
         service.connect();
         expect(service.configureBaseSocketFeatures).toHaveBeenCalled();
     });
-    it('configureBaseSocketFeatures should set up the "connect" event listener on the socket client', () => {
+    it('configureBaseSocketFeatures should set up the "connect", "hello" and "message" event listener on the socket client', () => {
         const spy = spyOn(socketClient, 'on');
         service.configureBaseSocketFeatures();
         expect(spy).toHaveBeenCalled();
-        expect(socketClient.on).toHaveBeenCalledWith('connect', ()=>{});
-      });
-    
-      it('should set up the "hello" event listener on the socket client', () => {
-        const spy = spyOn(socketClient, 'on');
-        service.configureBaseSocketFeatures();
-        expect(spy).toHaveBeenCalled();
+        expect(socketClient.on).toHaveBeenCalledWith('connect', jasmine.any(Function));
         expect(socketClient.on).toHaveBeenCalledWith('hello', jasmine.any(Function));
-      });
-    
-      it('should set up the "message" event listener on the socket client', () => {
-        const spy = spyOn(socketClient, 'on');
-        service.configureBaseSocketFeatures();
-        expect(spy).toHaveBeenCalled();
         expect(socketClient.on).toHaveBeenCalledWith('message', jasmine.any(Function));
       });
-
+    
     it('should not connect to the socket if the socket is connected', () => {
         spyOn(socketClient, 'isSocketAlive').and.returnValue(true);
         spyOn(socketClient, 'connect');

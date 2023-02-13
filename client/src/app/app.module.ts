@@ -1,7 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
@@ -29,6 +29,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
 import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
+import { OverlayModule } from '@angular/cdk/overlay';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -69,8 +70,9 @@ import { GameNameSaveComponent } from './components/game-name-save/game-name-sav
         MatGridListModule,
         MatDialogModule,
         MatFormFieldModule,
+        OverlayModule,
     ],
-    providers: [MatDialogModule],
+    providers: [MatDialog, MatDialogModule],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

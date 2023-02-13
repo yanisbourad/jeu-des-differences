@@ -114,7 +114,7 @@ describe('ImageDiffService', () => {
         const spyA = spyOn(service, 'setImageData').and.callThrough();
         const spyB = spyOn(service, 'readData').and.callThrough();
         const spyC = spyOn(service, 'resetImageData').and.callThrough();
-        service.setPixelMatrix(originalCanvasArray, modifiedCanvasArray);
+        service.setPixelMatrix();
         expect(spyA).toHaveBeenCalled();
         expect(spyB).toHaveBeenCalled();
         expect(spyC).toHaveBeenCalled();

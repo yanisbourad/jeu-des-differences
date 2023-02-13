@@ -23,7 +23,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
+
+    // TODO: use camelCase
     playerName: string;
+
     gameName: string;
 
     // TODO: reduce the number of parameters
@@ -53,6 +56,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.socket.disconnect();
         this.clientTimeService.resetTimer();
         this.socket.leaveRoom();
+        this.gameName = '';
     }
 
     ngAfterViewInit(): void {
@@ -60,10 +64,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.socket.joinRoom(this.gameService.playerName);
         this.clientTimeService.startTimer();
         this.gameService.displayIcons();
-        this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
         this.drawService.setColor = 'yellow';
     }
-
+    
     getRouteurParams() {
         this.route.params.subscribe((params) => {
             this.gameName = params['gameName'];
@@ -72,10 +75,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.gameService.displayIcons();
         this.getRouteurParams();
         this.gameService.getGame(this.gameName);
+        this.gameService.displayIcons();
+        this.loading();
         this.gameService.playerName = this.playerName;
+    }
+    
+    loading(): void{
+        setTimeout(()=>{ 
+            this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+        }, 500)
     }
 
     mouseHitDetect(event: MouseEvent) {

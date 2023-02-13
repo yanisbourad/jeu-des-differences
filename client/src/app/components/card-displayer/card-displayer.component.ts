@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
-// import { Router } from '@angular/router';
 @Component({
     selector: 'app-card-displayer',
     templateUrl: './card-displayer.component.html',

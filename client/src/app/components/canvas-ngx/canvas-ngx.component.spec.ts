@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
 import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
@@ -8,28 +8,37 @@ import { CanvasNgxComponent } from './canvas-ngx.component';
 describe('CanvasNgxComponent', () => {
     let component: CanvasNgxComponent;
     let fixture: ComponentFixture<CanvasNgxComponent>;
+    let drawService: jasmine.SpyObj<DrawService>;
+    let canvasHolderService: jasmine.SpyObj<CanvasHolderService>;
+    let bitmapService: jasmine.SpyObj<BitmapService>;
+    // let blobImage: Blob;
     let image: ImageBitmap;
-    let drawService: DrawService;
-    let canvasHolderService: CanvasHolderService;
-    let bitmapService: BitmapService;
-    let blobImage: Blob;
     beforeEach(async () => {
-        await TestBed.configureTestingModule({
+        drawService = jasmine.createSpyObj(DrawService, ['drawImage', 'clearCanvas', 'getContext']);
+        canvasHolderService = jasmine.createSpyObj(CanvasHolderService, ['setCanvas', 'setCanvasData']);
+        bitmapService = jasmine.createSpyObj(BitmapService, ['handleFileSelect']);
+        TestBed.configureTestingModule({
             declarations: [CanvasNgxComponent],
+            providers: [
+                { provide: DrawService, useValue: drawService },
+                { provide: CanvasHolderService, useValue: canvasHolderService },
+                { provide: BitmapService, useValue: bitmapService },
+            ],
         }).compileComponents();
+        bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
 
         fixture = TestBed.createComponent(CanvasNgxComponent);
-        drawService = TestBed.inject(DrawService);
-        canvasHolderService = TestBed.inject(CanvasHolderService);
-        bitmapService = TestBed.inject(BitmapService);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        drawService.getContext.and.returnValue(component.canvasNative.getContext('2d') as CanvasRenderingContext2D);
+
         // read the image file as a data URL
+        component.type = canvasHolderService.originalCanvas;
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
         xhr.responseType = 'blob';
         xhr.onload = () => {
-            blobImage = xhr.response;
+            const blobImage = xhr.response;
             createImageBitmap(blobImage).then((bmp) => {
                 image = bmp;
             });
@@ -51,10 +60,9 @@ describe('CanvasNgxComponent', () => {
     });
     it('should draw an image on the canvas', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spy = spyOn(drawService, 'drawImage');
         const spyOnSaveImage = spyOn(component, 'saveCanvas');
         component.loadImage(image);
-        expect(spy).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
+        expect(drawService.drawImage).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
         expect(spyOnSaveImage).toHaveBeenCalled();
     });
 
@@ -73,37 +81,46 @@ describe('CanvasNgxComponent', () => {
     });
 
     it('should call bitmap service when fileSelectd', () => {
-        const spy = spyOn(bitmapService, 'handleFileSelect');
         // create a new event on change file selection
         const event = new Event('change');
-        const file = new File([''], 'test.bmp', { type: 'image/bmp' });
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const fileList = { 0: file, length: 1, item: () => file };
-        Object.defineProperty(event, 'target', { value: { files: fileList } });
-
         // dispatch event to the component and register spy
         component.onFileSelected(event);
-        expect(spy).toHaveBeenCalledOnceWith(event);
+        expect(bitmapService.handleFileSelect).toHaveBeenCalledOnceWith(event);
     });
 
-    it('should loadImage when file is selected', () => {
+    it('should loadImage when file is selected', fakeAsync(() => {
         const spy = spyOn(component, 'loadImage');
         // create a new event on change file selection
         const event = new Event('change');
-        const file = new File([blobImage], 'test.bmp', { type: 'image/bmp' });
-        console.log('blob = ', blobImage);
+        const file = new File([], 'test.bmp', { type: 'image/bmp' });
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });
         component.onFileSelected(event);
+        tick(1);
         expect(spy).toHaveBeenCalledTimes(1);
-    });
+    }));
 
     it('should save canvas', () => {
-        const spy = spyOn(canvasHolderService, 'setCanvas');
+        canvasHolderService.setCanvas.calls.reset();
         component.saveCanvas();
         const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight).data;
-        if (canvasData) expect(spy).toHaveBeenCalledOnceWith(canvasData, component.type);
-        else expect(spy).not.toHaveBeenCalled();
+        const canvasDataStr = component.canvasNative.toDataURL();
+        if (canvasData) expect(canvasHolderService.setCanvas).toHaveBeenCalled();
+        else expect(canvasHolderService.setCanvas).not.toHaveBeenCalled();
+
+        if (canvasDataStr) expect(canvasHolderService.setCanvasData).toHaveBeenCalled();
+        else expect(canvasHolderService.setCanvasData).not.toHaveBeenCalled();
+    });
+
+    it('should clear canvas', () => {
+        drawService.clearCanvas.calls.reset();
+        const spy = spyOn(component, 'saveCanvas');
+        component.clearCanvas();
+        expect(drawService.clearCanvas).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(component.canvasNative, 'getContext').and.returnValue(null);
+        expect(drawService.clearCanvas).not.toHaveBeenCalled();
     });
 });

@@ -12,7 +12,6 @@ export class SocketClientService {
 
     roomName: string;
 
-    // timer ??
     constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
     get socketId() {
@@ -60,7 +59,7 @@ export class SocketClientService {
 
     // leaveRoom
     leaveRoom() {
-        this.socketClient.send('leaveRoom');
         this.disconnect();
+        this.socketClient.send('leaveRoom');
     }
 }

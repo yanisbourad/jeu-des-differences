@@ -4,15 +4,18 @@ import { GameInfoComponent } from './game-info.component';
 import SpyObj = jasmine.SpyObj;
 
 describe('GameInfoComponent', () => {
+    let gameServiceSpy: SpyObj<GameService>;
     let component: GameInfoComponent;
     let fixture: ComponentFixture<GameInfoComponent>;
-    let gameService: SpyObj<GameService>;
+
+    beforeEach(() => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['displayIcons']);
+    });
 
     beforeEach(async () => {
-        gameService = jasmine.createSpyObj<GameService>(['displayIcons']);
         await TestBed.configureTestingModule({
             declarations: [GameInfoComponent],
-            providers: [{ provide: GameService, useValue: gameService }]
+            providers: [{ provide: GameService, useValue: gameServiceSpy }],
         }).compileComponents();
     });
 
@@ -26,16 +29,9 @@ describe('GameInfoComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call loading method', () => {
-        spyOn(component, 'loading');
+    it('ngOnInit should call displayIcons from gameService', () => {
         component.ngOnInit();
-        expect(component.loading).toHaveBeenCalled();
+        expect(component.ngOnInit()).toHaveBeenCalled();
+        expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
     });
-
-    it('should call displayIcons method of gameService', () => { 
-        spyOn(gameService, 'displayIcons'); 
-        component.loading(); 
-        
-        expect(gameService.displayIcons).toHaveBeenCalled(); 
-     }); 
 });

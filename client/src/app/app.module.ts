@@ -72,7 +72,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
         MatFormFieldModule,
         OverlayModule,
     ],
-    providers: [MatDialog, MatDialogModule],
+    providers: [MatDialog],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

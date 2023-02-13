@@ -21,7 +21,7 @@ export class ValidateCreateBtnComponent {
         if (originalData && modifiedData) {
             this.imageDifferenceService.resetImageData();
             this.imageDifferenceService.setPixelMatrix(originalData, modifiedData);
-            this.imageDifferenceService.setDifferenceDataToDraw();
+            this.imageDifferenceService.getDifferenceMatrix();
             this.imageDifferenceService.defineDifferences();
         } else {
             alert('Error: No image loaded!');

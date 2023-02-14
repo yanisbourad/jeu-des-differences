@@ -1,18 +1,22 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
+import { Directive} from '@angular/core';
+
+
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
 })
-export class GameCardComponent {
+export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
+    url : string; 
 
     constructor(public dialog: MatDialog, private router: Router) {}
     openDialog(): void {
@@ -24,8 +28,11 @@ export class GameCardComponent {
             this.name = result;
         });
     }
+    ngOnInit(): void{
+        this.url = this.router.url;
+    }
     changeButton(): string {
-        switch (this.router.url) {
+        switch (this.url) {
             case '/classique': {
                 this.typePage = 'Classique';
                 return this.typePage;
@@ -38,3 +45,29 @@ export class GameCardComponent {
         return '';
     }
 }
+@Directive({
+    selector: '[appButtonOne]'
+  })
+  export class ButtonOneDirective {
+    constructor() { }
+
+  }
+  
+  @Directive({
+    selector: '[appButtonTwo]'
+  })
+  export class ButtonTwoDirective {
+    constructor() { }
+  }
+  @Directive({
+    selector: '[appButtonThree]'
+  })
+  export class ButtonThreeDirective {
+    constructor() { }
+  }
+  @Directive({
+    selector: '[appButtonFour]'
+  })
+  export class ButtonFourDirective {
+    constructor() { }
+  }

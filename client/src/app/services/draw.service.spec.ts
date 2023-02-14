@@ -30,8 +30,8 @@ describe('DrawService', () => {
     });
 
     it('should set the canvas size', () => {
-        expect(service.width).toBe(constants.defaultWidth);
-        expect(service.height).toBe(constants.defaultHeight);
+        expect(service.width).toBe(constants.DEFAULT_WIDTH);
+        expect(service.height).toBe(constants.DEFAULT_HEIGHT);
     });
 
     it('should set the color', () => {
@@ -54,7 +54,7 @@ describe('DrawService', () => {
         const spy = spyOn<any>(canvas.getContext('2d'), 'drawImage');
         service.drawImage(image, canvas);
         expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledOnceWith(image, 0, 0, constants.defaultWidth, constants.defaultHeight);
+        expect(spy).toHaveBeenCalledOnceWith(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
     });
 
     it('should draw an image on multiple canvas', () => {

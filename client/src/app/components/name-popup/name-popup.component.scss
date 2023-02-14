@@ -110,4 +110,6 @@
     // margin: auto;
     // float:left;
 }
-
+::ng-deep .mat-input-element{
+    max-width: 200% !important;
+}

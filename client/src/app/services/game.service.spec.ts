@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
-import { ImagePath } from '@app/interfaces/hint-diff-path';
+// import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Game, GameInfo } from '@common/game';
 import { of } from 'rxjs/internal/observable/of';
 import { ClientTimeService } from './client-time.service';
@@ -263,4 +263,3 @@ describe('GameService', () => {
     // it('blinkDifference should clear the interval after the specified number of blinks', async () => {});
     // it('blinkDifference should not clear the interval if specified number of blinks is invalid', async () => {});
 });
-

@@ -21,7 +21,7 @@
             <p class = "text">3. Temps gagné avec la découverte d’une différence</p>
             <p class = "time2">{{timer3}} s</p>
             <div class = "buttonContainer">
-                <button [disabled]="this.timer3===0" class = "lessTime" (click) = "decrementTime3()"> <p>-</p> </button>
+                <button [disabled]="this.timer3===0" class = "lessTime" id = "buttonTime3" (click) = "decrementTime3()"> <p>-</p> </button>
                 <button class = "addButton" (click) = "incrementTime3()"> + </button>
             </div>
         </div>

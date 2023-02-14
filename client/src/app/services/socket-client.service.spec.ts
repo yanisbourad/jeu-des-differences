@@ -21,18 +21,7 @@ describe('SocketClientService', () => {
             ],
         });
         service = TestBed.inject(SocketClientService);
-        socketClient.socket = new SocketTestHelper() as unknown as Socket;
-        socketClient.on.and.callFake((event: string, callback: (data: unknown) => void) => {
-            if (event === 'hello') {
-                callback('Hello, world!');
-            }
-            if (event === 'message') {
-                callback('message');
-            }
-            if (event === 'connect') {
-                callback('connect');
-            }
-        });
+        service.socket = new SocketTestHelper() as unknown as Socket;
     });
 
     it('should be created', () => {

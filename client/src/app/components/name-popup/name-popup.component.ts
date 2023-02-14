@@ -19,11 +19,9 @@ export class NamePopupComponent implements OnInit {
     ngOnInit(): void {
         this.data.name = ' ';
     }
-
     onNoClick(): void {
         this.dialogRef.close();
     }
-
     redirect(): void {
         this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName }]);
     }

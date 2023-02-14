@@ -64,6 +64,7 @@ export class GameCreationPageComponent implements OnInit {
 
     loadImage(e: Event): void {
         this.bitmapService.handleFileSelect(e).then((img) => {
+            if (!img) return;
             this.originalCanvasComponent.loadImage(img);
             this.modifiedCanvasComponent.loadImage(img);
         });

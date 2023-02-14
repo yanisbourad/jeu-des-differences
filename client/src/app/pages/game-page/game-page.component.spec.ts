@@ -1,19 +1,19 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import * as constants from '@app/configuration/const-canvas';
-import { HeaderComponent } from '@app/components/header/header.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import * as constants from '@app/configuration/const-canvas';
+import * as constantsTime from '@app/configuration/const-time';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import * as constantsTime from '@app/configuration/const-time';
 import { GamePageComponent } from './game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { HttpClientModule } from '@angular/common/http';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 
 const DEFAULT_NAME = 'defaultName';
 const DEFAULT_PLAYER = 'defaultPlayer';
@@ -89,7 +89,7 @@ describe('GamePageComponent', () => {
         }).compileComponents();
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
-        (component as any).route = new ActivatedRouteMock();
+        (component as unknown).route = new ActivatedRouteMock();
         fixture.detectChanges();
     });
 
@@ -114,15 +114,15 @@ describe('GamePageComponent', () => {
     });
 
     it('should return the default height', () => {
-        const spy = spyOnProperty(component, 'height').and.returnValue(constants.defaultHeight);
-        expect(component['height']).toBe(constants.defaultHeight);
+        const spy = spyOnProperty(component, 'height').and.returnValue(constants.DEFAULT_HEIGHT);
+        expect(component['height']).toBe(constants.DEFAULT_HEIGHT);
         console.log(component['height']);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should return the default width', () => {
-        const spy = spyOnProperty(component, 'width').and.returnValue(constants.defaultWidth);
-        expect(component['width']).toBe(constants.defaultWidth);
+        const spy = spyOnProperty(component, 'width').and.returnValue(constants.DEFAULT_WIDTH);
+        expect(component['width']).toBe(constants.DEFAULT_WIDTH);
         expect(spy).toHaveBeenCalled();
     });
 

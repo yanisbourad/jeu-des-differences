@@ -258,7 +258,7 @@ describe('GameService', () => {
     });
 
     it('blinkDifference should have setStyle from renderer2 called', async () => {
-        const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+        const canvas1: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         let isVisible = true;
         let blinkCount = 0;

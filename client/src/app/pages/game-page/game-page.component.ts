@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
@@ -30,13 +30,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     gameName: string;
 
     // TODO: reduce the number of parameters
-    constructor (
+    constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
         readonly clientTimeService: ClientTimeService,
         public dialog: MatDialog,
-        public routeur: Router,
         public route: ActivatedRoute,
     ) {
         this.mousePosition = { x: 0, y: 0 };
@@ -68,10 +67,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     getRouteurParams() {
-        this.route.params.subscribe((params) => {
-            this.gameName = params['gameName'];
-            this.playerName = params['player'];
-        });
+        this.playerName = this.route.snapshot.paramMap.get('player') as string;
+        this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
     }
 
     ngOnInit(): void {
@@ -85,7 +82,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     loading(): void {
         setTimeout(() => {
             this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
-        }, 500)
+        }, 500);
     }
 
     mouseHitDetect(event: MouseEvent) {

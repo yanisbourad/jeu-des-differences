@@ -10,7 +10,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-// import { of } from 'rxjs';
+import * as constantsTime from '@app/configuration/const-time'
 import { GamePageComponent } from './game-page.component';
 import SpyObj = jasmine.SpyObj;
 import { HttpClientModule } from '@angular/common/http';
@@ -28,13 +28,9 @@ class ActivatedRouteMock {
     };
 }
 
-fdescribe('GamePageComponent', () => {
+describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
-    // const canvas1: HTMLCanvasElement;
-    // const canvas2: HTMLCanvasElement;
-    // const ctx1: CanvasRenderingContext2D;
-    // const ctx2: CanvasRenderingContext2D;
     let timeServiceSpy: SpyObj<ClientTimeService>;
     let gameServiceSpy: SpyObj<GameService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
@@ -42,12 +38,7 @@ fdescribe('GamePageComponent', () => {
     let dialogSpy: SpyObj<MatDialog>;
     let msg: string;
     let type: string;
-    //let gameName: string
-    // const  mousePosition: Vec2;
-    // const errorPenalty: boolean;
-    // const  unfoundedDifference: Set<number>[];
-    // const playerName: string;
-    // const gameName: string;
+    // let errorPenalty: boolean;
 
     beforeEach(() => {
         timeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['stopTimer', 'resetTimer', 'startTimer', 'getCount']);
@@ -81,7 +72,7 @@ fdescribe('GamePageComponent', () => {
         }
         msg = 'Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.';
         type = 'giveUp';
-       // gameName = 'game1';
+        // errorPenalty = true;
     });
 
     beforeEach(async () => {
@@ -97,13 +88,7 @@ fdescribe('GamePageComponent', () => {
             ],
             imports: [MatDialogModule, HttpClientModule],
         }).compileComponents();
-        // gameServiceSpy.getGame.and.callFake(()=>{of()})
-        // routeSpy.paramMap.callFake(()=>{of({gameName:"", player:""})})
         fixture = TestBed.createComponent(GamePageComponent);
-        // const canvas1 = fixture.nativeElement.querySelector('canvas1');
-        // const canvas2 = fixture.nativeElement.querySelector('canvas2');
-
-        // TODO: use camelCase
         component = fixture.componentInstance;
         (component as any).route = new ActivatedRouteMock();
         fixture.detectChanges();
@@ -203,5 +188,51 @@ fdescribe('GamePageComponent', () => {
         jasmine.clock().uninstall();
     });
 
-    
+    it('returns an array of sets containing the number values from the input strings', () => {
+        const differencesStr = ['1,2,3', '4,5,6', '7,8,9'];
+        const expectedResult = [new Set([1, 2, 3]), new Set([4, 5, 6]), new Set([7, 8, 9])];
+        expect(component.getSetDifference(differencesStr)).toEqual(expectedResult);
+      });
+
+    it('should call drawDiff on canvas1 and canvas2', () => {
+        const diff = new Set<number>();
+        component.drawDifference(diff);
+        expect(drawserviceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvas1.nativeElement);
+        expect(drawserviceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvas2.nativeElement);
+    });
+
+    it('should call blinkDifference with canvas1 and canvas2', () => {
+        component.blinkCanvas();
+        expect(gameServiceSpy.blinkDifference).toHaveBeenCalledWith(component.canvas1, component.canvas2);
+    });
+
+    it('should clear the canvas after a certain time', () => {
+        jasmine.clock().install();
+        component.clearCanvas();
+        jasmine.clock().tick(constantsTime.BLINKING_TIME);
+        expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas1.nativeElement);
+        expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas2.nativeElement);
+        jasmine.clock().uninstall();
+    });
+
+    it('should play failure audio and draw word on both canvases when word is "Erreur"', () => {
+        jasmine.clock().install();
+        component.displayWord('Erreur');
+        expect(gameServiceSpy.playFailureAudio).toHaveBeenCalled();
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas1.nativeElement, component.mousePosition);
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas2.nativeElement, component.mousePosition);
+        jasmine.clock().tick(constantsTime.BLINKING_TIME);
+        expect(component.errorPenalty).toBeFalsy();
+        jasmine.clock().uninstall();
+    });
+
+    it('should play success audio, draw word on both canvases, call clickDifferencesFound and blinkCanvas when word is not "Erreur"', () => {
+        component.displayWord('Test');
+        expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas1.nativeElement, component.mousePosition);
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas2.nativeElement, component.mousePosition);
+        expect(gameServiceSpy.clickDifferencesFound).toHaveBeenCalled(); 
+    }); 
+
+    // test mouseEvent :   
 });

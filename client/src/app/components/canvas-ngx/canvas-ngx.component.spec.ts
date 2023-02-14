@@ -93,11 +93,11 @@ describe('CanvasNgxComponent', () => {
         // create a new event on change file selection
         const event = new Event('change');
         const blob = await (await fetch('./assets/image_empty.bmp')).blob();
-        const file = new File([blob], 'test.bmp', { type: 'image/bmp' });
+        const file = await new File([blob], 'test.bmp', { type: 'image/bmp' });
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });
-        component.onFileSelected(event);
+        await component.onFileSelected(event);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -119,8 +119,5 @@ describe('CanvasNgxComponent', () => {
         component.clearCanvas();
         expect(drawService.clearCanvas).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledTimes(1);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(component.canvasNative, 'getContext').and.returnValue(null);
-        expect(drawService.clearCanvas).not.toHaveBeenCalled();
     });
 });

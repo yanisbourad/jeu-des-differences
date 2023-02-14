@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameInfo } from '@common/game';
 import { GameInfoComponent } from '../game-info/game-info.component';
-import { NamePopupComponent } from '../name-popup/name-popup.component';
 import { GameCardComponent } from './game-card.component';
 
 
@@ -29,6 +28,7 @@ describe('GameCardComponent', () => {
         component = new GameCardComponent(matDialog, router );
         component.card = card;
     });
+});
 
 //     it('should create', () => {
 //         expect(component).toBeTruthy();

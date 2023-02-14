@@ -60,7 +60,6 @@ export class BitmapService {
             alert('Image size is not correct');
             return false;
         }
-        alert('Image size is not correct');
-        return false;
+        return true;
     }
 }

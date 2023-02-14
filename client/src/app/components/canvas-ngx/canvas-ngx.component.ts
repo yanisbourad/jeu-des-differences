@@ -48,8 +48,7 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     saveCanvas(): void {
         const canvas = this.canvas.nativeElement;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        if (!ctx) return;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
         const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         const canvasData = imageData.data;
         const canvasDataStr = ctx.canvas.toDataURL('image/bmp');

@@ -1,7 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 import { Game, GameInfo, GameRecord } from '@common/game';
@@ -19,11 +18,11 @@ export class GameDatabaseService {
     }
 
     getAllGames(): Observable<GameInfo[]> {
-        return this.http.get<GameInfo[]>(`${this.baseUrl}/game`).pipe(catchError(this.handleError<GameInfo[]>('getAllGames')));
+        return this.http.get<GameInfo[]>(`${this.baseUrl}/game`);
     }
 
     getGameByName(gameName: string): Observable<GameInfo> {
-        return this.http.get<GameInfo>(`${this.baseUrl}/game/${gameName}`).pipe(catchError(this.handleError<GameInfo>('getGameById')));
+        return this.http.get<GameInfo>(`${this.baseUrl}/game/${gameName}`);
     }
 
     createGameRecord(gameRecord: GameRecord): Observable<HttpResponse<string>> {
@@ -35,7 +34,7 @@ export class GameDatabaseService {
     }
 
     async validateGameName(gameName: string): Promise<Observable<boolean>> {
-        return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`).pipe(catchError(this.handleError<boolean>('validateGameName')));
+        return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`);
     }
 
     saveGame(_gameName: string): EventEmitter<boolean> {
@@ -47,22 +46,14 @@ export class GameDatabaseService {
             difficulty: this.imageDiff.getDifficulty(),
         };
         const isSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
-        try {
-            this.createGame(game).subscribe((response) => {
-                if (response.status === this.twoHundredOkResponse) {
-                    isSaved.emit(true);
-                } else {
-                    isSaved.emit(false);
-                }
-            });
-        } catch (err) {
-            isSaved.emit(false);
-        }
-
+        this.createGame(game).subscribe((response) => {
+            if (response.status === this.twoHundredOkResponse) {
+                isSaved.emit(true);
+            } else {
+                isSaved.emit(false);
+            }
+        });
         return isSaved;
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
-    }
 }

@@ -18,6 +18,7 @@ describe('GameService', () => {
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
+    let audioMock: SpyObj<HTMLAudioElement>;
     let gameService: GameService;
     let path: ImagePath;
     let game: Game;
@@ -35,9 +36,10 @@ describe('GameService', () => {
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['']);
+        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
+        audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
     });
 
     beforeEach(() => {
@@ -82,10 +84,10 @@ describe('GameService', () => {
             rankingSolo: [],
         };
         path = {
-            differenceNotFound: 'differenceNotFound.png',
-            differenceFound: 'differenceFound.png',
-            hintUnused: 'hintUnused.png',
-            hintUsed: 'hintUsed.png',
+            differenceNotFound: '../../../assets/img/difference-not-found.png',
+            differenceFound: '../../../assets/img/difference-found.png',
+            hintUnused: '../../../assets/img/hint-unused.png',
+            hintUsed: '../../../assets/img/hint-used.png',
         };
     });
 
@@ -104,6 +106,7 @@ describe('GameService', () => {
         expect(gameService.gameInformation.gameDifficulty).toBe(game.difficulty);
         expect(gameService.gameInformation.nDifferences).toBe(game.listDifferences.length);
         expect(gameService.gameInformation.nHints).toBe(3);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(gameService.gameInformation.hintsPenalty).toBe(5);
         expect(gameService.gameInformation.isClassical).toBe(false);
         expect(gameService.nDifferencesNotFound).toBe(gameInformation.nDifferences);
@@ -183,4 +186,71 @@ describe('GameService', () => {
         expect(gameService.gameInformation.hintsPenalty).toBe(0);
         expect(gameService.gameInformation.isClassical).toBe(false);
     });
+
+    it('should playSuccessAudio', () => {
+        spyOn(window, 'Audio').and.returnValue(audioMock);
+        gameService.playSuccessAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
+    });
+
+    it('should playFailureAudio', () => {
+        spyOn(window, 'Audio').and.returnValue(audioMock);
+        gameService.playFailureAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
+    });
+
+    it('getGameTime should mock and call getCount from clientTimeService and return time for seconds under 10 digit', () => {
+        const mockTime = '0:01';
+        clientTimeServiceSpy.getCount.and.returnValue(1);
+        const time: string = gameService.getGameTime();
+        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
+        expect(time).toBe(mockTime);
+    });
+
+    it('getGameTime should mock and call getCount from clientTimeService and return time for seconds above 10 digit', () => {
+        const mockTime = '0:45';
+        clientTimeServiceSpy.getCount.and.returnValue(45);
+        const time: string = gameService.getGameTime();
+        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
+        expect(time).toBe(mockTime);
+    });
+
+    it('clickDifferencesFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
+        gameService.nDifferencesFound = 0;
+        gameService.nDifferencesNotFound = 3;
+        gameService.differencesArray = [path.differenceNotFound, path.differenceNotFound, path.differenceNotFound];
+        gameService.clickDifferencesFound();
+        expect(gameService.nDifferencesFound).toBe(1);
+        expect(gameService.differencesArray).toEqual([path.differenceFound, path.differenceNotFound, path.differenceNotFound]);
+    });
+
+    it('clickDifferencesFound should call stopTimer, saveGameRecord, displayGameEnded and reinitializeGame when game ended', () => {
+        gameService.nDifferencesFound = 3;
+        gameService.nDifferencesNotFound = 3;
+        gameService.isGameFinished = false;
+        const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
+        const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
+        const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
+        gameService.clickDifferencesFound();
+        expect(clientTimeServiceSpy.stopTimer).toHaveBeenCalled();
+        expect(gameService.isGameFinished).toBe(true);
+        expect(saveGameRecordSpy).toHaveBeenCalled();
+        expect(displayGameEndedSpy).toHaveBeenCalled();
+        expect(reinitializeGameSpy).toHaveBeenCalled();
+    });
+    //     gameService.nDifferencesFound = 2;
+    //     gameService.nDifferencesNotFound = 1;
+    //     gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceNotFound];
+    //     const stopTimerSpy = spyOn(gameService, 'stopTimer');
+    //     const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
+    //     const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
+    //     const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
+    //     gameService.clickDifferencesFound();
+    //     expect(stopTimerSpy).toHaveBeenCalled();
+    //     expect(saveGameRecordSpy).toHaveBeenCalled();
+    //     expect(displayGameEndedSpy).toHaveBeenCalled();
+    //     expect(reinitializeGameSpy).toHaveBeenCalled();
+    // }
 });

@@ -75,8 +75,8 @@ describe('SocketClientService', () => {
 
     it('returns undefined if the socket is not defined', () => {
         expect(service.isSocketAlive()).toBeUndefined();
-      });
-    
+    });
+
     it('returns false if the socket is defined but not connected', () => {
         service.socket.connected = false;
         expect(service.isSocketAlive()).toBe(false);

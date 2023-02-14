@@ -4,8 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
-// eslint-disable-next-line no-restricted-imports
-import { Game, GameInfo, GameRecord } from '../../../../common/game';
+import { Game, GameInfo, GameRecord } from '@common/game';
 import { CanvasHolderService } from './canvas-holder.service';
 import { ImageDiffService } from './image-diff.service';
 @Injectable({

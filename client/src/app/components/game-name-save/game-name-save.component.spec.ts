@@ -9,6 +9,7 @@ import SpyObj = jasmine.SpyObj;
 describe('GameNameSaveComponent', () => {
     let component: GameNameSaveComponent;
     let fixture: ComponentFixture<GameNameSaveComponent>;
+
     let imageDiffServiceSpy: SpyObj<ImageDiffService>;
     let gameDatabaseServiceSpy: SpyObj<GameDatabaseService>;
     let routingSpy: SpyObj<Router>;

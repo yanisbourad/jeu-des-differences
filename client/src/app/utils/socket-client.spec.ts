@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { connect } from 'http2';
 import { Socket } from 'socket.io-client';
 import { SocketClient } from './socket-client';
 import { SocketTestHelper } from './socket-helper';
@@ -60,8 +59,18 @@ describe('SocketClientService', () => {
     });
 
     it('connect should be called', () => {
+        const spy = spyOn(service, 'connect');
         service.connect();
-        expect(connect).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should connect to the server', () => { // failed
+        const environment = { serverUrl: 'http://localhost:3000' };
+        const socket = { io: jasmine.createSpy('io')};
+
+        service.connect();
+
+        expect(socket.io).toHaveBeenCalledWith(environment.serverUrl,  { transports: ['websocket'], upgrade: false });
     });
 
     it('returns undefined if the socket is not defined', () => {

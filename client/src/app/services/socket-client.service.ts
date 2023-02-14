@@ -10,8 +10,6 @@ export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
 
-    roomName: string;
-
     constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
     get socketId() {

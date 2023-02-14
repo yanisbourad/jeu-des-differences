@@ -104,7 +104,7 @@ describe('CanvasNgxComponent', () => {
     it('should save canvas', () => {
         canvasHolderService.setCanvas.calls.reset();
         component.saveCanvas();
-        const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight).data;
+        const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT).data;
         const canvasDataStr = component.canvasNative.toDataURL();
         if (canvasData) expect(canvasHolderService.setCanvas).toHaveBeenCalled();
         else expect(canvasHolderService.setCanvas).not.toHaveBeenCalled();

@@ -148,7 +148,6 @@ export class GameService {
             this.isGameFinished = true;
             this.saveGameRecord();
             this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-            // Hard reset variables
             this.reinitializeGame();
         }
     }

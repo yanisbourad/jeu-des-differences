@@ -1,3 +1,4 @@
+import { HttpResponse } from '@angular/common/http';
 import { RendererFactory2 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -24,20 +25,12 @@ describe('GameService', () => {
     let game: Game;
     let gameInformation: GameInformation;
     let gameInfo: GameInfo;
-    // let nDifferencesNotFound: number;
-    // let nDifferencesFound: number;
-    // let differencesArray: string[];
-    // let isGameFinished: boolean;
-    // let nHintsUnused: number;
-    // let nHintsUsed: number;
-    // let hintsArray: string[];
-    // let playerName: string;
 
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
     });
@@ -240,17 +233,34 @@ describe('GameService', () => {
         expect(displayGameEndedSpy).toHaveBeenCalled();
         expect(reinitializeGameSpy).toHaveBeenCalled();
     });
-    //     gameService.nDifferencesFound = 2;
-    //     gameService.nDifferencesNotFound = 1;
-    //     gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceNotFound];
-    //     const stopTimerSpy = spyOn(gameService, 'stopTimer');
-    //     const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
-    //     const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
-    //     const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
-    //     gameService.clickDifferencesFound();
-    //     expect(stopTimerSpy).toHaveBeenCalled();
-    //     expect(saveGameRecordSpy).toHaveBeenCalled();
-    //     expect(displayGameEndedSpy).toHaveBeenCalled();
-    //     expect(reinitializeGameSpy).toHaveBeenCalled();
-    // }
+
+    it('saveGameRecord should call createGameRecord from gameDataBaseService', () => {
+        const gameTitle = 'gameName';
+        const gameMode = 'solo';
+        const playerName = 'playerName';
+        const dateStart = new Date().getTime().toString();
+        const gameTime = '01:00';
+        const gameRecordMock = {
+            gameName: gameTitle,
+            typeGame: gameMode,
+            playerName,
+            dateStart,
+            time: gameTime,
+        };
+        gameService.gameInformation.gameTitle = gameTitle;
+        gameService.gameInformation.gameMode = gameMode;
+        gameService.playerName = playerName;
+        spyOn(gameService, 'getGameTime').and.returnValue(gameTime);
+        const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
+        gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
+        gameService.saveGameRecord();
+        expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
+    });
+    // it('blinkDifference should set the canvas1 visible and canvas2 visible', async () => {});
+    // it('blinkDifference should set the canvas1 visible and canvas2 hidden', async () => {});
+    // it('blinkDifference should set the canvas1 hidden and canvas2 visible', async () => {});
+    // it('blinkDifference should set the canvas1 hidden and canvas2 hidden', async () => {});
+    // it('blinkDifference should clear the interval after the specified number of blinks', async () => {});
+    // it('blinkDifference should not clear the interval if specified number of blinks is invalid', async () => {});
 });
+

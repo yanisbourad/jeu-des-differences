@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GameInformation } from '@app/interfaces/game-information';
 // import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { SocketClientService } from './socket-client.service';
-import { Game, GameInfo } from '@common/game';
-import { GameDatabaseService } from './game-database.service';
-import { ClientTimeService } from './client-time.service';
-import { GameService } from './game.service';
-import SpyObj = jasmine.SpyObj;
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { Game, GameInfo } from '@common/game';
 import { of } from 'rxjs/internal/observable/of';
+import { ClientTimeService } from './client-time.service';
+import { GameDatabaseService } from './game-database.service';
+import { GameService } from './game.service';
+import { SocketClientService } from './socket-client.service';
+import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;

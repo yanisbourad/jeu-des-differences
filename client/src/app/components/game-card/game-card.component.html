@@ -1,6 +1,6 @@
 <div id="rectangle1">
     <div id="rectangle2">
-        <p>{{ card.gameName }}</p>
+        <p *ngIf = "card.gameName"> {{ card.gameName }}</p>
     </div>
     <div class="gameImage">
         <img src="{{ card.originalImageData }}" />

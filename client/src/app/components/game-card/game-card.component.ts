@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
@@ -8,11 +8,12 @@ import { GameInfo } from '@common/game';
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
 })
-export class GameCardComponent {
+export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
+    url : string; 
 
     constructor(public dialog: MatDialog, private router: Router) {}
     openDialog(): void {
@@ -24,8 +25,11 @@ export class GameCardComponent {
             this.name = result;
         });
     }
+    ngOnInit(): void{
+        this.url = this.router.url;
+    }
     changeButton(): string {
-        switch (this.router.url) {
+        switch (this.url) {
             case '/classique': {
                 this.typePage = 'Classique';
                 return this.typePage;

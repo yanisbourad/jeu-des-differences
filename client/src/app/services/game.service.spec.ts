@@ -15,6 +15,7 @@ import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
+    // let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
@@ -28,6 +29,7 @@ describe('GameService', () => {
 
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
+        // renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
@@ -245,7 +247,7 @@ describe('GameService', () => {
             gameName: gameTitle,
             typeGame: gameMode,
             playerName,
-            dateStart,
+            dateStart: Number(dateStart).toString(),
             time: gameTime,
         };
         gameService.gameInformation.gameTitle = gameTitle;
@@ -258,10 +260,12 @@ describe('GameService', () => {
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
     });
 
-    // it('blinkDifference should set the canvas1 visible and canvas2 visible', async () => {});
-    // it('blinkDifference should set the canvas1 visible and canvas2 hidden', async () => {});
-    // it('blinkDifference should set the canvas1 hidden and canvas2 visible', async () => {});
-    // it('blinkDifference should set the canvas1 hidden and canvas2 hidden', async () => {});
-    // it('blinkDifference should clear the interval after the specified number of blinks', async () => {});
-    // it('blinkDifference should not clear the interval if specified number of blinks is invalid', async () => {});
+    // it('blinkDifference should setStyle from renderer2 and clearInterval with intervalId', async () => {
+    //     const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+    //     const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+
+    //     gameService.blinkDifference(canvas1, canvas2);
+    //     expect(renderer2Spy.setStyle).toHaveBeenCalled();
+    //     expect(clearInterval).toHaveBeenCalled();
+    // });
 });

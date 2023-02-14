@@ -28,7 +28,7 @@ class ActivatedRouteMock {
     };
 }
 
-fdescribe('GamePageComponent', () => {
+describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     // const canvas1: HTMLCanvasElement;

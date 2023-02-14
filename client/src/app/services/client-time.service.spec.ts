@@ -3,7 +3,7 @@ import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
 
 import { ClientTimeService } from './client-time.service';
 
-fdescribe('ClientTimeService', () => {
+describe('ClientTimeService', () => {
     let service: ClientTimeService;
     
     beforeEach(() => {

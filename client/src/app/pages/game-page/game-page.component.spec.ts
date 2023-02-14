@@ -5,12 +5,11 @@ import * as constants from '@app/configuration/const-canvas';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
-// import { Vec2 } from '@app/interfaces/vec2';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import * as constantsTime from '@app/configuration/const-time'
+import * as constantsTime from '@app/configuration/const-time';
 import { GamePageComponent } from './game-page.component';
 import SpyObj = jasmine.SpyObj;
 import { HttpClientModule } from '@angular/common/http';
@@ -28,7 +27,7 @@ class ActivatedRouteMock {
     };
 }
 
-describe('GamePageComponent', () => {
+fdescribe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let timeServiceSpy: SpyObj<ClientTimeService>;
@@ -38,9 +37,10 @@ describe('GamePageComponent', () => {
     let dialogSpy: SpyObj<MatDialog>;
     let msg: string;
     let type: string;
-    // let errorPenalty: boolean;
+    let mouseEvent: MouseEvent;
 
     beforeEach(() => {
+        mouseEvent = new MouseEvent('click', { button: 0 });
         timeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['stopTimer', 'resetTimer', 'startTimer', 'getCount']);
         gameServiceSpy = jasmine.createSpyObj('GameService', [
             'displayIcons',
@@ -60,7 +60,7 @@ describe('GamePageComponent', () => {
             originalImageData: 'string',
             modifiedImageData: 'string',
             listDifferences: [],
-        }
+        };
         gameServiceSpy.gameInformation = {
             gameTitle: 'game1',
             gameMode: 'solo',
@@ -69,10 +69,9 @@ describe('GamePageComponent', () => {
             nHints: 1,
             hintsPenalty: 5,
             isClassical: true,
-        }
+        };
         msg = 'Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.';
         type = 'giveUp';
-        // errorPenalty = true;
     });
 
     beforeEach(async () => {
@@ -104,26 +103,26 @@ describe('GamePageComponent', () => {
             data: [msg, type],
             minWidth: '250px',
             minHeight: '150px',
-            panelClass: 'custom-dialog-container'
+            panelClass: 'custom-dialog-container',
         });
-    }); 
+    });
 
     it('should call displayGiveUp when giveUp is called', () => {
         const spy = spyOn(component, 'displayGiveUp').and.callThrough();
         component.giveUp();
-        expect(spy).toHaveBeenCalledWith(msg, type); 
-    }); 
+        expect(spy).toHaveBeenCalledWith(msg, type);
+    });
 
     it('should return the default height', () => {
         const spy = spyOnProperty(component, 'height').and.returnValue(constants.defaultHeight);
-        expect(component[('height')]).toBe(constants.defaultHeight);
-        console.log(component[('height')]);
+        expect(component['height']).toBe(constants.defaultHeight);
+        console.log(component['height']);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should return the default width', () => {
         const spy = spyOnProperty(component, 'width').and.returnValue(constants.defaultWidth);
-        expect(component[('width')]).toBe(constants.defaultWidth);
+        expect(component['width']).toBe(constants.defaultWidth);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -131,11 +130,11 @@ describe('GamePageComponent', () => {
         const spy = spyOn(component, 'ngOnDestroy').and.callThrough();
         component.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
-        expect(timeServiceSpy.stopTimer).toHaveBeenCalled(); 
-        expect(socketClientServiceSpy.disconnect).toHaveBeenCalled(); 
-        expect(timeServiceSpy.resetTimer).toHaveBeenCalled(); 
-        expect(socketClientServiceSpy.leaveRoom).toHaveBeenCalled(); 
-        expect(component.gameName).toEqual(''); 
+        expect(timeServiceSpy.stopTimer).toHaveBeenCalled();
+        expect(socketClientServiceSpy.disconnect).toHaveBeenCalled();
+        expect(timeServiceSpy.resetTimer).toHaveBeenCalled();
+        expect(socketClientServiceSpy.leaveRoom).toHaveBeenCalled();
+        expect(component.gameName).toEqual('');
     });
 
     it('ngOninit() should call getGame() from gameService', () => {
@@ -188,11 +187,11 @@ describe('GamePageComponent', () => {
         jasmine.clock().uninstall();
     });
 
-    it('returns an array of sets containing the number values from the input strings', () => {
+    it('should returns an array of sets containing the number values from the input strings', () => {
         const differencesStr = ['1,2,3', '4,5,6', '7,8,9'];
         const expectedResult = [new Set([1, 2, 3]), new Set([4, 5, 6]), new Set([7, 8, 9])];
         expect(component.getSetDifference(differencesStr)).toEqual(expectedResult);
-      });
+    });
 
     it('should call drawDiff on canvas1 and canvas2', () => {
         const diff = new Set<number>();
@@ -231,8 +230,38 @@ describe('GamePageComponent', () => {
         expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
         expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas1.nativeElement, component.mousePosition);
         expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas2.nativeElement, component.mousePosition);
-        expect(gameServiceSpy.clickDifferencesFound).toHaveBeenCalled(); 
-    }); 
+        expect(gameServiceSpy.clickDifferencesFound).toHaveBeenCalled();
+    });
 
-    // test mouseEvent :   
+    it('should set errorPenalty to true and display word "Erreur" when no diff is found', () => {
+        const spy = spyOn(component, 'displayWord').and.callThrough();
+        component.unfoundedDifference = [];
+        component.mouseHitDetect(mouseEvent);
+        expect(component.errorPenalty).toBe(true);
+        expect(spy).toHaveBeenCalledWith('Erreur');
+    });
+
+    it('should sets the mouse position to the event offsetX and offsetY when the left mouse button is clicked and there is no error penalty', () => {
+        component.unfoundedDifference = [];
+        component.mouseHitDetect(mouseEvent);
+        expect(component.mousePosition).toEqual({ x: mouseEvent.offsetX, y: mouseEvent.offsetY });
+    });
+
+    it('should sets errorPenalty to true and displays the word "Erreur" when the difference is not found', () => {
+        component.unfoundedDifference = [new Set([1, 2, 3])];
+        const spy = spyOn(component, 'displayWord').and.callThrough();
+        component.mouseHitDetect(mouseEvent);
+        expect(component.errorPenalty).toBe(true);
+        expect(spy).toHaveBeenCalledWith('Erreur');
+    });
+
+    it('should draws the difference, removes the difference from unfundedDifference, and displays the word "Trouvé" when the difference is found', () => {
+        const spyDisplayWord = spyOn(component, 'displayWord').and.callThrough();
+        const spyDrawDiff = spyOn(component, 'drawDifference').and.callThrough();
+        component.unfoundedDifference = [new Set([0])];
+        component.mouseHitDetect(mouseEvent);
+        expect(component.unfoundedDifference).toEqual([]);
+        expect(spyDrawDiff).toHaveBeenCalledWith(new Set([0]));
+        expect(spyDisplayWord).toHaveBeenCalledWith('Trouvé');
+    });
 });

@@ -3,7 +3,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 import { TimerComponent } from './timer.component';
 import SpyObj = jasmine.SpyObj;
 
-fdescribe('TimerComponent', () => {
+describe('TimerComponent', () => {
     let component: TimerComponent;
     let timer: SpyObj<ClientTimeService>
     let fixture: ComponentFixture<TimerComponent>;

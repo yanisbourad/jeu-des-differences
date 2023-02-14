@@ -204,7 +204,8 @@ describe('GameService', () => {
 
     it('getGameTime should mock and call getCount from clientTimeService and return time for seconds above 10 digit', () => {
         const mockTime = '0:45';
-        clientTimeServiceSpy.getCount.and.returnValue(45);
+        const countTime = 45;
+        clientTimeServiceSpy.getCount.and.returnValue(countTime);
         const time: string = gameService.getGameTime();
         expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
         expect(time).toBe(mockTime);
@@ -256,6 +257,7 @@ describe('GameService', () => {
         gameService.saveGameRecord();
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
     });
+
     // it('blinkDifference should set the canvas1 visible and canvas2 visible', async () => {});
     // it('blinkDifference should set the canvas1 visible and canvas2 hidden', async () => {});
     // it('blinkDifference should set the canvas1 hidden and canvas2 visible', async () => {});

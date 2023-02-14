@@ -106,19 +106,6 @@ export class GameService {
         }
     }
 
-    async deleteAllGames(): Promise<void> {
-        try {
-            this.gamesNames.forEach(async (_gameName) => {
-                this.deleteDirectory(_gameName);
-                const name = _gameName + this.key;
-                await this.gameRecordModel.deleteMany({ gameName: name });
-            });
-            this.gamesNames = [];
-        } catch (error) {
-            return Promise.reject(`Failed to delete all Games: ${error}`);
-        }
-    }
-
     private createFile(dirName: string, fileName: string, data: string): void {
         if (!fs.existsSync(`${this.rootPath}/${dirName}`)) {
             fs.mkdirSync(`${this.rootPath}/${dirName}`);

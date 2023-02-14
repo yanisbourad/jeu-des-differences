@@ -36,7 +36,7 @@ describe('GameService', () => {
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount']);
+        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
@@ -84,10 +84,10 @@ describe('GameService', () => {
             rankingSolo: [],
         };
         path = {
-            differenceNotFound: 'differenceNotFound.png',
-            differenceFound: 'differenceFound.png',
-            hintUnused: 'hintUnused.png',
-            hintUsed: 'hintUsed.png',
+            differenceNotFound: '../../../assets/img/difference-not-found.png',
+            differenceFound: '../../../assets/img/difference-found.png',
+            hintUnused: '../../../assets/img/hint-unused.png',
+            hintUsed: '../../../assets/img/hint-used.png',
         };
     });
 
@@ -216,4 +216,41 @@ describe('GameService', () => {
         expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
         expect(time).toBe(mockTime);
     });
+
+    it('clickDifferencesFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
+        gameService.nDifferencesFound = 0;
+        gameService.nDifferencesNotFound = 3;
+        gameService.differencesArray = [path.differenceNotFound, path.differenceNotFound, path.differenceNotFound];
+        gameService.clickDifferencesFound();
+        expect(gameService.nDifferencesFound).toBe(1);
+        expect(gameService.differencesArray).toEqual([path.differenceFound, path.differenceNotFound, path.differenceNotFound]);
+    });
+
+    it('clickDifferencesFound should call stopTimer, saveGameRecord, displayGameEnded and reinitializeGame when game ended', () => {
+        gameService.nDifferencesFound = 3;
+        gameService.nDifferencesNotFound = 3;
+        gameService.isGameFinished = false;
+        const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
+        const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
+        const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
+        gameService.clickDifferencesFound();
+        expect(clientTimeServiceSpy.stopTimer).toHaveBeenCalled();
+        expect(gameService.isGameFinished).toBe(true);
+        expect(saveGameRecordSpy).toHaveBeenCalled();
+        expect(displayGameEndedSpy).toHaveBeenCalled();
+        expect(reinitializeGameSpy).toHaveBeenCalled();
+    });
+    //     gameService.nDifferencesFound = 2;
+    //     gameService.nDifferencesNotFound = 1;
+    //     gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceNotFound];
+    //     const stopTimerSpy = spyOn(gameService, 'stopTimer');
+    //     const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
+    //     const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
+    //     const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
+    //     gameService.clickDifferencesFound();
+    //     expect(stopTimerSpy).toHaveBeenCalled();
+    //     expect(saveGameRecordSpy).toHaveBeenCalled();
+    //     expect(displayGameEndedSpy).toHaveBeenCalled();
+    //     expect(reinitializeGameSpy).toHaveBeenCalled();
+    // }
 });

@@ -4,7 +4,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { Game, GameInfo } from '@common/game';
+import { Game, GameInfo, GameRecord } from '@common/game';
 import { of } from 'rxjs/internal/observable/of';
 import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
@@ -18,6 +18,7 @@ describe('GameService', () => {
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
+    let audioMock: SpyObj<HTMLAudioElement>;
     let gameService: GameService;
     let path: ImagePath;
     let game: Game;
@@ -35,9 +36,10 @@ describe('GameService', () => {
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
+        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName, createGameRecord']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
+        audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
     });
 
     beforeEach(() => {
@@ -104,6 +106,7 @@ describe('GameService', () => {
         expect(gameService.gameInformation.gameDifficulty).toBe(game.difficulty);
         expect(gameService.gameInformation.nDifferences).toBe(game.listDifferences.length);
         expect(gameService.gameInformation.nHints).toBe(3);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(gameService.gameInformation.hintsPenalty).toBe(5);
         expect(gameService.gameInformation.isClassical).toBe(false);
         expect(gameService.nDifferencesNotFound).toBe(gameInformation.nDifferences);
@@ -182,5 +185,19 @@ describe('GameService', () => {
         expect(gameService.gameInformation.nHints).toBe(3);
         expect(gameService.gameInformation.hintsPenalty).toBe(0);
         expect(gameService.gameInformation.isClassical).toBe(false);
+    });
+
+    it('should playSuccessAudio', () => {
+        spyOn(window, 'Audio').and.returnValue(audioMock);
+        gameService.playSuccessAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
+    });
+
+    it('should playFailureAudio', () => {
+        spyOn(window, 'Audio').and.returnValue(audioMock);
+        gameService.playFailureAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
     });
 });

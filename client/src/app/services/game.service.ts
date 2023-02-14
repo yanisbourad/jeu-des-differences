@@ -25,6 +25,7 @@ export class GameService {
     nHintsUsed: number;
     hintsArray: string[];
     playerName: string;
+    isVisible: boolean;
     private renderer: Renderer2;
 
     constructor(
@@ -52,6 +53,7 @@ export class GameService {
         this.nDifferencesFound = 0;
         this.isGameFinished = false;
         this.renderer = rendererFactory.createRenderer(null, null);
+        this.isVisible = true;
     }
 
     defineVariables(): void {
@@ -86,13 +88,13 @@ export class GameService {
         }
     }
 
+
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
-        let visible = true;
         let blinkCount = 0;
         const intervalId = setInterval(() => {
-            visible = !visible;
-            this.renderer.setStyle(canvas1.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-            this.renderer.setStyle(canvas2.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
+            this.isVisible = !this.isVisible;
+            this.renderer.setStyle(canvas1.nativeElement, 'visibility', this.isVisible ? 'visible' : 'hidden');
+            this.renderer.setStyle(canvas2.nativeElement, 'visibility', this.isVisible ? 'visible' : 'hidden');
 
             blinkCount++;
             if (blinkCount === constantsTime.BLINKING_COUNT) {

@@ -15,6 +15,7 @@ export class GameCreationPageComponent implements OnInit {
     @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef<HTMLInputElement>;
     reposition: boolean = false;
 
+    // eslint-disable-next-line max-params
     constructor(
         public dialog: MatDialog,
         private renderer: Renderer2,

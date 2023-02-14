@@ -27,6 +27,7 @@ export class GameService {
     playerName: string;
     private renderer: Renderer2;
 
+    // eslint-disable-next-line max-params
     constructor(
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,
@@ -87,12 +88,12 @@ export class GameService {
     }
 
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
-        let visible = true;
+        let isVisible = true;
         let blinkCount = 0;
         const intervalId = setInterval(() => {
-            visible = !visible;
-            this.renderer.setStyle(canvas1.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-            this.renderer.setStyle(canvas2.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
+            isVisible = !isVisible;
+            this.renderer.setStyle(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+            this.renderer.setStyle(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
 
             blinkCount++;
             if (blinkCount === constantsTime.BLINKING_COUNT) {
@@ -148,7 +149,6 @@ export class GameService {
             this.isGameFinished = true;
             this.saveGameRecord();
             this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-            // Hard reset variables
             this.reinitializeGame();
         }
     }

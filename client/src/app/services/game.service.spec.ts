@@ -1,3 +1,4 @@
+import { HttpResponse } from '@angular/common/http';
 import { RendererFactory2 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -5,7 +6,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Game, GameInfo } from '@common/game';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
@@ -14,6 +15,7 @@ import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
+    // let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
@@ -24,20 +26,13 @@ describe('GameService', () => {
     let game: Game;
     let gameInformation: GameInformation;
     let gameInfo: GameInfo;
-    // let nDifferencesNotFound: number;
-    // let nDifferencesFound: number;
-    // let differencesArray: string[];
-    // let isGameFinished: boolean;
-    // let nHintsUnused: number;
-    // let nHintsUsed: number;
-    // let hintsArray: string[];
-    // let playerName: string;
 
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
+        // renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
     });
@@ -211,7 +206,8 @@ describe('GameService', () => {
 
     it('getGameTime should mock and call getCount from clientTimeService and return time for seconds above 10 digit', () => {
         const mockTime = '0:45';
-        clientTimeServiceSpy.getCount.and.returnValue(45);
+        const countTime = 45;
+        clientTimeServiceSpy.getCount.and.returnValue(countTime);
         const time: string = gameService.getGameTime();
         expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
         expect(time).toBe(mockTime);
@@ -240,17 +236,36 @@ describe('GameService', () => {
         expect(displayGameEndedSpy).toHaveBeenCalled();
         expect(reinitializeGameSpy).toHaveBeenCalled();
     });
-    //     gameService.nDifferencesFound = 2;
-    //     gameService.nDifferencesNotFound = 1;
-    //     gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceNotFound];
-    //     const stopTimerSpy = spyOn(gameService, 'stopTimer');
-    //     const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
-    //     const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
-    //     const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
-    //     gameService.clickDifferencesFound();
-    //     expect(stopTimerSpy).toHaveBeenCalled();
-    //     expect(saveGameRecordSpy).toHaveBeenCalled();
-    //     expect(displayGameEndedSpy).toHaveBeenCalled();
-    //     expect(reinitializeGameSpy).toHaveBeenCalled();
-    // }
+
+    it('saveGameRecord should call createGameRecord from gameDataBaseService', () => {
+        const gameTitle = 'gameName';
+        const gameMode = 'solo';
+        const playerName = 'playerName';
+        const dateStart = new Date().getTime().toString();
+        const gameTime = '01:00';
+        const gameRecordMock = {
+            gameName: gameTitle,
+            typeGame: gameMode,
+            playerName,
+            dateStart: Number(dateStart).toString(),
+            time: gameTime,
+        };
+        gameService.gameInformation.gameTitle = gameTitle;
+        gameService.gameInformation.gameMode = gameMode;
+        gameService.playerName = playerName;
+        spyOn(gameService, 'getGameTime').and.returnValue(gameTime);
+        const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
+        gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
+        gameService.saveGameRecord();
+        expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
+    });
+
+    // it('blinkDifference should setStyle from renderer2 and clearInterval with intervalId', async () => {
+    //     const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+    //     const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+
+    //     gameService.blinkDifference(canvas1, canvas2);
+    //     expect(renderer2Spy.setStyle).toHaveBeenCalled();
+    //     expect(clearInterval).toHaveBeenCalled();
+    // });
 });

@@ -1,12 +1,12 @@
 <div id="rectangle1">
     <div id="rectangle2">
-        <p>{{ card.gameName }}</p>
+        <p *ngIf = "card.gameName" id = "gameName"> {{ card.gameName }}</p>
     </div>
     <div class="gameImage">
         <img src="{{ card.originalImageData }}" />
     </div>
     <div class="Difficulty">
-        <p> Difficulté: {{ card.difficulty }}</p>
+        <p id = "gameDifficulty"> Difficulté: {{ card.difficulty }}</p>
     </div> 
     <div class="rankingTable">
         <table>
@@ -17,29 +17,29 @@
             </tr>
             <tr>
                 <th scope="row" class="ranking" style="color: #ffe600">1.</th>
-                <td class="firstAndThird">
+                <td class="firstAndThird" id = "firstSolo">
                     {{ card.rankingSolo[0].time || "N/D" }} {{ card.rankingSolo[0].playerName || "N/D"}}
                 </td>
-                <td class="firstAndThird">
+                <td class="firstAndThird" id = "firstMulti">
                     {{ card.rankingMulti[0].time || "N/D"}} {{ card.rankingMulti[0].playerName || "N/D"}}
                 </td>
             </tr>
             
             <tr>
                     <th scope="row"  class= "ranking" style="color:#E0ECEF">2.</th>
-                    <td class = "second"> {{ card.rankingSolo[1].time || "N/D" }} {{ card.rankingSolo[1].playerName || "N/D"}}</td>
-                    <td class = "second"> {{ card.rankingMulti[1].time || "N/D"}} {{ card.rankingMulti[1].playerName || "N/D"}} </td>
+                    <td class = "second" id = "secondSolo"> {{ card.rankingSolo[1].time || "N/D" }} {{ card.rankingSolo[1].playerName || "N/D"}}</td>
+                    <td class = "second" id = "secondMulti"> {{ card.rankingMulti[1].time || "N/D"}} {{ card.rankingMulti[1].playerName || "N/D"}} </td>
                 </tr>
                 <tr>
                     <th scope="row"  class= "ranking" style="color:#FF8B02">3.</th>
-                    <td class="firstAndThird"> {{ card.rankingSolo[2].time || "N/D"}} {{ card.rankingSolo[2].playerName || "N/D" }}</td>
-                    <td class="firstAndThird"> {{ card.rankingMulti[2].time || "N/D"}} {{ card.rankingMulti[2].playerName || "N/D"}}  </td>
+                    <td class="firstAndThird" id = "thirdSolo"> {{ card.rankingSolo[2].time || "N/D"}} {{ card.rankingSolo[2].playerName || "N/D" }}</td>
+                    <td class="firstAndThird" id = "thirdMulti"> {{ card.rankingMulti[2].time || "N/D"}} {{ card.rankingMulti[2].playerName || "N/D"}}  </td>
                 </tr>
         </table>
     </div>
-    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()">Jouer</button>
-    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>
+    <button appButtonOne *ngIf="changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()">Jouer</button>
+    <button appButtonTwo *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>
 
-    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
-    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>
+    <button appButtonThree *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
+    <button appButtonFour *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>
 </div>

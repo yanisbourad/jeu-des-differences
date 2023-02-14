@@ -30,6 +30,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     gameName: string;
 
     // TODO: reduce the number of parameters
+    // eslint-disable-next-line max-params
     constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,
@@ -43,11 +44,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     get width(): number {
-        return constants.defaultWidth;
+        return constants.DEFAULT_WIDTH;
     }
 
     get height(): number {
-        return constants.defaultHeight;
+        return constants.DEFAULT_HEIGHT;
     }
 
     ngOnDestroy(): void {

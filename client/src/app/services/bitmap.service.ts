@@ -7,13 +7,14 @@ import * as constants from '@app/configuration/const-canvas';
 export class BitmapService {
     context: CanvasRenderingContext2D;
 
-    async handleFileSelect(e: Event): Promise<ImageBitmap> {
+    async handleFileSelect(e: Event): Promise<ImageBitmap | undefined> {
         const newImage = this.getFile(e);
-        if (!(await this.validateBitmap(newImage)).valueOf()) return new ImageBitmap();
+        if (!(await this.validateBitmap(newImage)).valueOf()) return undefined;
         const img = await this.fileToImageBitmap(newImage);
-        if (!this.validateSize(img)) return new ImageBitmap();
+        if (!this.validateSize(img)) return undefined;
         return img;
     }
+
     getFile(e: Event): File {
         const target = e.target as HTMLInputElement;
         if (target.files === null) {
@@ -21,6 +22,7 @@ export class BitmapService {
         }
         return target.files[0];
     }
+
     async fileToImageBitmap(file: File): Promise<ImageBitmap> {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -47,14 +49,14 @@ export class BitmapService {
             alert('Not a bitmap file');
             return false;
         }
-        if (bitDepth !== constants.desiredBitDepth) {
-            alert(`Incorrect bit depth: expected ${constants.desiredBitDepth} but got ${bitDepth}`);
+        if (bitDepth !== constants.DESIRED_BIT_DEPTH) {
+            alert(`Incorrect bit depth: expected ${constants.DESIRED_BIT_DEPTH} but got ${bitDepth}`);
             return false;
         }
         return true;
     }
     validateSize(imageBitmap: ImageBitmap) {
-        if (imageBitmap.width !== constants.defaultWidth || imageBitmap.height !== constants.defaultHeight) {
+        if (imageBitmap.width !== constants.DEFAULT_WIDTH || imageBitmap.height !== constants.DEFAULT_HEIGHT) {
             alert('Image size is not correct');
             return false;
         }

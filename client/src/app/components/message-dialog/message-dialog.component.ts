@@ -15,6 +15,7 @@ export class MessageDialogComponent {
     formatTime: string;
 
     // TODO: reduce the number of constructor parameters
+    // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,

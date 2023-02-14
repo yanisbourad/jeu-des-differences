@@ -4,7 +4,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { Game, GameInfo, GameRecord } from '@common/game';
+import { Game, GameInfo } from '@common/game';
 import { of } from 'rxjs/internal/observable/of';
 import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
@@ -37,7 +37,7 @@ describe('GameService', () => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName, createGameRecord']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
     });
@@ -199,5 +199,21 @@ describe('GameService', () => {
         gameService.playFailureAudio();
         expect(audioMock.load).toHaveBeenCalled();
         expect(audioMock.play).toHaveBeenCalled();
+    });
+
+    it('getGameTime should mock and call getCount from clientTimeService and return time for seconds under 10 digit', () => {
+        const mockTime = '0:01';
+        clientTimeServiceSpy.getCount.and.returnValue(1);
+        const time: string = gameService.getGameTime();
+        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
+        expect(time).toBe(mockTime);
+    });
+
+    it('getGameTime should mock and call getCount from clientTimeService and return time for seconds above 10 digit', () => {
+        const mockTime = '0:45';
+        clientTimeServiceSpy.getCount.and.returnValue(45);
+        const time: string = gameService.getGameTime();
+        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
+        expect(time).toBe(mockTime);
     });
 });

@@ -76,8 +76,8 @@ describe('CanvasHolderServiceService', () => {
             },
         });
         const bitmap = await service.handleFileSelect(event);
-        expect(bitmap?.height).toEqual(constants.defaultHeight);
-        expect(bitmap?.width).toEqual(constants.defaultWidth);
+        expect(bitmap?.height).toEqual(constants.DEFAULT_HEIGHT);
+        expect(bitmap?.width).toEqual(constants.DEFAULT_WIDTH);
     });
 
     it('should return a new ImageBitmap when the file is not the correct form with alert', async () => {

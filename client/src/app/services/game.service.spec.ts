@@ -15,7 +15,6 @@ import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
-    // let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
@@ -29,7 +28,6 @@ describe('GameService', () => {
 
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
-        // renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
@@ -95,14 +93,14 @@ describe('GameService', () => {
         gameService.gameInformation = gameInformation;
         const nDifferencesNotFound = 3;
         const nHintsUnused = 3;
+        const hintsPenalty = 5;
         gameService.defineVariables();
         expect(gameService.gameInformation.gameTitle).toBe(game.gameName);
         expect(gameService.gameInformation.gameMode).toBe('solo');
         expect(gameService.gameInformation.gameDifficulty).toBe(game.difficulty);
         expect(gameService.gameInformation.nDifferences).toBe(game.listDifferences.length);
         expect(gameService.gameInformation.nHints).toBe(3);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(gameService.gameInformation.hintsPenalty).toBe(5);
+        expect(gameService.gameInformation.hintsPenalty).toBe(hintsPenalty);
         expect(gameService.gameInformation.isClassical).toBe(false);
         expect(gameService.nDifferencesNotFound).toBe(gameInformation.nDifferences);
         expect(gameService.nHintsUnused).toBe(gameInformation.nHints);
@@ -247,7 +245,7 @@ describe('GameService', () => {
             gameName: gameTitle,
             typeGame: gameMode,
             playerName,
-            dateStart: Number(dateStart).toString(),
+            dateStart,
             time: gameTime,
         };
         gameService.gameInformation.gameTitle = gameTitle;
@@ -257,15 +255,7 @@ describe('GameService', () => {
         const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
         gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
         gameService.saveGameRecord();
+        gameRecordMock.dateStart = new Date().getTime().toString();
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
     });
-
-    // it('blinkDifference should setStyle from renderer2 and clearInterval with intervalId', async () => {
-    //     const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-    //     const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-
-    //     gameService.blinkDifference(canvas1, canvas2);
-    //     expect(renderer2Spy.setStyle).toHaveBeenCalled();
-    //     expect(clearInterval).toHaveBeenCalled();
-    // });
 });

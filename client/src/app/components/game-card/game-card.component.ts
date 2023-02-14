@@ -3,6 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
+import { Directive} from '@angular/core';
+
 
 @Component({
     selector: 'app-game-card',
@@ -43,3 +45,29 @@ export class GameCardComponent implements OnInit {
         return '';
     }
 }
+@Directive({
+    selector: '[appButtonOne]'
+  })
+  export class ButtonOneDirective {
+    constructor() { }
+
+  }
+  
+  @Directive({
+    selector: '[appButtonTwo]'
+  })
+  export class ButtonTwoDirective {
+    constructor() { }
+  }
+  @Directive({
+    selector: '[appButtonThree]'
+  })
+  export class ButtonThreeDirective {
+    constructor() { }
+  }
+  @Directive({
+    selector: '[appButtonFour]'
+  })
+  export class ButtonFourDirective {
+    constructor() { }
+  }

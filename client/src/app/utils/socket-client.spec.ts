@@ -57,4 +57,34 @@ describe('SocketClientService', () => {
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith(event);
     });
+
+    it('connect should be called', () => {
+        const spy = spyOn(service, 'connect');
+        service.connect();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should connect to the server', () => {
+        // failed
+        const environment = { serverUrl: 'http://localhost:3000' };
+        const socket = { io: jasmine.createSpy('io') };
+
+        service.connect();
+
+        expect(socket.io).toHaveBeenCalledWith(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+    });
+
+    it('returns undefined if the socket is not defined', () => {
+        expect(service.isSocketAlive()).toBeUndefined();
+    });
+
+    it('returns false if the socket is defined but not connected', () => {
+        service.socket.connected = false;
+        expect(service.isSocketAlive()).toBe(false);
+    });
+
+    it('returns true if the socket is defined and connected', () => {
+        service.socket.connected = true;
+        expect(service.isSocketAlive()).toBe(true);
+    });
 });

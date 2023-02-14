@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketClientService } from './socket-client.service';
-import { ClientTimeService } from './client-time.service';
 import { SocketClient } from '@app/utils/socket-client';
 import { SocketTestHelper } from '@app/utils/socket-helper';
 import { Socket } from 'socket.io-client';
+import { ClientTimeService } from './client-time.service';
+import { SocketClientService } from './socket-client.service';
 import SpyObj = jasmine.SpyObj;
 
 describe('SocketClientService', () => {
@@ -13,14 +13,7 @@ describe('SocketClientService', () => {
 
     beforeEach(async () => {
         timeService = jasmine.createSpyObj('ClientTimeService', ['stopTimer']);
-        socketClient = jasmine.createSpyObj('SocketClient', [
-            'isSocketAlive',
-            'connect',
-            'on',
-            'emit',
-            'send',
-            'disconnect'
-        ]);
+        socketClient = jasmine.createSpyObj('SocketClient', ['isSocketAlive', 'connect', 'on', 'emit', 'send', 'disconnect']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: ClientTimeService, useValue: timeService },
@@ -29,22 +22,17 @@ describe('SocketClientService', () => {
         });
         service = TestBed.inject(SocketClientService);
         socketClient.socket = new SocketTestHelper() as unknown as Socket;
-        socketClient.on.and.callFake(
-            (event: string, callback: (data: any) => void) => {
-                if (event === 'hello') {
-                    callback('Hello, world!');
-                }
-                if(event === 'message')
-                {
-                    callback('message');
-                }
-                if(event === 'connect')
-                {
-                    callback('connect');
-                }
+        socketClient.on.and.callFake((event: string, callback: (data: unknown) => void) => {
+            if (event === 'hello') {
+                callback('Hello, world!');
             }
-        ) 
-       
+            if (event === 'message') {
+                callback('message');
+            }
+            if (event === 'connect') {
+                callback('connect');
+            }
+        });
     });
 
     it('should be created', () => {
@@ -101,7 +89,7 @@ describe('SocketClientService', () => {
 
     it('should return a roomName', () => {
         const roomName = 'roomName';
-        socketClient.socket.id = roomName
+        socketClient.socket.id = roomName;
         expect(service.getRoomName()).toEqual(roomName);
     });
 
@@ -114,6 +102,6 @@ describe('SocketClientService', () => {
     it('leaveRoom should emit leaveRoom', () => {
         service.leaveRoom();
         expect(socketClient.send).toHaveBeenCalled();
-        expect(socketClient.send).toHaveBeenCalledWith('leaveRoom')
+        expect(socketClient.send).toHaveBeenCalledWith('leaveRoom');
     });
 });

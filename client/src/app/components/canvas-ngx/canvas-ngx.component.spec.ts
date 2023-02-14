@@ -91,7 +91,6 @@ describe('CanvasNgxComponent', () => {
         // create a new event on change file selection
         const event = new Event('change');
         const file = new File([blobImage], 'test.bmp', { type: 'image/bmp' });
-        console.log('blob = ', blobImage);
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });

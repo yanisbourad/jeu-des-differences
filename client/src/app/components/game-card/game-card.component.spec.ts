@@ -37,7 +37,8 @@ describe('GameCardComponent', () => {
 
         component.openDialog();
 
-        // expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'Test' } }); // Check if dialog is opened with correct parameters
+        // expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'Test' } });
+        // Check if dialog is opened with correct parameters
     });
 
     it('should change button text to "Classique" when on classique page', () => {

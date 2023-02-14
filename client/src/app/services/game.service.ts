@@ -27,6 +27,7 @@ export class GameService {
     playerName: string;
     private renderer: Renderer2;
 
+    // eslint-disable-next-line max-params
     constructor(
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,

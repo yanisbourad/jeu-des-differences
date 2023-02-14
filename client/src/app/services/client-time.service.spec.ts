@@ -5,12 +5,11 @@ import { ClientTimeService } from './client-time.service';
 
 describe('ClientTimeService', () => {
     let service: ClientTimeService;
-    
+
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(ClientTimeService);
         spyOn(service, 'startTimer').and.callThrough();
-
     });
 
     it('should be created', () => {

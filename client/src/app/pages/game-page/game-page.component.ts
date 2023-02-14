@@ -30,6 +30,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     gameName: string;
 
     // TODO: reduce the number of parameters
+    // eslint-disable-next-line max-params
     constructor(
         private readonly drawService: DrawService,
         public gameService: GameService,

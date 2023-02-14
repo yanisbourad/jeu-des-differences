@@ -21,7 +21,7 @@ describe('SocketClientService', () => {
             ],
         });
         service = TestBed.inject(SocketClientService);
-        service.socket = (new SocketTestHelper() as unknown) as Socket;
+        service.socket = new SocketTestHelper() as unknown as Socket;
     });
 
     it('should be created', () => {
@@ -50,7 +50,6 @@ describe('SocketClientService', () => {
         spyOn(socketClient, 'isSocketAlive').and.returnValue(true);
         spyOn(socketClient, 'connect');
         expect(socketClient.connect).not.toHaveBeenCalled();
-       
     });
 
     it('should call configureBaseSocketFeatures if the socket is connected', () => {
@@ -66,8 +65,8 @@ describe('SocketClientService', () => {
         expect(socketClient.on).toHaveBeenCalledWith('connect', jasmine.any(Function));
         expect(socketClient.on).toHaveBeenCalledWith('hello', jasmine.any(Function));
         expect(socketClient.on).toHaveBeenCalledWith('message', jasmine.any(Function));
-      });
-    
+    });
+
     it('should not connect to the socket if the socket is connected', () => {
         spyOn(socketClient, 'isSocketAlive').and.returnValue(true);
         spyOn(socketClient, 'connect');
@@ -81,13 +80,12 @@ describe('SocketClientService', () => {
         service.joinRoom(roomName);
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith('joinRoom', roomName);
-    
-      });
+    });
 
     it('should return the current server message', () => {
-    const message = 'Hello from the server';
-    service.serverMessage = message;
-    expect(service.getServerMessage()).toEqual(message);
+        const message = 'Hello from the server';
+        service.serverMessage = message;
+        expect(service.getServerMessage()).toEqual(message);
     });
 
     it('should return a roomName', () => {
@@ -115,6 +113,4 @@ describe('SocketClientService', () => {
         service.leaveRoom();
         expect(spy).toHaveBeenCalled();
     });
-
-    
 });

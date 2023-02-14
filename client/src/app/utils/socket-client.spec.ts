@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { connect } from 'http2';
 import { Socket } from 'socket.io-client';
 import { SocketClient } from './socket-client';
 import { SocketTestHelper } from './socket-helper';
@@ -56,5 +57,24 @@ describe('SocketClientService', () => {
         service.send(event, data);
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith(event);
+    });
+
+    it('connect should be called', () => {
+        service.connect();
+        expect(connect).toHaveBeenCalled();
+    });
+
+    it('returns undefined if the socket is not defined', () => {
+        expect(service.isSocketAlive()).toBeUndefined();
+      });
+    
+    it('returns false if the socket is defined but not connected', () => {
+        service.socket.connected = false;
+        expect(service.isSocketAlive()).toBe(false);
+    });
+
+    it('returns true if the socket is defined and connected', () => {
+        service.socket.connected = true;
+        expect(service.isSocketAlive()).toBe(true);
     });
 });

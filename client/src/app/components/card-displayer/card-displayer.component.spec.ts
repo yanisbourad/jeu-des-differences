@@ -4,31 +4,14 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { By } from '@angular/platform-browser';
 import * as constants from '@app/configuration/const-game';
+import * as constantsMock from '@app/configuration/const-mock';
+
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 import { of } from 'rxjs';
 import { CardDisplayerComponent } from './card-displayer.component';
 
-const MOCK_CARDS: GameInfo[] = [
-    {
-        gameName: 'difference 1',
-        difficulty: 'Facile',
-        originalImageData: 'imageOriginal1',
-        modifiedImageData: 'imageModifie1',
-        listDifferences: ['diffrence 1', 'difference 2'],
-        rankingMulti: [],
-        rankingSolo: [],
-    },
-    {
-        gameName: 'difference 2',
-        difficulty: 'Facile',
-        originalImageData: 'imageOriginal2',
-        modifiedImageData: 'imageModifie2',
-        listDifferences: ['diffrence 3', 'difference 4'],
-        rankingMulti: [],
-        rankingSolo: [],
-    },
-];
+const mockCards: GameInfo[] = constantsMock.MOCK_CARDS;
 
 describe('CardDisplayerComponent', () => {
     let component: CardDisplayerComponent;
@@ -44,7 +27,7 @@ describe('CardDisplayerComponent', () => {
             declarations: [CardDisplayerComponent],
         }).compileComponents();
 
-        communicationServiceSpy.getAllGames.and.callFake(() => of(MOCK_CARDS));
+        communicationServiceSpy.getAllGames.and.callFake(() => of(mockCards));
 
         fixture = TestBed.createComponent(CardDisplayerComponent);
         component = fixture.componentInstance;
@@ -95,7 +78,7 @@ describe('CardDisplayerComponent', () => {
         // on le reset car getAllGames est appellé OnInit
         communicationServiceSpy.getAllGames.calls.reset();
         component.updateCards();
-        expect(component.allCards).toEqual(MOCK_CARDS);
+        expect(component.allCards).toEqual(mockCards);
         expect(communicationServiceSpy.getAllGames).toHaveBeenCalledTimes(1);
     }));
 

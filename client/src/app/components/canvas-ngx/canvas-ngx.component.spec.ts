@@ -55,8 +55,8 @@ describe('CanvasNgxComponent', () => {
     });
     it('should have a canvas with the right size', () => {
         const canvas = fixture.nativeElement.querySelector('canvas');
-        expect(canvas.width).toEqual(constants.defaultWidth);
-        expect(canvas.height).toEqual(constants.defaultHeight);
+        expect(canvas.width).toEqual(constants.DEFAULT_WIDTH);
+        expect(canvas.height).toEqual(constants.DEFAULT_HEIGHT);
     });
     it('should draw an image on the canvas', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

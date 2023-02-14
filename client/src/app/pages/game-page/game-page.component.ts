@@ -44,11 +44,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     get width(): number {
-        return constants.defaultWidth;
+        return constants.DEFAULT_WIDTH;
     }
 
     get height(): number {
-        return constants.defaultHeight;
+        return constants.DEFAULT_HEIGHT;
     }
 
     ngOnDestroy(): void {

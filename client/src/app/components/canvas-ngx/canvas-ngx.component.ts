@@ -21,10 +21,10 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     // needed for the canvas size
     get width(): number {
-        return constants.defaultWidth;
+        return constants.DEFAULT_WIDTH;
     }
     get height(): number {
-        return constants.defaultHeight;
+        return constants.DEFAULT_HEIGHT;
     }
 
     get canvasNative(): HTMLCanvasElement {
@@ -47,8 +47,10 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     saveCanvas(): void {
-        const ctx = this.canvasNative.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-        const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
+        const canvas = this.canvas.nativeElement;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return;
+        const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         const canvasData = imageData.data;
         const canvasDataStr = ctx.canvas.toDataURL('image/bmp');
         if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);

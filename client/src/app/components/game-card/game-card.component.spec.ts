@@ -28,6 +28,7 @@ describe('GameCardComponent', () => {
         component = new GameCardComponent(matDialog, router);
         component.card = card;
     });
+});
 
     //     it('should create', () => {
     //         expect(component).toBeTruthy();

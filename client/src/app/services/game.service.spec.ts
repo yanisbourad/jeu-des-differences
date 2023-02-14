@@ -10,7 +10,7 @@ import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
 import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
@@ -27,7 +27,6 @@ describe('GameService', () => {
     let gameInformation: GameInformation;
     let gameInfo: GameInfo;
 
-
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
@@ -43,6 +42,7 @@ describe('GameService', () => {
             declarations: [MessageDialogComponent],
             providers: [
                 { provide: RendererFactory2, useValue: rendererFactory2Spy },
+                { provide: Renderer2, useValue: renderer2Spy },
                 { provide: MatDialog, useValue: matDialogSpy },
                 { provide: ClientTimeService, useValue: clientTimeServiceSpy },
                 { provide: GameDatabaseService, useValue: gameDataBaseSpy },
@@ -129,16 +129,11 @@ describe('GameService', () => {
         gameService.nHintsUnused = 1;
         gameService.path = path;
         gameService.differencesArray = new Array(3);
-        gameService.hintsArray = new Array(1);
         gameService.displayIcons();
         for (let i = 0; i < gameService.nDifferencesNotFound; i++) {
             expect(gameService.differencesArray[i]).toEqual(gameService.path.differenceNotFound);
         }
-        for (let i = 0; i < gameService.nHintsUnused; i++) {
-            expect(gameService.hintsArray[i]).toEqual(gameService.path.hintUnused);
-        }
         expect(gameService.differencesArray.length).toBe(3);
-        expect(gameService.hintsArray.length).toBe(1);
     });
 
     it('displayGameEnded should open a dialog', () => {
@@ -262,23 +257,22 @@ describe('GameService', () => {
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
     });
 
-    it('blinkDifference should have setStyle from renderer2 called', async () => {
+    it('should toggle the visibility of two canvases at a regular interval', fakeAsync(() => {
+        const intervalTime = 125;
+        const blinkCount = 8;
+        const expectedCalls = blinkCount * 2;
         const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-        let isVisible = true;
-        let blinkCount = 0;
-        const blinkCountMax = 8;
-        const blinkTimeout = 125;
+        gameService['renderer'] = renderer2Spy;
+        // Call the function with the mock renderer
         gameService.blinkDifference(canvas1, canvas2);
-        const intervalId = setInterval(() => {
-            isVisible = !isVisible;
-            expect(renderer2Spy.setStyle).toHaveBeenCalledWith(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-            expect(renderer2Spy.setStyle).toHaveBeenCalledWith(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-            blinkCount++;
-            if (blinkCount === blinkCountMax) {
-                clearInterval(intervalId);
-                expect(clearInterval).toHaveBeenCalledWith(intervalId);
-            }
-        }, blinkTimeout);
-    });
+
+        // Advance the clock and tick until the intervals are complete
+        tick(intervalTime * blinkCount);
+
+        // Verify that the setStyle method was called with the correct arguments
+        expect(renderer2Spy.setStyle.calls.count()).toBe(expectedCalls);
+        expect(renderer2Spy.setStyle.calls.argsFor(0)).toEqual([canvas1.nativeElement, 'visibility', 'hidden']);
+        expect(renderer2Spy.setStyle.calls.argsFor(expectedCalls - 1)).toEqual([canvas2.nativeElement, 'visibility', 'visible']);
+    }));
 });

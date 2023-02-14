@@ -92,9 +92,10 @@ export class GameService {
         let blinkCount = 0;
         const intervalId = setInterval(() => {
             isVisible = !isVisible;
-            this.renderer.setStyle(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-            this.renderer.setStyle(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-
+            if (this.renderer) {
+                this.renderer.setStyle(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+                this.renderer.setStyle(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+            }
             blinkCount++;
             if (blinkCount === constantsTime.BLINKING_COUNT) {
                 clearInterval(intervalId);

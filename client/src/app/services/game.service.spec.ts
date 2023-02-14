@@ -1,6 +1,4 @@
 import { HttpResponse } from '@angular/common/http';
-import { RendererFactory2 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
@@ -11,10 +9,13 @@ import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
+import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
+    let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
     let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
@@ -26,8 +27,10 @@ describe('GameService', () => {
     let gameInformation: GameInformation;
     let gameInfo: GameInfo;
 
+
     beforeEach(() => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
+        renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
@@ -257,5 +260,25 @@ describe('GameService', () => {
         gameService.saveGameRecord();
         gameRecordMock.dateStart = new Date().getTime().toString();
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
+    });
+
+    it('blinkDifference should have setStyle from renderer2 called', async () => {
+        const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+        const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+        let isVisible = true;
+        let blinkCount = 0;
+        const blinkCountMax = 8;
+        const blinkTimeout = 125;
+        gameService.blinkDifference(canvas1, canvas2);
+        const intervalId = setInterval(() => {
+            isVisible = !isVisible;
+            expect(renderer2Spy.setStyle).toHaveBeenCalledWith(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+            expect(renderer2Spy.setStyle).toHaveBeenCalledWith(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+            blinkCount++;
+            if (blinkCount === blinkCountMax) {
+                clearInterval(intervalId);
+                expect(clearInterval).toHaveBeenCalledWith(intervalId);
+            }
+        }, blinkTimeout);
     });
 });

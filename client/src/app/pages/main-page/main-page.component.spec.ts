@@ -1,4 +1,4 @@
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -7,12 +7,11 @@ describe('MainPageComponent', () => {
     let component: MainPageComponent;
     let fixture: ComponentFixture<MainPageComponent>;
 
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [RouterTestingModule, HttpClientModule],
             declarations: [MainPageComponent],
-            providers:[]
+            providers: [],
         }).compileComponents();
     });
 
@@ -48,12 +47,12 @@ describe('MainPageComponent', () => {
     it('should have 6 authors', () => {
         const authors = fixture.nativeElement;
         expect(authors.querySelector('#authors').textContent).toContain(
-            'Auteurs: Guimfack Melvice Junior, Hamza Berrada, Daniel Giao, Yanis Bouard, Lounes Sadmi, Renel Lherisson'
+            'Auteurs: Guimfack Melvice Junior, Hamza Berrada, Daniel Giao, Yanis Bouard, Lounes Sadmi, Renel Lherisson',
         );
     });
 
     it('should have a team number', () => {
         const team = fixture.nativeElement;
         expect(team.querySelector('#team').textContent).toContain('Équipe: 208');
-    });    
+    });
 });

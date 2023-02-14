@@ -55,5 +55,4 @@ export class GameDatabaseService {
         });
         return isSaved;
     }
-
 }

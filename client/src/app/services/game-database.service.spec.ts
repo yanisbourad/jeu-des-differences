@@ -8,7 +8,6 @@ import { CanvasHolderService } from './canvas-holder.service';
 import { GameDatabaseService } from './game-database.service';
 import { ImageDiffService } from './image-diff.service';
 
-
 describe('GameDatabaseService', () => {
     let service: GameDatabaseService;
     let httpTestingController: HttpTestingController;
@@ -19,13 +18,11 @@ describe('GameDatabaseService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            
         });
         httpTestingController = TestBed.inject(HttpTestingController);
         canvasHolderService = TestBed.inject(CanvasHolderService);
         imageDiffService = TestBed.inject(ImageDiffService);
         service = TestBed.inject(GameDatabaseService);
-
     });
 
     afterEach(() => {
@@ -46,7 +43,6 @@ describe('GameDatabaseService', () => {
             expect(games).toEqual(data);
         });
         httpTestingController.expectOne(`${baseUrl}/game`).flush(data);
-
     });
 
     it('should get game by name', () => {
@@ -57,19 +53,18 @@ describe('GameDatabaseService', () => {
             listDifferences: ['test'],
             difficulty: 'Facile',
             rankingMulti: [],
-            rankingSolo: []
+            rankingSolo: [],
         };
         service.getGameByName('test').subscribe((game) => {
             expect(game).toEqual(data);
         });
-        const req = httpTestingController.expectOne(`${baseUrl}/game/test`)
+        const req = httpTestingController.expectOne(`${baseUrl}/game/test`);
         expect(req.request.method).toEqual('GET');
         expect(req.request.responseType).toEqual('json');
         expect(req.request.body).toBeNull();
         req.flush(data);
-
     });
-    
+
     it('should create game', () => {
         const data: Game = {
             gameName: 'test',
@@ -82,7 +77,6 @@ describe('GameDatabaseService', () => {
             expect(game.ok).toEqual(true);
         });
         httpTestingController.expectOne(`${baseUrl}/game/create`).flush(data);
-
     });
 
     it('should create game record', () => {
@@ -96,21 +90,20 @@ describe('GameDatabaseService', () => {
         service.createGameRecord(data).subscribe((res) => {
             expect(res.ok).toEqual(true);
         });
-        httpTestingController.expectOne({method: "POST", url: `${baseUrl}/gameRecord/create`}).flush('true');
+        httpTestingController.expectOne({ method: 'POST', url: `${baseUrl}/gameRecord/create` }).flush('true');
     });
 
     it('should validate game name', async () => {
-        const data: boolean = true;
+        const data = true;
         (await service.validateGameName('test')).subscribe((game) => {
             expect(game).toEqual(data);
         });
         httpTestingController.expectOne(`${baseUrl}/game/validate/test`).flush(data);
-
     });
 
     it('should save the game from the canvas holder et imageDiffService and return true', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set([1,2,3,4])];
+        imageDiffService.listDifferences = [new Set([1, 2, 3, 4])];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'testName',
@@ -119,19 +112,18 @@ describe('GameDatabaseService', () => {
             listDifferences: ['1,2,3,4'],
             difficulty: 'Facile',
         };
-        const spy = spyOn(service, 'createGame').and.returnValue(of(new HttpResponse({body: 'true'})));
+        const spy = spyOn(service, 'createGame').and.returnValue(of(new HttpResponse({ body: 'true' })));
         service.saveGame('testName').subscribe((saved) => {
             expect(saved).toEqual(true);
         });
         expect(spy).toHaveBeenCalledOnceWith(game);
         expect(spyGetData).toHaveBeenCalledTimes(2);
         expect(spyDiffDifficulty).toHaveBeenCalledTimes(1);
-        
     });
 
     it('should return false if the game was not saved', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set([1,2,3,4])];
+        imageDiffService.listDifferences = [new Set([1, 2, 3, 4])];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'test',
@@ -140,7 +132,7 @@ describe('GameDatabaseService', () => {
             listDifferences: ['1,2,3,4'],
             difficulty: 'Facile',
         };
-        const spy = spyOn(service, 'createGame').and.returnValue(of(new HttpResponse({body: 'false', status: 400})));
+        const spy = spyOn(service, 'createGame').and.returnValue(of(new HttpResponse({ body: 'false', status: 400 })));
         service.saveGame('test').subscribe((saved) => {
             expect(saved).toEqual(false);
         });
@@ -148,5 +140,4 @@ describe('GameDatabaseService', () => {
         expect(spy).toHaveBeenCalledOnceWith(game);
         expect(spyDiffDifficulty).toHaveBeenCalledTimes(1);
     });
-
 });

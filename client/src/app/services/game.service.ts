@@ -9,8 +9,6 @@ import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
-// import { DrawService } from './draw.service';
-// import { SocketClientService } from './socket-client.service';
 
 @Injectable({
     providedIn: 'root',

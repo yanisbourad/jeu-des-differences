@@ -33,7 +33,7 @@ describe('ValidateCreateBtnComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should not set pixel arrays and should call resetImageData', () => {
+    it('should launch detection system and generate differences between two images', () => {
         component.onClick();
         expect(imageDiffServiceSpy.resetImageData).toHaveBeenCalled();
         expect(imageDiffServiceSpy.setPixelMatrix).toHaveBeenCalled();

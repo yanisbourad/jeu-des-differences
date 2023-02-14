@@ -36,20 +36,18 @@ export class GameNameSaveComponent {
     }
 
     getGameData() {
-        if (this.validateGameName(this.gameName)) {
-            this.gameDataBase.saveGame(this.gameName).subscribe((res: boolean) => {
-                if (!res) {
-                    alert('/"Nom indisponible: Entrer un autre nom SVP!/"');
-                } else {
-                    this.level = '';
-                    this.showFeedback = '';
-                    this.dialogRef.close();
-                    this.router.navigate(['/config']);
-                }
-            });
-            this.gameName = '';
+        if (this.validateGameName(this.gameName.toLocaleLowerCase())) {
+            if (!this.gameDataBase.saveGame(this.gameName)) {
+                alert('/"Nom indisponible: Entrer un autre nom SVP!/"');
+            }
+            this.level = '';
+            this.showFeedback = '';
+            this.dialogRef.close();
+            this.router.navigate(['/config']);
         }
+        this.gameName = '';
     }
+
     closeOnAbort() {
         this.dialogRef.close();
     }

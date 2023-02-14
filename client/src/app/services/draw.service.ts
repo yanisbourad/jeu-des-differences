@@ -37,7 +37,7 @@ export class DrawService {
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
         const context = this.getContext(canvas);
-        context?.drawImage(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+        context.drawImage(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
     }
 
     drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {

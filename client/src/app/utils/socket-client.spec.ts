@@ -64,13 +64,14 @@ describe('SocketClientService', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should connect to the server', () => { // failed
+    it('should connect to the server', () => {
+        // failed
         const environment = { serverUrl: 'http://localhost:3000' };
-        const socket = { io: jasmine.createSpy('io')};
+        const socket = { io: jasmine.createSpy('io') };
 
         service.connect();
 
-        expect(socket.io).toHaveBeenCalledWith(environment.serverUrl,  { transports: ['websocket'], upgrade: false });
+        expect(socket.io).toHaveBeenCalledWith(environment.serverUrl, { transports: ['websocket'], upgrade: false });
     });
 
     it('returns undefined if the socket is not defined', () => {

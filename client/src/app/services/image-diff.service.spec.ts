@@ -200,4 +200,30 @@ describe('ImageDiffService', () => {
         const res: string = service.getDifficulty();
         expect(res).toBe('Difficile');
     });
+
+    it('should genenerate a list of differences', () => {
+        // with radius 0 should return 4 differences
+        service.radius = 0;
+        service.setDiffPixels = new Set([1, 3, 5, 7]);
+        service.differenceMatrix = [0, 1, 0, 1, 0, 1, 0, 1];
+        service.listDifferences = [];
+        service.defineDifferences();
+        expect(service.listDifferences.length).toBe(4);
+
+        // with radius 3 should return 1 difference
+        service.radius = 3;
+        service.setDiffPixels = new Set([1, 3, 5, 7]);
+        service.differenceMatrix = [0, 1, 0, 1, 0, 1, 0, 1];
+        service.listDifferences = [];
+        service.defineDifferences();
+        expect(service.listDifferences.length).toBe(1);
+
+        // with radius 6 should return 2 difference
+        service.radius = 6;
+        service.setDiffPixels = new Set([1, 9]);
+        service.differenceMatrix = [0, 1, 0, 0, 0, 0, 0, 0, 0, 1];
+        service.listDifferences = [];
+        service.defineDifferences();
+        expect(service.listDifferences.length).toBe(2);
+    });
 });

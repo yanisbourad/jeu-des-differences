@@ -27,9 +27,10 @@ import { MatRadioModule } from '@angular/material/radio';
 // import { MatStepperModule } from '@angular/material/stepper';
 // import { MatTableModule } from '@angular/material/table';
 // import { MatTabsModule } from '@angular/material/tabs';
-import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInputModule } from '@angular/material/input';
+
 const modules = [
     MatInputModule,
     // MatAutocompleteModule,
@@ -63,6 +64,7 @@ const modules = [
     // MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatInputModule,
 ];
 
 /**

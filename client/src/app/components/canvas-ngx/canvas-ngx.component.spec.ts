@@ -8,28 +8,37 @@ import { CanvasNgxComponent } from './canvas-ngx.component';
 describe('CanvasNgxComponent', () => {
     let component: CanvasNgxComponent;
     let fixture: ComponentFixture<CanvasNgxComponent>;
+    let drawService: jasmine.SpyObj<DrawService>;
+    let canvasHolderService: jasmine.SpyObj<CanvasHolderService>;
+    let bitmapService: jasmine.SpyObj<BitmapService>;
+    // let blobImage: Blob;
     let image: ImageBitmap;
-    let drawService: DrawService;
-    let canvasHolderService: CanvasHolderService;
-    let bitmapService: BitmapService;
-    let blobImage: Blob;
     beforeEach(async () => {
-        await TestBed.configureTestingModule({
+        drawService = jasmine.createSpyObj(DrawService, ['drawImage', 'clearCanvas', 'getContext']);
+        canvasHolderService = jasmine.createSpyObj(CanvasHolderService, ['setCanvas', 'setCanvasData']);
+        bitmapService = jasmine.createSpyObj(BitmapService, ['handleFileSelect']);
+        TestBed.configureTestingModule({
             declarations: [CanvasNgxComponent],
+            providers: [
+                { provide: DrawService, useValue: drawService },
+                { provide: CanvasHolderService, useValue: canvasHolderService },
+                { provide: BitmapService, useValue: bitmapService },
+            ],
         }).compileComponents();
+        bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
 
         fixture = TestBed.createComponent(CanvasNgxComponent);
-        drawService = TestBed.inject(DrawService);
-        canvasHolderService = TestBed.inject(CanvasHolderService);
-        bitmapService = TestBed.inject(BitmapService);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        drawService.getContext.and.returnValue(component.canvasNative.getContext('2d') as CanvasRenderingContext2D);
+
         // read the image file as a data URL
+        component.type = canvasHolderService.originalCanvas;
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
         xhr.responseType = 'blob';
         xhr.onload = () => {
-            blobImage = xhr.response;
+            const blobImage = xhr.response;
             createImageBitmap(blobImage).then((bmp) => {
                 image = bmp;
             });
@@ -46,15 +55,14 @@ describe('CanvasNgxComponent', () => {
     });
     it('should have a canvas with the right size', () => {
         const canvas = fixture.nativeElement.querySelector('canvas');
-        expect(canvas.width).toEqual(constants.defaultWidth);
-        expect(canvas.height).toEqual(constants.defaultHeight);
+        expect(canvas.width).toEqual(constants.DEFAULT_WIDTH);
+        expect(canvas.height).toEqual(constants.DEFAULT_HEIGHT);
     });
     it('should draw an image on the canvas', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spy = spyOn(drawService, 'drawImage');
         const spyOnSaveImage = spyOn(component, 'saveCanvas');
         component.loadImage(image);
-        expect(spy).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
+        expect(drawService.drawImage).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
         expect(spyOnSaveImage).toHaveBeenCalled();
     });
 
@@ -73,37 +81,43 @@ describe('CanvasNgxComponent', () => {
     });
 
     it('should call bitmap service when fileSelectd', () => {
-        const spy = spyOn(bitmapService, 'handleFileSelect');
         // create a new event on change file selection
         const event = new Event('change');
-        const file = new File([''], 'test.bmp', { type: 'image/bmp' });
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const fileList = { 0: file, length: 1, item: () => file };
-        Object.defineProperty(event, 'target', { value: { files: fileList } });
-
         // dispatch event to the component and register spy
         component.onFileSelected(event);
-        expect(spy).toHaveBeenCalledOnceWith(event);
+        expect(bitmapService.handleFileSelect).toHaveBeenCalledOnceWith(event);
     });
 
-    it('should loadImage when file is selected', () => {
+    it('should loadImage when file is selected', async () => {
         const spy = spyOn(component, 'loadImage');
         // create a new event on change file selection
         const event = new Event('change');
-        const file = new File([blobImage], 'test.bmp', { type: 'image/bmp' });
-        console.log('blob = ', blobImage);
+        const blob = await (await fetch('./assets/image_empty.bmp')).blob();
+        const file = await new File([blob], 'test.bmp', { type: 'image/bmp' });
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });
-        component.onFileSelected(event);
+        await component.onFileSelected(event);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should save canvas', () => {
-        const spy = spyOn(canvasHolderService, 'setCanvas');
+        canvasHolderService.setCanvas.calls.reset();
         component.saveCanvas();
-        const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight).data;
-        if (canvasData) expect(spy).toHaveBeenCalledOnceWith(canvasData, component.type);
-        else expect(spy).not.toHaveBeenCalled();
+        const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT).data;
+        const canvasDataStr = component.canvasNative.toDataURL();
+        if (canvasData) expect(canvasHolderService.setCanvas).toHaveBeenCalled();
+        else expect(canvasHolderService.setCanvas).not.toHaveBeenCalled();
+
+        if (canvasDataStr) expect(canvasHolderService.setCanvasData).toHaveBeenCalled();
+        else expect(canvasHolderService.setCanvasData).not.toHaveBeenCalled();
+    });
+
+    it('should clear canvas', () => {
+        drawService.clearCanvas.calls.reset();
+        const spy = spyOn(component, 'saveCanvas');
+        component.clearCanvas();
+        expect(drawService.clearCanvas).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 });

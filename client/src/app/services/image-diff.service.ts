@@ -23,6 +23,7 @@ export class ImageDiffService {
     // differencePixelArray: number[];
     currentDifferenceTemp: Set<number>;
     listDifferences: Set<number>[];
+    listDifferencesLength: number;
     differenceMatrix: number[];
     pixelNumberByImage: number;
     mapDistPoint: Map<number, number>;
@@ -164,6 +165,7 @@ export class ImageDiffService {
         }
         this.currentDifferenceTemp = new Set<number>();
         // clearing the service is needed to be able to read the next images
+        this.listDifferencesLength = this.listDifferences.length;
         return this.listDifferences;
     }
 

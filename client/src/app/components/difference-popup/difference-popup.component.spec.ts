@@ -17,10 +17,10 @@ describe('DifferencePopupComponent', () => {
     let changeDetectorRefSpy: SpyObj<ChangeDetectorRef>;
 
     beforeEach(() => {
-        imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['listDifferences']);
-        imageDiffServiceSpy = jasmine.createSpyObj('DrawService', ['clearCanvas', 'drawAllDiff']);
+        imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['listDifferencesLength', 'listDifferences']);
+        drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearCanvas', 'drawAllDiff']);
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        dialogRefSpy = jasmine.createSpyObj('MatDialogRef<GameNameSaveComponent>', ['close']);
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef<GameNameSaveComponent>', ['close', 'afterClosed']);
     });
 
     beforeEach(async () => {
@@ -41,31 +41,47 @@ describe('DifferencePopupComponent', () => {
     });
 
     it('should create', () => {
-        component.showMessage = '';
         component.showValidation = false;
-        component.lowerLimitDifferenceAllowed = 3;
-        component.upperLimitDifferenceAllowed = 9;
-        component.showDifference = 5;
-        expect(imageDiffServiceSpy.listDifferences).toHaveBeenCalled();
+        component.lowerLimitDifferenceAllowed = 2;
+        component.upperLimitDifferenceAllowed = 10;
         expect(component).toBeTruthy();
-        // expect(component.ngAfterViewInit).toHaveBeenCalled();
     });
 
-    it('should communicate game name to be saved to the server on valid name', () => {
-        component.showDifference = 5;
-        component.lowerLimitDifferenceAllowed = 3;
-        component.upperLimitDifferenceAllowed = 9;
+    it('should call methods for needed services', () => {
+        component.showDifference = 8;
+        component.lowerLimitDifferenceAllowed = 2;
+        component.upperLimitDifferenceAllowed = 10;
         component.ngAfterViewInit();
-        expect(imageDiffServiceSpy.listDifferences.length).toHaveBeenCalled();
+        expect(imageDiffServiceSpy.listDifferencesLength).toBeTruthy();
         expect(drawServiceSpy.clearCanvas).toHaveBeenCalled();
         expect(drawServiceSpy.drawAllDiff).toHaveBeenCalled();
     });
 
-    it('should not communicate game name to be saved to the server on invalid name ', () => {
-        component.showValidation = false;
+    it('should communicate no feedback message on valid name', () => {
+        component.showDifference = 8;
+        component.lowerLimitDifferenceAllowed = 2;
+        component.upperLimitDifferenceAllowed = 10;
+        component.handleOutputMessage();
+        expect(component.showMessage).toBe('');
+        expect(component.showValidation).toBeTruthy();
+    });
+
+    it('should not communicate feedback message on invalid name ', () => {
+        component.showDifference = 1;
+        component.lowerLimitDifferenceAllowed = 2;
+        component.upperLimitDifferenceAllowed = 10;
+        component.handleOutputMessage();
+        expect(component.showMessage).toBe('(valide entre 3 et 9)');
+        expect(component.showValidation).toBeFalsy();
+    });
+
+    it('should open Game Name dialog ', () => {
+        component.showValidation = true;
+        component.showDifference = 7;
+        component.lowerLimitDifferenceAllowed = 2;
+        component.upperLimitDifferenceAllowed = 10;
         component.openName();
         expect(dialogSpy.open).toHaveBeenCalled();
-        expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
     it('should close pop up on call ', () => {

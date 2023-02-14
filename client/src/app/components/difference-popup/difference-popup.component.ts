@@ -34,7 +34,7 @@ export class DifferencePopupComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        // this.showDifference = this.imageDifferenceService.listDifferences.length;
+        this.showDifference = this.imageDifferenceService.listDifferences.length;
         if (this.imageDifferenceService.listDifferences) {
             this.drawService.clearCanvas(this.canvas.nativeElement);
             const differences = this.imageDifferenceService.listDifferences;

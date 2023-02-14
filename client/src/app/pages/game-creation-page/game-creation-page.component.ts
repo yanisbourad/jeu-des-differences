@@ -27,9 +27,11 @@ export class GameCreationPageComponent implements OnInit {
     get originalCanvas(): string {
         return this.canvasHolderService.originalCanvas;
     }
+
     get modifiedCanvas(): string {
         return this.canvasHolderService.modifiedCanvas;
     }
+
     ngOnInit(): void {
         this.canvasHolderService.clearCanvas();
     }
@@ -42,6 +44,7 @@ export class GameCreationPageComponent implements OnInit {
         this.renderer.insertBefore(element1Image.parentNode, element2Image, element1Image);
         this.renderer.insertBefore(element1Image.parentNode, middleButtons, element1Image);
     }
+
     swapImages(): void {
         if (this.reposition) {
             this.handleSwapping('.original', '.modified');
@@ -50,14 +53,15 @@ export class GameCreationPageComponent implements OnInit {
         }
         this.reposition = !this.reposition;
     }
+
     openCanvas(): void {
-        const dialogRef = this.dialog.open(DifferencePopupComponent, {
+        this.dialog.open(DifferencePopupComponent, {
             disableClose: true,
             height: '480x',
             width: '640px',
         });
-        dialogRef.afterClosed().subscribe();
     }
+
     loadImage(e: Event): void {
         this.bitmapService.handleFileSelect(e).then((img) => {
             this.originalCanvasComponent.loadImage(img);

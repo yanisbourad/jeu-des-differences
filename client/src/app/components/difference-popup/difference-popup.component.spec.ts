@@ -42,10 +42,13 @@ describe('DifferencePopupComponent', () => {
 
     it('should create', () => {
         component.showMessage = '';
+        component.showValidation = false;
         component.lowerLimitDifferenceAllowed = 3;
         component.upperLimitDifferenceAllowed = 9;
         component.showDifference = 5;
+        expect(imageDiffServiceSpy.listDifferences).toHaveBeenCalled();
         expect(component).toBeTruthy();
+        // expect(component.ngAfterViewInit).toHaveBeenCalled();
     });
 
     it('should communicate game name to be saved to the server on valid name', () => {

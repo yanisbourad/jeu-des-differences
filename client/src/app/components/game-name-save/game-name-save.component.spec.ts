@@ -14,6 +14,7 @@ describe('GameNameSaveComponent', () => {
     let gameDatabaseServiceSpy: SpyObj<GameDatabaseService>;
     let routingSpy: SpyObj<Router>;
     let dialogSpy: SpyObj<MatDialogRef<GameNameSaveComponent>>;
+
     beforeEach(() => {
         imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['getDifficulty']);
         gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['saveGame']);

@@ -28,7 +28,7 @@ class ActivatedRouteMock {
     };
 }
 
-describe('GamePageComponent', () => {
+fdescribe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     // const canvas1: HTMLCanvasElement;
@@ -42,7 +42,7 @@ describe('GamePageComponent', () => {
     let dialogSpy: SpyObj<MatDialog>;
     let msg: string;
     let type: string;
-    let gameName: string
+    //let gameName: string
     // const  mousePosition: Vec2;
     // const errorPenalty: boolean;
     // const  unfoundedDifference: Set<number>[];
@@ -60,7 +60,7 @@ describe('GamePageComponent', () => {
             'getGame',
             'getSetDifference',
         ]);
-        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect', 'joinRoom', 'disconnect']);
+        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect', 'joinRoom', 'disconnect', 'leaveRoom']);
         drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff']);
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         gameServiceSpy.game = {
@@ -81,7 +81,7 @@ describe('GamePageComponent', () => {
         }
         msg = 'Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.';
         type = 'giveUp';
-        gameName = 'game1';
+       // gameName = 'game1';
     });
 
     beforeEach(async () => {
@@ -114,9 +114,8 @@ describe('GamePageComponent', () => {
     });
 
     it('should open a dialog with the given message and type', () => {
-        const spy = spyOn(component.dialog, 'open');
         component.displayGiveUp(msg, type);
-        expect(spy).toHaveBeenCalledWith(MessageDialogComponent, {
+        expect(dialogSpy.open).toHaveBeenCalledWith(MessageDialogComponent, {
             data: [msg, type],
             minWidth: '250px',
             minHeight: '150px',
@@ -130,11 +129,10 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(msg, type); 
     }); 
 
-
-
     it('should return the default height', () => {
         const spy = spyOnProperty(component, 'height').and.returnValue(constants.defaultHeight);
         expect(component[('height')]).toBe(constants.defaultHeight);
+        console.log(component[('height')]);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -145,24 +143,22 @@ describe('GamePageComponent', () => {
     });
 
     it('should call ngOnDestroy()', () => {
-        const spy = spyOn(component, 'ngOnDestroy');
+        const spy = spyOn(component, 'ngOnDestroy').and.callThrough();
         component.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
         expect(timeServiceSpy.stopTimer).toHaveBeenCalled(); 
         expect(socketClientServiceSpy.disconnect).toHaveBeenCalled(); 
         expect(timeServiceSpy.resetTimer).toHaveBeenCalled(); 
         expect(socketClientServiceSpy.leaveRoom).toHaveBeenCalled(); 
-        expect(component.gameName).toEqual(gameName); 
+        expect(component.gameName).toEqual(''); 
     });
 
     it('ngOninit() should call getGame() from gameService', () => {
-        // spyOn(gameServiceSpy, 'getGame');
         component.ngOnInit();
         expect(gameServiceSpy.getGame).toHaveBeenCalled();
     });
 
     it('ngOninit() should call displayIcons() from gameService', () => {
-        // spyOn(gameServiceSpy, 'displayIcons');
         component.ngOnInit();
         expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
     });
@@ -174,13 +170,11 @@ describe('GamePageComponent', () => {
     });
 
     it('ngAfterViewInit() should call connect from SocketClientSerive', () => {
-        // spyOn(component.socket, 'connect');
         component.ngAfterViewInit();
         expect(component.socket.connect).toHaveBeenCalled();
     });
 
     it('ngAfterViewInit() should call joinRoom from SocketClientSerive', () => {
-        // spyOn(socketClientServiceSpy, 'joinRoom');
         component.ngAfterViewInit();
         expect(socketClientServiceSpy.joinRoom).toHaveBeenCalled();
     });
@@ -191,22 +185,23 @@ describe('GamePageComponent', () => {
     });
 
     it('ngAfterViewInit() should call displayIcons() from gameService', () => {
-        // spyOn(gameServiceSpy, 'displayIcons');
         component.ngAfterViewInit();
         expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
     });
 
-    it('ngAfterViewInit() should set color to yellow', () => {
+    it('ngAfterViewInit() should call setColor', () => {
         component.ngAfterViewInit();
         expect(drawserviceSpy['setColor']).toEqual('yellow');
     });
 
     it('loading() should call getSetDifference()', () => {
         jasmine.clock().install();
-        // // spyOn(component, 'getSetDifference').and.callThrough();
-        // component.loading();
-        // jasmine.clock().tick(500);
-        // expect(component.getSetDifference).toHaveBeenCalled();
-        // jasmine.clock().uninstall();
+        spyOn(component, 'getSetDifference').and.callThrough();
+        component.loading();
+        jasmine.clock().tick(500);
+        expect(component.getSetDifference).toHaveBeenCalled();
+        jasmine.clock().uninstall();
     });
+
+    
 });

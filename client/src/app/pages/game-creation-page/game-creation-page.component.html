@@ -8,9 +8,12 @@
             <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas"
                 #originalCanvasComponent></app-canvas-ngx>
             <div class="swapping-canvas">
-                <img alt="swapping" src="./assets/img/SwappingCanvas.png" (click)="swapImages()" />
+                <img
+                    matTooltip="Intervertir les arrière-plans"
+                    matTooltipPosition="above"
+                    alt="swapping" src="./assets/img/SwappingCanvas.png" (click)="swapImages()" />
                 <input type="file" class="file-upload" accept=".bmp" #fileUpload (change)="loadImage($event)" />
-                <img alt="fileUpload" src="./assets/img/UploadBackground.png" (click)="fileUpload.click()" />
+                <img matTooltip="Téléverser une image" alt="fileUpload" src="./assets/img/UploadBackground.png" (click)="fileUpload.click()" />
             </div>
             <app-canvas-ngx class=" Canvas-ngx modified" [type]="modifiedCanvas"
                 #modifiedCanvasComponent></app-canvas-ngx>

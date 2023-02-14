@@ -1,27 +1,27 @@
 import { Component, OnInit } from '@angular/core';
+import * as constants from '@app/configuration/const-game';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
-// import { Router } from '@angular/router';
+
 @Component({
     selector: 'app-card-displayer',
     templateUrl: './card-displayer.component.html',
     styleUrls: ['./card-displayer.component.scss'],
 })
 export class CardDisplayerComponent implements OnInit {
-    currentPage: number; // page actuelle
+    currentPage: number;
     allPages: number;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    cardByPage: number = 4;
+    cardByPage: number = constants.FOUR;
     allCards: GameInfo[];
 
     constructor(private readonly gameDataBase: GameDatabaseService) {
-        this.currentPage = 0;
+        this.currentPage = constants.ZERO;
     }
     ngOnInit(): void {
-        this.getAllCards();
+        this.updateCards();
     }
 
-    getAllCards(): void {
+    updateCards() {
         this.gameDataBase.getAllGames().subscribe((res: GameInfo[]) => {
             this.allCards = res;
         });
@@ -32,7 +32,7 @@ export class CardDisplayerComponent implements OnInit {
         this.currentPage = newIndex;
     }
     goToPrevious(): void {
-        const isFirstPage = this.currentPage === 0;
+        const isFirstPage = this.currentPage === constants.ZERO;
         const newIndex = isFirstPage ? this.currentPage : this.currentPage - 1;
         this.currentPage = newIndex;
     }
@@ -41,8 +41,8 @@ export class CardDisplayerComponent implements OnInit {
         const startIndex: number = this.cardByPage * this.currentPage;
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);
-        if (this.allCards.length % this.cardByPage === 0) {
-            this.allPages = this.allCards.length / this.cardByPage - 1;
+        if (this.allCards.length % this.cardByPage === constants.ZERO) {
+            this.allPages = this.allCards.length / this.cardByPage - constants.ONE;
         } else {
             this.allPages = Math.floor(this.allCards.length / this.cardByPage);
         }

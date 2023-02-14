@@ -21,10 +21,14 @@ export class CanvasNgxComponent implements AfterViewInit {
 
     // needed for the canvas size
     get width(): number {
-        return constants.defaultWidth;
+        return constants.DEFAULT_WIDTH;
     }
     get height(): number {
-        return constants.defaultHeight;
+        return constants.DEFAULT_HEIGHT;
+    }
+
+    get canvasNative(): HTMLCanvasElement {
+        return this.canvas.nativeElement;
     }
     ngAfterViewInit(): void {
         this.drawService.clearCanvas(this.canvas.nativeElement);
@@ -37,9 +41,8 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     async onFileSelected(e: Event) {
-        this.bitmap.handleFileSelect(e).then((image: ImageBitmap) => {
-            this.loadImage(image);
-        });
+        const image = await this.bitmap.handleFileSelect(e);
+        if (image) this.loadImage(image);
         this.fileUpload.nativeElement.value = '';
     }
 
@@ -47,7 +50,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         const canvas = this.canvas.nativeElement;
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
-        const imageData = ctx.getImageData(0, 0, constants.defaultWidth, constants.defaultHeight);
+        const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         const canvasData = imageData.data;
         const canvasDataStr = ctx.canvas.toDataURL('image/bmp');
         if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);

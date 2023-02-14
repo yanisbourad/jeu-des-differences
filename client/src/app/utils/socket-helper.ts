@@ -16,6 +16,9 @@ export class SocketTestHelper {
         // this.callbacks.get(event)!.push(callback);
         this.callbacks.get(event)?.push(callback);
     }
+    getCallbacks(): Map<string, CallbackSignature[]> {
+        return this.callbacks;
+    }
 
     emit(): void {
         return;

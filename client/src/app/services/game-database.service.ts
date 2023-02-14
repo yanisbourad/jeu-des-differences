@@ -44,7 +44,7 @@ export class GameDatabaseService {
             gameName: _gameName,
             originalImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.originalCanvas),
             modifiedImageData: this.canvasHolder.getCanvasUrlData(this.canvasHolder.modifiedCanvas),
-            listDifferences: this.imageDiff.getDifferences(),
+            listDifferences: this.imageDiff.listDifferences.map((set) => Array.from(set).join(',')),
             difficulty: this.imageDiff.getDifficulty(),
         };
         const isSaved: EventEmitter<boolean> = new EventEmitter<boolean>();

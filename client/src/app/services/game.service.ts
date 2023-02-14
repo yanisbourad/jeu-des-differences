@@ -16,21 +16,13 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class GameService {
-    path: ImagePath = {
-        differenceNotFound: '../../../assets/img/difference-not-found.png',
-        differenceFound: '../../../assets/img/difference-found.png',
-        hintUnused: '../../../assets/img/hint-unused.png',
-        hintUsed: '../../../assets/img/hint-used.png',
-    };
-
+    path: ImagePath;
     game: Game;
     gameInformation: GameInformation;
-
     nDifferencesNotFound: number;
-    nDifferencesFound: number = 0;
+    nDifferencesFound: number;
     differencesArray: string[];
-    isGameFinished: boolean = false;
-
+    isGameFinished: boolean;
     nHintsUnused: number;
     nHintsUsed: number;
     hintsArray: string[];
@@ -44,6 +36,12 @@ export class GameService {
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
     ) {
+        this.path = {
+            differenceNotFound: '../../../assets/img/difference-not-found.png',
+            differenceFound: '../../../assets/img/difference-found.png',
+            hintUnused: '../../../assets/img/hint-unused.png',
+            hintUsed: '../../../assets/img/hint-used.png',
+        };
         this.gameInformation = {
             gameTitle: '',
             gameMode: 'solo',
@@ -53,6 +51,8 @@ export class GameService {
             hintsPenalty: 0,
             isClassical: false,
         };
+        this.nDifferencesFound = 0;
+        this.isGameFinished = false;
         this.renderer = rendererFactory.createRenderer(null, null);
     }
 
@@ -114,10 +114,29 @@ export class GameService {
     }
 
     reinitializeGame(): void {
-        this.isGameFinished = false;
+        this.nDifferencesNotFound = 0;
+        this.nHintsUnused = 0;
         this.nDifferencesFound = 0;
-        this.nHintsUsed = 0;
+        this.differencesArray = [];
+        this.playerName = '';
+        this.nDifferencesFound = 0;
         this.socket.leaveRoom();
+        this.game = {
+            gameName: '',
+            difficulty: '',
+            originalImageData: '',
+            modifiedImageData: '',
+            listDifferences: [],
+        };
+        this.gameInformation = {
+            gameTitle: '',
+            gameMode: 'solo',
+            gameDifficulty: '',
+            nDifferences: 0,
+            nHints: constants.NUMBER_OF_HINTS,
+            hintsPenalty: 0,
+            isClassical: false,
+        };
     }
 
     clickDifferencesFound(): void {

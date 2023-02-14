@@ -1,17 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services/game.service';
-
 import { GameInfoComponent } from './game-info.component';
+import SpyObj = jasmine.SpyObj;
 
 describe('GameInfoComponent', () => {
+    let gameServiceSpy: SpyObj<GameService>;
     let component: GameInfoComponent;
     let fixture: ComponentFixture<GameInfoComponent>;
+
+    beforeEach(() => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['displayIcons']);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameInfoComponent],
+            providers: [{ provide: GameService, useValue: gameServiceSpy }],
         }).compileComponents();
+    });
 
+    beforeEach(() => {
         fixture = TestBed.createComponent(GameInfoComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -20,14 +28,10 @@ describe('GameInfoComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should call displayIcons after timeout', () => {
-        const gameService = TestBed.inject(GameService);
-        spyOn(gameService, 'displayIcons');
 
+    it('ngOnInit should call displayIcons from gameService', () => {
         component.ngOnInit();
-        const timeout = 250;
-        setTimeout(() => {
-            expect(gameService.displayIcons).toHaveBeenCalled();
-        }, timeout);
+        expect(component.ngOnInit()).toHaveBeenCalled();
+        expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
     });
 });

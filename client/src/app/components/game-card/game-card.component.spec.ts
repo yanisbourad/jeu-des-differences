@@ -4,17 +4,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NamePopupComponent } from '../name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
-//import { GameInfoComponent } from '../game-info/game-info.component';
-//import { GameDatabaseService } from '@app/services/game-database.service';
 import { Router } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
-    //let dialog: MatDialog;
-    //let router: Router;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCardComponent, NamePopupComponent],
@@ -23,9 +17,6 @@ describe('GameCardComponent', () => {
         }).compileComponents();
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
-        //dialog = TestBed.inject(MatDialog);
-        //router = TestBed.inject(Router);
-
         component.card  = {
                         gameName: 'difference 1',
                         difficulty: 'Facile',
@@ -80,34 +71,26 @@ describe('GameCardComponent', () => {
         fixture.detectChanges();
 
     });
-
     it('should create', () => {
         expect(component).toBeTruthy();
     });
     it('should open dialog', () => {
-        const spy = spyOn(component.dialog, 'open').and.callThrough();
+            const spy = spyOn(component.dialog, 'open').and.callThrough();
+            component.openDialog();
+            expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'difference 1' } });
+      }); 
 
-        component.openDialog();
-
-        expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'difference 1' } });  // Check if dialog is opened with correct parameters 
-
-    });
-
-    it('should change button text to "Classique" when on classique page', () => {  // Check if button text is changed correctly when on different pages 
-
-        component.url = '/classique'
+    it('should change button text to "Classique" when on classique page', () =>{
+        component.url = '/classique';
         const type = component.changeButton(); 
         expect(type).toEqual('Classique'); 
+     });
+     it('should change button text to "Configuration" when on configuration page', () =>{
+        component.url = '/config'; 
 
-    });
-    it('should change button text to "Classique" when on configuration page', () => {  // Check if button text is changed correctly when on different pages 
-
-        component.url = '/config'; // Mock router url to classique page 
-
-        const type = component.changeButton();  // Call function to check result 
+        const type = component.changeButton(); 
         expect(type).toEqual('Configuration');
 
     });  
-
 
 });

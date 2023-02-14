@@ -1,15 +1,15 @@
 // this file contains all the constants used in the canvas
-export const defaultWidth = 640;
-export const defaultHeight = 480;
-export const defaultLineWidth = 5;
-export const defaultLineCap = 'round';
-export const minLineWidth = 1;
-export const maxLineWidth = 10;
-export const defaultRadius = 0;
-export const defaultLineColor = '#000000';
-export const defaultBackgroundColor = '#ffffff';
+export const DEFAULT_WIDTH = 640;
+export const DEFAULT_HEIGHT = 480;
+export const DEFAULT_LINE_WIDTH = 5;
+export const DEFAULT_LINE_CAP = 'round';
+export const MIN_LINE_WIDTH = 1;
+export const MAX_LINE_WIDTH = 10;
+export const DEFAULT_RADIUS = 0;
+export const DEFAULT_LINE_COLOR = '#000000';
+export const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-export const possibleRadius = [0, 3, 6, 9, 15];
-export const nextPixelStartIndex = 4;
-export const incrementValue = 1;
-export const desiredBitDepth = 24;
+export const POSSIBLE_RADIUS = [0, 3, 6, 9, 15];
+export const NEXT_PIXEL_START_INDEX = 4;
+export const INCREMENT_VALUE = 1;
+export const DESIRED_BIT_DEPTH = 24;

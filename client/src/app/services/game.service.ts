@@ -9,8 +9,6 @@ import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
 import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
-// import { DrawService } from './draw.service';
-// import { SocketClientService } from './socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -86,13 +84,14 @@ export class GameService {
     }
 
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
-        let visible = true;
+        let isVisible = true;
         let blinkCount = 0;
         const intervalId = setInterval(() => {
-            visible = !visible;
-            this.renderer.setStyle(canvas1.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-            this.renderer.setStyle(canvas2.nativeElement, 'visibility', visible ? 'visible' : 'hidden');
-
+            isVisible = !isVisible;
+            if (this.renderer) {
+                this.renderer.setStyle(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+                this.renderer.setStyle(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
+            }
             blinkCount++;
             if (blinkCount === constantsTime.BLINKING_COUNT) {
                 clearInterval(intervalId);

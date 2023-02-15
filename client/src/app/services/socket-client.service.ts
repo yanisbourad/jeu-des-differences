@@ -33,7 +33,7 @@ export class SocketClientService {
 
     configureBaseSocketFeatures() {
         this.socketClient.on('connect', () => {
-            alert('connection au socket');
+            // alert('connection au socket');
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('hello', (message: string) => {

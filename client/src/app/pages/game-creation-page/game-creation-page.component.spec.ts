@@ -11,8 +11,6 @@ import SpyObj = jasmine.SpyObj;
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
-    let bitmapService: BitmapService;
-
     let bitmapServiceSpy: SpyObj<BitmapService>;
     let canvasHolderServiceSpy: SpyObj<CanvasHolderService>;
     let renderer2Spy: SpyObj<Renderer2>;
@@ -20,7 +18,7 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(() => {
         canvasHolderServiceSpy = jasmine.createSpyObj('CanvasHolderService', ['originalCanvas', 'modifiedCanvas', 'clearCanvas']);
-        // bitmapServiceSpy = jasmine.createSpyObj('BitmapService', ['handleFileSelect']);
+        bitmapServiceSpy = jasmine.createSpyObj('BitmapService', ['handleFileSelect']);
         renderer2Spy = jasmine.createSpyObj('Renderer2', ['insertBefore']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
     });
@@ -30,7 +28,7 @@ describe('GameCreationPageComponent', () => {
             imports: [MatDialogModule],
             declarations: [GameCreationPageComponent, CanvasNgxComponent, DifferencePopupComponent],
             providers: [
-                // { provide: BitmapService, useValue: bitmapServiceSpy },
+                { provide: BitmapService, useValue: bitmapServiceSpy },
                 { provide: CanvasHolderService, useValue: canvasHolderServiceSpy },
                 { provide: Renderer2, useValue: renderer2Spy },
                 { provide: MatDialog, useValue: matDialogSpy },
@@ -39,7 +37,7 @@ describe('GameCreationPageComponent', () => {
 
         fixture = TestBed.createComponent(GameCreationPageComponent);
         component = fixture.componentInstance;
-        bitmapService = TestBed.inject(BitmapService);
+        // bitmapService = TestBed.inject(BitmapService);
     });
 
     it('should create', () => {
@@ -81,12 +79,13 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should call handleFileSelect from BitmapService', () => {
-        spyOn(bitmapService, 'handleFileSelect');
-        // spyOn(component.originalCanvasComponent, 'loadImage');
-        // spyOn(component.modifiedCanvasComponent, 'loadImage');
-        component.loadImage({} as Event);
-        expect(component.originalCanvasComponent.loadImage).toBeTruthy();
-        expect(component.modifiedCanvasComponent.loadImage).toBeTruthy();
+        bitmapServiceSpy.handleFileSelect.and.returnValue(Promise.resolve({} as ImageBitmap));
+        const can1 = spyOn(component.originalCanvasComponent, 'loadImage');
+        const can2 = spyOn(component.modifiedCanvasComponent, 'loadImage');
+        const e = new Event('change');
+        component.loadImage(e);
+        expect(can1).toHaveBeenCalledTimes(1);
+        expect(can2).toHaveBeenCalledTimes(1);
         expect(bitmapServiceSpy.handleFileSelect).toHaveBeenCalledWith({} as Event);
     });
 });

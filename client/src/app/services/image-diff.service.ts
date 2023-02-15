@@ -37,7 +37,6 @@ export class ImageDiffService {
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.setDiffPixels = new Set();
         this.radius = constants.DEFAULT_RADIUS;
-        // this.differencePixelArray = [];
         this.differenceMatrix = [];
         this.pixelNumberByImage = 0;
         this.hasBeenChanged = false;
@@ -56,7 +55,6 @@ export class ImageDiffService {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.differenceMatrix = [];
-        // this.differencePixelArray = [];
         this.drawingDifferenceArray = new Uint8ClampedArray([]);
         this.setDiffPixels = new Set();
         this.hasBeenChanged = false;
@@ -109,7 +107,6 @@ export class ImageDiffService {
 
     getDifferenceMatrix(): void {
         this.differenceMatrix = [];
-        // this.differencePixelArray = [];
         if (!this.areEmpty()) {
             for (let i = 0; i < this.pixelNumberByImage; i++) {
                 if (
@@ -126,18 +123,6 @@ export class ImageDiffService {
             }
         }
     }
-
-    // setDifferenceDataToDraw(): void {
-    //     this.getDifferenceMatrix();
-    //     if (!this.hasBeenChanged && this.differencePixelArray.length !== 0) {
-    //         this.drawingDifferenceArray = new Uint8ClampedArray(this.differencePixelArray);
-    //     }
-    //     this.hasBeenChanged = !this.hasBeenChanged;
-    // }
-
-    // getDifferencePixelToDraw(): Set<number>[] {
-    //     return this.listDifferences;
-    // }
 
     defineDifferences(): Set<number>[] {
         // listDifferences is the list of independent differences
@@ -223,22 +208,6 @@ export class ImageDiffService {
         const xPosition = x - y * constants.DEFAULT_WIDTH;
         return { x: xPosition, y };
     }
-
-    // getDifferenceNumber() {
-    //     return this.listDifferences.length;
-    // }
-
-    // getOriginalImageData(): number[] {
-    //     return this.originalImageData;
-    // }
-
-    // getModifiedImageData(): number[] {
-    //     return this.modifiedImageData;
-    // }
-
-    // getDifferences(): string[] {
-    //     return this.listDifferences.map((set) => Array.from(set).join(','));
-    // }
 
     getDifficulty(): string {
         let count = 0;

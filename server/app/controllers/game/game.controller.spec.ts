@@ -108,6 +108,7 @@ describe('GameController', () => {
     });
     describe('createGame', () => {
         it('createGame() should return NOT_FOUND when service add the course', async () => {
+            const spy = jest.spyOn(gameService, 'addGame').mockImplementation();
             const game = {
                 gameName: 'kasspopobnmkieieio',
                 difficulty: 'easy',
@@ -122,7 +123,7 @@ describe('GameController', () => {
                 return res;
             };
             res.send = () => res;
-
+            expect(spy).toBeCalled();
             await controller.createGame(game, res);
         });
     });

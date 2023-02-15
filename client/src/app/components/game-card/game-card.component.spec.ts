@@ -165,7 +165,6 @@ describe('GameCardComponent', () => {
       it('should apply the ButtonFourDirective to the Reinitialiser button', () => {
         component.url = '/config';
         fixture.detectChanges();
-    
         const button = fixture.debugElement.query(By.css('#joinButton'));
         expect(button).not.toBeNull();
     

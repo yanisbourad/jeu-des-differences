@@ -3,7 +3,6 @@ import * as constants from '@app/configuration/const-canvas';
 import { BfsInput } from '@app/interfaces/bfs-input';
 import { PixelMatrix } from '@app/interfaces/pixel-matrix';
 import { Point } from '@app/interfaces/point';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
 
 @Injectable({
     providedIn: 'root',
@@ -20,10 +19,10 @@ export class ImageDiffService {
     drawingDifferenceArray: Uint8ClampedArray;
     hasBeenChanged: boolean;
     setDiffPixels: Set<number>;
+    listDifferencesLength: number = 0;
     // differencePixelArray: number[];
     currentDifferenceTemp: Set<number>;
     listDifferences: Set<number>[];
-    listDifferencesLength: number;
     differenceMatrix: number[];
     pixelNumberByImage: number;
     mapDistPoint: Map<number, number>;
@@ -33,7 +32,7 @@ export class ImageDiffService {
     ratioLimitDifficultyLevel: number;
     private imageMatrixSize: number;
 
-    constructor(private canvasHolderService: CanvasHolderService) {
+    constructor() {
         this.originalPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.modifiedPixelMatrix = { red: [], green: [], blue: [], alpha: [] };
         this.setDiffPixels = new Set();
@@ -102,13 +101,9 @@ export class ImageDiffService {
         }
     }
 
-    setPixelMatrix(): void {
+    setPixelMatrix(originalCanvasArray: Uint8ClampedArray, modifiedCanvasArray: Uint8ClampedArray): void {
         this.resetImageData();
-        const originalData = this.canvasHolderService.getCanvasData(this.canvasHolderService.originalCanvas);
-        const modifiedData = this.canvasHolderService.getCanvasData(this.canvasHolderService.modifiedCanvas);
-        if (originalData && modifiedData) {
-            this.setImageData(originalData, modifiedData);
-        }
+        this.setImageData(originalCanvasArray, modifiedCanvasArray);
         this.readData();
     }
 

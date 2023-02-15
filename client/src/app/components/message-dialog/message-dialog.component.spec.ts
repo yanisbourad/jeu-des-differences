@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ClientTimeService } from '@app/services/client-time.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { MessageDialogComponent } from './message-dialog.component';
 import spyObj = jasmine.SpyObj;
 
-fdescribe('MessageDialogComponent', () => {
+describe('MessageDialogComponent', () => {
     let component: MessageDialogComponent;
     let fixture: ComponentFixture<MessageDialogComponent>;
     let socket: spyObj<SocketClientService>;
@@ -26,7 +26,7 @@ fdescribe('MessageDialogComponent', () => {
                 { provide: SocketClientService, useValue: socket },
                 { provide: ClientTimeService, useValue: timer },
                 { provide: MAT_DIALOG_DATA, useValue: matDialogSpy },
-                { provide: Router, useValue: router},
+                { provide: Router, useValue: router },
             ],
         }).compileComponents();
 

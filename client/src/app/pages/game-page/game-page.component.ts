@@ -81,9 +81,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     loading(): void {
+        const timeout = 500;
         setTimeout(() => {
             this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
-        }, 500);
+        }, timeout);
     }
 
     mouseHitDetect(event: MouseEvent) {

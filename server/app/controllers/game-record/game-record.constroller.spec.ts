@@ -24,27 +24,27 @@ describe('GameRecordController', () => {
         }).compile();
         controller = module.get<GameRecordController>(GameRecordController);
         game = {
-          gameName: 'test',
-          typeGame: 'test',
-          time: 'test',
-          playerName: 'test',
-          dateStart: 'test'
+            gameName: 'test',
+            typeGame: 'test',
+            time: 'test',
+            playerName: 'test',
+            dateStart: 'test',
         };
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
-    
+
     it('should create a game record and return 201 status code', async () => {
-       gameRecordService.addGameRecord.resolves();
-       const res = {} as unknown as Response;
-       res.status = (code) => {
+        gameRecordService.addGameRecord.resolves();
+        const res = {} as unknown as Response;
+        res.status = (code) => {
             expect(code).toBe(HttpStatus.NOT_FOUND);
             return res;
-       }
-      res.send = () => res;
-      await controller.createGameRecord(game,res);
+        };
+        res.send = () => res;
+        await controller.createGameRecord(game, res);
     });
 
     it('createGameRecord() should return NOT_FOUND when service add the game record', async () => {
@@ -54,7 +54,6 @@ describe('GameRecordController', () => {
             expect(code).toEqual(HttpStatus.NOT_FOUND);
             return res;
         };
-        console.log(res);
         res.send = () => res;
         await controller.createGameRecord(game, res);
     });

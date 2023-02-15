@@ -107,7 +107,6 @@ export class GameService {
     }
 
     deleteDirectory(dirName: string): void {
-        console.log('deleteDirectory');
         fs.rm(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
             if (err) {
                 this.logger.error(`Failed to delete directory ${dirName}`);

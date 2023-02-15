@@ -53,7 +53,6 @@ export class GameController {
         try {
             const res = await this.gamesService.addGame(game);
             response.status(HttpStatus.OK).json(res);
-           
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }

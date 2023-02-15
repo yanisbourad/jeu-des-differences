@@ -5,16 +5,14 @@ import SpyObj = jasmine.SpyObj;
 
 describe('TimerComponent', () => {
     let component: TimerComponent;
-    let timer: SpyObj<ClientTimeService>
+    let timer: SpyObj<ClientTimeService>;
     let fixture: ComponentFixture<TimerComponent>;
 
     beforeEach(async () => {
         timer = jasmine.createSpyObj('ClientTimeService', ['getCount']);
         await TestBed.configureTestingModule({
             declarations: [TimerComponent],
-            providers: [
-                { provide: ClientTimeService, useValue: timer }
-            ]
+            providers: [{ provide: ClientTimeService, useValue: timer }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TimerComponent);
@@ -26,7 +24,7 @@ describe('TimerComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should return the time in a string format', () => { 
+    it('should return the time in a string format', () => {
         component.time = { minute: 15, second: 10 };
         expect(component.formatTime()).toBe('15:10');
     });
@@ -56,5 +54,5 @@ describe('TimerComponent', () => {
         timer.getCount.and.returnValue(countStub);
         component.transform();
         expect(component.transform()).toEqual(expectedResult);
-    }); 
+    });
 });

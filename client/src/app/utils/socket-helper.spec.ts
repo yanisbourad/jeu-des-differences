@@ -8,7 +8,7 @@ describe('SocketTestHelper', () => {
     });
 
     it('should store a callback for a given event', () => {
-        const callback = (params: unknown) => ({});
+        const callback = () => ({});
         const event = '';
         socket.on('', callback);
         expect(socket.getCallbacks().has(event)).toBeTruthy();
@@ -16,7 +16,7 @@ describe('SocketTestHelper', () => {
     });
 
     it('should store a callback for a given event', () => {
-        const callback = (params: unknown) => ({});
+        const callback = () => ({});
         const event = '';
         socket.on(event, callback);
         expect(socket.getCallbacks().has(event)).toBeTruthy();
@@ -26,10 +26,10 @@ describe('SocketTestHelper', () => {
     it('should call the callbacks for a given event', () => {
         const callback = jasmine.createSpy();
         const event = 'test-event';
-        const params = {};
+
         socket.on(event, callback);
-        socket.peerSideEmit(event, params);
-        expect(callback).toHaveBeenCalledWith(params);
+        socket.peerSideEmit(event, {});
+        expect(callback).toHaveBeenCalledWith({});
     });
 
     it('should call the callbacks for a given event with multiple callbacks', () => {
@@ -45,7 +45,7 @@ describe('SocketTestHelper', () => {
     });
 
     it('should return nothing if callback has no event', () => {
-        const callback1 = (params: unknown) => ({});
+        const callback1 = () => ({});
         const event = 'test-event';
         const params = {};
         socket.on(event, callback1);

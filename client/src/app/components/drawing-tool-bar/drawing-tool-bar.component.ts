@@ -17,11 +17,7 @@ export class DrawingToolBarComponent {
     showDifference: number = 0;
     tic: boolean = false;
 
-    constructor(
-        private readonly drawingService: DrawService,
-        // private readonly canvasHolder: CanvasHolderService,
-        private readonly imageDifferenceService: ImageDiffService,
-    ) {}
+    constructor(private readonly drawingService: DrawService, private readonly imageDifferenceService: ImageDiffService) {}
     get const(): typeof constants {
         return constants;
     }
@@ -35,14 +31,5 @@ export class DrawingToolBarComponent {
 
     setRadius(): void {
         this.imageDifferenceService.setRadius = this.selectedRadius;
-    }
-
-    drawDifferenceImage2() {
-        if (this.imageDifferenceService.listDifferences.length !== 0) {
-            // this.showMessage = !this.showMessage;
-            this.showDifference = this.imageDifferenceService.listDifferences.length;
-            this.tic = !this.tic;
-            this.onReadyToDraw.emit();
-        }
     }
 }

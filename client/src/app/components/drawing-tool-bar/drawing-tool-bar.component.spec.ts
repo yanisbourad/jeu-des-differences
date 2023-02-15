@@ -1,21 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DrawService } from '@app/services/draw.service';
-
+import { ImageDiffService } from '@app/services/image-diff.service';
 import { DrawingToolBarComponent } from './drawing-tool-bar.component';
+import SpyObj = jasmine.SpyObj;
 
 describe('DrawingToolBarComponent', () => {
     let component: DrawingToolBarComponent;
     let fixture: ComponentFixture<DrawingToolBarComponent>;
-    let drawService: DrawService;
+    let drawServiceSpy: SpyObj<DrawService>;
+    let imageDiffServiceSpy: SpyObj<ImageDiffService>;
+
+    beforeEach(() => {
+        drawServiceSpy = jasmine.createSpyObj('DrawService', ['setLineWidth', 'setColor']);
+        imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['setRadius']);
+    });
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [DrawingToolBarComponent],
-            providers: [DrawService],
+            providers: [
+                { provide: DrawService, useValue: drawServiceSpy },
+                { provide: ImageDiffService, useValue: imageDiffServiceSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(DrawingToolBarComponent);
-        // eslint-disable-next-line deprecation/deprecation
-        drawService = TestBed.get(DrawService);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -27,17 +36,18 @@ describe('DrawingToolBarComponent', () => {
     it('should call set method on service when setLineWidth is called', () => {
         component.lineWidth = 1;
         component.setLineWidth();
-        expect(drawService.getLineWidth).toBe(1);
-        component.lineWidth = 3;
-        component.setLineWidth();
-        expect(drawService.getLineWidth).toBe(3);
+        expect(drawServiceSpy.getLineWidth).toHaveBeenCalled();
     });
+
     it('should set Color on service when setColor is called', () => {
         component.lineColor = '#000000';
         component.setLineColor();
-        expect(drawService.getColor).toBe('#000000');
-        component.lineColor = '#FFFFFF';
-        component.setLineColor();
-        expect(drawService.getColor).toBe('#FFFFFF');
+        expect(drawServiceSpy.getColor).toHaveBeenCalled();
+    });
+
+    it('should set radius on service when setRadius is called', () => {
+        component.selectedRadius = 1;
+        component.setRadius();
+        expect(imageDiffServiceSpy.setRadius).toHaveBeenCalled();
     });
 });

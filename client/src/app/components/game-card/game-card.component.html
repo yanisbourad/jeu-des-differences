@@ -37,9 +37,9 @@
                 </tr>
         </table>
     </div>
-    <button appButtonOne *ngIf="changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()">Jouer</button>
-    <button appButtonTwo *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>
+    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="playButton" (click)="openDialog()">Jouer</button>
+    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton">Joindre</button>
 
-    <button appButtonThree *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
-    <button appButtonFour *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>
+    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
+    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>
 </div>

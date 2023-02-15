@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -12,6 +12,7 @@ describe('NamePopupComponent', () => {
     let route: Router;
     const dialogRefSpy = {
         close: () => {},
+    };
     let component: NamePopupComponent;
     let fixture: ComponentFixture<NamePopupComponent>;
     let route: Router;

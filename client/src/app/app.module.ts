@@ -1,3 +1,4 @@
+import { OverlayModule } from '@angular/cdk/overlay';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -17,19 +18,18 @@ import { CardDisplayerComponent } from './components/card-displayer/card-display
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
+import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { NamePopupComponent } from './components/name-popup/name-popup.component';
+import { TimePopupComponent } from './components/time-popup/time-popup.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/configuration-jeu-page.component';
-import { TimePopupComponent } from './components/time-popup/time-popup.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
-import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
-import { OverlayModule } from '@angular/cdk/overlay';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.

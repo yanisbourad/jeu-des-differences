@@ -1,8 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
-import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
 
 @Component({
     selector: 'app-difference-popup',
@@ -56,11 +56,13 @@ export class DifferencePopupComponent implements AfterViewInit {
     openName() {
         if (this.showValidation) {
             this.dialogRef.close();
-            this.dialog.open(GameNameSaveComponent, {
+            const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
                 disableClose: true,
                 height: '600x',
                 width: '500px',
             });
+            this.closeOnAbort();
+            dialogRefGame.afterClosed();
         }
     }
 

@@ -91,6 +91,7 @@ describe('CanvasNgxComponent', () => {
     it('should loadImage when file is selected', async () => {
         const spy = spyOn(component, 'loadImage');
         // create a new event on change file selection
+        bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
         const event = new Event('change');
         const blob = await (await fetch('./assets/image_empty.bmp')).blob();
         const file = await new File([blob], 'test.bmp', { type: 'image/bmp' });
@@ -99,6 +100,7 @@ describe('CanvasNgxComponent', () => {
         Object.defineProperty(event, 'target', { value: { files: fileList } });
         await component.onFileSelected(event);
         expect(spy).toHaveBeenCalledTimes(1);
+        expect(bitmapService.handleFileSelect).toHaveBeenCalledTimes(1);
     });
 
     it('should save canvas', () => {

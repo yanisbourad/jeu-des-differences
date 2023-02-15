@@ -36,18 +36,18 @@ describe('DrawingToolBarComponent', () => {
     it('should call set method on service when setLineWidth is called', () => {
         component.lineWidth = 1;
         component.setLineWidth();
-        expect(drawServiceSpy.getLineWidth).toHaveBeenCalled();
+        expect(drawServiceSpy.setLineWidth).toEqual(1);
     });
 
     it('should set Color on service when setColor is called', () => {
         component.lineColor = '#000000';
         component.setLineColor();
-        expect(drawServiceSpy.getColor).toHaveBeenCalled();
+        expect(drawServiceSpy.setColor).toEqual('#000000');
     });
 
     it('should set radius on service when setRadius is called', () => {
         component.selectedRadius = 1;
         component.setRadius();
-        expect(imageDiffServiceSpy.setRadius).toHaveBeenCalled();
+        expect(imageDiffServiceSpy.setRadius).toEqual(1);
     });
 });

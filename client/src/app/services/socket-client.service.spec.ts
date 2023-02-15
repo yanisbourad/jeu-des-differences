@@ -21,7 +21,19 @@ describe('SocketClientService', () => {
             ],
         });
         service = TestBed.inject(SocketClientService);
-        service.socket = new SocketTestHelper() as unknown as Socket;
+        socketClient.socket = new SocketTestHelper() as unknown as Socket;
+        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+        socketClient.on.and.callFake((event: string, callback: (data: any) => void) => {
+            if (event === 'hello') {
+                callback('Hello, world!');
+            }
+            if (event === 'message') {
+                callback('message');
+            }
+            if (event === 'connect') {
+                callback('connect');
+            }
+        });
     });
 
     it('should be created', () => {

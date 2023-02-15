@@ -32,7 +32,14 @@ export class DifferencePopupComponent implements AfterViewInit {
         this.upperLimitDifferenceAllowed = 10;
     }
 
-    handleOutputMessage() {
+    ngAfterViewInit(): void {
+        this.showDifference = this.imageDifferenceService.listDifferences.length;
+        if (this.showDifference !== 0) {
+            this.drawService.clearCanvas(this.canvas.nativeElement);
+            const differences = this.imageDifferenceService.listDifferences;
+            this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
+        }
+
         if (this.showDifference > this.lowerLimitDifferenceAllowed && this.showDifference < this.upperLimitDifferenceAllowed) {
             this.showMessage = '';
             this.showValidation = true;
@@ -40,32 +47,20 @@ export class DifferencePopupComponent implements AfterViewInit {
             this.showValidation = false;
             this.showMessage = '(valide entre 3 et 9)';
         }
-    }
-
-    ngAfterViewInit(): void {
-        this.showDifference = this.imageDifferenceService.listDifferencesLength;
-        if (this.showDifference !== 0) {
-            this.drawService.clearCanvas(this.canvas.nativeElement);
-            const differences = this.imageDifferenceService.listDifferences;
-            this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
-        }
-        this.handleOutputMessage();
         this.changeDetectorRef.detectChanges();
     }
 
     openName() {
         if (this.showValidation) {
-            this.dialogRef.close();
             const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
                 disableClose: true,
                 height: '600x',
                 width: '500px',
             });
-            this.closeOnAbort();
+            this.dialogRef.close();
             dialogRefGame.afterClosed();
         }
     }
-
     closeOnAbort() {
         this.dialogRef.close();
     }

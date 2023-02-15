@@ -1,40 +1,32 @@
-import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 import { DifferencePopupComponent } from './difference-popup.component';
-import SpyObj = jasmine.SpyObj;
-
 describe('DifferencePopupComponent', () => {
     let component: DifferencePopupComponent;
     let fixture: ComponentFixture<DifferencePopupComponent>;
-
-    let imageDiffServiceSpy: SpyObj<ImageDiffService>;
-    let drawServiceSpy: SpyObj<DrawService>;
-    let dialogSpy: SpyObj<MatDialog>;
-    let dialogRefSpy: SpyObj<MatDialogRef<DifferencePopupComponent>>;
-    let changeDetectorRefSpy: SpyObj<ChangeDetectorRef>;
-
-    beforeEach(() => {
-        imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['listDifferencesLength', 'listDifferences']);
-        drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearCanvas', 'drawAllDiff']);
-        dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        dialogRefSpy = jasmine.createSpyObj('MatDialogRef<GameNameSaveComponent>', ['close', 'afterClosed']);
-    });
+    let matDialogSpy: jasmine.SpyObj<MatDialog>;
+    let imageDiffServiceSpy: jasmine.SpyObj<ImageDiffService>;
+    let drawServiceSpy: jasmine.SpyObj<DrawService>;
+    const dialogRefSpy = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        close: () => {},
+    };
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
         imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['listDifferences']);
         drawServiceSpy = jasmine.createSpyObj('ImageDiffService', ['clearCanvas', 'drawAllDiff']);
         await TestBed.configureTestingModule({
-            declarations: [DifferencePopupComponent],
+            imports: [MatDialogModule],
+            declarations: [DifferencePopupComponent, GameNameSaveComponent],
             providers: [
+                { provide: MatDialog, useValue: matDialogSpy },
+                { provide: MatDialogRef, useValue: dialogRefSpy },
                 { provide: ImageDiffService, useValue: imageDiffServiceSpy },
-                { provide: MatDialog, useValue: dialogSpy },
-                { provide: MatDialogRef<DifferencePopupComponent>, useValue: dialogRefSpy },
                 { provide: DrawService, useValue: drawServiceSpy },
-                { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
             ],
         }).compileComponents();
 
@@ -44,51 +36,39 @@ describe('DifferencePopupComponent', () => {
     });
 
     it('should create', () => {
-        component.showValidation = false;
-        component.lowerLimitDifferenceAllowed = 2;
-        component.upperLimitDifferenceAllowed = 10;
         expect(component).toBeTruthy();
     });
 
-    it('should call methods for needed services', () => {
-        component.showDifference = 8;
-        component.lowerLimitDifferenceAllowed = 2;
-        component.upperLimitDifferenceAllowed = 10;
+    it('should open settings dialog and close', () => {
+        const dialogCloseSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        matDialogSpy.open.and.returnValue(dialogCloseSpy);
+        component.showValidation = true;
+        component.openName();
+        expect(matDialogSpy.open).toHaveBeenCalledWith(GameNameSaveComponent, {
+            disableClose: true,
+            height: '600x',
+            width: '500px',
+        });
+        expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
+    });
+
+    it('should call close', () => {
+        const spy = spyOn(component.dialogRef, 'close').and.callThrough();
+        component.closeOnAbort();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should show validation', () => {
+        component['imageDifferenceService'].listDifferences = [new Set([1, 2, 3]), new Set([4, 5]), new Set([6, 7, 8, 9])];
         component.ngAfterViewInit();
-        expect(imageDiffServiceSpy.listDifferencesLength).toBeTruthy();
-        expect(drawServiceSpy.clearCanvas).toHaveBeenCalled();
-        expect(drawServiceSpy.drawAllDiff).toHaveBeenCalled();
-    });
-
-    it('should communicate no feedback message on valid name', () => {
-        component.showDifference = 8;
-        component.lowerLimitDifferenceAllowed = 2;
-        component.upperLimitDifferenceAllowed = 10;
-        component.handleOutputMessage();
         expect(component.showMessage).toBe('');
-        expect(component.showValidation).toBeTruthy();
+        expect(component.showValidation).toBeTrue();
     });
 
-    it('should not communicate feedback message on invalid name ', () => {
-        component.showDifference = 1;
-        component.lowerLimitDifferenceAllowed = 2;
-        component.upperLimitDifferenceAllowed = 10;
-        component.handleOutputMessage();
+    it('should not show validation', () => {
+        component['imageDifferenceService'].listDifferences = [new Set([1, 2, 3]), new Set([4, 5])];
+        component.ngAfterViewInit();
         expect(component.showMessage).toBe('(valide entre 3 et 9)');
         expect(component.showValidation).toBeFalsy();
-    });
-
-    it('should open Game Name dialog ', () => {
-        component.showValidation = true;
-        component.showDifference = 7;
-        component.lowerLimitDifferenceAllowed = 2;
-        component.upperLimitDifferenceAllowed = 10;
-        component.openName();
-        expect(dialogSpy.open).toHaveBeenCalled();
-    });
-
-    it('should close pop up on call ', () => {
-        component.closeOnAbort();
-        expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 });

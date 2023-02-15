@@ -9,7 +9,7 @@ describe('HeaderComponent', () => {
     let matDialogSpy: jasmine.SpyObj<MatDialog>;
 
     beforeEach(async () => {
-        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'close']);
+        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
         await TestBed.configureTestingModule({
             imports: [MatDialogModule],
             declarations: [HeaderComponent, TimePopupComponent],

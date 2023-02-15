@@ -82,9 +82,6 @@ export class GameService {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
         }
-        for (let i = 0; i < this.nHintsUnused; i++) {
-            this.hintsArray[i] = this.path.hintUnused;
-        }
     }
 
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {

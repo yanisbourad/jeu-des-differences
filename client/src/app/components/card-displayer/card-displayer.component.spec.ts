@@ -96,8 +96,8 @@ describe('CardDisplayerComponent', () => {
         expect(component.goToNext).toHaveBeenCalled();
     });
 
-    it('should display 4 game cards by page', () => {
-        const cards: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-grid-tile'));
-        expect(cards.length).toBe(constants.FOUR);
+    it('should display max 4 game cards by page', () => {
+        const gridList = fixture.nativeElement.querySelector('mat-grid-list');
+        expect(gridList.getAttribute('cols')).toEqual(constants.FOUR.toString());
     });
 });

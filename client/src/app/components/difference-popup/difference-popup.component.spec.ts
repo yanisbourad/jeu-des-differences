@@ -24,6 +24,9 @@ describe('DifferencePopupComponent', () => {
     });
 
     beforeEach(async () => {
+        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
+        imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['listDifferences']);
+        drawServiceSpy = jasmine.createSpyObj('ImageDiffService', ['clearCanvas', 'drawAllDiff']);
         await TestBed.configureTestingModule({
             declarations: [DifferencePopupComponent],
             providers: [

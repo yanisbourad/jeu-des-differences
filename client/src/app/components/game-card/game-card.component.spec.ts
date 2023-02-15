@@ -89,32 +89,93 @@
 //     it('should change button text to "Configuration" when on configuration page', () =>{
 //         component.url = '/config';
 
-//         const type = component.changeButton();
-//         expect(type).toEqual('Configuration');
+        const type = component.changeButton();
+        expect(type).toEqual('Configuration');
 
-// //         component.openDialog();
+    });
+    it ('should display the difficutly', () => {
+        const p = fixture.nativeElement;
+        expect(p.querySelector('#gameDifficulty').textContent).toContain('Difficulté: Facile');
+    });
+    it ('should display the name of the game', () => {
+        const p = fixture.nativeElement;
+        expect(p.querySelector('#gameName').textContent).toContain('difference 1');
+    });
+    it('should apply the ButtonOneDirective to the Jouer button', () => {
+        component.url = '/classique';
+        fixture.detectChanges();
 
-// //         expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'Test' } });  // Check if dialog is opened with correct parameters
+        const button = fixture.debugElement.query(By.css('#playButton'));
+        expect(button).not.toBeNull();
 
-// //     });
+        const directive = button.injector.get(ButtonOneDirective);
+        expect(directive).toBeDefined();
+      });
 
-// //     it('should change button text to "Classique" when on classique page', () => {  // Check if button text is changed correctly when on different pages
+      it('should not apply the ButtonOneDirective when the url is not /classique', () => {
+        component.url = '/config';
+        fixture.detectChanges();
 
-// //         const result = spyOnProperty(component['router'], 'url').and.returnValue('/classique'); // Mock router url to classique page
+        const button = fixture.nativeElement;
+        expect(button.querySelector('#playButton').textContent).toContain('Supprimer');
+      });
+      it('should apply the ButtonTwoDirective to the Joindre button', () => {
+        component.url = '/classique';
+        fixture.detectChanges();
 
-// //         component.changeButton();  // Call function to check result
+        const button = fixture.debugElement.query(By.css('#joinButton'));
+        expect(button).not.toBeNull();
 
-// //         expect(result).toBe('Classique'); // Check if result is correct
+        const directive = button.injector.get(ButtonTwoDirective);
+        expect(directive).toBeDefined();
+      });
+      it('should not apply the ButtonTwoDirective when the url is not /classique', () => {
+        component.url = '/config';
+        fixture.detectChanges();
 
-// //     });
-// //     it('should change button text to "Classique" when on configuration page', () => {  // Check if button text is changed correctly when on different pages
+        const button = fixture.nativeElement;
+        expect(button.querySelector('#joinButton').textContent).toContain('Reinitialiser');
+      });
+      it('should not apply the ButtonThreeDirective when the url is not /classique', () => {
+        component.url = '/classique';
+        fixture.detectChanges();
 
-// //         const result = spyOnProperty(component['router'], 'url').and.returnValue('/configuration'); // Mock router url to classique page
+        const button = fixture.nativeElement;
+        expect(button.querySelector('#playButton').textContent).toContain('Jouer');
+      });
+      it('should not apply the ButtonFourDirective when the url is not /classique', () => {
+        component.url = '/classique';
+        fixture.detectChanges();
 
-// //         component.changeButton();  // Call function to check result
+        const button = fixture.nativeElement;
+        expect(button.querySelector('#joinButton').textContent).toContain('Joindre');
+      });
+      it('should apply the ButtonThreeDirective to the Supprimer button', () => {
+        component.url = '/config';
+        fixture.detectChanges();
 
-// //         expect(result).toBe('Configuration'); // Check if result is correct
+        const button = fixture.debugElement.query(By.css('#playButton'));
+        expect(button).not.toBeNull();
 
-// //     });
+        const directive = button.injector.get(ButtonThreeDirective);
+        expect(directive).toBeDefined();
+      });
+      it('should apply the ButtonFourDirective to the Reinitialiser button', () => {
+        component.url = '/config';
+        fixture.detectChanges();
 
-// });
+        const button = fixture.debugElement.query(By.css('#joinButton'));
+        expect(button).not.toBeNull();
+
+        const directive = button.injector.get(ButtonFourDirective);
+        expect(directive).toBeDefined();
+      });
+      it('should display the first one for solo game', () => {
+        const firstRanking = fixture.nativeElement;
+        expect(firstRanking.querySelector('#firstSolo').textContent).toContain('2:34 joueur 2');
+      });
+      it('should display the first one for multi game', () => {
+        const firstRanking = fixture.nativeElement;
+        expect(firstRanking.querySelector('#firstMulti').textContent).toContain('1:23 joueur 1');
+      });
+});

@@ -2,8 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } fr
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
-// eslint-disable-next-line no-restricted-imports
-import { GameNameSaveComponent } from '../game-name-save/game-name-save.component';
+import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
 
 @Component({
     selector: 'app-difference-popup',

@@ -14,4 +14,8 @@
     <div class="footer">
         <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
     </div>
+    <div class="message">
+       <app-message-area [playerName] = "this.gameService.playerName"></app-message-area>
+    </div>
+
 </div>

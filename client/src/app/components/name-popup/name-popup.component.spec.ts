@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
@@ -11,6 +12,7 @@ describe('NamePopupComponent', () => {
     let fixture: ComponentFixture<NamePopupComponent>;
     let route: Router;
     const dialogRefSpy = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         close: () => {},
     };
 

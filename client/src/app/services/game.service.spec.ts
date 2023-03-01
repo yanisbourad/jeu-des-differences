@@ -253,7 +253,7 @@ describe('GameService', () => {
         const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
         gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
         gameService.saveGameRecord();
-        gameRecordMock.dateStart = new Date().getTime().toString();
+        // gameRecordMock.dateStart = new Date().getTime().toString();
         expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalledWith(gameRecordMock);
     });
 

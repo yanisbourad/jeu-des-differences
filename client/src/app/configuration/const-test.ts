@@ -9,3 +9,4 @@ export const THIRD_DIFF = '7,8,9';
 export const TICK_TIME = 500;
 export const FOURTH_SET = [6, 7, 8, 9];
 export const FIFTH_SET = [4, 5];
+export const SIXTH_SET = [1, 2, 3, 4];

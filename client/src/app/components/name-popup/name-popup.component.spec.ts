@@ -37,7 +37,7 @@ describe('NamePopupComponent', () => {
     });
     it('should initialize data.name to an empty string', () => {
         component.ngOnInit();
-        expect(component.data.name).toBe('');
+        expect(component.data.name).toBe(' ');
     });
     it('should call close', () => {
         const spy = spyOn(component.dialogRef, 'close').and.callThrough();

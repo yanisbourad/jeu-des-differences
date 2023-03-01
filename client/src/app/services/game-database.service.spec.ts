@@ -104,7 +104,7 @@ describe('GameDatabaseService', () => {
 
     it('should save the game from the canvas holder et imageDiffService and return true', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set(constantes.FOURTH_SET)];
+        imageDiffService.listDifferences = [new Set(constantes.SIXTH_SET)];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'testName',
@@ -124,7 +124,7 @@ describe('GameDatabaseService', () => {
 
     it('should return false if the game was not saved', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set(constantes.FOURTH_SET)];
+        imageDiffService.listDifferences = [new Set(constantes.SIXTH_SET)];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'test',

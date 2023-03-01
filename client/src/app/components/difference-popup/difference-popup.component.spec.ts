@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
+import * as constants from '@app/configuration/const-test';
 import { DrawService } from '@app/services/draw.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 import { DifferencePopupComponent } from './difference-popup.component';
+
 describe('DifferencePopupComponent', () => {
     let component: DifferencePopupComponent;
     let fixture: ComponentFixture<DifferencePopupComponent>;
     let matDialogSpy: jasmine.SpyObj<MatDialog>;
     let imageDiffServiceSpy: jasmine.SpyObj<ImageDiffService>;
     let drawServiceSpy: jasmine.SpyObj<DrawService>;
+
     const dialogRefSpy = {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         close: () => {},
@@ -59,14 +62,18 @@ describe('DifferencePopupComponent', () => {
     });
 
     it('should show validation', () => {
-        component['imageDifferenceService'].listDifferences = [new Set([1, 2, 3]), new Set([4, 5]), new Set([6, 7, 8, 9])];
+        component['imageDifferenceService'].listDifferences = [
+            new Set(constants.FIRST_SET),
+            new Set(constants.FIFTH_SET),
+            new Set(constants.FOURTH_SET),
+        ];
         component.ngAfterViewInit();
         expect(component.showMessage).toBe('');
         expect(component.showValidation).toBeTrue();
     });
 
     it('should not show validation', () => {
-        component['imageDifferenceService'].listDifferences = [new Set([1, 2, 3]), new Set([4, 5])];
+        component['imageDifferenceService'].listDifferences = [new Set(constants.FIRST_SET), new Set(constants.FIFTH_SET)];
         component.ngAfterViewInit();
         expect(component.showMessage).toBe('(valide entre 3 et 9)');
         expect(component.showValidation).toBeFalsy();

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 // eslint-disable-next-line no-restricted-imports
+import * as constants from '@app/configuration/const-test';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
 // eslint-disable-next-line no-restricted-imports
 import { ImageDiffService } from '../../services/image-diff.service';
@@ -41,7 +42,7 @@ describe('ValidateCreateBtnComponent', () => {
     });
 
     it('should launch detection system and generate differences between two images', () => {
-        canvasHolderSpy.getCanvasData.and.returnValue(new Uint8ClampedArray([1, 2, 3, 4]));
+        canvasHolderSpy.getCanvasData.and.returnValue(new Uint8ClampedArray(constants.FOURTH_SET));
         component.onClick();
         expect(canvasHolderSpy.getCanvasData).toHaveBeenCalledTimes(2);
         expect(imageDiffServiceSpy.resetImageData).toHaveBeenCalled();

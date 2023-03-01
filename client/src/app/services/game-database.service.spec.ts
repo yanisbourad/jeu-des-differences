@@ -1,6 +1,7 @@
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import * as constantes from '@app/configuration/const-test';
 import { Game, GameInfo, GameRecord } from '@common/game';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -103,7 +104,7 @@ describe('GameDatabaseService', () => {
 
     it('should save the game from the canvas holder et imageDiffService and return true', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set([1, 2, 3, 4])];
+        imageDiffService.listDifferences = [new Set(constantes.FOURTH_SET)];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'testName',
@@ -123,7 +124,7 @@ describe('GameDatabaseService', () => {
 
     it('should return false if the game was not saved', () => {
         const spyGetData = spyOn(canvasHolderService, 'getCanvasUrlData').and.returnValue('testData');
-        imageDiffService.listDifferences = [new Set([1, 2, 3, 4])];
+        imageDiffService.listDifferences = [new Set(constantes.FOURTH_SET)];
         const spyDiffDifficulty = spyOn(imageDiffService, 'getDifficulty').and.returnValue('Facile');
         const game: Game = {
             gameName: 'test',

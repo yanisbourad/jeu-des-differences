@@ -1,4 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
+import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
@@ -9,8 +11,6 @@ import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
-import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
@@ -261,7 +261,7 @@ describe('GameService', () => {
         const intervalTime = 125;
         const blinkCount = 8;
         const expectedCalls = blinkCount * 2;
-        const canvas1: ElementRef<HTMLCanvasElement>= new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+        const canvas1: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         gameService['renderer'] = renderer2Spy;
         // Call the function with the mock renderer

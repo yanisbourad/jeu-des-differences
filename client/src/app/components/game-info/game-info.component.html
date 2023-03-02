@@ -1,8 +1,8 @@
 <div class="infos">
-  <div class="left">
+  <div  class="left">
       <p class="title">{{gameService.gameInformation.gameTitle}}</p>
       <p class="sub-title game-infos">{{gameService.gameInformation.gameMode}}</p>
-      <p class="sub-title">Différences trouvées</p>
+      <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
       <div>
           <img
               *ngFor="let differences of gameService.differencesArray"
@@ -14,32 +14,16 @@
   </div>
   <div class="middle">
       <div class="difficulty">
-          <div>
-              <img class="difficulty-bar-img" alt="Bar"/>
-          </div>
-          <div>
-              <img class="difficulty-bar-indicator-img" alt="Bar"/>
-          </div>
-          <p>Difficulté</p>
+            <p>
+                Difficulté : 
+                <span *ngIf="gameService.gameInformation.gameDifficulty === 'Facile'" class="difficulty-easy">
+                    {{gameService.gameInformation.gameDifficulty}}
+                </span>
+                <span *ngIf="gameService.gameInformation.gameDifficulty === 'Difficile'" class="difficulty-hard">
+                   {{gameService.gameInformation.gameDifficulty}}
+                </span>
+            </p>
       </div>
-      <app-timer [isClassicMode]= true ></app-timer>
-  </div>
-  <div class="right">
-      <p class="sub-title">Indices restants</p>
-      <div>
-          <img
-              *ngFor="let hint of gameService.hintsArray"
-              class="indices-restants-img"
-              src={{hint}}
-              alt="Indices restants"
-          />
-      </div>
-      <p class="sub-title">pénalité : 5s / indice</p>
-      <div>
-          <button *ngIf="!this.gameService.isGameFinished && this.gameService.nHintsUsed < this.gameService.nHintsUnused" 
-          mat-raised-button class="btn" (click)="getHint()">Obtenir un indice</button>
-          <button *ngIf="this.gameService.isGameFinished || this.gameService.nHintsUsed === this.gameService.nHintsUnused" 
-          disabled mat-raised-button class="btn">Obtenir un indice</button>
-      </div>
+      <app-timer></app-timer>
   </div>
 </div>

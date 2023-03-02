@@ -29,8 +29,10 @@ import { MatRadioModule } from '@angular/material/radio';
 // import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInputModule } from '@angular/material/input';
 
 const modules = [
+    MatInputModule,
     // MatAutocompleteModule,
     MatButtonModule,
     // MatButtonToggleModule,
@@ -62,6 +64,7 @@ const modules = [
     // MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatInputModule,
 ];
 
 /**

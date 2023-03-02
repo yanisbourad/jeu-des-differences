@@ -1,0 +1,36 @@
+<div class = "firstBox">
+    <p id = "title">Constantes de Jeu</p>
+    <div class = "main">
+        <div class = "section" id = "first">
+            <p class = "text">1. Temps initial du compte à rebours</p>
+            <p class = "time">{{timer1}} s</p>
+            <div class = "buttonContainer">
+                <button [disabled]="this.timer1===0" class = "lessTime" (click) = "decrementTime1()"> <p>-</p> </button>
+                <button class = "addButton" (click) = "incrementTime1()"> + </button>
+            </div>
+        </div>
+        <div class = "section" id = "second">
+            <p class = "text">2. Temps de pénalité pour l’utilisation d’une indice</p>
+            <p class = "time2">{{timer2}} s</p>
+            <div class = "buttonContainer">
+                <button [disabled]="this.timer2===0" class = "lessTime" (click) = "decrementTime2()"> <p>-</p> </button>
+                <button class = "addButton" (click) = "incrementTime2()"> + </button>
+            </div>
+        </div>
+        <div class = "section" id = "third">
+            <p class = "text">3. Temps gagné avec la découverte d’une différence</p>
+            <p class = "time2">{{timer3}} s</p>
+            <div class = "buttonContainer">
+                <button [disabled]="this.timer3===0" class = "lessTime" id = "buttonTime3" (click) = "decrementTime3()"> <p>-</p> </button>
+                <button class = "addButton" (click) = "incrementTime3()"> + </button>
+            </div>
+        </div>
+        
+    </div>
+    <div class = "buttonContainer2">
+        <button class = "bottomButtons" id = "cancelButton" (click)="onNoClick()">Annuler</button>
+        <button class = "bottomButtons" id = "modifyButton">Modifier</button>
+    </div>
+</div>
+
+

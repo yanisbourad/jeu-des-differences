@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import * as constants from '@app/configuration/const-game';
 import { GameService } from '@app/services/game.service';
-
 @Component({
     selector: 'app-game-info',
     templateUrl: './game-info.component.html',
@@ -8,12 +8,10 @@ import { GameService } from '@app/services/game.service';
 })
 export class GameInfoComponent implements OnInit {
     constructor(public gameService: GameService) {}
-    // in infos component change display depending of the game mode (solo, multijoueur, temps limite)
-    ngOnInit(): void {
-        this.gameService.displayIcons();
-    }
 
-    getHint() {
-        this.gameService.clickGetHints();
+    ngOnInit(): void {
+        setTimeout(() => {
+            this.gameService.displayIcons();
+        }, constants.WAITING_TIME);
     }
 }

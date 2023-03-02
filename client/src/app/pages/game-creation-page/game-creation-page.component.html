@@ -1,0 +1,41 @@
+<div class="game-creation-page">
+    <app-header [iconUsed]="false" class="navigation"></app-header>
+    <div class="warning">
+        <h2>Veuillez seulement téléverser des images dans un format bitmap (BMP) 24-bit de taille 640x480 pixels</h2>
+    </div>
+    <div class="body">
+        <div id="drawing-column">
+            <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas"
+                #originalCanvasComponent></app-canvas-ngx>
+            <div class="swapping-canvas">
+                <img
+                    matTooltip="Intervertir les arrière-plans"
+                    matTooltipPosition="above"
+                    alt="swapping" src="./assets/img/SwappingCanvas.png" (click)="swapImages()" />
+                <input type="file" class="file-upload" accept=".bmp" #fileUpload (change)="loadImage($event)" />
+                <img matTooltip="Téléverser une image" alt="fileUpload" src="./assets/img/UploadBackground.png" (click)="fileUpload.click()" />
+            </div>
+            <app-canvas-ngx class=" Canvas-ngx modified" [type]="modifiedCanvas"
+                #modifiedCanvasComponent></app-canvas-ngx>
+        </div>
+
+        <div id="tools-column">
+            <app-drawing-tool-bar></app-drawing-tool-bar>
+        </div>
+    </div>
+    <div>
+        <div id="return-container">
+            <div class="draw-difference">
+                <button class="btn" routerLink="/config" id="classique">
+                    Retour aux configurations
+                </button>
+            </div>
+            <div class="draw-difference tools">
+                <app-validate-create-btn text="Lancer validation de differences" color="green"
+                    (onBtnClick)="openCanvas()">
+                </app-validate-create-btn>
+            </div>
+        </div>
+    </div>
+
+</div>

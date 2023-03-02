@@ -1,70 +1,158 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
+import * as constants from '@app/configuration/const-canvas';
+import * as constantsTime from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
+import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit {
+export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
 
-    readonly DEFAULT_WIDTH = 640;
-    readonly DEFAULT_HEIGHT = 480;
-    readonly ONE_QUARTER = 1 / 4;
-    readonly ONE_SIXTH = 1 / 6;
-    mousePosition: Vec2 = { x: 0, y: 0 };
-    constructor(private readonly drawService: DrawService, public gameService: GameService, public readonly socket: SocketClientService) {}
+    mousePosition: Vec2;
+    errorPenalty: boolean;
+    unfoundedDifference: Set<number>[];
+
+    // TODO: use camelCase
+    playerName: string;
+
+    gameName: string;
+
+    // TODO: reduce the number of parameters
+    // eslint-disable-next-line max-params
+    constructor(
+        private readonly drawService: DrawService,
+        public gameService: GameService,
+        readonly socket: SocketClientService,
+        readonly clientTimeService: ClientTimeService,
+        public dialog: MatDialog,
+        public route: ActivatedRoute,
+    ) {
+        this.mousePosition = { x: 0, y: 0 };
+        this.errorPenalty = false;
+    }
+
+    get width(): number {
+        return constants.DEFAULT_WIDTH;
+    }
+
+    get height(): number {
+        return constants.DEFAULT_HEIGHT;
+    }
+
+    ngOnDestroy(): void {
+        this.clientTimeService.stopTimer();
+        this.socket.disconnect();
+        this.clientTimeService.resetTimer();
+        this.socket.leaveRoom();
+        this.gameName = '';
+    }
+
+    ngAfterViewInit(): void {
+        this.socket.connect();
+        this.socket.joinRoom(this.gameService.playerName);
+        this.clientTimeService.startTimer();
+        this.gameService.displayIcons();
+        this.drawService.setColor = 'yellow';
+    }
+
+    getRouteurParams() {
+        this.playerName = this.route.snapshot.paramMap.get('player') as string;
+        this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+    }
 
     ngOnInit(): void {
-        this.socket.connect();
-        this.socket.classicalMode(true);
-        console.log(this.socket.getServerMessage() + " " + this.socket.getServerTime());
+        this.getRouteurParams();
+        this.gameService.getGame(this.gameName);
+        this.gameService.displayIcons();
+        this.loading();
+        this.gameService.playerName = this.playerName;
     }
+
+    loading(): void {
+        const timeout = 500;
+        setTimeout(() => {
+            this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+        }, timeout);
+    }
+
     mouseHitDetect(event: MouseEvent) {
-        if (event.button === MouseButton.Left) {
+        if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            // Testing mouse click arbitrary interval
-            if (
-                this.mousePosition.y <= this.DEFAULT_HEIGHT * (1 - this.ONE_QUARTER) &&
-                this.mousePosition.y >= this.DEFAULT_HEIGHT * this.ONE_QUARTER &&
-                this.mousePosition.x <= this.DEFAULT_WIDTH * (1 - this.ONE_SIXTH) &&
-                this.mousePosition.x >= this.DEFAULT_WIDTH * this.ONE_SIXTH
-            ) {
-                this.gameService.playSuccessAudio();
-                this.drawService.drawWords('Trouvé', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Trouvé', this.canvas2.nativeElement, this.mousePosition);
+            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
+            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            if (diff) {
+                this.drawDifference(diff);
+                // remove difference found from unfundedDifference
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+                this.displayWord('Trouvé');
             } else {
-                this.gameService.playFailureAudio();
-                this.drawService.drawWords('Erreur', this.canvas1.nativeElement, this.mousePosition);
-                this.drawService.drawWords('Erreur', this.canvas2.nativeElement, this.mousePosition);
+                this.errorPenalty = true;
+                this.displayWord('Erreur');
             }
+            this.clearCanvas();
         }
-        // async loadImage(): Promise<void> {
-        //     const original_image = new Image();
-        //     const modified_image = new Image();
-        //     original_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(original_image).then((imageBitmap) => {
-        //     // this.drawService.drawImage(imageBitmap,this.canvas1.nativeElement);
-        //     });
-        //     modified_image.src = '../../../assets/img/k3FhRA.jpg';
-        //     createImageBitmap(modified_image).then((imageBitmap) => {
-        //     // this.drawService.drawImage(imageBitmap,this.canvas2.nativeElement);
-        //     });
-        // }
+    }
+
+    displayWord(word: string): void {
+        if (word === 'Erreur') {
+            this.gameService.playFailureAudio();
+            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
+            setTimeout(() => {
+                this.errorPenalty = false;
+            }, constantsTime.BLINKING_TIME);
+        } else {
+            this.gameService.playSuccessAudio();
+            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
+            this.gameService.clickDifferencesFound();
+            this.blinkCanvas();
+        }
+    }
+
+    getSetDifference(differencesStr: string[]): Set<number>[] {
+        return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
+    }
+
+    drawDifference(diff: Set<number>) {
+        this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+        this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+    }
+
+    blinkCanvas() {
+        this.gameService.blinkDifference(this.canvas1, this.canvas2);
+    }
+
+    clearCanvas() {
+        setTimeout(() => {
+            this.drawService.clearDiff(this.canvas1.nativeElement);
+            this.drawService.clearDiff(this.canvas2.nativeElement);
+        }, constantsTime.BLINKING_TIME);
+    }
+
+    displayGiveUp(msg: string, type: string) {
+        // display modal
+        this.dialog.open(MessageDialogComponent, {
+            data: [msg, type],
+            minWidth: '250px',
+            minHeight: '150px',
+            panelClass: 'custom-dialog-container',
+        });
     }
 
     giveUp(): void {
-        /* feedback message : {Êtes-vous sur de vouloir abandonner la partie? Cette action est irréversible.}
-        // if yes do
-            // stop game
-            // save infos???
-            // redirect user to main page
-        // else close modal and continue the game
-        */
+        this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
 }

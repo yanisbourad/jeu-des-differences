@@ -1,0 +1,100 @@
+#rectangle1{
+    height : 665px;
+    width: 448px;
+    background-color: #292736;
+    border-radius: 25px;
+    border: 3px solid #A8A8A8;
+}
+#rectangle2{
+    background-color: #584577;
+    width: 448px;
+    height: 58px;
+    border-radius: 25px 25px 0% 0%;
+}
+p{
+    font-family:  Helvetica;
+    font-size: 30px;
+    display: flex;
+    padding-top: 20px;
+    justify-content:center;
+    align-items: center;
+    font-weight: bold;
+    color: white ; 
+}
+.gameImage img{
+    width: 100%;
+    height: 300px;
+    position: relative;
+}
+.ranking{
+    background: #063047;
+    border: 3px solid #A8A8A8;
+    border-radius: 6px 0px 0px 6px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 39px;
+    color:orangered;
+    width: 88px;
+
+}
+.firstAndThird{
+    box-sizing: border-box;
+    width: 153px;
+    height: 50px;
+
+    background: #1D1F27;
+    border: 3px solid #A8A8A8;
+    border-radius: 6px;
+    color:white;
+    text-align: center;
+    
+}
+.second{
+    box-sizing: border-box;
+    width: 153px;
+    height: 50px;
+    background: #3D404D;
+    border: 3px solid #A8A8A8;
+    border-radius: 6px;
+    color:white;
+    text-align: center;
+}
+.gameCategory{
+    background: #1D4C71;
+    border: 2px solid #868686;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px 20px 0px 0px;
+    color:white;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 29px;
+}
+.rankingTable{
+    position:relative;
+    margin-top : 0%;
+    margin-left : 2%;
+}
+#playButton{
+    margin-left: 27%;
+}
+#joinButton{
+    margin-left : 8%;
+}
+.playingButtons{
+    width: 126px;
+    height: 49px;
+    left: 171px;
+    top: 836px;
+    border: 3px solid #7B57B8;
+    border-radius: 30px;
+    background-color: transparent;
+    color:white;
+}
+.playingButtons:hover{
+    background-color: #9845e7;
+  }
+  

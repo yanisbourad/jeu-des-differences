@@ -1,76 +1,109 @@
 import { TestBed } from '@angular/core/testing';
-import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-import { DrawService } from '@app/services/draw.service';
-
+import * as constants from '@app/configuration/const-canvas';
+import { Vec2 } from '@app/interfaces/vec2';
+import { DrawService } from './draw.service';
 describe('DrawService', () => {
     let service: DrawService;
-    let ctxStub: CanvasRenderingContext2D;
-
-    const CANVAS_WIDTH = 500;
-    const CANVAS_HEIGHT = 500;
+    let canvas: HTMLCanvasElement;
+    let image: ImageBitmap;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(DrawService);
-        ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        service.context = ctxStub;
+        canvas = document.createElement('canvas');
+
+        // read the image file as a data URL
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', './assets/image_empty.bmp');
+        xhr.responseType = 'blob';
+        xhr.onload = () => {
+            const blob = xhr.response;
+            createImageBitmap(blob).then((bmp) => {
+                image = bmp;
+            });
+        };
+        xhr.send();
     });
 
-    it('should be created', () => {
+    it('should create an instance', () => {
         expect(service).toBeTruthy();
     });
 
-    it(' width should return the width of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_WIDTH);
+    it('should set the canvas size', () => {
+        expect(service.width).toBe(constants.DEFAULT_WIDTH);
+        expect(service.height).toBe(constants.DEFAULT_HEIGHT);
     });
 
-    it(' height should return the height of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_HEIGHT);
+    it('should set the color', () => {
+        service.setColor = 'red';
+        expect(service.getColor).toBe('red');
     });
 
-    it(' drawWord should call fillText on the canvas', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('test');
-        expect(fillTextSpy).toHaveBeenCalled();
+    it('should set the line width', () => {
+        service.setLineWidth = 0;
+        expect(service.getLineWidth).toBe(0);
     });
 
-    it(' drawWord should not call fillText if word is empty', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        service.drawWord('');
-        expect(fillTextSpy).toHaveBeenCalledTimes(0);
+    it('should get the context', () => {
+        const context = service.getContext(canvas);
+        expect(context).toBeTruthy();
     });
 
-    it(' drawWord should call fillText as many times as letters in a word', () => {
-        const fillTextSpy = spyOn(service.context, 'fillText').and.callThrough();
-        const word = 'test';
-        service.drawWord(word);
-        expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
+    it('should draw an image on the canvas', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'drawImage');
+        service.drawImage(image, canvas);
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledOnceWith(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
     });
 
-    it(' drawWord should color pixels on the canvas', () => {
-        let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawWord('test');
-        imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const afterSize = imageData.filter((x) => x !== 0).length;
-        expect(afterSize).toBeGreaterThan(beforeSize);
+    it('should draw an image on multiple canvas', () => {
+        // read the image file as a data URL
+        const spy = spyOn(service, 'drawImage');
+        service.drawImageOnMultipleCanvas(image, canvas, canvas);
+        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spy).toHaveBeenCalledWith(image, canvas);
+        expect(spy).toHaveBeenCalledWith(image, canvas);
     });
 
-    it(' drawGrid should call moveTo and lineTo 4 times', () => {
-        const expectedCallTimes = 4;
-        const moveToSpy = spyOn(service.context, 'moveTo').and.callThrough();
-        const lineToSpy = spyOn(service.context, 'lineTo').and.callThrough();
-        service.drawGrid();
-        expect(moveToSpy).toHaveBeenCalledTimes(expectedCallTimes);
-        expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
+    it('should draw all differences', () => {
+        const spy = spyOn(service, 'drawDiff');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const listDiff = [new Set([1, 2, 3, 4])];
+        service.drawAllDiff(listDiff, canvas);
+        expect(spy).toHaveBeenCalledOnceWith(listDiff[0], canvas);
     });
 
-    it(' drawGrid should color pixels on the canvas', () => {
-        let imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const beforeSize = imageData.filter((x) => x !== 0).length;
-        service.drawGrid();
-        imageData = service.context.getImageData(0, 0, service.width, service.height).data;
-        const afterSize = imageData.filter((x) => x !== 0).length;
-        expect(afterSize).toBeGreaterThan(beforeSize);
+    it('should draw a difference', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const diff = new Set([1, 2, 3, 4]);
+        service.drawDiff(diff, canvas);
+        expect(spy).toHaveBeenCalledTimes(diff.size);
+    });
+
+    it('should clear the canvas', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        service.clearCanvas(canvas);
+        expect(spy).toHaveBeenCalledOnceWith(0, 0, service.width, service.height);
+    });
+
+    it('should clear the difference', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'clearRect');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        service.clearDiff(canvas);
+        expect(spy).toHaveBeenCalledOnceWith(0, 0, service.width, service.height);
+    });
+
+    it('should draw a word', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(canvas.getContext('2d'), 'fillText');
+        const position: Vec2 = { x: 0, y: 0 };
+        service.drawWord('test', canvas, position);
+        expect(spy).toHaveBeenCalledOnceWith('test', 0, 0);
     });
 });

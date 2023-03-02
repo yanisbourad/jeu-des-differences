@@ -1,0 +1,21 @@
+<div class="drawing-tool-bar">
+    <h2>Personnaliser</h2>
+    <div class="tool-parial" id="line-width">
+        <input type="range" (min)="(const.MIN_LINE_WIDTH)" (max)="(const.MAX_LINE_WIDTH)" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
+        <p>{{ lineWidth }}</p>
+    </div>
+    <div class="tool-parial" id="line-color">
+        <input type="color" [(ngModel)]="lineColor" (change)="setLineColor()" />
+        <p>{{ lineColor }}</p>
+    </div>
+    <!-- A line to divide the tools from the validator -->
+    <div class="tool-parial" id="line"></div>
+
+    <!-- The validator -->
+    <div class="tool-parial" id="radius-tronslation">
+        <p>Rayon d'élargissment</p>
+        <select [(ngModel)]="selectedRadius" (change)="setRadius()">
+            <option *ngFor="let radius of const.POSSIBLE_RADIUS" [value]="radius">{{ radius }}</option>
+        </select>
+    </div>
+</div>

@@ -1,82 +1,63 @@
 import { Injectable } from '@angular/core';
-import { SocketClient } from '@app/utils/socketClient';
+import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
+import { ClientTimeService } from './client-time.service';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class SocketClientService {
-  serverMessages: string[] = [];
-  roomMessages: string[] = [];
+    socket: Socket;
+    serverMessage: string = '';
 
-  constructor(private readonly socketClient: SocketClient) {
-   }
+    constructor(private readonly socketClient: SocketClient, private timer: ClientTimeService) {}
 
-  socket: Socket;
-  serverTime:number;
-  serverMessage: string = "";
-
-  get socketId() {
-    return this.socketClient.socket.id ? this.socketClient.socket.id : "";
-  }
-
-  connect() {
-    if (!this.socketClient.isSocketAlive()) {
-      this.socketClient.connect();
-      this.configureBaseSocketFeatures();
-      console.log(this.serverMessage);
+    get socketId() {
+        return this.socketClient.socket.id ? this.socketClient.socket.id : '';
     }
-  }
-  getServerMessage():String{
-    return this.serverMessage;
-  }
-  getServerTime():number{
-    return this.serverTime;
-  }
 
-  configureBaseSocketFeatures() {
-    this.socketClient.on("connect",() => {
-      console.log(`connection au serveur`)
-      console.log(this.serverMessage)
-    });
-    // Afficher le message envoyé lors de la connexion avec le serveur
-    this.socketClient.on("hello", (message: string) => {
-      this.serverMessage = message;
-      console.log(this.serverMessage);
-    });
-    this.socketClient.on("clock", (time: number) => {
-      this.serverTime = time;
-    });
+    connect() {
+        if (!this.socketClient.isSocketAlive()) {
+            this.socketClient.connect();
+            this.configureBaseSocketFeatures();
+        }
+    }
 
-    // // Afficher le message envoyé à chaque émission de l'événement "clock" du serveur
-    // this.socketClient.on("timer", () => {
-    //   console.log("timer start");
-    // });
+    getRoomName(): string {
+        return this.socketId;
+    }
 
-    // Gérer l'événement envoyé par le serveur : afficher le résultat de validation
-    
-    // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un client connecté
-    this.socketClient.on('massMessage', (broadcastMessage: string) => {
-     this.serverMessages.push(broadcastMessage);
-    });
+    getServerMessage(): string {
+        return this.serverMessage;
+    }
 
-    // Gérer l'événement envoyé par le serveur : afficher le message envoyé par un membre de la salle
-    this.socketClient.on('roomMessage', (roomMessage: string) => {
-      this.roomMessages.push(roomMessage);
-    });
-  }
+    configureBaseSocketFeatures() {
+        this.socketClient.on('connect', () => {
+            // alert('connection au socket');
+        });
+        // Afficher le message envoyé lors de la connexion avec le serveur
+        this.socketClient.on('hello', (message: string) => {
+            this.serverMessage = message;
+        });
+        // Afficher le message envoyé lors de la connexion au socket
+        this.socketClient.on('message', (message: string) => {
+            this.serverMessage = message;
+        });
+    }
 
-  disconnect() {
-    this.socketClient.disconnect();
-  }
+    disconnect() {
+        this.timer.stopTimer();
+        this.socketClient.disconnect();
+    }
 
- //starttimer
-  startTimer() {
-    this.socketClient.send('timer', ()=>{ console.log("timer start");});
-  }
+    // joinRoom
+    joinRoom(playerName: string) {
+        this.socketClient.send('joinRoom', playerName);
+    }
 
-  //classicalMode
-  classicalMode(isClassicalMode: boolean) {
-    this.socketClient.send('classical', isClassicalMode);
-  }
+    // leaveRoom
+    leaveRoom() {
+        this.disconnect();
+        this.socketClient.send('leaveRoom');
+    }
 }

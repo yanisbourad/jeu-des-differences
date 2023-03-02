@@ -1,0 +1,36 @@
+.btn {
+    display: flex;
+    justify-content: center;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1.5em;
+    font-family: 'Roboto', sans-serif;
+    height: 3em;
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-block {
+    display: flex;
+    margin: 0 auto;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-block button {
+    background-color: #000;
+    color: #fff;
+    padding-top: 20px;
+}

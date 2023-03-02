@@ -1,89 +1,63 @@
-import { DateService } from '@app/services/date/date.service';
+import { PlayerService } from '@app/services/player/player-service';
+import { Player } from '@common/player';
 import { Injectable, Logger } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
-import { channel } from 'diagnostics_channel';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
+import { INDEX_NOT_FOUND } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
-@WebSocketGateway({namespace: '/api', cors:true, transport: ['websocket']})
+@WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+    @WebSocketServer() server: Server;
+    socketId: string = '';
 
-    @WebSocketServer()  server: Server;
+    constructor(private readonly logger: Logger, private readonly playerService: PlayerService) {}
 
-    private readonly room = PRIVATE_ROOM_ID;
-    // isClassicalMode: boolean = true;
-    
-    constructor(private readonly logger: Logger, private readonly dateService : DateService) {
-        console.log("ChatGateway constructor");
-        // (this.isClassicalMode)? this.dateService.startTimer() : this.dateService.startCountDown();
+    @SubscribeMessage(ChatEvents.Connect)
+    connect(socket: Socket, message: string) {
+        this.server.emit(ChatEvents.Message, `: ${message}`);
+        this.logger.log('connection au socket');
+    }
+
+    @SubscribeMessage(ChatEvents.JoinRoom)
+    async joinRoom(socket: Socket, playerName: string) {
+        const startTime = new Date();
+        const player: Player = {
+            playerName,
+            socketId: socket.id,
+        };
+        if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
+            await this.playerService.addRoom(player.socketId, player, startTime);
+            socket.join(player.socketId);
+        } else {
+            this.playerService.addPlayer(player.socketId, player, startTime);
+            socket.join(player.socketId);
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.LeaveRoom)
+    async leaveRoom(socket: Socket) {
+        await this.playerService.removeRoom(socket.id);
+        socket.leave(socket.id);
     }
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello from serveur');  
+        this.socketId = socket.id;
+        socket.emit(ChatEvents.Hello, 'Hello from serveur');
     }
-    
-    handleDisconnect(socket: Socket,) {
+
+    async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
+        await this.playerService.removeRoom(socket.id);
+        socket.leave(socket.id);
     }
 
-    @SubscribeMessage(ChatEvents.Message)
-    message(_: Socket, message: string) {
-        this.logger.log(`Message reçu : ${message}`);
-    }
-    @SubscribeMessage(ChatEvents.Error)
-    error(socket: Socket) {
-        socket.emit(ChatEvents.Error, 'Erreur');  
-    }
-    @SubscribeMessage(ChatEvents.DifferenceFound)
-    differenceFound(socket: Socket) {
-        socket.emit(ChatEvents.DifferenceFound, 'Différence trouvée');  
-    }
-    @SubscribeMessage(ChatEvents.Hint)
-    hint(socket: Socket) {
-        socket.emit(ChatEvents.Hint, 'Indice utilisé');  
+    getSocketId() {
+        return this.socketId;
     }
 
-    @SubscribeMessage(ChatEvents.Connect)
-    connect(_: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `: ${message}`);
-        this.logger.log(`connection au socket`);
-    }
-
-    @SubscribeMessage(ChatEvents.Timer)
-    timer(_: Socket) {
-        this.logger.log("timer start")
-        this.server.emit(ChatEvents.Timer, this.dateService.startTimer());
-    }
-
-    @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${message}`);
-    }
-
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
-    }
-
-    @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
-        // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
-            console.log(message);
-        }
-    }
-    
     afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
+        this.logger.log('Init');
     }
-
-    private emitTime() {
-       this.server.emit('clock', new Date().toLocaleTimeString());
-    } 
 }

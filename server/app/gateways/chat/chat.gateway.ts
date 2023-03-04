@@ -47,6 +47,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(socket.id);
     }
 
+    @SubscribeMessage(ChatEvents.StopTimer)
+    async stopTimer(_: Socket, roomName: string) {
+        // not tested
+        this.serverTime.stopChronometer(roomName); // maybe change the return value
+    }
+
     // add event game finished to stop the timer
 
     handleConnection(socket: Socket) {

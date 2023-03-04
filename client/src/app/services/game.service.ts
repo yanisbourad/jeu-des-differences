@@ -7,7 +7,6 @@ import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
-import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -32,7 +31,6 @@ export class GameService {
     constructor(
         rendererFactory: RendererFactory2,
         public dialog: MatDialog,
-        private readonly clientTimeService: ClientTimeService,
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
     ) {
@@ -144,7 +142,8 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            this.gameTime = this.clientTimeService.stopChronometer();// change to server time
+            this.socket.stopTimer(this.socket.getRoomName());
+            this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
             this.isGameFinished = true;
             this.saveGameRecord();
             this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());

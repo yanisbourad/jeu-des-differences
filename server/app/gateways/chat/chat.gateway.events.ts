@@ -4,6 +4,7 @@ export enum ChatEvents {
     JoinRoom = 'joinRoom',
     LeaveRoom = 'leaveRoom',
     ServerTime = 'serverTime',
+    StopTimer = 'stopTimer',
     Hello = 'hello',
     Time = 'time',
 }

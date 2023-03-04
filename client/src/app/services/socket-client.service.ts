@@ -64,6 +64,11 @@ export class SocketClientService {
         this.socketClient.send('joinRoom', playerName);
     }
 
+    // stop timer
+    stopTimer(roomName: string) {
+        this.socketClient.send('stopTimer', roomName);
+    }
+
     // leaveRoom
     leaveRoom() {
         this.disconnect();

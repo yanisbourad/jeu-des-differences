@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import * as constants from '@app/configuration/const-time';
 import { Time } from '@app/interfaces/time';
 import { ClientTimeService } from '@app/services/client-time.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
@@ -9,7 +10,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 })
 export class TimerComponent {
     time: Time;
-    constructor(readonly clientTimeService: ClientTimeService) {
+    constructor(readonly clientTimeService: ClientTimeService, readonly socket: SocketClientService) {
         this.time = { minute: 0, second: 0 };
     }
 
@@ -32,10 +33,14 @@ export class TimerComponent {
         this.time.second = this.getSecond();
         this.time.minute = this.getMinute();
     }
+
     getSecond(): number {
-        return this.clientTimeService.getCount() ? Number(this.clientTimeService.getCount() % constants.SIXTY_SECOND) : 0;
+        const time = this.socket.getRoomTime(this.socket.getRoomName());
+        return time ? Number(time % constants.SIXTY_SECOND) : 0;
     }
+
     getMinute(): number {
-        return this.clientTimeService.getCount() ? Number(Math.floor(this.clientTimeService.getCount() / constants.SIXTY_SECOND)) : 0;
+        const time = this.socket.getRoomTime(this.socket.getRoomName());
+        return time ? Number(Math.floor(time / constants.SIXTY_SECOND)) : 0;
     }
 }

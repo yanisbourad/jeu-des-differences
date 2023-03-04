@@ -52,9 +52,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.clientTimeService.stopTimer();
+        // this.clientTimeService.stopTimer();
         this.socket.disconnect();
-        this.clientTimeService.resetTimer();
+        // this.clientTimeService.resetTimer();
         this.socket.leaveRoom();
         this.gameName = '';
     }
@@ -62,7 +62,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngAfterViewInit(): void {
         this.socket.connect();
         this.socket.joinRoom(this.gameService.playerName);
-        this.clientTimeService.startTimer();
+        // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
     }

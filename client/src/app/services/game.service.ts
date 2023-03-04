@@ -25,6 +25,7 @@ export class GameService {
     nHintsUsed: number;
     hintsArray: string[];
     playerName: string;
+    gameTime: number;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -143,7 +144,7 @@ export class GameService {
             this.differencesArray.unshift(this.path.differenceFound);
         }
         if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            this.clientTimeService.stopTimer();
+            this.gameTime = this.clientTimeService.stopChronometer();// change to server time
             this.isGameFinished = true;
             this.saveGameRecord();
             this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
@@ -163,8 +164,8 @@ export class GameService {
     }
 
     getGameTime(): string {
-        const minutes = Math.floor(this.clientTimeService.getCount() / constantsTime.SIXTY_SECOND);
-        const seconds = this.clientTimeService.getCount() - minutes * constantsTime.SIXTY_SECOND;
+        const minutes = Math.floor(this.gameTime / constantsTime.SIXTY_SECOND);
+        const seconds = this.gameTime - minutes * constantsTime.SIXTY_SECOND;
         return `${minutes}:${seconds < constantsTime.UNDER_TEN ? '0' : ''}${seconds}`;
     }
 

@@ -1,4 +1,6 @@
 import { PlayerService } from '@app/services/player/player-service';
+import { ServerTimeService } from '@app/services/time/server-time.service';
+import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
 import { Player } from '@common/player';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -11,23 +13,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer() server: Server;
     socketId: string = '';
 
-    constructor(private readonly logger: Logger, private readonly playerService: PlayerService) {}
+    constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly serverTime: ServerTimeService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
     connect(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.Message, `: ${message}`);
+        this.server.emit(ChatEvents.Message, `Message reçu : ${message}`);
         this.logger.log('connection au socket');
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     async joinRoom(socket: Socket, playerName: string) {
         const startTime = new Date();
+        this.socketId = socket.id;
         const player: Player = {
             playerName,
             socketId: socket.id,
         };
         if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
             await this.playerService.addRoom(player.socketId, player, startTime);
+            if (!this.serverTime.timers[player.socketId]) {
+                this.serverTime.startChronometer(player.socketId);
+            }
             socket.join(player.socketId);
         } else {
             this.playerService.addPlayer(player.socketId, player, startTime);
@@ -41,10 +47,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(socket.id);
     }
 
+    // add event game finished to stop the timer
+
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
         this.socketId = socket.id;
-        socket.emit(ChatEvents.Hello, 'Hello from serveur');
+        socket.emit(ChatEvents.Hello, `${socket.id}`);
     }
 
     async handleDisconnect(socket: Socket) {
@@ -58,6 +66,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     afterInit() {
-        this.logger.log('Init');
+        this.emitTime();
+    }
+
+    private emitTime(): void {
+        setInterval(() => {
+            this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
+        }, DELAY_BEFORE_EMITTING_TIME);
     }
 }

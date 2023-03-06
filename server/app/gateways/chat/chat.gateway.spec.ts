@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { PlayerService } from '@app/services/player/player-service';
+import { ServerTimeService } from '@app/services/time/server-time.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Subscription } from 'rxjs';
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { INDEX_NOT_FOUND } from './chat.gateway.constants';
@@ -13,12 +16,14 @@ describe('ChatGateway', () => {
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let playerService: SinonStubbedInstance<PlayerService>;
+    let timeService: SinonStubbedInstance<ServerTimeService>;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
         playerService = createStubInstance<PlayerService>(PlayerService);
+        timeService = createStubInstance<ServerTimeService>(ServerTimeService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ChatGateway,
@@ -31,12 +36,15 @@ describe('ChatGateway', () => {
                     provide: PlayerService,
                     useValue: playerService,
                 },
+                {
+                    provide: ServerTimeService,
+                    useValue: timeService,
+                },
             ],
         }).compile();
 
         gateway = module.get<ChatGateway>(ChatGateway);
         // We want to assign a value to the private field
-        // eslint-disable-next-line dot-notation
         gateway['server'] = server;
     });
 
@@ -50,7 +58,12 @@ describe('ChatGateway', () => {
     });
 
     it('JoinRoom() should add a room if the player does not have one', async () => {
-        const playerName = 'test';
+        const playerName = 'John Doe';
+        timeService.timers = {
+            timer1: new Subscription(),
+            timer2: new Subscription(),
+            timer3: new Subscription(),
+        };
         jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(INDEX_NOT_FOUND);
         jest.spyOn(playerService, 'addRoom').mockImplementation(async () => {
             return Promise.resolve();
@@ -68,6 +81,19 @@ describe('ChatGateway', () => {
         await gateway.joinRoom(socket, playerName);
         expect(playerService.addPlayer).toHaveBeenCalled();
     });
+
+    // it('joinRoom() should start the chronometer', async () => {
+    //     timeService.timers = {};
+    //     const playerName = 'test';
+    //     jest.spyOn(playerService, 'addPlayer').mockImplementation(async () => {
+    //         return Promise.resolve();
+    //     });
+    //     jest.spyOn(timeService, 'startChronometer').mockImplementation(jest.fn());
+    //     jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(0);
+    //     await gateway.joinRoom(socket, playerName);
+    //     expect(timeService.startChronometer).toBeCalled();
+    //     expect(playerService.addPlayer).toHaveBeenCalled();
+    // });
 
     it('leaveRoom() should leave the socket room and call removeRoom() from playerService', async () => {
         jest.spyOn(playerService, 'removeRoom').mockImplementation(async () => {
@@ -98,9 +124,10 @@ describe('ChatGateway', () => {
         expect(socket.leave.calledOnce).toBeTruthy();
     });
 
-    it('afterInit() should call the logger.log method', () => {
+    it('afterInit() should call the emitTime()', () => {
+        jest.spyOn(gateway, 'emitTime').mockImplementation(jest.fn());
         gateway.afterInit();
-        expect(logger.log.calledOnce).toBeTruthy();
+        expect(gateway.emitTime).toBeCalled();
     });
 
     it('connect() should emit a message and call the logger.log method', () => {
@@ -112,5 +139,23 @@ describe('ChatGateway', () => {
     it('getSocketId() should return the socket id', () => {
         gateway.handleConnection(socket);
         expect(gateway.getSocketId()).toEqual(socket.id);
+    });
+
+    jest.useFakeTimers();
+    it('emitTime() should emit the time', () => {
+        gateway.emitTime();
+        timeService.elapsedTimes = new Map<string, number>([
+            ['timer1', 0],
+            ['timer2', 100],
+            ['timer3', 200],
+        ]);
+        jest.advanceTimersByTime(1000);
+        expect(server.emit.calledWith(ChatEvents.ServerTime, match.any)).toBeTruthy();
+    });
+
+    it('stopTimer() should call stopChronometer() with correct parameter', () => {
+        jest.spyOn(timeService, 'stopChronometer').mockImplementation(jest.fn());
+        gateway.stopTimer(socket, 'timer1');
+        expect(timeService.stopChronometer).toBeCalledWith('timer1');
     });
 });

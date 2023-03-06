@@ -75,7 +75,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.emitTime();
     }
 
-    private emitTime(): void {
+    emitTime(): void {
         setInterval(() => {
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
         }, DELAY_BEFORE_EMITTING_TIME);

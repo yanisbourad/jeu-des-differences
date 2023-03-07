@@ -64,9 +64,9 @@ export class GameController {
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
-    @Get('/validate/:id')
-    async validateGameName(@Param('id') id: string, @Res() response: Response) {
-        const res = this.gamesService.isValidGameName(id);
+    @Get('/validate/:name')
+    async validateGameName(@Param('name') name: string, @Res() response: Response) {
+        const res = this.gamesService.isValidGameName(name);
         response.status(HttpStatus.OK).json(res);
     }
 }

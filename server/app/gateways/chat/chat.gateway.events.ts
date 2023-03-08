@@ -7,4 +7,5 @@ export enum ChatEvents {
     StopTimer = 'stopTimer',
     Hello = 'hello',
     Time = 'time',
+    GetMessage = 'getMessage',
 }

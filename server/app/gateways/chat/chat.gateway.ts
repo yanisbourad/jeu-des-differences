@@ -5,14 +5,14 @@ import { Player } from '@common/player';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { INDEX_NOT_FOUND } from './chat.gateway.constants';
+import { INDEX_NOT_FOUND, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() server: Server;
     socketId: string = '';
-
+    private readonly room = PRIVATE_ROOM_ID;
     constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly serverTime: ServerTimeService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
@@ -51,6 +51,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async stopTimer(_: Socket, roomName: string) {
         // not tested
         this.serverTime.stopChronometer(roomName); // maybe change the return value
+    }
+    @SubscribeMessage(ChatEvents.Message)
+    async message(socket: Socket, data: [string, string]) {
+        console.log(data[0]);
+        socket.emit('message-return', { message: data[0], userName: data[1] });
     }
 
     // add event game finished to stop the timer

@@ -10,6 +10,7 @@ export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
     id: string = '';
+    messageList: { message: string; userName: string; mine: boolean }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     constructor(private readonly socketClient: SocketClient) {}
 
@@ -52,6 +53,12 @@ export class SocketClientService {
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
         });
+        this.socketClient.on('message-return', (data: { message: string; userName: string }) => {
+            console.log(data.userName);
+            if (data) {
+                this.messageList.push({ message: data.message, userName: data.userName, mine: false });
+            }
+        });
     }
 
     disconnect() {
@@ -73,5 +80,8 @@ export class SocketClientService {
     leaveRoom() {
         this.disconnect();
         this.socketClient.send('leaveRoom');
+    }
+    sendMessage(message: string, playerName: string) {
+        this.socketClient.send('message', [message, playerName]);
     }
 }

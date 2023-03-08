@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
 import { interval, Subscription } from 'rxjs';
+// eslint-disable-next-line import/no-unresolved
 import { Service } from 'typedi';
 
 @Injectable()

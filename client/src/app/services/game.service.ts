@@ -5,10 +5,10 @@ import * as constants from '@app/configuration/const-game';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
+import { ClientTimeService } from '@app/services/client-time.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
-import { ClientTimeService } from './client-time.service';
-import { SocketClientService } from './socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -36,10 +36,10 @@ export class GameService {
         private socket: SocketClientService,
     ) {
         this.path = {
-            differenceNotFound: '../../../assets/img/difference-not-found.png',
-            differenceFound: '../../../assets/img/difference-found.png',
-            hintUnused: '../../../assets/img/hint-unused.png',
-            hintUsed: '../../../assets/img/hint-used.png',
+            differenceNotFound: './assets/img/difference-not-found.png',
+            differenceFound: './assets/img/difference-found.png',
+            hintUnused: './assets/img/hint-unused.png',
+            hintUsed: './assets/img/hint-used.png',
         };
         this.gameInformation = {
             gameTitle: '',
@@ -170,14 +170,14 @@ export class GameService {
 
     playSuccessAudio(): void {
         const audio = new Audio();
-        audio.src = '../../assets/sounds/yay-6120.mp3';
+        audio.src = './assets/sounds/yay-6120.mp3';
         audio.load();
         audio.play();
     }
 
     playFailureAudio(): void {
         const audio = new Audio();
-        audio.src = '../../assets/sounds/wronganswer-37702.mp3';
+        audio.src = './assets/sounds/wronganswer-37702.mp3';
         audio.load();
         audio.play();
     }

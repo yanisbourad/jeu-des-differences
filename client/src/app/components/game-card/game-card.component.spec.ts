@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameInfo } from '@common/game';
 // eslint-disable-next-line no-restricted-imports
-import { NamePopupComponent } from '../name-popup/name-popup.component';
+import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;

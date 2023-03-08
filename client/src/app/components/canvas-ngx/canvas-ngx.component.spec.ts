@@ -35,7 +35,7 @@ describe('CanvasNgxComponent', () => {
         // read the image file as a data URL
         component.type = canvasHolderService.originalCanvas;
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', './assets/image_empty.bmp');
+        xhr.open('GET', 'assets/image_empty.bmp');
         xhr.responseType = 'blob';
         xhr.onload = () => {
             const blobImage = xhr.response;
@@ -59,7 +59,6 @@ describe('CanvasNgxComponent', () => {
         expect(canvas.height).toEqual(constants.DEFAULT_HEIGHT);
     });
     it('should draw an image on the canvas', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyOnSaveImage = spyOn(component, 'saveCanvas');
         component.loadImage(image);
         expect(drawService.drawImage).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
@@ -93,7 +92,7 @@ describe('CanvasNgxComponent', () => {
         // create a new event on change file selection
         bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
         const event = new Event('change');
-        const blob = await (await fetch('./assets/image_empty.bmp')).blob();
+        const blob = await (await fetch('assets/image_empty.bmp')).blob();
         const file = await new File([blob], 'test.bmp', { type: 'image/bmp' });
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const fileList = { 0: file, length: 1, item: () => file };

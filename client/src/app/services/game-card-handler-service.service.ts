@@ -10,6 +10,7 @@ export class GameCardHandlerServiceService {
     }
 
     toggleCreateJoin(gameName: string): string {
+        this.allGames.set('ewsd', 1); // test bien
         if (this.allGames.get(gameName) === 1) return 'Joindre';
         return 'Créer';
     }

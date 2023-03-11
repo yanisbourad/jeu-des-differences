@@ -9,4 +9,5 @@ export enum ChatEvents {
     Hello = 'hello',
     Time = 'time',
     GetRooms = 'getRooms',
+    GetMessage = 'getMessage',
 }

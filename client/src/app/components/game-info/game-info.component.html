@@ -2,14 +2,16 @@
   <div  class="left">
       <p class="title">{{gameService.gameInformation.gameTitle}}</p>
       <p class="sub-title game-infos">{{gameService.gameInformation.gameMode}}</p>
-      <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
-      <div>
-          <img
-              *ngFor="let differences of gameService.differencesArray"
-              class="differences-trouvees-img"
-              src={{differences}}
-              alt="Differences trouvées"
-          />
+      <div *ngFor="let player of gameService.playersName">
+        <p class="sub-title">Différences trouvées par - {{player}}</p>
+        <div>
+            <img
+                *ngFor="let differences of gameService.differencesArray"
+                class="differences-trouvees-img"
+                src={{differences}}
+                alt="Differences trouvées"
+            />
+        </div>
       </div>
   </div>
   <div class="middle">

@@ -7,6 +7,7 @@ import { GameService } from '@app/services/game.service';
     styleUrls: ['./game-info.component.scss'],
 })
 export class GameInfoComponent implements OnInit {
+    gameType: string;
     constructor(public gameService: GameService) {}
 
     ngOnInit(): void {

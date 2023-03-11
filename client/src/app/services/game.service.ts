@@ -24,6 +24,7 @@ export class GameService {
     nHintsUsed: number;
     hintsArray: string[];
     playerName: string;
+    playersName: string[];
     gameTime: number;
     private renderer: Renderer2;
 
@@ -115,6 +116,7 @@ export class GameService {
         this.nDifferencesFound = 0;
         this.differencesArray = [];
         this.playerName = '';
+        this.playersName = [];
         this.nDifferencesFound = 0;
         this.socket.leaveRoom();
         this.game = {

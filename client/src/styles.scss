@@ -122,8 +122,13 @@ body {
 
   .custom-dialog-container{
     mat-dialog-container{
-        border: 2px solid #ffffff;
-        background: #4a415c;
+        border: 2px solid #706f6f;
+        border-radius: 10px;
+        background: #150f1f;
+        opacity: 1;
         color: white;
     }
   }
+  .cdk-overlay-dark-backdrop {
+        background: rgba(0, 0, 0, 1);
+    }

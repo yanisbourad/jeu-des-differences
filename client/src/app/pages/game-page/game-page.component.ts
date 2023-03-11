@@ -26,6 +26,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // TODO: use camelCase
     playerName: string;
+    // mock mutliPlayers
+    players = ['first', 'second'];
 
     gameName: string;
 
@@ -61,23 +63,26 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.socket.connect();
-        this.socket.joinRoom(this.gameService.playerName);
+        // this.socket.joinRoomSolo(this.gameService.playerName);
+        this.socket.joinRoomMulti(this.players);
         // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
     }
 
-    getRouteurParams() {
+    getRouterParams() {
         this.playerName = this.route.snapshot.paramMap.get('player') as string;
         this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
     }
 
     ngOnInit(): void {
-        this.getRouteurParams();
+        this.getRouterParams();
         this.gameService.getGame(this.gameName);
         this.gameService.displayIcons();
         this.loading();
         this.gameService.playerName = this.playerName;
+        // modify this for 1 v 1
+        this.gameService.playersName.push(this.playerName);
     }
 
     loading(): void {

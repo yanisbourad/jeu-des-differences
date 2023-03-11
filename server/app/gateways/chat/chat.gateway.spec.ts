@@ -52,12 +52,18 @@ describe('ChatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('joinRoom() should join the socket room', async () => {
-        await gateway.joinRoom(socket, 'some name');
+    it('joinRoomSolo() should join the socket room', async () => {
+        timeService.timers = {
+            timer1: new Subscription(),
+            timer2: new Subscription(),
+            timer3: new Subscription(),
+        };
+        jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(INDEX_NOT_FOUND);
+        await gateway.joinRoomSolo(socket, 'some name');
         expect(socket.join.calledOnce).toBeTruthy();
     });
 
-    it('JoinRoom() should add a room if the player does not have one', async () => {
+    it('JoinRoomSolo() should add a room if the player does not have one', async () => {
         const playerName = 'John Doe';
         timeService.timers = {
             timer1: new Subscription(),
@@ -65,21 +71,18 @@ describe('ChatGateway', () => {
             timer3: new Subscription(),
         };
         jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(INDEX_NOT_FOUND);
-        jest.spyOn(playerService, 'addRoom').mockImplementation(async () => {
+        jest.spyOn(playerService, 'addRoomSolo').mockImplementation(async () => {
             return Promise.resolve();
         });
-        await gateway.joinRoom(socket, playerName);
-        expect(playerService.addRoom).toHaveBeenCalled();
+        await gateway.joinRoomSolo(socket, playerName);
+        expect(playerService.addRoomSolo).toHaveBeenCalled();
     });
 
-    it('joinRoom() should add a player if they already have a room', async () => {
+    it('joinRoomSolo() should call logger.log() if room already exist', async () => {
         const playerName = 'test';
         jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(0);
-        jest.spyOn(playerService, 'addPlayer').mockImplementation(async () => {
-            return Promise.resolve();
-        });
-        await gateway.joinRoom(socket, playerName);
-        expect(playerService.addPlayer).toHaveBeenCalled();
+        await gateway.joinRoomSolo(socket, playerName);
+        expect(logger.log.calledOnce).toBeTruthy();
     });
 
     // it('joinRoom() should start the chronometer', async () => {
@@ -104,7 +107,7 @@ describe('ChatGateway', () => {
         expect(playerService.removeRoom).toHaveBeenCalled();
     });
 
-    it('hello message should be sent on connection and logger.log method shoud be called', () => {
+    it('hello message should be sent on connection and logger.log method shoud be called', async () => {
         gateway.handleConnection(socket);
         expect(logger.log.calledOnce).toBeTruthy();
         expect(socket.emit.calledWith(ChatEvents.Hello, match.any)).toBeTruthy();

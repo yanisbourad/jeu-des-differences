@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
+import { Room } from '@common/rooms';
 // import { ClientTimeService } from './client-time.service';
 
 @Injectable({
@@ -11,6 +12,7 @@ export class SocketClientService {
     serverMessage: string = '';
     id: string = '';
     elapsedTimes: Map<string, number> = new Map<string, number>();
+    rooms: Room[] = [];
     constructor(private readonly socketClient: SocketClient) {}
 
     get socketId() {
@@ -51,6 +53,13 @@ export class SocketClientService {
         // Obtenir le temps envoyé par le serveur
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
+            console.log(this.elapsedTimes);
+        });
+
+        this.socketClient.on('getRooms', (rooms: Room[]) => {
+            this.rooms = rooms;
+            // //this.setRooms(rooms);
+            // console.log(this.rooms);
         });
     }
 
@@ -59,9 +68,25 @@ export class SocketClientService {
         this.socketClient.disconnect();
     }
 
-    // joinRoom
-    joinRoom(playerName: string) {
-        this.socketClient.send('joinRoom', playerName);
+    // joinRoomSolo
+    joinRoomSolo(playerName: string) {
+        console.log('joinRoom', this.rooms);
+        const room = this.getRoom();
+        console.log(room);
+        this.socketClient.send('joinRoomSolo', [playerName, room?.name]);
+        // this.socketClient.send('joinRoom', playerName);
+    }
+
+    // joinRoomMulti
+    joinRoomMulti(playerName: string[]) {
+        console.log('joinRoom', this.rooms);
+        this.socketClient.send('joinRoomMulti', [playerName[0], playerName[1]]);
+    }
+
+    // return first room with one player
+    getRoom() {
+        console.log("getroom",this.rooms);
+        return this.rooms.find((room) => room.players.length === 1);
     }
 
     // stop timer

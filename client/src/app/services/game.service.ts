@@ -26,6 +26,7 @@ export class GameService {
     playerName: string;
     playersName: string[];
     gameTime: number;
+    gameType: string;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -53,6 +54,7 @@ export class GameService {
         this.nDifferencesFound = 0;
         this.isGameFinished = false;
         this.renderer = rendererFactory.createRenderer(null, null);
+        this.playersName = ['first', 'second'];
     }
 
     defineVariables(): void {
@@ -117,6 +119,8 @@ export class GameService {
         this.differencesArray = [];
         this.playerName = '';
         this.playersName = [];
+        this.gameTime = 0;
+        this.gameType = '';
         this.nDifferencesFound = 0;
         this.socket.leaveRoom();
         this.game = {

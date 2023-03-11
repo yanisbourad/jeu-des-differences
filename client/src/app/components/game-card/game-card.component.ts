@@ -19,7 +19,7 @@ export class GameCardComponent implements OnInit {
     constructor(public dialog: MatDialog, private router: Router) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
-            data: { name: this.name, gameName: this.card.gameName },
+            data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
         });
 
         dialogRef.afterClosed().subscribe((result) => {

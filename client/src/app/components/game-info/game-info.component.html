@@ -1,8 +1,21 @@
 <div class="infos">
   <div  class="left">
       <p class="title">{{gameService.gameInformation.gameTitle}}</p>
-      <p class="sub-title game-infos">{{gameService.gameInformation.gameMode}}</p>
-      <div *ngFor="let player of gameService.playersName">
+      <p class="sub-title game-infos">{{gameService.gameType}}</p>
+
+      <div *ngIf="gameService.gameType === 'solo'; else elseBlock">
+        <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
+        <div>
+            <img
+                *ngFor="let differences of gameService.differencesArray"
+                class="differences-trouvees-img"
+                src={{differences}}
+                alt="Differences trouvées"
+            />
+        </div>
+      </div>
+      <ng-template #elseBlock>
+        <div *ngFor="let player of gameService.playersName">
         <p class="sub-title">Différences trouvées par - {{player}}</p>
         <div>
             <img
@@ -13,6 +26,7 @@
             />
         </div>
       </div>
+      </ng-template>
   </div>
   <div class="middle">
       <div class="difficulty">

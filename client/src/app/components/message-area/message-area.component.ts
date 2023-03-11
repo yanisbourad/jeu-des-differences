@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import * as constants from '@app/configuration/const-game';
+import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 //import { SocketClientService } from '@app/services/socket-client.service';
 //import { Socket } from 'socket.io-client';
@@ -20,7 +21,7 @@ export class MessageAreaComponent implements OnInit {
     chatBox: number[] = new Array(this.chatBoxDemo);
     userList: string[] = [];
     socket: SocketClient;
-    constructor(private readonly socketClient: SocketClientService) {}
+    constructor(private readonly socketClient: SocketClientService, readonly gameService: GameService) {}
     ngOnInit() {
         this.playerInitials = this.playerName[0];
     }

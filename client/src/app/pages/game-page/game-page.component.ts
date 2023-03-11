@@ -28,6 +28,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     playerName: string;
     // mock mutliPlayers
     players = ['first', 'second'];
+    gameType: string;
 
     gameName: string;
 
@@ -73,6 +74,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     getRouterParams() {
         this.playerName = this.route.snapshot.paramMap.get('player') as string;
         this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+        this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
     }
 
     ngOnInit(): void {
@@ -81,6 +83,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.displayIcons();
         this.loading();
         this.gameService.playerName = this.playerName;
+        this.gameService.gameType = this.gameType;
         // modify this for 1 v 1
         this.gameService.playersName.push(this.playerName);
     }

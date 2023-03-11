@@ -106,6 +106,7 @@ export class SocketClientService {
         this.disconnect();
         this.socketClient.send('leaveRoom');
     }
+
     sendMessage(message: string, playerName: string) {
         this.socketClient.send('message', [message, playerName]);
     }

@@ -12,11 +12,11 @@
         </div>
     </div>
     <div class="container">
-        <textarea type="text" maxlength="200" cols="40"  
+        <textarea [disabled]= "gameService.gameType === 'solo'" type="text" maxlength="200" cols="40"  
          rows="5"  placeholder="Écrire à {{playerName}}… (200 caractères maximum)" [(ngModel)]="message">
         </textarea>
     </div>
     <div class="container">
-        <button mat-raised-button class="send-btn" (click)="sendMessage()">Envoyer</button>
+        <button mat-raised-button class="send-btn" (click)="sendMessage()" [disabled]= "gameService.gameType === 'solo'" >Envoyer</button>
     </div>
 </div>

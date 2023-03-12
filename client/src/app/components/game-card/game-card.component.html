@@ -43,7 +43,8 @@
     </div>
     <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="playButton"
         (click)="openDialog()">Jouer</button>
-    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton">{{createJoinState}}</button>
+    <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton"
+        (click)="launchDialog()">{{createJoinState}}</button>
 
     <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
     <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>

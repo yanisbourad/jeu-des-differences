@@ -21,16 +21,28 @@ export class GameCardComponent implements OnInit {
     constructor(public dialog: MatDialog, private router: Router, private readonly gameCardHandlerServiceService: GameCardHandlerServiceService) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
-            data: { name: this.name, gameName: this.card.gameName },
+            data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
         });
 
         dialogRef.afterClosed().subscribe((result) => {
             this.name = result;
         });
     }
+
     ngOnInit(): void {
         this.url = this.router.url;
     }
+
+    launchDialog(): void {
+        const dialogRef = this.dialog.open(NamePopupComponent, {
+            data: { name: this.name, gameName: this.card.gameName, gameType: 'double' },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            this.name = result;
+        });
+    }
+
     changeButton(): string {
         switch (this.url) {
             case '/classique': {

@@ -1,6 +1,6 @@
 export interface GameInformation {
     gameTitle: string;
-    gameMode: 'solo' | 'multi';
+    gameMode: string; // 'solo' | 'multi'
     gameDifficulty: string;
     nDifferences: number;
     nHints: number;

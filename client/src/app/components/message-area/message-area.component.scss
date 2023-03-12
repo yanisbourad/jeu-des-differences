@@ -77,6 +77,21 @@ hr {
     background: #458fff;
     border-radius: 20px;
 }
+.user-message{
+    margin-top: 10px;
+    margin-left: 2px;
+    display: block;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: right;
+    text-align: left;
+    word-break: break-all;
+    padding: 12px 20px;
+    color: white;
+    background: #7b57b8;
+    width: fit-content;
+    border-radius: 20px;
+}
 textarea {
     box-sizing: border-box;
     width: 331px;

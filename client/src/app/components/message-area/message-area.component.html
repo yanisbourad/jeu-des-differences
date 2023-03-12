@@ -6,9 +6,11 @@
     </div>
     <div class="container">
         <div class="discussion-box">
-            <p class="event-title">message d'événement</p>
+            <p class="event-title">Messages</p>
             <hr>
-            <p *ngFor="let message of chatBox " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
+            <p *ngFor="let message of socketClient.messageList " class="user-message" [style.background-color]="message.color"
+               [style.margin-left]="message.pos"
+            >{{message.userName}}- {{message.message}}</p>
         </div>
     </div>
     <div class="container">

@@ -1,11 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import * as constants from '@app/configuration/const-game';
+// import * as constants from '@app/configuration/const-game';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-//import { SocketClientService } from '@app/services/socket-client.service';
-//import { Socket } from 'socket.io-client';
 import { SocketClient } from '@app/utils/socket-client';
-// import * as io from 'socket.io-client';
 
 @Component({
     selector: 'app-message-area',
@@ -17,24 +14,29 @@ export class MessageAreaComponent implements OnInit {
     @Input() message: string = '';
     playerInitials: string;
     date: Date = new Date();
-    chatBoxDemo: number = constants.CHAT_BOX_DEMO;
-    chatBox: number[] = new Array(this.chatBoxDemo);
     userList: string[] = [];
     socket: SocketClient;
-    constructor(private readonly socketClient: SocketClientService, readonly gameService: GameService) {}
+    defaultColor: string[];
+    position: string[];
+    constructor(readonly socketClient: SocketClientService, readonly gameService: GameService) {}
     ngOnInit() {
         this.playerInitials = this.playerName[0];
+        this.defaultColor = ['#69bd84', '#6ca2c7'];
+        this.position = ['1%', '50%'];
     }
 
     getTimestamp(): string {
         return this.date.toLocaleTimeString();
     }
     sendMessage() {
-        console.log(this.message);
-        this.socketClient.sendMessage(this.message, this.playerName);
-        console.log('taboune');
-        this.socketClient.messageList.push({ message: this.message, userName: this.playerName, mine: true });
-        console.log('taboune');
+        this.socketClient.sendMessage(this.message, this.playerName, this.defaultColor[0], this.position[0]);
+        this.socketClient.messageList.push({
+            message: this.message,
+            userName: this.playerName,
+            mine: true,
+            color: this.defaultColor[1],
+            pos: this.position[1],
+        });
         this.message = '';
     }
 }

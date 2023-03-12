@@ -36,12 +36,13 @@
 }
 .giveUp {
     display: flex;
-    margin-left: 42%;
+    margin-left: 48%;
     backdrop-filter: blur(32px) brightness(100%);
     border: 2px solid;
     border-color: rgb(235, 88, 88);
     border-radius: 32px;
     background-color: #a77878df;
+    margin-top: 1.5%;
     color: white;
 }
 .giveUp:hover {

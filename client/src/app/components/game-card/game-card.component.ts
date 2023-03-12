@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
+import { GameDatabaseService } from '@app/services/game-database.service';
 
 @Component({
     selector: 'app-game-card',
@@ -16,7 +17,7 @@ export class GameCardComponent implements OnInit {
     typePage: 'Classique' | 'Configuration';
     url: string;
 
-    constructor(public dialog: MatDialog, private router: Router) {}
+    constructor(public dialog: MatDialog, private router: Router, private readonly gameDataBase: GameDatabaseService) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName },
@@ -41,5 +42,9 @@ export class GameCardComponent implements OnInit {
             }
         }
         return '';
+    }
+
+    deleteGame(gameName: string) {
+        return this.gameDataBase.deleteGame(gameName);
     }
 }

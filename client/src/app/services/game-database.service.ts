@@ -37,6 +37,10 @@ export class GameDatabaseService {
         return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`);
     }
 
+    deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
+
     saveGame(_gameName: string): EventEmitter<boolean> {
         const game: Game = {
             gameName: _gameName,

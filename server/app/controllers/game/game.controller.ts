@@ -1,5 +1,5 @@
 import { GameService } from '@app/services/game/game.service';
-import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Game } from './../../../../common/game';
@@ -69,4 +69,15 @@ export class GameController {
         const res = this.gamesService.isValidGameName(id);
         response.status(HttpStatus.OK).json(res);
     }
+
+    @Delete('/:id')
+    async deleteGame(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const res = await this.gamesService.deleteGame(id);
+            response.status(HttpStatus.OK).json(res);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+
 }

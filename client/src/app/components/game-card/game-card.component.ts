@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
 import { GameDatabaseService } from '@app/services/game-database.service';
+import { CardDisplayerComponent } from '@app/components/card-displayer/card-displayer.component';
 
 @Component({
     selector: 'app-game-card',
@@ -16,6 +17,7 @@ export class GameCardComponent implements OnInit {
     gameName: string;
     typePage: 'Classique' | 'Configuration';
     url: string;
+    carrousel: CardDisplayerComponent;
 
     constructor(public dialog: MatDialog, private router: Router, private readonly gameDataBase: GameDatabaseService) {}
     openDialog(): void {
@@ -45,6 +47,7 @@ export class GameCardComponent implements OnInit {
     }
 
     deleteGame(gameName: string) {
-        return this.gameDataBase.deleteGame(gameName).subscribe();
+        this.gameDataBase.deleteGame(gameName).subscribe();
+        return this.carrousel.updateCards();
     }
 }

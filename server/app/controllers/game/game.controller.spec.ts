@@ -127,4 +127,20 @@ describe('GameController', () => {
             await controller.createGame(game, res);
         });
     });
+
+    describe('deleteGame', () => {
+        it('it should call function deleteGame from service', async () => {
+            const spy = jest.spyOn(gameService, 'deleteGame').mockImplementation();
+            const game = {
+                gameName: 'kasspopobnmkieieio',
+                difficulty: 'easy',
+                originalImageData: 'imageData',
+                modifiedImageData: 'modifiedImageData',
+                listDifferences: ['diff1', 'diff2'],
+            };
+            gameService.addGame(game);
+            gameService.deleteGame(game.gameName);
+            expect(spy).toBeCalled();
+        });
+    });
 });

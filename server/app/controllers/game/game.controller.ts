@@ -79,5 +79,4 @@ export class GameController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
 }

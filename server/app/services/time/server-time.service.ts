@@ -39,4 +39,9 @@ export class ServerTimeService {
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
     }
+
+    removeTimer(id: string): void {
+        this.timers[id].unsubscribe();
+        this.elapsedTimes.delete(id);
+    }
 }

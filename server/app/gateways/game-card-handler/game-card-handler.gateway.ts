@@ -14,9 +14,9 @@ export class GameCardHandlerGateway {
     constructor(private readonly gameCardHandlerService: GameCardHandlerService) {}
 
     @SubscribeMessage('findAllGamesStatus')
-    async updateGameStatus() {
-        const gameCardInfo = this.gameCardHandlerService.findAllGamesStatus();
-        this.server.emit('findAllGamesStatus', gameCardInfo);
+    async updateGameStatus(@ConnectedSocket() gamer: Socket) {
+        // const gameCardInfo = this.gameCardHandlerService.findAllGamesStatus();
+        // this.server.to(gamer.id).emit('findAllGamesStatus', 'merci');
     }
 
     @SubscribeMessage('joinGame')
@@ -26,22 +26,40 @@ export class GameCardHandlerGateway {
             name: payload.name,
             gameName: payload.gameName,
         };
-        // send message to everyone else
+        // send feedback to player
         // create queue for each game and add gamer to queue
-        return this.gameCardHandlerService.stackPlayer(player);
+        gamer.join(player.id);
+        const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
+        if (stackedPlayerNumber === 1) {
+            this.server.to(player.id).emit('feedbackOnJoin', stackedPlayerNumber);
+        } else if (stackedPlayerNumber === 2) {
+            const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
+            this.server.to(players[0]).emit('feedbackOnAccept', stackedPlayerNumber);
+            this.server.to(players[1]).emit('feedbackOnWait', stackedPlayerNumber);
+        } else {
+            this.server.to(player.id).emit('feedbackTryAgain', stackedPlayerNumber);
+        }
     }
 
     @SubscribeMessage('cancelGame')
     cancel(@ConnectedSocket() gamer: Socket): boolean {
-        // send message to everyone else
-        // return this.gameCardHandlerService.remove(gamer.id);
+        // if player is alone remove him from queue
+        const player = this.gameCardHandlerService.getPlayer(gamer.id);
+        // const stackedPlayerNumber = this.gameCardHandlerService.getStackedPlayers();
+        // if player is with opponent remove him from queue and send message to opponent
         return true;
     }
 
     @SubscribeMessage('rejectOpponent')
     reject(@ConnectedSocket() gamer: Socket) {
         // send message to everyone opponent
-        return this.gameCardHandlerService.deleteOponent(gamer.id);
+        const opponent = this.gameCardHandlerService.deleteOponent(gamer.id);
+        if (opponent) {
+            this.server.to(gamer.id).emit('feedbackOnReject', true);
+            this.server.to(opponent.id).emit('feedbackOnReject', false);
+        } else {
+            this.server.to(gamer.id).emit('feedbackOnReject', false);
+        }
     }
 
     @SubscribeMessage('acceptOpponent')

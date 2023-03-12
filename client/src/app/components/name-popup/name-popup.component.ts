@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 export interface DialogData {
@@ -13,7 +13,7 @@ export interface DialogData {
 export class NamePopupComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<NamePopupComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string },
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
         private route: Router,
     ) {}
     ngOnInit(): void {
@@ -23,6 +23,6 @@ export class NamePopupComponent implements OnInit {
         this.dialogRef.close();
     }
     redirect(): void {
-        this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName }]);
+        if (this.data.gameType === 'solo') this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName }]);
     }
 }

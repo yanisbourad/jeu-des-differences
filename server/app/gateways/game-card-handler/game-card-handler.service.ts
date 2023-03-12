@@ -25,7 +25,7 @@ export class GameCardHandlerService {
             if (this.gamesQueue.get(player.gameName).length === 0) return false;
             return true;
         } else {
-            this.gamesQueue[player.gameName] = [];
+            this.gamesQueue.set(player.gameName, []);
             return false;
         }
     }
@@ -35,17 +35,23 @@ export class GameCardHandlerService {
         this.players.set(player.id, player);
         if (!this.isPlayerWaiting(player)) {
             this.gamesQueue.get(player.gameName).push(player.id);
-            return 1;
-        } else {
+            return this.gamesQueue.get(player.gameName).length;
+        } else if (this.gamesQueue.get(player.gameName).length < 2) {
             return this.dispatchPlayer(player);
+        } else {
+            return 0;
         }
+    }
+
+    getStackedPlayers(gameName: string): string[] {
+        return this.gamesQueue.get(gameName);
     }
 
     // add second player at the stack fifo
     dispatchPlayer(player: Player): number {
         if (this.gamesQueue.has(player.gameName)) {
             this.gamesQueue.get(player.gameName).push(player.id);
-            return 2;
+            return this.gamesQueue.get(player.gameName).length;
         }
     }
 
@@ -60,10 +66,17 @@ export class GameCardHandlerService {
         return [creatorPlayer, opponentPlayer];
     }
 
-    deleteOponent(playerId: string): boolean {
-        const opponent = this.gamesQueue.get(this.players.get(playerId).gameName).pop();
-        this.players.delete(opponent);
-        return true;
+    deleteOponent(playerId: string): Player {
+        const opponentId = this.gamesQueue.get(this.players.get(playerId).gameName).pop();
+        const opponent = this.players.get(opponentId);
+        if (this.players.delete(opponent.id)) {
+            return opponent;
+        }
+    }
+
+    getPlayer(playerId: string): Player {
+        if (this.players.has(playerId)) return this.players.get(playerId);
+        return null;
     }
 
     // remove(id: string): boolean {

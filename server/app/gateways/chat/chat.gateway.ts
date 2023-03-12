@@ -94,8 +94,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.StopTimer)
-    async stopTimer(_: Socket, roomName: string) {
+    async stopTimer(socket: Socket, roomName: string) {
         // not tested
+        socket.to(roomName).emit('gameEnded', true);
         this.serverTime.stopChronometer(roomName); // maybe change the return value
     }
     @SubscribeMessage(ChatEvents.Message)
@@ -106,10 +107,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         // to be private
-        this.serverTime.stopChronometer(roomName);
         this.serverTime.removeTimer(roomName);
         this.playerService.removeRoom(roomName);
         this.playerService.roomNamesMulti.filter((name) => name !== roomName);
+        this.logger.log('game ended');
+        this.logger.log(this.roomName);
         socket.leave(roomName);
     }
 

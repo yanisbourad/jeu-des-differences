@@ -29,7 +29,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     // mock mutliPlayers
     players = ['first', 'second'];
     gameType: string;
-
     gameName: string;
 
     // TODO: reduce the number of parameters
@@ -73,6 +72,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
+        this.socket.gameState$.subscribe((newValue) => {
+            if (newValue === true) {
+                this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
+            }
+            console.log('The value of gameState has changed:', newValue);
+        });
     }
 
     getRouterParams() {

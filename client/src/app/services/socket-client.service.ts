@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
 import { Room } from '@common/rooms';
+import { Observable, Subject } from 'rxjs';
 // import { ClientTimeService } from './client-time.service';
 
 @Injectable({
@@ -14,6 +15,11 @@ export class SocketClientService {
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
+    // gameState$: Observable<boolean> = of(this.gameFinished);
+    private gameState = new Subject<boolean>();
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    gameState$: Observable<boolean> = this.gameState.asObservable();
+
     constructor(private readonly socketClient: SocketClient) {}
 
     get socketId() {
@@ -68,6 +74,12 @@ export class SocketClientService {
                 this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
             }
         });
+
+        this.socketClient.on('gameEnded', (gameEnded: boolean) => {
+            // this.gameFinished = gameEnded;
+            this.gameState.next(gameEnded);
+            console.log('gameEnded', this.gameState);
+        });
     }
 
     disconnect() {
@@ -114,8 +126,8 @@ export class SocketClientService {
 
     // leaveRoom
     leaveRoom() {
-        this.disconnect();
         this.socketClient.send('leaveRoom');
+        this.disconnect();
     }
 
     sendMessage(message: string, playerName: string, color: string, pos: string) {

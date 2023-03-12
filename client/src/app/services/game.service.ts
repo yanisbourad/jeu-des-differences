@@ -108,7 +108,7 @@ export class GameService {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
-    displayGameEnded(msg: string, type: string, time: string) {
+    displayGameEnded(msg: string, type: string, time?: string) {
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type, time],
             disableClose: true,

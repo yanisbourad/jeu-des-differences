@@ -5,7 +5,7 @@ import { Player } from '@common/player';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { INDEX_NOT_FOUND, PRIVATE_ROOM_ID } from './chat.gateway.constants';
+import { INDEX_NOT_FOUND } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
@@ -13,11 +13,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer() server: Server;
     socketId: string = '';
     roomName: string = '';
-    private readonly room = PRIVATE_ROOM_ID;
     constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly serverTime: ServerTimeService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
-    connect(socket: Socket, message: string) {
+    connect(_: Socket, message: string) {
         this.server.emit(ChatEvents.Message, `Message reçu : ${message}`);
         this.logger.log('connection au socket');
     }
@@ -33,9 +32,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         };
         if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
             await this.playerService.addRoomSolo(socket.id, player, startTime);
-            if (!this.serverTime.timers[player.socketId]) {
-                this.serverTime.startChronometer(socket.id);
-            }
+            this.startGame();
             socket.join(player.socketId);
         } else {
             this.logger.log('room already exists');
@@ -71,6 +68,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // console.log(this.playerService.rooms[0].players);
     }
 
+    @SubscribeMessage(ChatEvents.JoinRoom)
+    joinRoom(socket: Socket, data: { playerName: string; roomName: string }) {
+        const player: Player = {
+            playerName: data.playerName,
+            socketId: socket.id,
+        };
+        if (this.playerService.roomNamesMulti.includes(data.roomName)) {
+            this.roomName = data.roomName;
+            this.playerService.addPlayerMul(data.roomName, player, new Date());
+            socket.join(data.roomName);
+            this.startGame();
+            return;
+        } else {
+            this.roomName = data.roomName;
+            this.playerService.addRoomMul(data.roomName, player, new Date());
+            socket.join(data.roomName);
+        }
+    }
+
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
         await this.playerService.removeRoom(socket.id);
@@ -83,25 +99,46 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.serverTime.stopChronometer(roomName); // maybe change the return value
     }
     @SubscribeMessage(ChatEvents.Message)
-    async message(socket: Socket, data: [string, string]) {
-        console.log(data[0]);
-        socket.emit('message-return', { message: data[0], userName: data[1] });
+    async message(socket: Socket, data: [string, string, string, string]) {
+        socket.to(this.roomName).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3] });
+    }
+
+    @SubscribeMessage(ChatEvents.GameEnded)
+    async gameEnded(socket: Socket, roomName: string) {
+        // to be private
+        this.serverTime.stopChronometer(roomName);
+        this.serverTime.removeTimer(roomName);
+        this.playerService.removeRoom(roomName);
+        this.playerService.roomNamesMulti.filter((name) => name !== roomName);
+        socket.leave(roomName);
+    }
+
+    startGame(): void {
+        // to be private
+        this.playerService.rooms.forEach((room) => {
+            if (room.maxPlayers === room.players.length) {
+                if (!this.serverTime.timers[room.name]) {
+                    this.serverTime.startChronometer(room.name);
+                }
+            }
+        });
     }
 
     // add event game finished to stop the timer
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
+        console.log(this.playerService.rooms);
         this.socketId = socket.id;
-        if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
-            this.roomName = this.socketId;
-        }
+        // if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
+        //     this.roomName = this.socketId;
+        // }
         socket.emit(ChatEvents.Hello, `${this.roomName}`); // modif here
         socket.emit(ChatEvents.GetRooms, this.playerService.rooms);
     }
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
-        await this.playerService.removeRoom(socket.id);
+        // await this.playerService.removeRoom(socket.id);
         socket.leave(socket.id);
     }
 

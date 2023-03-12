@@ -64,8 +64,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.socket.connect();
-        // this.socket.joinRoomSolo(this.gameService.playerName);
-        this.socket.joinRoomMulti(this.players);
+        // if (this.gameType === 'solo') {
+        //     this.socket.joinRoomSolo(this.playerName);
+        // } else {
+        //     this.socket.joinRoomMulti(this.players);
+        // }
+        this.socket.joinRoom(this.playerName, 'testRoom');
         // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
@@ -85,7 +89,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.playerName = this.playerName;
         this.gameService.gameType = this.gameType;
         // modify this for 1 v 1
-        this.gameService.playersName.push(this.playerName);
+        // this.gameService.playersName.push(this.playerName);
     }
 
     loading(): void {
@@ -105,6 +109,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 // remove difference found from unfundedDifference
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
                 this.displayWord('Trouvé');
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                // setTimeout(() => this.drawDifference(diff), 1000);
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
@@ -151,7 +157,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     displayGiveUp(msg: string, type: string) {
-        // display modal
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type],
             minWidth: '250px',

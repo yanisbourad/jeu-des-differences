@@ -10,8 +10,8 @@ import { Room } from '@common/rooms';
 export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
-    id: string = '';
-    messageList: { message: string; userName: string; mine: boolean }[] = [];
+    roomName: string = '';
+    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
     constructor(private readonly socketClient: SocketClient) {}
@@ -32,7 +32,7 @@ export class SocketClientService {
     }
 
     getRoomName(): string {
-        return this.id;
+        return this.roomName;
     }
 
     getServerMessage(): string {
@@ -45,7 +45,7 @@ export class SocketClientService {
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketClient.on('hello', (socketId: string) => {
-            this.id = socketId;
+            this.roomName = socketId;
         });
         // Afficher le message envoyé lors de la connexion au socket
         this.socketClient.on('message', (message: string) => {
@@ -62,10 +62,10 @@ export class SocketClientService {
             // //this.setRooms(rooms);
             // console.log(this.rooms);
         });
-        this.socketClient.on('message-return', (data: { message: string; userName: string }) => {
+        this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
             console.log(data.userName);
             if (data) {
-                this.messageList.push({ message: data.message, userName: data.userName, mine: false });
+                this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
             }
         });
     }
@@ -84,6 +84,17 @@ export class SocketClientService {
         // this.socketClient.send('joinRoom', playerName);
     }
 
+    //joinRoom
+    joinRoom(playerName: string, roomName: string) {
+        // console.log('joinRoom', this.rooms);
+        this.socketClient.send('joinRoom', { playerName, roomName });
+    }
+
+    gameEnded(roomName: string): void {
+        console.log('gameEnded', roomName);
+        this.socketClient.send('gameEnded', roomName);
+    }
+
     // joinRoomMulti
     joinRoomMulti(playerName: string[]) {
         console.log('joinRoom', this.rooms);
@@ -92,7 +103,7 @@ export class SocketClientService {
 
     // return first room with one player
     getRoom() {
-        console.log("getroom",this.rooms);
+        console.log('getroom', this.rooms);
         return this.rooms.find((room) => room.players.length === 1);
     }
 
@@ -107,7 +118,7 @@ export class SocketClientService {
         this.socketClient.send('leaveRoom');
     }
 
-    sendMessage(message: string, playerName: string) {
-        this.socketClient.send('message', [message, playerName]);
+    sendMessage(message: string, playerName: string, color: string, pos: string) {
+        this.socketClient.send('message', [message, playerName, color, pos]);
     }
 }

@@ -44,7 +44,7 @@ export class GameService {
         };
         this.gameInformation = {
             gameTitle: '',
-            gameMode: 'solo',
+            gameMode: '',
             gameDifficulty: '',
             nDifferences: 0,
             nHints: constants.NUMBER_OF_HINTS,
@@ -60,7 +60,7 @@ export class GameService {
     defineVariables(): void {
         this.gameInformation = {
             gameTitle: this.game.gameName,
-            gameMode: 'solo',
+            gameMode: this.gameType,
             gameDifficulty: this.game.difficulty,
             nDifferences: this.game.listDifferences.length,
             nHints: constants.NUMBER_OF_HINTS,
@@ -79,6 +79,12 @@ export class GameService {
             this.defineVariables();
         });
     }
+
+    // findDiff(pos: number, gameName: string) {
+    //     this.gameDataBase.(pos, gameName).subscribe((res: Game) => {
+    //         this.game = res;
+    //     });
+    // }
 
     displayIcons(): void {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
@@ -132,7 +138,7 @@ export class GameService {
         };
         this.gameInformation = {
             gameTitle: '',
-            gameMode: 'solo',
+            gameMode: '',
             gameDifficulty: '',
             nDifferences: 0,
             nHints: constants.NUMBER_OF_HINTS,
@@ -147,20 +153,40 @@ export class GameService {
             this.differencesArray.pop();
             this.differencesArray.unshift(this.path.differenceFound);
         }
-        if (this.nDifferencesFound === this.nDifferencesNotFound) {
-            this.socket.stopTimer(this.socket.getRoomName());
-            this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
-            this.isGameFinished = true;
-            this.saveGameRecord();
-            this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-            this.reinitializeGame();
+        if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
+            this.endGame();
         }
+        if (this.multiGameEnd() && this.gameType === 'multi') {
+            this.endGame();
+        }
+    }
+
+    isEven(number: number) {
+        return number % 2 === 0;
+    }
+
+    multiGameEnd(): boolean {
+        if (this.isEven(this.nDifferencesNotFound)) {
+            return this.nDifferencesFound === this.nDifferencesNotFound / 2;
+        }
+        return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
+    }
+
+    endGame(): void {
+        this.socket.stopTimer(this.socket.getRoomName());
+        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
+        console.log(this.gameTime, this.gameInformation.gameMode);
+        this.isGameFinished = true;
+        this.saveGameRecord();
+        this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
+        this.socket.gameEnded(this.socket.getRoomName());
+        this.reinitializeGame();
     }
 
     saveGameRecord(): void {
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
-            typeGame: this.gameInformation.gameMode,
+            typeGame: this.gameType,
             playerName: this.playerName,
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),
@@ -186,5 +212,10 @@ export class GameService {
         audio.src = '../../assets/sounds/wronganswer-37702.mp3';
         audio.load();
         audio.play();
+    }
+
+    // generate random unique roomName
+    generateRoomName(): string {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     }
 }

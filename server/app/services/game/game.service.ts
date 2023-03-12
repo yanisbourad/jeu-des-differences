@@ -60,6 +60,16 @@ export class GameService {
         return JSON.parse(this.getFile(_gameName, 'info.json')) as Game;
     }
 
+    // validateDifference(distMousePosition: number, gameName: string): Set<number> {
+    //     const game = this.getGame(gameName);
+    //     const unfoundedDifference: Set<number>[] = this.getSetDifference(game.listDifferences);
+    //     return unfoundedDifference.find((set) => set.has(distMousePosition));
+    // }
+
+    // getSetDifference(differencesStr: string[]): Set<number>[] {
+    //     return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
+    // }
+
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {
             throw Error(`Failed to insert Game: ${game.gameName} already exists`);

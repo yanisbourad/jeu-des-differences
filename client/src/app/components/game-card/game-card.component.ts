@@ -45,6 +45,6 @@ export class GameCardComponent implements OnInit {
     }
 
     deleteGame(gameName: string) {
-        return this.gameDataBase.deleteGame(gameName);
+        return this.gameDataBase.deleteGame(gameName).subscribe();
     }
 }

@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import * as constants from '@app/configuration/const-game';
+import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 
@@ -15,7 +16,11 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
     allCards: GameInfo[];
     isViewable: boolean;
 
-    constructor(private readonly gameDataBase: GameDatabaseService, private changeDetectorRef: ChangeDetectorRef) {
+    constructor(
+        private readonly gameDataBase: GameDatabaseService,
+        private changeDetectorRef: ChangeDetectorRef,
+        private readonly gameCardHandlerService: GameCardHandlerService,
+    ) {
         this.currentPage = constants.ZERO;
     }
     ngOnInit(): void {
@@ -28,9 +33,14 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
     }
 
     updateCards() {
+        const gameNames: string[] = [];
         this.gameDataBase.getAllGames().subscribe((res: GameInfo[]) => {
             this.allCards = res;
+            this.allCards.forEach((card: GameInfo) => {
+                gameNames.push(card.gameName);
+            });
             if (this.allCards) this.isViewable = true;
+            this.gameCardHandlerService.updateGameStatus(gameNames);
             this.changeDetectorRef.detectChanges();
         });
     }

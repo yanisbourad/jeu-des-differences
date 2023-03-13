@@ -13,3 +13,5 @@ export const POSSIBLE_RADIUS = [0, 3, 6, 9, 15];
 export const NEXT_PIXEL_START_INDEX = 4;
 export const INCREMENT_VALUE = 1;
 export const DESIRED_BIT_DEPTH = 24;
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+export const FOURTH_SET = [1, 2, 3, 4];

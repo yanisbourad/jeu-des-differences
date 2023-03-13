@@ -9,3 +9,4 @@ export const THREE = 3;
 export const FOUR = 4;
 export const FIVE = 5;
 export const EIGHT = 8;
+export const MINUS_ONE = -1;

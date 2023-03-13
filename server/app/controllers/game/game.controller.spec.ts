@@ -9,7 +9,7 @@ describe('GameController', () => {
     let app: INestApplication;
     let gameService: GameService;
     let controller: GameController;
-    let service: GameService;
+    // let service: GameService;
 
     beforeAll(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('GameController', () => {
         gameService = moduleRef.get<GameService>(GameService);
         app = moduleRef.createNestApplication();
         controller = moduleRef.get<GameController>(GameController);
-        service = moduleRef.get<GameService>(GameService);
+        // service = moduleRef.get<GameService>(GameService);
         await app.init();
     });
 

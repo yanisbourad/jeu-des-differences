@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import * as constants from '@app/configuration/const-game';
+import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 
@@ -8,22 +9,39 @@ import { GameInfo } from '@common/game';
     templateUrl: './card-displayer.component.html',
     styleUrls: ['./card-displayer.component.scss'],
 })
-export class CardDisplayerComponent implements OnInit {
+export class CardDisplayerComponent implements AfterViewInit, OnInit {
     currentPage: number;
     allPages: number;
     cardByPage: number = constants.FOUR;
     allCards: GameInfo[];
+    isViewable: boolean;
 
-    constructor(private readonly gameDataBase: GameDatabaseService) {
+    constructor(
+        private readonly gameDataBase: GameDatabaseService,
+        private changeDetectorRef: ChangeDetectorRef,
+        private readonly gameCardHandlerService: GameCardHandlerService,
+    ) {
         this.currentPage = constants.ZERO;
     }
     ngOnInit(): void {
+        this.isViewable = false;
+        this.updateCards();
+    }
+
+    ngAfterViewInit(): void {
         this.updateCards();
     }
 
     updateCards() {
+        const gameNames: string[] = [];
         this.gameDataBase.getAllGames().subscribe((res: GameInfo[]) => {
             this.allCards = res;
+            this.allCards.forEach((card: GameInfo) => {
+                gameNames.push(card.gameName);
+            });
+            if (this.allCards) this.isViewable = true;
+            this.gameCardHandlerService.updateGameStatus(gameNames);
+            this.changeDetectorRef.detectChanges();
         });
     }
     goToNext(): void {

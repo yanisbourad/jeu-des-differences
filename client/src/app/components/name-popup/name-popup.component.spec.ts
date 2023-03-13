@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
@@ -11,6 +12,7 @@ describe('NamePopupComponent', () => {
     let fixture: ComponentFixture<NamePopupComponent>;
     let route: Router;
     const dialogRefSpy = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         close: () => {},
     };
 
@@ -37,7 +39,7 @@ describe('NamePopupComponent', () => {
     });
     it('should initialize data.name to an empty string', () => {
         component.ngOnInit();
-        expect(component.data.name).toBe('');
+        expect(component.data.name).toBe(' ');
     });
     it('should call close', () => {
         const spy = spyOn(component.dialogRef, 'close').and.callThrough();

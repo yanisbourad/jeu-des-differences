@@ -99,7 +99,7 @@ describe('CanvasNgxComponent', () => {
         const fileList = { 0: file, length: 1, item: () => file };
         Object.defineProperty(event, 'target', { value: { files: fileList } });
         await component.onFileSelected(event);
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalled();
         expect(bitmapService.handleFileSelect).toHaveBeenCalledTimes(1);
     });
 

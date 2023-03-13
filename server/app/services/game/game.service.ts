@@ -45,7 +45,7 @@ export class GameService {
                 return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
             }
         });
-        return Promise.all(await it);
+        return Promise.all(it);
     }
 
     isValidGameName(gameName: string): boolean {

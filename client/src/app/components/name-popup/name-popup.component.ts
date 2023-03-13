@@ -1,6 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+// eslint-disable-next-line no-restricted-imports
+import { PlayerWaitPopupComponent } from '../player-wait-popup/player-wait-popup.component';
 
 export interface DialogData {
     name: string;
@@ -11,8 +13,11 @@ export interface DialogData {
     styleUrls: ['./name-popup.component.scss'],
 })
 export class NamePopupComponent implements OnInit {
+    name: string;
+    // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<NamePopupComponent>,
+        public dialog: MatDialog,
         @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
         private route: Router,
     ) {}
@@ -22,7 +27,21 @@ export class NamePopupComponent implements OnInit {
     onNoClick(): void {
         this.dialogRef.close();
     }
+    launchDialog(): void {
+        const dialog = this.dialog.open(PlayerWaitPopupComponent, {
+            data: { name: this.data.name, gameName: this.data.gameName, gameType: 'double' },
+            disableClose: true,
+            height: '600x',
+            width: '600px',
+        });
+
+        dialog.afterClosed().subscribe((result) => {
+            this.name = result;
+        });
+    }
     redirect(): void {
-        this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName, gameType: this.data.gameType }]);
+        if (this.data.gameType === 'solo')
+            this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName, gameType: this.data.gameType }]);
+        if (this.data.gameType === 'double') this.launchDialog();
     }
 }

@@ -48,4 +48,10 @@ export class CardDisplayerComponent implements OnInit {
         }
         return pageSliced;
     }
+
+    onGameDeleted(game: GameInfo): void {
+        this.allCards = this.allCards.filter((g) => g !== game);
+        this.updateCards();
+        this.getCurrentPageCards();
+    }
 }

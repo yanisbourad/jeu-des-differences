@@ -1,3 +1,4 @@
+import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
@@ -9,6 +10,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -182,7 +184,11 @@ export class GameService {
         audio.play();
     }
 
-    async deleteGame(gameName: string) {
-        this.gameDataBase.deleteGame(gameName).subscribe();
+    // async deleteGame(gameName: string) {
+    //     this.gameDataBase.deleteGame(gameName).subscribe();
+    // }
+
+    deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        return this.gameDataBase.deleteGame(gameName);
     }
 }

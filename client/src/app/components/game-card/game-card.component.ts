@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameInfo } from '@common/game';
 import { GameService } from '@app/services/game.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-game-card',
@@ -12,6 +13,7 @@ import { GameService } from '@app/services/game.service';
 })
 export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
+    @Output() gameDeleted = new EventEmitter<void>();
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
@@ -45,6 +47,11 @@ export class GameCardComponent implements OnInit {
     }
 
     async onDelete(gameName: string) {
-        return this.gameService.deleteGame(gameName);
+        try {
+            await firstValueFrom(this.gameService.deleteGame(gameName));
+            this.gameDeleted.emit();
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

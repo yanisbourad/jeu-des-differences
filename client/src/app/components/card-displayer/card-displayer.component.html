@@ -2,7 +2,11 @@
     <mat-grid-list cols="4" rowHeight="670px">
         <div *ngFor="let card of getCurrentPageCards()">
             <mat-grid-tile>
-                <app-game-card [card]="card">{{ card }}</app-game-card>
+                <app-game-card 
+                [card]="card"
+                (gameDeleted)= "onGameDeleted(card)"
+                >
+                {{ card }}</app-game-card>
             </mat-grid-tile>
         </div>
     </mat-grid-list>

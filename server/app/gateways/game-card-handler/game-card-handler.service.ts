@@ -37,15 +37,6 @@ export class GameCardHandlerService {
         return gamesStatus;
     }
 
-    getObjectStatus() {
-        const gamesStatus = { gameNames: [], stack: [] };
-        this.gamesQueue.forEach((value, key) => {
-            gamesStatus.gameNames.push(key);
-            gamesStatus.stack.push(value.length);
-        });
-        return gamesStatus;
-    }
-
     // methods to manage player queues
 
     // true if not empty false if it is -- to refactor -- all games should be already in the map

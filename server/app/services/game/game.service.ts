@@ -105,11 +105,11 @@ export class GameService {
             }
         });
     }
-    deleteGame(_name: string): void {
+    async deleteGame(_name: string): Promise<void> {
         if (!this.gamesNames.includes(_name)) return;
         this.deleteDirectory(_name);
         this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
         const name = _name + this.key;
-        this.gameRecordModel.deleteMany({ gameName: name });
+        await this.gameRecordModel.deleteMany({ gameName: name });
     }
 }

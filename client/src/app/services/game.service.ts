@@ -181,4 +181,8 @@ export class GameService {
         audio.load();
         audio.play();
     }
+
+    async deleteGame(gameName: string) {
+        this.gameDataBase.deleteGame(gameName).subscribe();
+    }
 }

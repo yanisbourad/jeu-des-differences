@@ -1,14 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GameCardHandlerServiceService } from './game-card-handler-service.service';
+import { GameCardHandlerService } from './game-card-handler-service.service';
 
-describe('GameCardHandlerServiceService', () => {
-    let service: GameCardHandlerServiceService;
+describe('GameCardHandlerService', () => {
+    let service: GameCardHandlerService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(GameCardHandlerServiceService);
-        service.allGames = new Map<string, number>();
+        service = TestBed.inject(GameCardHandlerService);
+        service.allGames = ['test', 'toaster', 'dad'];
+        service.allGameStack = [1, 0, 0];
     });
 
     it('should be created', () => {
@@ -16,15 +17,12 @@ describe('GameCardHandlerServiceService', () => {
     });
 
     it('should return creer with value 0 for corresponding game name', () => {
-        service.allGames.set('toast', 0);
-        expect(service.toggleCreateJoin('toast')).toEqual('Créer');
+        expect(service.toggleCreateJoin('toaster')).toEqual('Créer');
     });
     it('should return creer when game name is not a key', () => {
-        service.allGames.set('test', 1);
         expect(service.toggleCreateJoin('motion')).toEqual('Créer');
     });
     it('should return joindre with value 1 for corresponding game name', () => {
-        service.allGames.set('test', 1);
         expect(service.toggleCreateJoin('test')).toEqual('Joindre');
     });
 });

@@ -10,11 +10,26 @@ export class GameCardHandlerService {
         this.players = new Map();
     }
 
-    findAllGamesStatus() {
-        if (this.gamesQueue.size === 0) return {};
-        const gamesStatus = {};
+    findAllGamesStatus(gameNames: string[]): Map<string, number> {
+        if (this.gamesQueue.size === 0) {
+            gameNames.forEach((gameName) => {
+                this.gamesQueue.set(gameName, []);
+            });
+            return new Map<string, number>();
+        }
+        const gamesStatus = new Map<string, number>();
+        gameNames.forEach((value) => {
+            if (!this.gamesQueue.has(value)) this.gamesQueue.set(value, []);
+            gamesStatus.set(value, this.gamesQueue.get(value).length);
+        });
+        return gamesStatus;
+    }
+
+    getObjectStatus() {
+        const gamesStatus = { gameNames: [], stack: [] };
         this.gamesQueue.forEach((value, key) => {
-            gamesStatus[key] = value.length;
+            gamesStatus.gameNames.push(key);
+            gamesStatus.stack.push(value.length);
         });
         return gamesStatus;
     }

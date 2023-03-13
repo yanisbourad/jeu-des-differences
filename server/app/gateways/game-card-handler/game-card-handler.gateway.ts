@@ -1,22 +1,22 @@
+import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameCardHandlerService } from './game-card-handler.service';
 
-@WebSocketGateway({
-    cors: {
-        origin: '*', // Allow all origins
-    },
-})
+@WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 export class GameCardHandlerGateway {
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly gameCardHandlerService: GameCardHandlerService) {}
+    constructor(private readonly logger: Logger, private readonly gameCardHandlerService: GameCardHandlerService) {}
 
     @SubscribeMessage('findAllGamesStatus')
-    async updateGameStatus(@ConnectedSocket() gamer: Socket) {
-        // const gameCardInfo = this.gameCardHandlerService.findAllGamesStatus();
-        // this.server.to(gamer.id).emit('findAllGamesStatus', 'merci');
+    updateGameStatus(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
+        this.logger.log('New connection to findAllGamesStatus ' + payload);
+        gamer.join(gamer.id);
+        this.gameCardHandlerService.findAllGamesStatus(payload);
+        const gamesStatus = this.gameCardHandlerService.getObjectStatus();
+        this.server.to(gamer.id).emit('found', gamesStatus);
     }
 
     @SubscribeMessage('joinGame')
@@ -26,6 +26,7 @@ export class GameCardHandlerGateway {
             name: payload.name,
             gameName: payload.gameName,
         };
+        this.logger.log(`joinGame my ${player.name} and my gameName is ${player.gameName} and my id is ${player.id}}`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         gamer.join(player.id);

@@ -17,6 +17,7 @@
     </div>
     <div class="btn-box">
         <button class="btn" (click)="leaveGame()">Annuler</button>
-        <button class="btn" (click)="startGame()">Commencer</button>
+        <button *ngIf="isReady" class="btn" (click)="startGame()">{{acceptState}}</button>
+        <button *ngIf="isReady" class="btn" (click)="rejectOpponent()">Refuser</button>
     </div>
 </div>

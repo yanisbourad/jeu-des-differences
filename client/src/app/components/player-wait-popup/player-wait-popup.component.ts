@@ -11,6 +11,8 @@ import { GameCardHandlerService } from '@app/services/game-card-handler-service.
 })
 export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     game: Game;
+    isReady: boolean;
+    acceptState = '';
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
@@ -23,17 +25,23 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             opponentName: '',
             gameName: '',
         };
+        this.isReady = false;
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
         this.game.gameName = this.data.gameName;
-        this.game.opponentName = ' ';
+        this.game.opponentName = "Attente d'un adversaire";
         this.data.name = ' ';
         this.gameCardHandlerService.join(this.game);
     }
 
     ngAfterContentChecked(): void {
         this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);
+        this.game.opponentName = this.gameCardHandlerService.opponentPlayer;
+        if (this.gameCardHandlerService.isCreator && this.game.opponentName !== "Attente d'un adversaire") {
+            this.isReady = true;
+            this.acceptState = this.gameCardHandlerService.state;
+        }
     }
 
     leaveGame(): void {
@@ -45,6 +53,10 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.gameCardHandlerService.startGame(this.game.gameName);
         this.redirect();
         this.dialogReff.close();
+    }
+
+    rejectOpponent(): void {
+        this.gameCardHandlerService.rejectOpponent(this.game.gameName);
     }
 
     redirect(): void {

@@ -4,12 +4,16 @@ import { Player } from './entities/player.entity';
 export class GameCardHandlerService {
     gamesQueue: Map<string, string[]>;
     players: Map<string, Player>;
+    joiningPlayersQueue: Map<string, Player[]>;
 
     constructor() {
         this.gamesQueue = new Map();
         this.players = new Map();
+        this.joiningPlayersQueue = new Map();
     }
 
+    // manage queue for each game and return the number of player waiting
+    // for update the status of each game at game selection page
     findAllGamesStatus(gameNames: string[]): Map<string, number> {
         if (this.gamesQueue.size === 0) {
             gameNames.forEach((gameName) => {
@@ -34,7 +38,9 @@ export class GameCardHandlerService {
         return gamesStatus;
     }
 
-    // true if not empty false if it is
+    // methods to manage player queues
+
+    // true if not empty false if it is -- to refactor -- all games should be already in the map
     isPlayerWaiting(player: Player): boolean {
         if (this.gamesQueue.has(player.gameName)) {
             if (this.gamesQueue.get(player.gameName).length === 0) return false;
@@ -62,11 +68,19 @@ export class GameCardHandlerService {
         return this.gamesQueue.get(gameName);
     }
 
-    // add second player at the stack fifo
+    // add second player at the stack fifo and return the number of players waiting
+    // add other joiners to the joining players queue following the game name they wish to join
     dispatchPlayer(player: Player): number {
-        if (this.gamesQueue.has(player.gameName)) {
+        if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length < 2) {
             this.gamesQueue.get(player.gameName).push(player.id);
             return this.gamesQueue.get(player.gameName).length;
+        } else if (!this.joiningPlayersQueue.has(player.gameName)) {
+            this.joiningPlayersQueue.set(player.gameName, []);
+            this.joiningPlayersQueue.get(player.gameName).push(player);
+            return 0;
+        } else {
+            this.joiningPlayersQueue.get(player.gameName).push(player);
+            return 0;
         }
     }
 

@@ -15,9 +15,7 @@ export class SocketClientService {
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
-    // gameState$: Observable<boolean> = of(this.gameFinished);
-    private gameState = new Subject<boolean>();
-    // eslint-disable-next-line @typescript-eslint/member-ordering
+    gameState = new Subject<boolean>(); // to be private
     gameState$: Observable<boolean> = this.gameState.asObservable();
 
     constructor(private readonly socketClient: SocketClient) {}
@@ -68,6 +66,7 @@ export class SocketClientService {
             // //this.setRooms(rooms);
             // console.log(this.rooms);
         });
+
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
             console.log(data.userName);
             if (data) {
@@ -96,10 +95,15 @@ export class SocketClientService {
         // this.socketClient.send('joinRoom', playerName);
     }
 
-    //joinRoom
+    // joinRoom
     joinRoom(playerName: string, roomName: string) {
         // console.log('joinRoom', this.rooms);
         this.socketClient.send('joinRoom', { playerName, roomName });
+    }
+
+    // startGame
+    startMultiGame(player: { id: string; creatorName: string; gameName: string; opponentName: string }): void {
+        this.socketClient.send('startMultiGame', player);
     }
 
     gameEnded(roomName: string): void {

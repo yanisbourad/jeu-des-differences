@@ -60,12 +60,14 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     }
 
     redirect(): void {
+        console.log('redirect', this.data.gameType);
         this.route.navigate([
             '/game',
             {
                 player: this.game.name,
                 opponentName: this.game.opponentName,
                 gameName: this.data.gameName,
+                gameType: this.data.gameType,
             },
         ]);
     }

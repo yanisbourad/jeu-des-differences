@@ -1,7 +1,8 @@
 import { PlayerService } from '@app/services/player/player-service';
 import { ServerTimeService } from '@app/services/time/server-time.service';
 import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
-import { Player } from '@common/player';
+import { PlayerEntity, PlayerMulti } from '@common/player';
+import { Player } from '@app/gateways/game-card-handler/entities/player.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -13,6 +14,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer() server: Server;
     socketId: string = '';
     roomName: string = '';
+    // create a list of Players
+    playersQueue: PlayerMulti[] = [];
+
     constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly serverTime: ServerTimeService) {}
 
     @SubscribeMessage(ChatEvents.Connect)
@@ -26,13 +30,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const startTime = new Date();
         this.logger.log('joinRoom', playerName);
         this.socketId = socket.id;
-        const player: Player = {
+        const player: PlayerEntity = {
             playerName,
             socketId: socket.id,
         };
         if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
             await this.playerService.addRoomSolo(socket.id, player, startTime);
-            this.startGame();
+            if (!this.serverTime.timers[player.socketId]) {
+                this.serverTime.startChronometer(player.socketId);
+            }
+            // this.startGame();
             socket.join(player.socketId);
         } else {
             this.logger.log('room already exists');
@@ -46,11 +53,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const startTime = new Date();
         this.logger.log('joinRoom', data); //
         this.socketId = socket.id;
-        const player1: Player = {
+        const player1: PlayerEntity = {
             playerName: data[0],
             socketId: socket.id,
         };
-        const player2: Player = {
+        const player2: PlayerEntity = {
             playerName: data[1],
             socketId: socket.id,
         };
@@ -70,7 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     joinRoom(socket: Socket, data: { playerName: string; roomName: string }) {
-        const player: Player = {
+        const player: PlayerEntity = {
             playerName: data.playerName,
             socketId: socket.id,
         };
@@ -95,7 +102,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, roomName: string) {
-        // not tested
         socket.to(roomName).emit('gameEnded', true);
         this.serverTime.stopChronometer(roomName); // maybe change the return value
     }
@@ -113,6 +119,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('game ended');
         this.logger.log(this.roomName);
         socket.leave(roomName);
+    }
+
+    @SubscribeMessage(ChatEvents.StartMultiGame)
+    async startMultiGame(socket: Socket, player: { id: string; creatorName: string; gameName: string; opponentName: string }) {
+        this.playersQueue.push({
+            socketId: socket.id,
+            id: player.id,
+            creatorName: player.creatorName,
+            gameName: player.gameName,
+            opponentName: player.opponentName,
+        });
+        console.log(this.playersQueue);
+        const myPlayers: PlayerMulti[] = this.playersMatch();
+        console.log('my players', myPlayers);
+        if (myPlayers.length === 2) {
+            const player1: PlayerEntity = {
+                playerName: myPlayers[0].creatorName,
+                socketId: myPlayers[0].socketId,
+            };
+            const player2: PlayerEntity = {
+                playerName: myPlayers[1].creatorName,
+                socketId: myPlayers[1].socketId,
+            };
+            this.roomName = myPlayers[0].id;
+            this.playerService.addRoomMulti(this.roomName, [player1, player2], new Date());
+            if (!this.serverTime.timers[this.roomName]) {
+                this.serverTime.startChronometer(this.roomName);
+            }
+            // socket.to(this.roomName).emit('gameStarted', true);
+            console.log(this.playerService.rooms);
+            socket.join(this.roomName);
+        }
     }
 
     startGame(): void {
@@ -157,5 +195,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         setInterval(() => {
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
         }, DELAY_BEFORE_EMITTING_TIME);
+    }
+
+    private playersMatch(): PlayerMulti[] {
+        const idMap = new Map<string, PlayerMulti>();
+        for (const obj of this.playersQueue) {
+            if (idMap.has(obj.id)) {
+                this.removePlayerFromQueue(obj);
+                this.removePlayerFromQueue(idMap.get(obj.id));
+                console.log('match found', this.playersQueue);
+                return [idMap.get(obj.id), obj];
+            }
+            idMap.set(obj.id, obj);
+        }
+        return [];
+        // const playersMatch: PlayerMulti[] = [];
+        // this.playersQueue.forEach((player) => {
+        //     if (playersMatch.length === 2) {
+        //         return;
+        //     } else {
+        //         if (player.id === this.playersQueue[0].id) {
+        //             playersMatch.push(player);
+        //             this.removePlayerFromQueue(player);
+        //         }
+        //     }
+        // });
+        // return playersMatch;
+    }
+
+    private removePlayerFromQueue(player: PlayerMulti): void {
+        this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
     }
 }

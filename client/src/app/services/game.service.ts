@@ -27,6 +27,7 @@ export class GameService {
     playersName: string[];
     gameTime: number;
     gameType: string;
+    opponentName: string;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -54,7 +55,6 @@ export class GameService {
         this.nDifferencesFound = 0;
         this.isGameFinished = false;
         this.renderer = rendererFactory.createRenderer(null, null);
-        this.playersName = ['first', 'second'];
     }
 
     defineVariables(): void {
@@ -71,6 +71,7 @@ export class GameService {
         this.nHintsUnused = this.gameInformation.nHints;
         this.differencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
+        this.playersName = [this.playerName, this.opponentName];
     }
 
     getGame(gameName: string): void {
@@ -156,7 +157,8 @@ export class GameService {
         if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
             this.endGame();
         }
-        if (this.multiGameEnd() && this.gameType === 'multi') {
+        console.log(this.nDifferencesFound, this.nDifferencesNotFound, this.gameType);
+        if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
     }
@@ -214,8 +216,8 @@ export class GameService {
         audio.play();
     }
 
-    // generate random unique roomName
-    generateRoomName(): string {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    }
+    // // generate random unique roomName
+    // generateRoomName(): string {
+    //     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    // }
 }

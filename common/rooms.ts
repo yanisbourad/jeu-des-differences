@@ -1,8 +1,8 @@
-import { Player } from './player';
+import { PlayerEntity } from './player';
 export interface Room {
     name: string;
-    host: Player;
-    players: Player[];
+    host: PlayerEntity;
+    players: PlayerEntity[];
     maxPlayers: number;
     startTime: Date;
 }

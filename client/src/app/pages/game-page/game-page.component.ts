@@ -30,6 +30,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     players = ['first', 'second'];
     gameType: string;
     gameName: string;
+    opponentName: string;
 
     // TODO: reduce the number of parameters
     // eslint-disable-next-line max-params
@@ -63,12 +64,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.socket.connect();
-        // if (this.gameType === 'solo') {
-        //     this.socket.joinRoomSolo(this.playerName);
-        // } else {
-        //     this.socket.joinRoomMulti(this.players);
-        // }
-        this.socket.joinRoom(this.playerName, 'testRoom');
+        if (this.gameType === 'solo') {
+            this.socket.joinRoomSolo(this.playerName);
+        } else {
+            // this.socket.joinRoomMulti(this.players);
+            this.socket.startMultiGame({ id: '0', creatorName: this.playerName, opponentName: this.opponentName, gameName: 'gameName' });
+        }
+        // this.socket.joinRoom(this.playerName, 'testRoom');
         // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
@@ -84,6 +86,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.playerName = this.route.snapshot.paramMap.get('player') as string;
         this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
         this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
+        this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
+        console.log('playerName', this.playerName);
+        console.log('gameName', this.gameName);
+        console.log('gameType', this.gameType);
+        console.log('opponentName', this.opponentName);
     }
 
     ngOnInit(): void {
@@ -93,8 +100,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading();
         this.gameService.playerName = this.playerName;
         this.gameService.gameType = this.gameType;
-        // modify this for 1 v 1
-        // this.gameService.playersName.push(this.playerName);
+        this.gameService.opponentName = this.opponentName;
     }
 
     loading(): void {

@@ -12,4 +12,5 @@ export enum ChatEvents {
     GetRooms = 'getRooms',
     GetMessage = 'getMessage',
     GameEnded = 'gameEnded',
+    StartMultiGame = 'startMultiGame',
 }

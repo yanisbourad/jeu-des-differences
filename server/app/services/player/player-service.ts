@@ -1,4 +1,4 @@
-import { Player } from '@common/player';
+import { PlayerEntity } from '@common/player';
 import { Room } from '@common/rooms';
 import { Injectable } from '@nestjs/common';
 import { INDEX_NOT_FOUND } from './consts-player-service';
@@ -11,30 +11,29 @@ export class PlayerService {
     // maxPlayers: number = 2;
     // add logic for multiplayer room
     // add logic to add two players
-    async addRoomSolo(roomName: string, host: Player, startTime: Date): Promise<void> {
+    async addRoomSolo(roomName: string, host: PlayerEntity, startTime: Date): Promise<void> {
         this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 1, startTime });
     }
 
-    async addRoomMulti(roomName: string, players: [Player, Player], startTime: Date): Promise<void> {
+    async addRoomMulti(roomName: string, players: [PlayerEntity, PlayerEntity], startTime: Date): Promise<void> {
         this.rooms.push({ name: roomName, host: players[0], players: [players[0], players[1]], maxPlayers: 2, startTime });
     }
 
-    async addRoomMul(roomName: string, player: Player, startTime: Date): Promise<void> {
+    async addRoomMul(roomName: string, player: PlayerEntity, startTime: Date): Promise<void> {
         this.rooms.push({ name: roomName, host: player, players: [player], maxPlayers: 2, startTime });
         console.log('room added', this.rooms);
         this.roomNamesMulti.push(roomName);
     }
 
-    
-    async addPlayerSolo(roomName: string, player: Player, startTime: Date): Promise<void> {
+    async addPlayerSolo(roomName: string, player: PlayerEntity, startTime: Date): Promise<void> {
         await this.addRoomSolo(roomName, player, startTime);
     }
 
-    async addPlayerMulti(roomName: string, player: [Player, Player], startTime: Date): Promise<void> {
+    async addPlayerMulti(roomName: string, player: [PlayerEntity, PlayerEntity], startTime: Date): Promise<void> {
         await this.addRoomMulti(roomName, player, startTime);
     }
     // add player to room
-    async addPlayerMul(roomName: string, player: Player, startTime: Date): Promise<void> {
+    async addPlayerMul(roomName: string, player: PlayerEntity, startTime: Date): Promise<void> {
         console.log('roomName', roomName);
         const rIndex = await this.getRoomIndex(roomName);
         console.log('rIndex', rIndex);

@@ -29,11 +29,10 @@ export class GameCardHandlerService {
         return gamesStatus;
     }
 
-    getObjectStatus() {
-        const gamesStatus = { gameNames: [], stack: [] };
+    updateGameStatus(): Map<string, number> {
+        const gamesStatus = new Map<string, number>();
         this.gamesQueue.forEach((value, key) => {
-            gamesStatus.gameNames.push(key);
-            gamesStatus.stack.push(value.length);
+            gamesStatus.set(key, value.length);
         });
         return gamesStatus;
     }

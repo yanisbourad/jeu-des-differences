@@ -8,8 +8,9 @@ describe('GameCardHandlerService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GameCardHandlerService);
-        service.allGames = ['test', 'toaster', 'dad'];
-        service.allGameStack = [1, 0, 0];
+        service.games.set('test', 1);
+        service.games.set('toaster', 0);
+        service.games.set('dad', 0);
     });
 
     it('should be created', () => {

@@ -1,12 +1,14 @@
 import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 export class GameCardHandlerGateway {
     @WebSocketServer()
     server: Server;
+    countGame: number = 0;
 
     constructor(private readonly logger: Logger, private readonly gameCardHandlerService: GameCardHandlerService) {}
 
@@ -14,9 +16,8 @@ export class GameCardHandlerGateway {
     updateGameStatus(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
         this.logger.log('New connection to find updated games status ');
         gamer.join(gamer.id);
-        this.gameCardHandlerService.findAllGamesStatus(payload);
-        const gamesStatus = this.gameCardHandlerService.getObjectStatus();
-        this.server.to(gamer.id).emit('found', gamesStatus);
+        const gamesStatus = this.gameCardHandlerService.findAllGamesStatus(payload);
+        this.server.to(gamer.id).emit('updateStatus', Array.from(gamesStatus));
     }
 
     @SubscribeMessage('joinGame')
@@ -34,6 +35,7 @@ export class GameCardHandlerGateway {
         switch (stackedPlayerNumber) {
             case 1: {
                 this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
 
                 break;
             }
@@ -43,11 +45,13 @@ export class GameCardHandlerGateway {
                 const opponent = this.gameCardHandlerService.getPlayer(players[1]);
                 this.server.to(players[0]).emit('feedbackOnAccept', opponent.name);
                 this.server.to(players[1]).emit('feedbackOnWait', creator.name);
+                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
 
                 break;
             }
             case 0: {
                 this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
+                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
 
                 break;
             }
@@ -66,7 +70,6 @@ export class GameCardHandlerGateway {
 
     @SubscribeMessage('rejectOpponent')
     reject(@ConnectedSocket() gamer: Socket) {
-        // send message to everyone opponent
         const opponent = this.gameCardHandlerService.deleteOponent(gamer.id);
         if (opponent) {
             this.server.to(gamer.id).emit('feedbackOnReject', true);
@@ -76,11 +79,19 @@ export class GameCardHandlerGateway {
         }
     }
 
-    @SubscribeMessage('acceptOpponent')
+    @SubscribeMessage('startGame')
     accept(@ConnectedSocket() gamer: Socket) {
         // send message to everyone opponent
         // remove oponent and delete game queue
         // send signal to start game
-        return this.gameCardHandlerService.acceptOpponent(gamer.id);
+        const playersList: Player[] = this.gameCardHandlerService.acceptOpponent(gamer.id);
+        const gameInfo = {
+            gameId: this.countGame++,
+            gameName: playersList[0].gameName,
+            creatorName: playersList[0].name,
+            opponentName: playersList[1].name,
+        };
+        this.server.to(playersList[0].id).emit('feedbackOnStart', gameInfo);
+        this.server.to(playersList[1].id).emit('feedbackOnStart', gameInfo);
     }
 }

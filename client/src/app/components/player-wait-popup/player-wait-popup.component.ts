@@ -1,6 +1,5 @@
 import { AfterContentChecked, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Game } from '@app/interfaces/game-handler';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 
@@ -17,8 +16,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
         public gameCardHandlerService: GameCardHandlerService,
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
-        private route: Router,
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string }, // private route: Router,
     ) {
         this.game = {
             name: '',
@@ -33,6 +31,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.game.opponentName = "Attente d'un adversaire";
         this.data.name = ' ';
         this.gameCardHandlerService.join(this.game);
+        this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);
     }
 
     ngAfterContentChecked(): void {
@@ -41,6 +40,9 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         if (this.gameCardHandlerService.isCreator && this.game.opponentName !== "Attente d'un adversaire") {
             this.isReady = true;
             this.acceptState = this.gameCardHandlerService.state;
+        }
+        if (this.gameCardHandlerService.isReadyToPlay) {
+            this.dialogReff.close();
         }
     }
 
@@ -51,24 +53,10 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
 
     startGame(): void {
         this.gameCardHandlerService.startGame(this.game.gameName);
-        this.redirect();
         this.dialogReff.close();
     }
 
     rejectOpponent(): void {
         this.gameCardHandlerService.rejectOpponent(this.game.gameName);
-    }
-
-    redirect(): void {
-        console.log('redirect', this.data.gameType);
-        this.route.navigate([
-            '/game',
-            {
-                player: this.game.name,
-                opponentName: this.game.opponentName,
-                gameName: this.data.gameName,
-                gameType: this.data.gameType,
-            },
-        ]);
     }
 }

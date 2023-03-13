@@ -12,7 +12,7 @@ export class GameCardHandlerGateway {
 
     @SubscribeMessage('findAllGamesStatus')
     updateGameStatus(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
-        this.logger.log('New connection to findAllGamesStatus ' + payload);
+        this.logger.log('New connection to find updated games status ');
         gamer.join(gamer.id);
         this.gameCardHandlerService.findAllGamesStatus(payload);
         const gamesStatus = this.gameCardHandlerService.getObjectStatus();
@@ -26,19 +26,32 @@ export class GameCardHandlerGateway {
             name: payload.name,
             gameName: payload.gameName,
         };
-        this.logger.log(`joinGame my ${player.name} and my gameName is ${player.gameName} and my id is ${player.id}}`);
+        this.logger.log(`${player.name} asks to play ${player.gameName} in 1vs1 mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
-        if (stackedPlayerNumber === 1) {
-            this.server.to(player.id).emit('feedbackOnJoin', stackedPlayerNumber);
-        } else if (stackedPlayerNumber === 2) {
-            const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
-            this.server.to(players[0]).emit('feedbackOnAccept', stackedPlayerNumber);
-            this.server.to(players[1]).emit('feedbackOnWait', stackedPlayerNumber);
-        } else {
-            this.server.to(player.id).emit('feedbackTryAgain', stackedPlayerNumber);
+        switch (stackedPlayerNumber) {
+            case 1: {
+                this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+
+                break;
+            }
+            case 2: {
+                const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
+                const creator = this.gameCardHandlerService.getPlayer(players[0]);
+                const opponent = this.gameCardHandlerService.getPlayer(players[1]);
+                this.server.to(players[0]).emit('feedbackOnAccept', opponent.name);
+                this.server.to(players[1]).emit('feedbackOnWait', creator.name);
+
+                break;
+            }
+            case 0: {
+                this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
+
+                break;
+            }
+            // No default
         }
     }
 

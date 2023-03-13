@@ -57,10 +57,8 @@ export class GameCardHandlerService {
         if (!this.isPlayerWaiting(player)) {
             this.gamesQueue.get(player.gameName).push(player.id);
             return this.gamesQueue.get(player.gameName).length;
-        } else if (this.gamesQueue.get(player.gameName).length < 2) {
-            return this.dispatchPlayer(player);
         } else {
-            return 0;
+            return this.dispatchPlayer(player);
         }
     }
 

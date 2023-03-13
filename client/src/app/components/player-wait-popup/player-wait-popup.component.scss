@@ -1,0 +1,60 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.player-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    width: 50%;
+    padding: 0 20px;
+}
+
+.creator {
+    height: 250px;
+    width: 100%;
+    background-color: rgb(13, 93, 93);
+}
+.opponent {
+    height: 250px;
+    width: 100%;
+    background-color: rgb(187, 57, 118);
+}
+
+.btn-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn {
+    background-color: rgb(129, 236, 236);
+    color: rgba(0, 0, 0, 0.952);
+    border-radius: 15px;
+    margin: 10px;
+    cursor: pointer;
+}

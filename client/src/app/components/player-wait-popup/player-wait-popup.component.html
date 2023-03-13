@@ -1,1 +1,22 @@
-<p>hello from me</p>
+<div class="container">
+    <h1>Attente avant de commencer</h1>
+    <h3>Nom du jeu : {{game.gameName}}</h3>
+    <div class="player-box">
+        <div class="player">
+            <div class="player-avatar creator">
+                <img src="" alt="avatar">
+            </div>
+            <div class="player-name">{{game.name}}</div>
+        </div>
+        <div class="player">
+            <div class="player-avatar opponent">
+                <img src="" alt="avatar">
+            </div>
+            <div class="player-name">{{game.opponentName}}</div>
+        </div>
+    </div>
+    <div class="btn-box">
+        <button class="btn" (click)="leaveGame()">Annuler</button>
+        <button class="btn" (click)="startGame()">Commencer</button>
+    </div>
+</div>

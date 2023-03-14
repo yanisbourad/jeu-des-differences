@@ -79,7 +79,12 @@ describe('GameCardComponent', () => {
     it('should open dialog', () => {
         const spy = spyOn(component.dialog, 'open').and.callThrough();
         component.openDialog();
-        expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'difference 1' } });
+        expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'difference 1', gameType: 'solo' } });
+    });
+    it('should open dialog calling launchDialog for 1v1', () => {
+        const spy = spyOn(component.dialog, 'open').and.callThrough();
+        component.launchDialog();
+        expect(spy).toHaveBeenCalledWith(NamePopupComponent, { data: { name: undefined, gameName: 'difference 1', gameType: 'double' } });
     });
 
     it('should change button text to "Classique" when on classique page', () => {

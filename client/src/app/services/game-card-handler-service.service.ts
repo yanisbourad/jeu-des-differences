@@ -72,13 +72,13 @@ export class GameCardHandlerService {
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });
-        this.socket.on('feedbackOnLeave', (a) => {
-            console.log(a);
+        this.socket.on('feedbackOnLeave', () => {
+            // console.log(a);
         });
 
-        this.socket.on('feedbackOnReject', (nextOpponentName) => {
-            this.opponentPlayer = nextOpponentName;
-            console.log(nextOpponentName);
+        this.socket.on('feedbackOnReject', () => {
+            // this.opponentPlayer = nextOpponentName;
+            // console.log(nextOpponentName);
         });
     }
 

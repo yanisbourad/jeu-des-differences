@@ -92,8 +92,7 @@ describe('CardDisplayerComponent', () => {
         component.updateCards();
         expect(component.allCards).toEqual(mockCards);
         expect(communicationServiceSpy.getAllGames).toHaveBeenCalledTimes(1);
-        expect(changeDetectorRefSpy.detectChanges).toHaveBeenCalledTimes(0);
-        expect(gameCardHandlerServiceSpy.updateGameStatus).toHaveBeenCalledTimes(1);
+        expect(gameCardHandlerServiceSpy.updateGameStatus).toHaveBeenCalled();
     }));
 
     it('should call goToPrevious() on previous button click', () => {

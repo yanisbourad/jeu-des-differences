@@ -16,6 +16,8 @@ export class SocketClientService {
     rooms: Room[] = [];
     gameState = new Subject<boolean>(); // to be private
     gameState$: Observable<boolean> = this.gameState.asObservable();
+    diffFounded = new Subject<Set<number>>();
+    diffFounded$: Observable<Set<number>> = this.diffFounded.asObservable();
 
     constructor(private readonly socketClient: SocketClient) {}
 
@@ -67,7 +69,6 @@ export class SocketClientService {
         });
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
-            console.log(data.userName);
             if (data) {
                 this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
             }
@@ -76,12 +77,19 @@ export class SocketClientService {
         this.socketClient.on('gameEnded', (gameEnded: boolean) => {
             this.gameState.next(gameEnded);
         });
+
+        this.socketClient.on('feedbackDifference', (diff: Set<number>) => {
+            const data = new Set<number>(diff);
+            console.log('diff', data);
+            this.diffFounded.next(data);
+        });
     }
 
     disconnect() {
         // this.timer.stopTimer();
         this.socketClient.disconnect();
     }
+
     joinRoomSolo(playerName: string) {
         const room = this.getRoom();
         this.socketClient.send('joinRoomSolo', [playerName, room?.name]);
@@ -115,5 +123,10 @@ export class SocketClientService {
 
     sendMessage(data: { message: string; playerName: string; color: string; pos: string; gameId: string }) {
         this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId]);
+    }
+
+    sendDifference(diff: Set<number>, roomName: string) {
+        console.log('sendDifference', diff);
+        this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
 }

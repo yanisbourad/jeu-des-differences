@@ -23,6 +23,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
+    // differenceFound: Set<number>[];
 
     // TODO: use camelCase
     playerName: string;
@@ -61,6 +62,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.clientTimeService.resetTimer();
         this.socket.leaveRoom();
         this.gameName = '';
+        this.gameId = '';
+        this.opponentName = '';
+        this.gameType = '';
+        this.playerName = '';
     }
 
     ngAfterViewInit(): void {
@@ -78,6 +83,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
             }
         });
+        // draw diff founded
+        this.socket.diffFounded$.subscribe((newValue) => {
+            if (newValue !== undefined) {
+                this.drawService.setColor = 'black';
+                this.drawDifference(newValue);
+                console.log('diff founded');
+                this.drawService.setColor = 'yellow';
+            }
+        });
     }
 
     getRouterParams() {
@@ -86,10 +100,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
         this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameId = this.route.snapshot.paramMap.get('gameId') as string;
-        console.log('playerName', this.playerName);
-        console.log('gameName', this.gameName);
-        console.log('gameType', this.gameType);
-        console.log('opponentName', this.opponentName);
     }
 
     ngOnInit(): void {
@@ -115,14 +125,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            if (diff) {
-                this.drawDifference(diff);
+            const differ = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            if (differ) {
+                this.drawDifference(differ);
                 // remove difference found from unfundedDifference
-                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== differ);
+                console.log(this.socket.getRoomName());
+                this.socket.sendDifference(differ, this.socket.getRoomName());
                 this.displayWord('Trouvé');
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                // setTimeout(() => this.drawDifference(diff), 1000);
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
@@ -130,6 +140,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clearCanvas();
         }
     }
+
+    // drawAllDifferences() {
+    //     this.differenceFound.forEach((difference) => {
+    //         this.drawService.setColor = 'black';
+    //         this.drawDifference(difference);
+    //     });
+    // }
 
     displayWord(word: string): void {
         if (word === 'Erreur') {

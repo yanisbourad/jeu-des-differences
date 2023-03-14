@@ -83,12 +83,6 @@ export class GameService {
         });
     }
 
-    // findDiff(pos: number, gameName: string) {
-    //     this.gameDataBase.(pos, gameName).subscribe((res: Game) => {
-    //         this.game = res;
-    //     });
-    // }
-
     displayIcons(): void {
         for (let i = 0; i < this.nDifferencesNotFound; i++) {
             this.differencesArray[i] = this.path.differenceNotFound;
@@ -139,8 +133,8 @@ export class GameService {
         this.game = {
             gameName: '',
             difficulty: '',
-            originalImageData: '',
-            modifiedImageData: '',
+            originalImageData: '../../assets/image_empty.bmp',
+            modifiedImageData: '../../assets/image_empty.bmp',
             listDifferences: [],
         };
         this.gameInformation = {
@@ -163,7 +157,6 @@ export class GameService {
         if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
             this.endGame();
         }
-        console.log(this.nDifferencesFound, this.nDifferencesNotFound, this.gameType);
         if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
@@ -180,6 +173,7 @@ export class GameService {
         return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
     }
 
+    // TODO: gameRecord doesn't save the time on the card , find and correct the bug
     endGame(): void {
         console.log('end game', this.socket.getRoomName());
         this.socket.stopTimer(this.socket.getRoomName());

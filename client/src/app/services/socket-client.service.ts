@@ -113,7 +113,7 @@ export class SocketClientService {
         this.disconnect();
     }
 
-    sendMessage(message: string, playerName: string, color: string, pos: string, gameId: string) {
-        this.socketClient.send('message', [message, playerName, color, pos, gameId]);
+    sendMessage(data: { message: string; playerName: string; color: string; pos: string; gameId: string }) {
+        this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId]);
     }
 }

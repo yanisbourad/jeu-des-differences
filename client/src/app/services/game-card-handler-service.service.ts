@@ -94,8 +94,8 @@ export class GameCardHandlerService {
         this.router.navigate([
             '/game',
             {
-                player: gamersIdentifier.creatorName,
-                opponentName: gamersIdentifier.opponentName,
+                player: this.isCreator ? gamersIdentifier.creatorName : gamersIdentifier.opponentName,
+                opponentName: this.isCreator ? gamersIdentifier.opponentName : gamersIdentifier.creatorName,
                 gameName: gamersIdentifier.gameName,
                 gameType: 'double',
                 gameId: gamersIdentifier.gameId,

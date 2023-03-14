@@ -4,6 +4,7 @@ import { ONE } from '@app/configuration/const-game';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { SocketClientService } from './socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
 @Injectable({
@@ -16,7 +17,7 @@ export class GameCardHandlerService {
     opponentPlayer: string;
     isReadyToPlay: boolean;
     games: Map<string, number>;
-    constructor(private router: Router) {
+    constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
         this.isReadyToPlay = false;
         this.opponentPlayer = '';
@@ -56,6 +57,9 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
+            this.socketClientService.connect();
+            this.socketClientService.startMultiGame(gameIdentifier);
+            console.log(gameIdentifier);
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });
@@ -90,9 +94,11 @@ export class GameCardHandlerService {
         this.router.navigate([
             '/game',
             {
-                player: gamersIdentifier.name,
+                player: gamersIdentifier.creatorName,
                 opponentName: gamersIdentifier.opponentName,
                 gameName: gamersIdentifier.gameName,
+                gameType: 'double',
+                gameId: gamersIdentifier.gameId,
             },
         ]);
     }

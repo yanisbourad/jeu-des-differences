@@ -4,8 +4,8 @@ export interface Game {
     gameName: string;
 }
 export class GamersInfo {
-    id: number;
-    name: string;
+    gameId: number;
+    creatorName: string;
     opponentName: string;
     gameName: string;
 }

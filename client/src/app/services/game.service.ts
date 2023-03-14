@@ -28,6 +28,8 @@ export class GameService {
     gameTime: number;
     gameType: string;
     opponentName: string;
+    gameId: string;
+    gameName: string;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -126,6 +128,10 @@ export class GameService {
         this.differencesArray = [];
         this.playerName = '';
         this.playersName = [];
+        this.opponentName = '';
+        this.isGameFinished = false;
+        this.gameId = '';
+        this.gameName = '';
         this.gameTime = 0;
         this.gameType = '';
         this.nDifferencesFound = 0;
@@ -175,6 +181,7 @@ export class GameService {
     }
 
     endGame(): void {
+        console.log('end game', this.socket.getRoomName());
         this.socket.stopTimer(this.socket.getRoomName());
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
         console.log(this.gameTime, this.gameInformation.gameMode);
@@ -215,9 +222,4 @@ export class GameService {
         audio.load();
         audio.play();
     }
-
-    // // generate random unique roomName
-    // generateRoomName(): string {
-    //     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    // }
 }

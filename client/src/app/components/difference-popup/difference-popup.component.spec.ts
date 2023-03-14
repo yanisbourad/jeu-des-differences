@@ -49,7 +49,7 @@ describe('DifferencePopupComponent', () => {
         component.openName();
         expect(matDialogSpy.open).toHaveBeenCalledWith(GameNameSaveComponent, {
             disableClose: true,
-            height: '600x',
+            height: '250px',
             width: '500px',
         });
         expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();

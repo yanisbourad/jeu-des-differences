@@ -19,9 +19,22 @@ export class GameCardHandlerService {
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
+        this.state = '';
         this.isReadyToPlay = false;
         this.opponentPlayer = '';
         this.games = new Map<string, number>();
+    }
+
+    getGameState(): string {
+        return this.state;
+    }
+
+    getCreatorStatus(): boolean {
+        return this.isCreator;
+    }
+
+    getReadinessStatus(): boolean {
+        return this.isReadyToPlay;
     }
 
     connect() {
@@ -44,7 +57,7 @@ export class GameCardHandlerService {
         });
         this.socket.on('feedbackOnAccept', (name) => {
             this.opponentPlayer = name;
-            if (this.isCreator) this.state = 'Accept';
+            if (this.isCreator) this.state = 'Accepter';
         });
 
         this.socket.on('feedbackOnWait', (name) => {
@@ -63,13 +76,13 @@ export class GameCardHandlerService {
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });
-        this.socket.on('feedbackOnLeave', (a) => {
-            console.log(a);
+        this.socket.on('feedbackOnLeave', () => {
+            // console.log(a);
         });
 
-        this.socket.on('feedbackOnReject', (nextOpponentName) => {
-            this.opponentPlayer = nextOpponentName;
-            console.log(nextOpponentName);
+        this.socket.on('feedbackOnReject', () => {
+            // this.opponentPlayer = nextOpponentName;
+            // console.log(nextOpponentName);
         });
     }
 

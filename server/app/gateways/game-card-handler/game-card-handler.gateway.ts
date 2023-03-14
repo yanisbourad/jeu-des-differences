@@ -65,7 +65,7 @@ export class GameCardHandlerGateway {
         const player = this.gameCardHandlerService.getPlayer(gamer.id);
         // const stackedPlayerNumber = this.gameCardHandlerService.getStackedPlayers();
         // if player is with opponent remove him from queue and send message to opponent
-        return true;
+        if (player) return true;
     }
 
     @SubscribeMessage('rejectOpponent')

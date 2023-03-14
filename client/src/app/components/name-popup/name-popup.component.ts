@@ -31,7 +31,7 @@ export class NamePopupComponent implements OnInit {
         const dialog = this.dialog.open(PlayerWaitPopupComponent, {
             data: { name: this.data.name, gameName: this.data.gameName, gameType: 'double' },
             disableClose: true,
-            height: '600x',
+            height: '600px',
             width: '600px',
         });
 

@@ -37,11 +37,11 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     ngAfterContentChecked(): void {
         this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);
         this.game.opponentName = this.gameCardHandlerService.opponentPlayer;
-        if (this.gameCardHandlerService.isCreator && this.game.opponentName !== "Attente d'un adversaire") {
+        if (this.gameCardHandlerService.getCreatorStatus() && this.game.opponentName !== "Attente d'un adversaire") {
             this.isReady = true;
-            this.acceptState = this.gameCardHandlerService.state;
+            this.acceptState = this.gameCardHandlerService.getGameState();
         }
-        if (this.gameCardHandlerService.isReadyToPlay) {
+        if (this.gameCardHandlerService.getReadinessStatus()) {
             this.dialogReff.close();
         }
     }

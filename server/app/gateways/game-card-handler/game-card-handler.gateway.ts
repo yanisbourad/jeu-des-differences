@@ -97,14 +97,17 @@ export class GameCardHandlerGateway {
         this.server.to(playersList[1].id).emit('feedbackOnStart', gameInfo);
         // call a function to remove player from queue and send feedback to player
         // make new pairs of players
-        const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
-        if (!newPair) {
+        // const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
+        const newPlayers: string[] = this.gameCardHandlerService.checkJoiningPlayersQueue(playersList[0].gameName);
+        if (newPlayers.length === 1) {
+            this.server.to(newPlayers[0]).emit('byeTillNext', 'Aucun adversaire');
+            this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
             return;
         }
-        const creator = this.gameCardHandlerService.getPlayer(newPair[0]);
-        const opponent = this.gameCardHandlerService.getPlayer(newPair[1]);
-        this.server.to(newPair[0]).emit('feedbackOnCreator', opponent.name);
-        this.server.to(newPair[1]).emit('feedbackOnWait', creator.name);
+        const creator = this.gameCardHandlerService.getPlayer(newPlayers[0]);
+        const opponent = this.gameCardHandlerService.getPlayer(newPlayers[1]);
+        this.server.to(newPlayers[0]).emit('feedbackOnCreator', opponent.name);
+        this.server.to(newPlayers[1]).emit('feedbackOnWait', creator.name);
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 }

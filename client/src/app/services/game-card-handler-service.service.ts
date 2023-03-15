@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ONE } from '@app/configuration/const-game';
+import { ONE, TWO } from '@app/configuration/const-game';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -15,6 +15,7 @@ export class GameCardHandlerService {
     state: string;
     opponentPlayer: string;
     isReadyToPlay: boolean;
+    isNewUpdate: boolean;
     games: Map<string, number>;
     constructor(private router: Router) {
         this.isCreator = false;
@@ -22,6 +23,7 @@ export class GameCardHandlerService {
         this.isReadyToPlay = false;
         this.opponentPlayer = '';
         this.games = new Map<string, number>();
+        this.isNewUpdate = false;
     }
 
     getGameState(): string {
@@ -45,7 +47,16 @@ export class GameCardHandlerService {
         this.socket.emit('findAllGamesStatus', gameNames);
         this.socket.on('updateStatus', (gamesStatus) => {
             this.games = new Map(gamesStatus);
+            this.isNewUpdate = true;
         });
+    }
+
+    getNewUpdate() {
+        return this.isNewUpdate;
+    }
+
+    setNewUpdate(isNewUpdate: boolean) {
+        this.isNewUpdate = isNewUpdate;
     }
 
     join(game: Game) {
@@ -95,7 +106,7 @@ export class GameCardHandlerService {
     }
 
     toggleCreateJoin(gameName: string): string {
-        if (this.games.has(gameName)) return this.games.get(gameName) === ONE ? 'Joindre' : 'Créer';
+        if (this.games.has(gameName)) return this.games.get(gameName) === ONE || this.games.get(gameName) === TWO ? 'Joindre' : 'Créer';
         return 'Créer';
     }
 

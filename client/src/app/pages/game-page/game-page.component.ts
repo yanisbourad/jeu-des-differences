@@ -121,6 +121,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 console.log(this.socket.getRoomName());
                 this.socket.sendDifference(differ, this.socket.getRoomName());
                 this.displayWord('Trouvé');
+                this.gameService.handleDifferenceFound();
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');

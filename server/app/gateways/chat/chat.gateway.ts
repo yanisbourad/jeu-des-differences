@@ -99,6 +99,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3] });
     }
 
+    @SubscribeMessage(ChatEvents.FindDifference)
+    async findDifference(socket: Socket, information: { playerName: string; roomName: string }) {
+        socket.to(information.roomName).emit('findDifference-return', { playerName: information.playerName });
+    }
+
     @SubscribeMessage(ChatEvents.FeedbackDifference)
     async differenceFound(socket: Socket, data) {
         socket.to(data[1]).emit('feedbackDifference', data[0]);

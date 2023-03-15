@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { FAKE_QUEUE, OVER_CROWDED } from './entities/constants';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 describe('GameCardHandlerService', () => {
@@ -46,16 +47,6 @@ describe('GameCardHandlerService', () => {
         ).toBeTruthy();
     });
 
-    it('should be false as no player is waiting', () => {
-        expect(
-            service.isPlayerWaiting({
-                id: 'duo',
-                name: 'Pablo',
-                gameName: 'uno',
-            }),
-        ).toBeFalsy();
-    });
-
     it('should be true as a player is waiting', () => {
         service.gamesQueue.set('duo', ['rac']);
         expect(
@@ -64,7 +55,7 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'duo',
             }),
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it('should be 2 as one player is waiting', () => {
@@ -85,10 +76,10 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
             }),
-        ).toBe(0);
+        ).toBe(3);
         expect(service.joiningPlayersQueue.get('uno').length).toBe(1);
     });
-    it('should add joining players to Queue as more than 1 player are joining', () => {
+    it('should add two more joining players to joining Queue', () => {
         service.gamesQueue.set('uno', ['rac', 'bac']);
         service.dispatchPlayer({
             id: 'back',
@@ -101,10 +92,11 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
             }),
-        ).toBe(0);
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        ).toBe(4);
         expect(service.joiningPlayersQueue.get('uno').length).toBe(2);
     });
-    it('should be 0 as more than 1 player is joining', () => {
+    it('should be 3 players are in the queue as a third player is joining', () => {
         service.gamesQueue.set('uno', ['rac', 'bac']);
         expect(
             service.dispatchPlayer({
@@ -112,12 +104,24 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
             }),
-        ).toBe(0);
+        ).toBe(3);
+    });
+    it('should return big number when more than 25 players are joining', () => {
+        service.gamesQueue.set('uno', ['rac', 'bac']);
+        service.joiningPlayersQueue.set('uno', FAKE_QUEUE);
+        expect(
+            service.dispatchPlayer({
+                id: 'z',
+                name: 'Pablo',
+                gameName: 'uno',
+            }),
+        ).toBe(OVER_CROWDED);
     });
 
     it('should return 1 if player is waiting', () => {
         const spy = jest.spyOn(service, 'isPlayerWaiting');
         service.gamesQueue.set('uno', []);
+        service.joiningPlayersQueue.set('uno', []);
         expect(service.stackPlayer({ id: 'ric', name: 'Mat', gameName: 'uno' })).toBe(1);
         expect(spy).toHaveBeenCalled();
     });
@@ -135,6 +139,7 @@ describe('GameCardHandlerService', () => {
 
     it('should return both 2 players', () => {
         service.gamesQueue.set('uno', ['rac', 'ric']);
+        service.joiningPlayersQueue.set('uno', ['tic', 'gac', 'bac']);
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
         service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno' });
         expect(service.acceptOpponent('rac')).toEqual([

@@ -49,7 +49,9 @@ export class GameCardHandlerGateway {
 
                 break;
             }
-            case 0: {
+            default: {
+                // call a function to remove player from queue and send feedback to player
+                // make new pairs of players
                 this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
                 this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
 
@@ -93,5 +95,16 @@ export class GameCardHandlerGateway {
         };
         this.server.to(playersList[0].id).emit('feedbackOnStart', gameInfo);
         this.server.to(playersList[1].id).emit('feedbackOnStart', gameInfo);
+        // call a function to remove player from queue and send feedback to player
+        // make new pairs of players
+        const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
+        if (!newPair) {
+            return;
+        }
+        const creator = this.gameCardHandlerService.getPlayer(newPair[0]);
+        const opponent = this.gameCardHandlerService.getPlayer(newPair[1]);
+        this.server.to(newPair[0]).emit('feedbackOnCreator', opponent.name);
+        this.server.to(newPair[1]).emit('feedbackOnWait', creator.name);
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 }

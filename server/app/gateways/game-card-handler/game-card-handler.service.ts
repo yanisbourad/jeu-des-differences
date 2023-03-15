@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { EMPTY, MAX_CAPACITY, OVER_CROWDED, PLAYER_PAIR } from './entities/constants';
 import { Player } from './entities/player.entity';
 @Injectable()
 export class GameCardHandlerService {
     gamesQueue: Map<string, string[]>;
     players: Map<string, Player>;
-    joiningPlayersQueue: Map<string, Player[]>;
+    joiningPlayersQueue: Map<string, string[]>;
 
     constructor() {
         this.gamesQueue = new Map();
@@ -15,15 +16,19 @@ export class GameCardHandlerService {
     // manage queue for each game and return the number of player waiting
     // for update the status of each game at game selection page
     findAllGamesStatus(gameNames: string[]): Map<string, number> {
-        if (this.gamesQueue.size === 0) {
+        if (this.gamesQueue.size === EMPTY) {
             gameNames.forEach((gameName) => {
                 this.gamesQueue.set(gameName, []);
+                this.joiningPlayersQueue.set(gameName, []);
             });
             return new Map<string, number>();
         }
         const gamesStatus = new Map<string, number>();
         gameNames.forEach((value) => {
-            if (!this.gamesQueue.has(value)) this.gamesQueue.set(value, []);
+            if (!this.gamesQueue.has(value)) {
+                this.joiningPlayersQueue.set(value, []);
+                this.gamesQueue.set(value, []);
+            }
             gamesStatus.set(value, this.gamesQueue.get(value).length);
         });
         return gamesStatus;
@@ -39,19 +44,14 @@ export class GameCardHandlerService {
 
     // methods to manage player queues
 
-    // true if not empty false if it is -- to refactor -- all games should be already in the map
+    // true if not empty false if it is empty
     isPlayerWaiting(player: Player): boolean {
-        if (this.gamesQueue.has(player.gameName)) {
-            if (this.gamesQueue.get(player.gameName).length === 0) return false;
-            return true;
-        } else {
-            this.gamesQueue.set(player.gameName, []);
-            return false;
-        }
+        return this.gamesQueue.get(player.gameName).length !== EMPTY || this.joiningPlayersQueue.get(player.gameName).length !== EMPTY;
     }
 
     // add player at the stack fifo
     stackPlayer(player: Player): number {
+        // add each player to the players map where information about the player is stored
         this.players.set(player.id, player);
         if (!this.isPlayerWaiting(player)) {
             this.gamesQueue.get(player.gameName).push(player.id);
@@ -68,27 +68,39 @@ export class GameCardHandlerService {
     // add second player at the stack fifo and return the number of players waiting
     // add other joiners to the joining players queue following the game name they wish to join
     dispatchPlayer(player: Player): number {
-        if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length < 2) {
+        if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length < PLAYER_PAIR) {
             this.gamesQueue.get(player.gameName).push(player.id);
             return this.gamesQueue.get(player.gameName).length;
-        } else if (!this.joiningPlayersQueue.has(player.gameName)) {
-            this.joiningPlayersQueue.set(player.gameName, []);
-            this.joiningPlayersQueue.get(player.gameName).push(player);
-            return 0;
+        } else if (this.joiningPlayersQueue.has(player.gameName)) {
+            if (this.joiningPlayersQueue.get(player.gameName).length < MAX_CAPACITY) {
+                this.joiningPlayersQueue.get(player.gameName).push(player.id);
+                return this.gamesQueue.get(player.gameName).length + this.joiningPlayersQueue.get(player.gameName).length;
+            }
+            return OVER_CROWDED;
         } else {
-            this.joiningPlayersQueue.get(player.gameName).push(player);
-            return 0;
+            this.joiningPlayersQueue.set(player.gameName, []);
+            this.joiningPlayersQueue.get(player.gameName).push(player.id);
+            return this.gamesQueue.get(player.gameName).length + this.joiningPlayersQueue.get(player.gameName).length;
         }
     }
 
     acceptOpponent(playerId: string): Player[] {
         const gameName = this.players.get(playerId).gameName;
-        const opponent = this.gamesQueue.get(gameName).pop();
-        const creator = this.gamesQueue.get(gameName).pop();
-        const opponentPlayer = this.players.get(opponent);
-        const creatorPlayer = this.players.get(creator);
-        this.players.delete(opponent);
-        this.players.delete(playerId);
+        let newCreatorId: string;
+        let newOponentId: string;
+
+        if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
+            newCreatorId = this.joiningPlayersQueue.get(gameName).shift();
+            newOponentId = this.joiningPlayersQueue.get(gameName).shift();
+        }
+        const opponentId = this.gamesQueue.get(gameName).pop();
+        const creatorId = this.gamesQueue.get(gameName).pop();
+        this.gamesQueue.get(gameName).push(newCreatorId);
+        this.gamesQueue.get(gameName).push(newOponentId);
+        const opponentPlayer = this.players.get(opponentId);
+        const creatorPlayer = this.players.get(creatorId);
+        this.players.delete(opponentId);
+        this.players.delete(creatorId);
         return [creatorPlayer, opponentPlayer];
     }
 
@@ -108,7 +120,7 @@ export class GameCardHandlerService {
     // remove(id: string): boolean {
     //     const player = this.players.get(id);
     //     this.players.delete(id);
-    //     if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length > 0) {
+    //     if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length > EMPTY) {
     //         const size = this.gamesQueue.get(player.gameName).length;
     //         if (size === 1) {
     //             this.gamesQueue.get(player.gameName).pop();

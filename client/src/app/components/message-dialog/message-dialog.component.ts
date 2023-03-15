@@ -23,14 +23,15 @@ export class MessageDialogComponent {
     }
 
     redirection(): void {
-        this.socket.sendMessage(
-            this.gameServ.playerName + ' a quitté la partie',
-            this.gameServ.playerName,
-            '#FF0000',
-            '50%',
-            this.gameServ.gameId,
-            true,
-        );
+        const dataToSend = {
+            message: this.gameServ.playerName + ' a quitté la partie',
+            playerName: this.gameServ.playerName,
+            color: '#FF0000',
+            pos: '50%',
+            gameId: this.socket.getRoomName(),
+            event: true,
+        };
+        this.socket.sendMessage(dataToSend);
         this.socket.messageList.push({
             message: this.gameServ.playerName + ' a quitté la partie',
             userName: this.gameServ.playerName,

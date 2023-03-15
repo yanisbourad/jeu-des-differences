@@ -13,7 +13,6 @@ export class SocketClientService {
     serverMessage: string = '';
     roomName: string = '';
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
-    messageQuit: { message: string; userName: string; quit: boolean; color: string; pos: string }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
     gameState = new Subject<boolean>(); // to be private
@@ -61,7 +60,7 @@ export class SocketClientService {
         });
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
-            console.log('elapsedTimes', this.elapsedTimes);
+            //console.log('elapsedTimes', this.elapsedTimes);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -75,7 +74,7 @@ export class SocketClientService {
         });
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
-            console.log(data.userName);
+            console.log(data);
             if (data) {
                 this.messageList.push({
                     message: data.message,

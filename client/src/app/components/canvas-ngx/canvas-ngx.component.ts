@@ -44,7 +44,11 @@ export class CanvasNgxComponent implements AfterViewInit {
         return constants.DEFAULT_HEIGHT;
     }
 
-    get canvasNative(): HTMLCanvasElement {
+    get canvasDrawNative(): HTMLCanvasElement {
+        return this.canvasDraw.nativeElement;
+    }
+
+    get canvasImageNative(): HTMLCanvasElement {
         return this.canvasImage.nativeElement;
     }
 
@@ -53,7 +57,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.canvasDraw.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
+        this.canvasDrawNative.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
         this.canvasDraw.nativeElement.addEventListener('mousemove', (event: MouseEvent) => {
@@ -68,6 +72,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     loadImage(img: ImageBitmap) {
         const command = new DrawImageCommand(img, this.canvasImage);
         this.commandService.do(command);
+        this.saveCanvas();
     }
 
     async onFileSelected(e: Event) {

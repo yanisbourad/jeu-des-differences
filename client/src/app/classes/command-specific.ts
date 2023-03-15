@@ -1,7 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { DEFAULT_LINE_CAP } from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
-import { Item } from 'linked-list';
 const NBR_PIXELS_SQUARE = 10;
 // this is the base class for all the commands regards to drawing
 // it contains all the methods that are common to all the drawing commands
@@ -12,10 +11,11 @@ const NBR_PIXELS_SQUARE = 10;
 // for saving last canvas state, we will divide the canvas in squares of 50x50 pixels
 // and save the data of each square that is modified
 
-export abstract class CommandSpecific extends Item {
+export abstract class CommandSpecific {
     canvas: ElementRef<HTMLCanvasElement>;
-    constructor(canvas: ElementRef<HTMLCanvasElement>) {
-        super();
+    canvasName: string;
+    constructor(canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
+        this.canvasName = canvasName;
         this.canvas = canvas;
     }
 
@@ -33,6 +33,14 @@ export abstract class CommandSpecific extends Item {
 
     protected get height(): number {
         return this.canvas.nativeElement.height;
+    }
+
+    doOnOtherCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
+        if (this.canvasName !== canvasName) return;
+        const tempCanvas = this.canvas;
+        this.canvas = canvas;
+        this.do(false);
+        this.canvas = tempCanvas;
     }
 
     protected rgbToHex(r: number, g: number, b: number): string {

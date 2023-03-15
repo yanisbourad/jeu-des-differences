@@ -70,7 +70,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     loadImage(img: ImageBitmap) {
-        const command = new DrawImageCommand(img, this.canvasImage);
+        const command = new DrawImageCommand(img, this.canvasImage, this.type);
         this.commandService.do(command);
         this.saveCanvas();
     }
@@ -125,11 +125,12 @@ export class CanvasNgxComponent implements AfterViewInit {
                     this.drawService.getColor,
                     this.drawService.getLineWidth,
                     this.canvasDraw,
+                    this.type,
                 );
                 break;
 
             case stylers.ERASER:
-                this.tempCommand = new DrawErasLineCommand(this.currentDrawing.points, this.drawService.getLineWidth, this.canvasDraw);
+                this.tempCommand = new DrawErasLineCommand(this.currentDrawing.points, this.drawService.getLineWidth, this.canvasDraw, this.type);
                 break;
 
             case stylers.RECTANGLE:
@@ -139,6 +140,7 @@ export class CanvasNgxComponent implements AfterViewInit {
                     this.drawService.getColor,
                     this.drawService.getRectangleIsSquare,
                     this.canvasDraw,
+                    this.type,
                 );
                 break;
 
@@ -148,7 +150,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         if (saveTheCommand && this.tempCommand) {
             this.commandService.do(this.tempCommand);
             this.tempCommand = undefined;
-            // this.saveCanvas();
+            this.saveCanvas();
         } else this.tempCommand?.do(true);
     }
 
@@ -162,11 +164,8 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     saveCanvas(): void {
-        const canvasImage = this.canvasImage.nativeElement;
-        const canvasDraw = this.canvasDraw.nativeElement;
+        this.commandService.executeAllOnCanvas(this.canvasTemp, this.type);
         const ctx = this.canvasTemp.nativeElement.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-        ctx.drawImage(canvasImage, 0, 0);
-        ctx.drawImage(canvasDraw, 0, 0);
         const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         const canvasData = imageData.data;
         const canvasDataStr = ctx.canvas.toDataURL('image/bmp');

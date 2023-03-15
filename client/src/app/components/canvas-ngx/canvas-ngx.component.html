@@ -4,7 +4,6 @@
         <canvas class="canvasImage" #CanvasImage [attr.width]="width" [attr.height]="height"></canvas>
         <canvas class="canvasDraw" #CanvasDraw [attr.width]="width" [attr.height]="height"></canvas>
     </div>
-    <canvas #CanvasTemp [attr.width]="width" [attr.height]="height"></canvas>
     <input type="file" class="file-upload" (change)="onFileSelected($event)" accept=".bmp" #fileUpload />
     <div class="Tools-Canvas {{ type }}">
         <img
@@ -24,6 +23,6 @@
             (click)="clearCanvas()"
         />
     </div>
-    <canvas #tempCanvas [attr.width]="width" [attr.height]="height" style="visibility: hidden;"></canvas>
+    <canvas #CanvasTemp [attr.width]="width" [attr.height]="height" style="display: none;"></canvas>
 
 </div>

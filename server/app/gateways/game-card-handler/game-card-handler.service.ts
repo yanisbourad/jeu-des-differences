@@ -53,11 +53,11 @@ export class GameCardHandlerService {
     stackPlayer(player: Player): number {
         // add each player to the players map where information about the player is stored
         this.players.set(player.id, player);
-        if (!this.isPlayerWaiting(player)) {
+        if (this.isPlayerWaiting(player)) {
+            return this.dispatchPlayer(player);
+        } else {
             this.gamesQueue.get(player.gameName).push(player.id);
             return this.gamesQueue.get(player.gameName).length;
-        } else {
-            return this.dispatchPlayer(player);
         }
     }
 
@@ -84,21 +84,40 @@ export class GameCardHandlerService {
         }
     }
 
+    // check playerJoiningQueue and add the first two players to the game queue
+    // return the number of players waiting
+    checkJoiningPlayersQueue(gameName: string): string[] {
+        if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
+            this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
+            this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
+            return this.gamesQueue.get(gameName);
+        }
+        const playerId = this.joiningPlayersQueue.get(gameName).shift();
+        this.players.delete(playerId);
+        return [playerId];
+    }
+
     acceptOpponent(playerId: string): Player[] {
         const gameName = this.players.get(playerId).gameName;
+
+        // check if there is a player waiting after the initial pair of players is allowed to play
         let newCreatorId: string;
         let newOponentId: string;
-
         if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
             newCreatorId = this.joiningPlayersQueue.get(gameName).shift();
             newOponentId = this.joiningPlayersQueue.get(gameName).shift();
         }
+        // empty the queue for the game to receive new players
         const opponentId = this.gamesQueue.get(gameName).pop();
         const creatorId = this.gamesQueue.get(gameName).pop();
+
+        // player pair who is about to play together -- developer choice
         this.gamesQueue.get(gameName).push(newCreatorId);
         this.gamesQueue.get(gameName).push(newOponentId);
         const opponentPlayer = this.players.get(opponentId);
         const creatorPlayer = this.players.get(creatorId);
+
+        // remove the players who are ready to play from the players info stack
         this.players.delete(opponentId);
         this.players.delete(creatorId);
         return [creatorPlayer, opponentPlayer];

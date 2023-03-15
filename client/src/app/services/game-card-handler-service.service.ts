@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Game } from '@app/interfaces/game-handler';
-import { io, Socket } from 'socket.io-client';
+import { Router } from '@angular/router';
+import { ONE } from '@app/configuration/const-game';
+import { Game, GamersInfo } from '@app/interfaces/game-handler';
+import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { SocketClientService } from './socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
 @Injectable({
@@ -12,13 +15,26 @@ export class GameCardHandlerService {
     isCreator: boolean;
     state: string;
     opponentPlayer: string;
-    allGames: string[];
-    allGameStack: number[];
-    constructor() {
-        this.allGames = [];
-        this.allGameStack = [];
+    isReadyToPlay: boolean;
+    games: Map<string, number>;
+    constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
+        this.state = '';
+        this.isReadyToPlay = false;
         this.opponentPlayer = '';
+        this.games = new Map<string, number>();
+    }
+
+    getGameState(): string {
+        return this.state;
+    }
+
+    getCreatorStatus(): boolean {
+        return this.isCreator;
+    }
+
+    getReadinessStatus(): boolean {
+        return this.isReadyToPlay;
     }
 
     connect() {
@@ -28,9 +44,8 @@ export class GameCardHandlerService {
     updateGameStatus(gameNames: string[]) {
         this.connect();
         this.socket.emit('findAllGamesStatus', gameNames);
-        this.socket.on('found', ({ games, stacks }) => {
-            this.allGames = games;
-            this.allGameStack = stacks;
+        this.socket.on('updateStatus', (gamesStatus) => {
+            this.games = new Map(gamesStatus);
         });
     }
 
@@ -42,7 +57,7 @@ export class GameCardHandlerService {
         });
         this.socket.on('feedbackOnAccept', (name) => {
             this.opponentPlayer = name;
-            if (this.isCreator) this.state = 'Accept';
+            if (this.isCreator) this.state = 'Accepter';
         });
 
         this.socket.on('feedbackOnWait', (name) => {
@@ -52,35 +67,52 @@ export class GameCardHandlerService {
         this.socket.on('feedbackOnWaitLonger', (name) => {
             this.opponentPlayer = name;
         });
+
+        this.socket.on('feedbackOnStart', (gameIdentifier) => {
+            // call method to redirect to game from service with gameIdentifier
+            this.socketClientService.connect();
+            this.socketClientService.startMultiGame(gameIdentifier);
+            console.log(gameIdentifier);
+            this.isReadyToPlay = true;
+            this.redirect(gameIdentifier);
+        });
+        this.socket.on('feedbackOnLeave', () => {
+            // console.log(a);
+        });
+
+        this.socket.on('feedbackOnReject', () => {
+            // this.opponentPlayer = nextOpponentName;
+            // console.log(nextOpponentName);
+        });
     }
 
     leave(gameName: string) {
         this.socket.emit('leaveGame', gameName);
-        this.socket.on('feedbackOnLeave', (a) => {
-            console.log(a);
-        });
     }
 
     startGame(gameName: string) {
         this.socket.emit('startGame', gameName);
-        this.socket.on('feedbackOnStart', (gameIdentifier) => {
-            // call method to redirect to game from service with gameIdentifier
-            console.log(gameIdentifier);
-        });
     }
 
     rejectOpponent(gameName: string) {
         this.socket.emit('rejectOpponent', gameName);
-        this.socket.on('feedbackOnReject', (nextOpponentName) => {
-            this.opponentPlayer = nextOpponentName;
-            console.log(nextOpponentName);
-        });
     }
 
     toggleCreateJoin(gameName: string): string {
-        // const index = this.allGames.indexOf(gameName);
-        // if (index === MINUS_ONE) return 'Créer';
-        // else if (this.allGameStack[index] === ONE) return 'Joindre';
+        if (this.games.has(gameName)) return this.games.get(gameName) === ONE ? 'Joindre' : 'Créer';
         return 'Créer';
+    }
+
+    redirect(gamersIdentifier: GamersInfo): void {
+        this.router.navigate([
+            '/game',
+            {
+                player: this.isCreator ? gamersIdentifier.creatorName : gamersIdentifier.opponentName,
+                opponentName: this.isCreator ? gamersIdentifier.opponentName : gamersIdentifier.creatorName,
+                gameName: gamersIdentifier.gameName,
+                gameType: 'double',
+                gameId: gamersIdentifier.gameId,
+            },
+        ]);
     }
 }

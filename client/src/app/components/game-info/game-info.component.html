@@ -17,8 +17,8 @@
         </div>
       </div>
       <ng-template #elseBlock>
-        <div *ngFor="let player of gameService.playersName">
-        <p class="sub-title">Différences trouvées par - {{player}}</p>
+        <!-- <div *ngFor="let player of gameService.playersName"> -->
+        <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
         <div>
             <img
                 *ngFor="let differences of gameService.differencesArray"
@@ -27,7 +27,16 @@
                 alt="Differences trouvées"
             />
         </div>
-      </div>
+        <p class="sub-title">Différences trouvées par - {{gameService.opponentName}}</p>
+        <div>
+            <img
+                *ngFor="let differences of gameService.opponentDifferencesArray"
+                class="differences-trouvees-img"
+                src={{differences}}
+                alt="Differences trouvées"
+            />
+        </div>
+      <!-- </div> -->
       </ng-template>
   </div>
   <div class="middle">

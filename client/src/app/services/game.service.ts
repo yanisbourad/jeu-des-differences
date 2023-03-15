@@ -7,7 +7,7 @@ import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
-import { SocketClientService } from './socket-client.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -19,6 +19,7 @@ export class GameService {
     nDifferencesNotFound: number;
     nDifferencesFound: number;
     differencesArray: string[];
+    opponentDifferencesArray: string[];
     isGameFinished: boolean;
     nHintsUnused: number;
     nHintsUsed: number;
@@ -28,6 +29,8 @@ export class GameService {
     gameTime: number;
     gameType: string;
     opponentName: string;
+    gameId: string;
+    gameName: string;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -70,6 +73,7 @@ export class GameService {
         this.nDifferencesNotFound = this.gameInformation.nDifferences;
         this.nHintsUnused = this.gameInformation.nHints;
         this.differencesArray = new Array(this.nDifferencesNotFound);
+        this.opponentDifferencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
         this.playersName = [this.playerName, this.opponentName];
     }
@@ -81,15 +85,17 @@ export class GameService {
         });
     }
 
-    // findDiff(pos: number, gameName: string) {
-    //     this.gameDataBase.(pos, gameName).subscribe((res: Game) => {
-    //         this.game = res;
-    //     });
-    // }
-
     displayIcons(): void {
-        for (let i = 0; i < this.nDifferencesNotFound; i++) {
-            this.differencesArray[i] = this.path.differenceNotFound;
+        if (this.gameType === 'solo') {
+            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+                this.differencesArray[i] = this.path.differenceNotFound;
+            }
+        }
+        if (this.gameType === 'double') {
+            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+                this.differencesArray[i] = this.path.differenceNotFound;
+                this.opponentDifferencesArray[i] = this.path.differenceNotFound;
+            }
         }
     }
 
@@ -122,19 +128,21 @@ export class GameService {
     reinitializeGame(): void {
         this.nDifferencesNotFound = 0;
         this.nHintsUnused = 0;
-        this.nDifferencesFound = 0;
         this.differencesArray = [];
         this.playerName = '';
         this.playersName = [];
+        this.opponentName = '';
+        this.isGameFinished = false;
+        this.gameId = '';
+        this.gameName = '';
         this.gameTime = 0;
         this.gameType = '';
         this.nDifferencesFound = 0;
-        this.socket.leaveRoom();
         this.game = {
             gameName: '',
             difficulty: '',
-            originalImageData: '',
-            modifiedImageData: '',
+            originalImageData: '../../assets/image_empty.bmp',
+            modifiedImageData: '../../assets/image_empty.bmp',
             listDifferences: [],
         };
         this.gameInformation = {
@@ -148,27 +156,32 @@ export class GameService {
         };
     }
 
-    clickDifferencesFound(): void {
-        if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            this.nDifferencesFound++;
-            this.differencesArray.pop();
-            this.differencesArray.unshift(this.path.differenceFound);
+    handleDifferenceFound(): void {
+        this.nDifferencesFound++;
+        this.differencesArray.pop();
+        this.differencesArray.unshift(this.path.differenceFound);
+
+        if (this.gameType === 'double') {
+            this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
         }
+
         if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
             this.endGame();
         }
-        console.log(this.nDifferencesFound, this.nDifferencesNotFound, this.gameType);
+
         if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
     }
 
-    isEven(number: number) {
-        return number % 2 === 0;
+    handlePlayerDifference() {
+        this.opponentDifferencesArray.pop();
+        this.opponentDifferencesArray.unshift(this.path.differenceFound);
     }
 
+
     multiGameEnd(): boolean {
-        if (this.isEven(this.nDifferencesNotFound)) {
+        if (this.nDifferencesNotFound % 2 === 0) {
             return this.nDifferencesFound === this.nDifferencesNotFound / 2;
         }
         return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
@@ -176,19 +189,20 @@ export class GameService {
 
     endGame(): void {
         this.socket.stopTimer(this.socket.getRoomName());
-        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
-        console.log(this.gameTime, this.gameInformation.gameMode);
+        console.log('end game', this.socket.getRoomName());
+        this.socket.gameEnded(this.socket.getRoomName());
+        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
+        console.log(this.gameTime, this.gameInformation.gameMode, this.gameType);
         this.isGameFinished = true;
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-        this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();
     }
 
     saveGameRecord(): void {
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
-            typeGame: this.gameType,
+            typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),
@@ -215,9 +229,4 @@ export class GameService {
         audio.load();
         audio.play();
     }
-
-    // // generate random unique roomName
-    // generateRoomName(): string {
-    //     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    // }
 }

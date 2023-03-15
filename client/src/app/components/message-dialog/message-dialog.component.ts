@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ClientTimeService } from '@app/services/client-time.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
@@ -17,20 +16,21 @@ export class MessageDialogComponent {
 
     // TODO: reduce the number of constructor parameters
     // eslint-disable-next-line max-params
-    constructor(
-        @Inject(MAT_DIALOG_DATA) data: string,
-        private router: Router,
-        private socket: SocketClientService,
-        private readonly clientTimeService: ClientTimeService,
-        readonly gameServ: GameService,
-    ) {
+    constructor(@Inject(MAT_DIALOG_DATA) data: string, private router: Router, private socket: SocketClientService, readonly gameServ: GameService) {
         this.message = data[0];
         this.type = data[1];
         this.formatTime = data[2];
     }
 
     redirection(): void {
-        this.socket.sendMessage(this.gameServ.playerName + ' a quitté la partie', this.gameServ.playerName, '#FF0000', '50%', true);
+        this.socket.sendMessage(
+            this.gameServ.playerName + ' a quitté la partie',
+            this.gameServ.playerName,
+            '#FF0000',
+            '50%',
+            this.gameServ.gameId,
+            true,
+        );
         this.socket.messageList.push({
             message: this.gameServ.playerName + ' a quitté la partie',
             userName: this.gameServ.playerName,
@@ -41,6 +41,5 @@ export class MessageDialogComponent {
         });
         this.router.navigate(['/home']);
         this.socket.leaveRoom();
-        this.clientTimeService.resetTimer();
     }
 }

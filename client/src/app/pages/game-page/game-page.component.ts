@@ -24,14 +24,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
 
-    // TODO: use camelCase
-    playerName: string;
-    // mock mutliPlayers
-    players = ['first', 'second'];
-    gameType: string;
-    gameName: string;
-    opponentName: string;
-
     // TODO: reduce the number of parameters
     // eslint-disable-next-line max-params
     constructor(
@@ -55,52 +47,59 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        // this.clientTimeService.stopTimer();
         this.socket.disconnect();
-        // this.clientTimeService.resetTimer();
         this.socket.leaveRoom();
-        this.gameName = '';
     }
 
     ngAfterViewInit(): void {
         this.socket.connect();
-        if (this.gameType === 'solo') {
-            this.socket.joinRoomSolo(this.playerName);
+        if (this.gameService.gameType === 'solo') {
+            this.socket.joinRoomSolo(this.gameService.playerName);
         } else {
-            // this.socket.joinRoomMulti(this.players);
-            this.socket.startMultiGame({ id: '0', creatorName: this.playerName, opponentName: this.opponentName, gameName: 'gameName' });
+            const roomName = this.gameService.gameId + this.gameService.gameName;
+            this.socket.sendRoomName(roomName);
         }
-        // this.socket.joinRoom(this.playerName, 'testRoom');
-        // this.clientTimeService.startChronometer();
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
+        this.socket.diffFounded$.subscribe((newValue) => {
+            if (newValue !== undefined) {
+                this.drawService.setColor = 'black';
+                this.drawDifference(newValue);
+                this.drawService.setColor = 'yellow';
+            }
+        });
         this.socket.gameState$.subscribe((newValue) => {
             if (newValue === true) {
                 this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
             }
-            console.log('The value of gameState has changed:', newValue);
+        });
+
+        this.socket.playerFoundDiff$.subscribe((newValue) => {
+            if (newValue === this.gameService.opponentName) {
+                this.gameService.handlePlayerDifference();
+            }
         });
     }
 
     getRouterParams() {
-        this.playerName = this.route.snapshot.paramMap.get('player') as string;
-        this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
-        this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
-        this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
-        console.log('playerName', this.playerName);
-        console.log('gameName', this.gameName);
-        console.log('gameType', this.gameType);
-        console.log('opponentName', this.opponentName);
+        // this.playerName = this.route.snapshot.paramMap.get('player') as string;
+        // this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+        // this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
+        // this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
+        // this.gameId = this.route.snapshot.paramMap.get('gameId') as string;
+
+        this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
+        this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+        this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
+        this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
+        this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
     }
 
     ngOnInit(): void {
         this.getRouterParams();
-        this.gameService.getGame(this.gameName);
+        this.gameService.getGame(this.gameService.gameName);
         this.gameService.displayIcons();
         this.loading();
-        this.gameService.playerName = this.playerName;
-        this.gameService.gameType = this.gameType;
-        this.gameService.opponentName = this.opponentName;
     }
 
     loading(): void {
@@ -114,14 +113,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            if (diff) {
-                this.drawDifference(diff);
+            const differ = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            if (differ) {
+                this.drawDifference(differ);
                 // remove difference found from unfundedDifference
-                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== differ);
+                console.log(this.socket.getRoomName());
+                this.socket.sendDifference(differ, this.socket.getRoomName());
                 this.displayWord('Trouvé');
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                // setTimeout(() => this.drawDifference(diff), 1000);
+                this.gameService.handleDifferenceFound();
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
@@ -131,18 +131,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     displayWord(word: string): void {
+        this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+        this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
         if (word === 'Erreur') {
             this.gameService.playFailureAudio();
-            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
-            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
             setTimeout(() => {
                 this.errorPenalty = false;
             }, constantsTime.BLINKING_TIME);
         } else {
             this.gameService.playSuccessAudio();
-            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
-            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
-            this.gameService.clickDifferencesFound();
             this.blinkCanvas();
         }
     }

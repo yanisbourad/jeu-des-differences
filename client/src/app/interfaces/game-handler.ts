@@ -3,3 +3,9 @@ export interface Game {
     opponentName: string;
     gameName: string;
 }
+export class GamersInfo {
+    gameId: number;
+    creatorName: string;
+    opponentName: string;
+    gameName: string;
+}

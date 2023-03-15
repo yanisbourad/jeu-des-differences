@@ -1,11 +1,12 @@
 import { HttpClientModule } from '@angular/common/http';
-import { DebugElement } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ChangeDetectorRef, DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { By } from '@angular/platform-browser';
 import * as constants from '@app/configuration/const-game';
 import * as constantsMock from '@app/configuration/const-mock';
 
+import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 import { of } from 'rxjs';
@@ -17,13 +18,20 @@ describe('CardDisplayerComponent', () => {
     let component: CardDisplayerComponent;
     let fixture: ComponentFixture<CardDisplayerComponent>;
     let communicationServiceSpy: jasmine.SpyObj<GameDatabaseService>;
+    let gameCardHandlerServiceSpy: jasmine.SpyObj<GameCardHandlerService>;
+    let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
 
     beforeEach(() => {
         communicationServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getAllGames']);
-
+        gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['updateGameStatus']);
+        changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
         TestBed.configureTestingModule({
             imports: [HttpClientModule, MatGridListModule],
-            providers: [{ provide: GameDatabaseService, useValue: communicationServiceSpy }],
+            providers: [
+                { provide: GameDatabaseService, useValue: communicationServiceSpy },
+                { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy },
+                { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+            ],
             declarations: [CardDisplayerComponent],
         }).compileComponents();
 
@@ -32,6 +40,10 @@ describe('CardDisplayerComponent', () => {
         fixture = TestBed.createComponent(CardDisplayerComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
     });
 
     it('should go to next page', () => {
@@ -80,6 +92,7 @@ describe('CardDisplayerComponent', () => {
         component.updateCards();
         expect(component.allCards).toEqual(mockCards);
         expect(communicationServiceSpy.getAllGames).toHaveBeenCalledTimes(1);
+        expect(gameCardHandlerServiceSpy.updateGameStatus).toHaveBeenCalled();
     }));
 
     it('should call goToPrevious() on previous button click', () => {

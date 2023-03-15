@@ -12,6 +12,7 @@
     border: 1px solid black;
 }
 
+
 .file-upload {
     display: none;
 }
@@ -44,4 +45,22 @@
     margin-left: 20px;
     padding: 10px;
     border-radius: 10px;
+}
+
+
+.superposeCanvasDrawCanvasImage {
+    width: 640px;
+    height: 480px;
+    .canvasImage {
+        position: relative;
+        top: 0;
+        left: 0;
+        background-color: transparent;
+    }
+    .canvasDraw {
+        position: relative !important;
+        top: -101.4% !important;
+        left: -0% !important;
+        background-color: transparent;
+    }
 }

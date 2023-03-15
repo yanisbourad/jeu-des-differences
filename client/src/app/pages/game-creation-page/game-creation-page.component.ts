@@ -1,15 +1,18 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { DrawDuplicateDrawing } from '@app/classes/commands/draw-duplicate-drawing';
+import { DrawExchange } from '@app/classes/commands/draw-exchange-drawing';
 import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
 import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
 import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
+import { CommandService } from '@app/services/command.service';
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent {
     @ViewChild('originalCanvasComponent') originalCanvasComponent: CanvasNgxComponent;
     @ViewChild('modifiedCanvasComponent') modifiedCanvasComponent: CanvasNgxComponent;
     @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef<HTMLInputElement>;
@@ -18,10 +21,9 @@ export class GameCreationPageComponent implements OnInit {
     // eslint-disable-next-line max-params
     constructor(
         public dialog: MatDialog,
-        private renderer: Renderer2,
-        private element: ElementRef,
         private readonly canvasHolderService: CanvasHolderService,
         private readonly bitmapService: BitmapService,
+        private readonly commandService: CommandService,
     ) {}
 
     get originalCanvas(): string {
@@ -31,27 +33,32 @@ export class GameCreationPageComponent implements OnInit {
     get modifiedCanvas(): string {
         return this.canvasHolderService.modifiedCanvas;
     }
-
-    ngOnInit(): void {
-        this.canvasHolderService.clearCanvas();
+    leftSwapDrawing() {
+        const command = new DrawDuplicateDrawing(
+            this.modifiedCanvasComponent.getCanvasDraw,
+            this.originalCanvasComponent.getCanvasDraw,
+            this.modifiedCanvas,
+        );
+        this.commandService.do(command);
     }
 
-    handleSwapping(element1Id: string, element2Id: string): void {
-        const element1Image = this.element.nativeElement.querySelector(element1Id);
-        const middleButtons = this.element.nativeElement.querySelector('.swapping-canvas');
-        const element2Image = this.element.nativeElement.querySelector(element2Id);
-
-        this.renderer.insertBefore(element1Image.parentNode, element2Image, element1Image);
-        this.renderer.insertBefore(element1Image.parentNode, middleButtons, element1Image);
+    rightSwapDrawing() {
+        const command = new DrawDuplicateDrawing(
+            this.originalCanvasComponent.getCanvasDraw,
+            this.modifiedCanvasComponent.getCanvasDraw,
+            this.originalCanvas,
+        );
+        this.commandService.do(command);
     }
 
     swapImages(): void {
-        if (this.reposition) {
-            this.handleSwapping('.original', '.modified');
-        } else {
-            this.handleSwapping('.modified', '.original');
-        }
-        this.reposition = !this.reposition;
+        const command = new DrawExchange(this.originalCanvasComponent.getCanvasImage, this.modifiedCanvasComponent.getCanvasImage, 'Exchange');
+        this.commandService.do(command);
+    }
+
+    swapDrawing(): void {
+        const command = new DrawExchange(this.originalCanvasComponent.getCanvasDraw, this.modifiedCanvasComponent.getCanvasDraw, 'Exchange');
+        this.commandService.do(command);
     }
 
     openCanvas(): void {

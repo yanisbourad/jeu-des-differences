@@ -52,27 +52,6 @@ describe('GameCreationPageComponent', () => {
         expect(component.modifiedCanvas).toBeTruthy();
     });
 
-    it('should call clearCanvas method from CanvasHolderService', () => {
-        component.ngOnInit();
-        expect(canvasHolderServiceSpy.clearCanvas).toHaveBeenCalled();
-    });
-
-    it('should swap canvas element', () => {
-        component.handleSwapping('.original', '.modified');
-        expect(renderer2Spy.insertBefore).toBeTruthy();
-    });
-
-    it('should swap canvas element once', () => {
-        component.reposition = true;
-        component.swapImages();
-        expect(renderer2Spy.insertBefore).toBeTruthy();
-    });
-    it('should reverse swapping canvas element', () => {
-        component.reposition = false;
-        component.swapImages();
-        expect(renderer2Spy.insertBefore).toBeTruthy();
-    });
-
     it('should open pop up on call ', () => {
         component.openCanvas();
         expect(matDialogSpy.open).toHaveBeenCalled();

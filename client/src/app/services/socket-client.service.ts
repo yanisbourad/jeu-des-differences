@@ -18,7 +18,6 @@ export class SocketClientService {
     gameState$: Observable<boolean> = this.gameState.asObservable();
     diffFounded = new Subject<Set<number>>();
     diffFounded$: Observable<Set<number>> = this.diffFounded.asObservable();
-
     constructor(private readonly socketClient: SocketClient) {}
 
     get socketId() {
@@ -56,6 +55,7 @@ export class SocketClientService {
         });
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
+            console.log('elapsedTimes', this.elapsedTimes);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -104,6 +104,7 @@ export class SocketClientService {
     }
 
     gameEnded(roomName: string): void {
+        console.log('gameEnded you called for me!!');
         this.socketClient.send('gameEnded', roomName);
     }
 
@@ -113,6 +114,8 @@ export class SocketClientService {
     }
 
     stopTimer(roomName: string) {
+        console.log('stopTimer you called for me!!');
+        console.log('roomName', roomName);
         this.socketClient.send('stopTimer', roomName);
     }
 

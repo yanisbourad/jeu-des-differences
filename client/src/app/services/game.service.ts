@@ -118,7 +118,6 @@ export class GameService {
     reinitializeGame(): void {
         this.nDifferencesNotFound = 0;
         this.nHintsUnused = 0;
-        this.nDifferencesFound = 0;
         this.differencesArray = [];
         this.playerName = '';
         this.playersName = [];
@@ -129,7 +128,6 @@ export class GameService {
         this.gameTime = 0;
         this.gameType = '';
         this.nDifferencesFound = 0;
-        this.socket.leaveRoom();
         this.game = {
             gameName: '',
             difficulty: '',
@@ -162,34 +160,29 @@ export class GameService {
         }
     }
 
-    isEven(number: number) {
-        return number % 2 === 0;
-    }
-
     multiGameEnd(): boolean {
-        if (this.isEven(this.nDifferencesNotFound)) {
+        if (this.nDifferencesNotFound % 2 === 0) {
             return this.nDifferencesFound === this.nDifferencesNotFound / 2;
         }
         return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
     }
 
-    // TODO: gameRecord doesn't save the time on the card , find and correct the bug
     endGame(): void {
-        console.log('end game', this.socket.getRoomName());
         this.socket.stopTimer(this.socket.getRoomName());
-        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
-        console.log(this.gameTime, this.gameInformation.gameMode);
+        console.log('end game', this.socket.getRoomName());
+        this.socket.gameEnded(this.socket.getRoomName());
+        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
+        console.log(this.gameTime, this.gameInformation.gameMode, this.gameType);
         this.isGameFinished = true;
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-        this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();
     }
 
     saveGameRecord(): void {
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
-            typeGame: this.gameType,
+            typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),

@@ -23,16 +23,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
-    // differenceFound: Set<number>[];
-
-    // TODO: use camelCase
-    playerName: string;
-    // mock mutliPlayers
-    players = ['first', 'second'];
-    gameType: string;
-    gameName: string;
-    opponentName: string;
-    gameId: string;
 
     // TODO: reduce the number of parameters
     // eslint-disable-next-line max-params
@@ -57,61 +47,47 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        // this.clientTimeService.stopTimer();
         this.socket.disconnect();
-        // this.clientTimeService.resetTimer();
         this.socket.leaveRoom();
-        this.gameName = '';
-        this.gameId = '';
-        this.opponentName = '';
-        this.gameType = '';
-        this.playerName = '';
     }
 
     ngAfterViewInit(): void {
         this.socket.connect();
-        if (this.gameType === 'solo') {
-            this.socket.joinRoomSolo(this.playerName);
+        if (this.gameService.gameType === 'solo') {
+            this.socket.joinRoomSolo(this.gameService.playerName);
         } else {
-            const roomName = this.gameId + this.gameName;
+            const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
         }
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
+        this.socket.diffFounded$.subscribe((newValue) => {
+            if (newValue !== undefined) {
+                this.drawService.setColor = 'black';
+                this.drawDifference(newValue);
+                this.drawService.setColor = 'yellow';
+            }
+        });
         this.socket.gameState$.subscribe((newValue) => {
             if (newValue === true) {
                 this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
             }
         });
-        // draw diff founded
-        this.socket.diffFounded$.subscribe((newValue) => {
-            if (newValue !== undefined) {
-                this.drawService.setColor = 'black';
-                this.drawDifference(newValue);
-                console.log('diff founded');
-                this.drawService.setColor = 'yellow';
-            }
-        });
     }
 
     getRouterParams() {
-        this.playerName = this.route.snapshot.paramMap.get('player') as string;
-        this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
-        this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
-        this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
-        this.gameId = this.route.snapshot.paramMap.get('gameId') as string;
+        this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
+        this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+        this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
+        this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
+        this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
     }
 
     ngOnInit(): void {
         this.getRouterParams();
-        this.gameService.getGame(this.gameName);
+        this.gameService.getGame(this.gameService.gameName);
         this.gameService.displayIcons();
         this.loading();
-        this.gameService.playerName = this.playerName;
-        this.gameService.gameType = this.gameType;
-        this.gameService.opponentName = this.opponentName;
-        this.gameService.gameId = this.gameId;
-        this.gameService.gameName = this.gameName;
     }
 
     loading(): void {
@@ -140,13 +116,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clearCanvas();
         }
     }
-
-    // drawAllDifferences() {
-    //     this.differenceFound.forEach((difference) => {
-    //         this.drawService.setColor = 'black';
-    //         this.drawDifference(difference);
-    //     });
-    // }
 
     displayWord(word: string): void {
         if (word === 'Erreur') {

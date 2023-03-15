@@ -97,14 +97,6 @@ export class GameService {
         this.gameRecordModel.insertMany(basRecords);
     }
 
-    deleteGame(_name: string): void {
-        if (!this.gamesNames.includes(_name)) return;
-        this.deleteDirectory(_name);
-        this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
-        const name = _name + this.key;
-        this.gameRecordModel.deleteMany({ gameName: name });
-    }
-
     createFile(dirName: string, fileName: string, data: string): void {
         if (!fs.existsSync(`${this.rootPath}/${dirName}`)) {
             fs.mkdirSync(`${this.rootPath}/${dirName}`);
@@ -122,5 +114,12 @@ export class GameService {
                 this.logger.error(`Failed to delete directory ${dirName}`);
             }
         });
+    }
+    async deleteGame(_name: string): Promise<void> {
+        if (!this.gamesNames.includes(_name)) return;
+        this.deleteDirectory(_name);
+        this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
+        const name = _name + this.key;
+        await this.gameRecordModel.deleteMany({ gameName: name });
     }
 }

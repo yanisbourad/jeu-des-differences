@@ -46,6 +46,6 @@
     <button *ngIf="changeButton() === 'Classique'" class="playingButtons" id="joinButton"
         (click)="launchDialog()">{{createJoinState}}</button>
 
-    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="playButton">Supprimer</button>
-    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="joinButton">Reinitialiser</button>
+    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="deleteButton" (click)="onDelete(card.gameName)" >Supprimer</button>
+    <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="resetButton">Reinitialiser</button>
 </div>

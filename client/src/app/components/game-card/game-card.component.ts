@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameInfo } from '@common/game';
+import { GameService } from '@app/services/game.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-game-card',
@@ -12,13 +14,20 @@ import { GameInfo } from '@common/game';
 })
 export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
+    @Output() gameDeleted = new EventEmitter<void>();
     createJoinState: string = 'Créer';
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
     url: string;
 
-    constructor(public dialog: MatDialog, private router: Router, private readonly gameCardHandlerService: GameCardHandlerService) {}
+    // eslint-disable-next-line max-params
+    constructor(
+        public dialog: MatDialog,
+        private router: Router,
+        private readonly gameCardHandlerService: GameCardHandlerService,
+        readonly gameService: GameService,
+    ) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
@@ -56,5 +65,14 @@ export class GameCardComponent implements OnInit {
             }
         }
         return '';
+    }
+
+    async onDelete(gameName: string) {
+        try {
+            await firstValueFrom(this.gameService.deleteGame(gameName));
+            this.gameDeleted.emit();
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

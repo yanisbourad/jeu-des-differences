@@ -1,11 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import SpyObj = jasmine.SpyObj;
-// eslint-disable-next-line no-restricted-imports
 import * as constants from '@app/configuration/const-test';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
-// eslint-disable-next-line no-restricted-imports
-import { ImageDiffService } from '../../services/image-diff.service';
+import { ImageDiffService } from '@app/services/image-diff.service';
 import { ValidateCreateBtnComponent } from './validate-create-btn.component';
+import SpyObj = jasmine.SpyObj;
 
 describe('ValidateCreateBtnComponent', () => {
     let component: ValidateCreateBtnComponent;

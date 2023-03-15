@@ -80,10 +80,10 @@ describe('GameService', () => {
             rankingSolo: [],
         };
         path = {
-            differenceNotFound: '../../../assets/img/difference-not-found.png',
-            differenceFound: '../../../assets/img/difference-found.png',
-            hintUnused: '../../../assets/img/hint-unused.png',
-            hintUsed: '../../../assets/img/hint-used.png',
+            differenceNotFound: './assets/img/difference-not-found.png',
+            differenceFound: './assets/img/difference-found.png',
+            hintUnused: './assets/img/hint-unused.png',
+            hintUsed: './assets/img/hint-used.png',
         };
     });
 

@@ -5,8 +5,10 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameInfo } from '@common/game';
 // eslint-disable-next-line no-restricted-imports
-import { NamePopupComponent } from '../name-popup/name-popup.component';
+import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardComponent } from './game-card.component';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
@@ -113,5 +115,11 @@ describe('GameCardComponent', () => {
     it('should display the first one for multi game', () => {
         const firstRanking = fixture.nativeElement;
         expect(firstRanking.querySelector('#firstMulti').textContent).toContain('1:23 joueur 1');
+    });
+    it('should call deleteGame() on delete click', () => {
+        spyOn(component, 'deleteGame');
+        const deleteButton: DebugElement = fixture.debugElement.query(By.css('.deleteButton'));
+        deleteButton.triggerEventHandler('click', null);
+        expect(component.deleteGame).toHaveBeenCalled();
     });
 });

@@ -141,4 +141,18 @@ describe('GameDatabaseService', () => {
         expect(spy).toHaveBeenCalledOnceWith(game);
         expect(spyDiffDifficulty).toHaveBeenCalledTimes(1);
     });
+
+    it('should delete game', () => {
+        const data: Game = {
+            gameName: 'test',
+            originalImageData: 'test',
+            modifiedImageData: 'test',
+            listDifferences: ['test'],
+            difficulty: 'Facile',
+        };
+        service.createGame(data).subscribe();
+        service.deleteGame(data.gameName).subscribe((game) => {
+            expect(game.ok).toEqual(true);
+        });
+    });
 });

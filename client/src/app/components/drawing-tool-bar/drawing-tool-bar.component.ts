@@ -14,7 +14,7 @@ export class DrawingToolBarComponent {
     @Output() onReadyToDraw = new EventEmitter();
     lineWidth: number = constants.DEFAULT_LINE_WIDTH;
     lineColor: string = constants.DEFAULT_LINE_COLOR;
-    selectedRadius: number = constants.POSSIBLE_RADIUS[0];
+    selectedRadius: number = constants.DEFAULT_RADIUS;
     showMessage: boolean = false;
     showDifference: number = 0;
     tool: string = 'pencil';

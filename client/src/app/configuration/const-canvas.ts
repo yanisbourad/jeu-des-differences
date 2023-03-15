@@ -3,7 +3,7 @@ export const DEFAULT_WIDTH = 640;
 export const DEFAULT_HEIGHT = 480;
 export const DEFAULT_LINE_WIDTH = 20;
 export const DEFAULT_LINE_CAP = 'round';
-export const DEFAULT_RADIUS = 0;
+export const DEFAULT_RADIUS = 3;
 export const DEFAULT_LINE_COLOR = '#000000';
 export const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers

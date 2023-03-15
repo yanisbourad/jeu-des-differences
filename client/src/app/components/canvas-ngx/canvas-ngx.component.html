@@ -1,6 +1,9 @@
 <div class="Canvas-ngx">
-    <p class="canvas-type">{{ type }}</p>
-    <canvas #Canvas [attr.width]="width" [attr.height]="height"></canvas>
+    <p class="canvas-type">{{type}}</p>
+    <div class='superposeCanvasDrawCanvasImage'>
+        <canvas class="canvasImage" #CanvasImage [attr.width]="width" [attr.height]="height"></canvas>
+        <canvas class="canvasDraw" #CanvasDraw [attr.width]="width" [attr.height]="height"></canvas>
+    </div>
     <input type="file" class="file-upload" (change)="onFileSelected($event)" accept=".bmp" #fileUpload />
     <div class="Tools-Canvas {{ type }}">
         <img
@@ -20,4 +23,6 @@
             (click)="clearCanvas()"
         />
     </div>
+    <canvas #tempCanvas [attr.width]="width" [attr.height]="height" style="visibility: hidden;"></canvas>
+
 </div>

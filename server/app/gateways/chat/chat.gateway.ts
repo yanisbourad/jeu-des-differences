@@ -106,8 +106,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.serverTime.stopChronometer(roomName); // maybe change the return value
     }
     @SubscribeMessage(ChatEvents.Message)
-    async message(socket: Socket, data: [string, string, string, string]) {
-        socket.to(this.roomName).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3] });
+    async message(socket: Socket, data: [string, string, string, string, boolean]) {
+        socket.to(this.roomName).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[4] });
     }
 
     @SubscribeMessage(ChatEvents.GameEnded)

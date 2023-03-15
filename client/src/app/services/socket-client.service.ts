@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
-import { Socket } from 'socket.io-client';
 import { Room } from '@common/rooms';
 import { Observable, Subject } from 'rxjs';
+import { Socket } from 'socket.io-client';
 // import { ClientTimeService } from './client-time.service';
 
 @Injectable({
@@ -12,7 +12,8 @@ export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
     roomName: string = '';
-    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string }[] = [];
+    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
+    messageQuit: { message: string; userName: string; quit: boolean; color: string; pos: string }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
     gameState = new Subject<boolean>(); // to be private
@@ -67,10 +68,17 @@ export class SocketClientService {
             // console.log(this.rooms);
         });
 
-        this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
+        this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
             console.log(data.userName);
             if (data) {
-                this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
+                this.messageList.push({
+                    message: data.message,
+                    userName: data.userName,
+                    mine: false,
+                    color: data.color,
+                    pos: data.pos,
+                    event: data.event,
+                });
             }
         });
 
@@ -134,7 +142,7 @@ export class SocketClientService {
         this.disconnect();
     }
 
-    sendMessage(message: string, playerName: string, color: string, pos: string) {
-        this.socketClient.send('message', [message, playerName, color, pos]);
+    sendMessage(message: string, playerName: string, color: string, pos: string, event: boolean) {
+        this.socketClient.send('message', [message, playerName, color, pos, event]);
     }
 }

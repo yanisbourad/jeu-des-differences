@@ -13,6 +13,7 @@ export class MessageAreaComponent implements OnInit {
     @Input() playerName: string = '';
     @Input() message: string = '';
     playerInitials: string;
+    giveUp: boolean;
     date: Date = new Date();
     userList: string[] = [];
     socket: SocketClient;
@@ -29,13 +30,14 @@ export class MessageAreaComponent implements OnInit {
         return this.date.toLocaleTimeString();
     }
     sendMessage() {
-        this.socketClient.sendMessage(this.message, this.playerName, this.defaultColor[0], this.position[0]);
+        this.socketClient.sendMessage(this.message, this.playerName, this.defaultColor[0], this.position[0], false);
         this.socketClient.messageList.push({
             message: this.message,
             userName: this.playerName,
             mine: true,
             color: this.defaultColor[1],
             pos: this.position[1],
+            event: false,
         });
         this.message = '';
     }

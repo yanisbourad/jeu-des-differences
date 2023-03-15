@@ -34,4 +34,9 @@ export class CommandService {
             command.doOnOtherCanvas(canvas, canvasName);
         });
     }
+
+    clear(): void {
+        this.pastCommand = [];
+        this.futureCommand = [];
+    }
 }

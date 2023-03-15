@@ -56,6 +56,14 @@ export class CanvasNgxComponent implements AfterViewInit {
         return this.drawService.usedTool;
     }
 
+    get getCanvasDraw(): ElementRef<HTMLCanvasElement> {
+        return this.canvasDraw;
+    }
+
+    get getCanvasImage(): ElementRef<HTMLCanvasElement> {
+        return this.canvasImage;
+    }
+
     ngAfterViewInit(): void {
         this.canvasDrawNative.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);

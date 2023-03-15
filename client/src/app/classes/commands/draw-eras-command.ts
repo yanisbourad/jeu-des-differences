@@ -6,6 +6,7 @@ export class DrawErasLineCommand extends CommandSpecific {
     oldPointsColor: Map<string, ImageData>;
     points: Point[];
     lineWidth: number;
+    // eslint-disable-next-line max-params
     constructor(points: Point[], lineWidth: number, canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
         super(canvas, canvasName);
         this.points = points;

@@ -73,8 +73,12 @@
 
 .swapping-canvas {
     width: 10%;
-    height: 20px;
-    margin-top: 20%;
+    height: fit-content;
+    margin-top: 5%;
+    img {
+        width: 75px;
+        height: 75px;
+    }
 }
 
 .warning h2 {

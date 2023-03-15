@@ -23,7 +23,7 @@ export class CanvasHolderService {
         if (canvasName === this.originalCanvas) {
             return this.canvasOriginal.getCanvasUrlData();
         } else if (canvasName === this.modifiedCanvas) {
-            return this.canvasOriginal.getCanvasUrlData();
+            return this.canvasModifier.getCanvasUrlData();
         } else throw new Error('Canvas name not found');
     }
     getCanvasData(canvasName: string): Uint8ClampedArray {

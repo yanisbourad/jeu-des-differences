@@ -65,15 +65,16 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        this.drawService.setColor = constants.DEFAULT_LINE_COLOR;
         this.canvasHolderService.setCanvas(this, this.type);
 
         this.canvasDrawNative.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
-        this.canvasDraw.nativeElement.addEventListener('mousemove', (event: MouseEvent) => {
+        this.canvasDrawNative.addEventListener('mousemove', (event: MouseEvent) => {
             this.mouseMoveDetection(event);
         });
-        this.canvasDraw.nativeElement.addEventListener('mouseup', () => {
+        this.canvasDrawNative.addEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
         this.clearCanvas();

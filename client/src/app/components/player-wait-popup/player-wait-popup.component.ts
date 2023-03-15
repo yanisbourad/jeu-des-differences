@@ -12,6 +12,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     game: Game;
     isReady: boolean;
     acceptState = '';
+    isUpdated: boolean;
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
@@ -24,6 +25,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             gameName: '',
         };
         this.isReady = false;
+        this.isUpdated = false;
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
@@ -40,6 +42,11 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         if (this.gameCardHandlerService.getCreatorStatus() && this.game.opponentName !== "Attente d'un adversaire") {
             this.isReady = true;
             this.acceptState = this.gameCardHandlerService.getGameState();
+        }
+        this.isUpdated = this.gameCardHandlerService.getNewUpdate();
+        if (this.isUpdated) {
+            this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);
+            this.gameCardHandlerService.setNewUpdate(false);
         }
         if (this.gameCardHandlerService.getReadinessStatus()) {
             this.dialogReff.close();

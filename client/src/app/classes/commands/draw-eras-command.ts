@@ -24,15 +24,9 @@ export class DrawErasLineCommand extends CommandSpecific {
 
     drawErasLine(points: Point[], lineWidth: number): void {
         const ctx = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        ctx.beginPath();
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = 'white';
-        ctx.moveTo(points[0].x, points[0].y);
+        const diff = lineWidth / 2;
         for (let i = 1; i < points.length; i++) {
-            ctx.lineTo(points[i].x, points[i].y);
+            ctx.clearRect(points[i].x - diff, points[i].y - diff, lineWidth, lineWidth);
         }
-        ctx.stroke();
     }
 }

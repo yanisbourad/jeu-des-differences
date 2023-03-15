@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
 
 @Injectable({
     providedIn: 'root',
@@ -7,45 +8,29 @@ export class CanvasHolderService {
     originalCanvas: string = 'Image Original';
     modifiedCanvas: string = 'Image Modifiée';
 
-    private canvasOriginal!: Uint8ClampedArray;
-    private canvasModifier!: Uint8ClampedArray;
-    private canvasOriginalData!: string;
-    private canvasModifiedData!: string;
+    private canvasOriginal!: CanvasNgxComponent;
+    private canvasModifier!: CanvasNgxComponent;
 
-    setCanvas(canvasData: Uint8ClampedArray, canvasName: string): void {
+    setCanvas(canvasNgx: CanvasNgxComponent, canvasName: string): void {
         if (canvasName === this.originalCanvas) {
-            this.canvasOriginal = canvasData;
+            this.canvasOriginal = canvasNgx;
         } else if (canvasName === this.modifiedCanvas) {
-            this.canvasModifier = canvasData;
-        } else throw new Error('Canvas name not found');
-    }
-    setCanvasData(canvasData: string, canvasName: string): void {
-        if (canvasName === this.originalCanvas) {
-            this.canvasOriginalData = canvasData;
-        } else if (canvasName === this.modifiedCanvas) {
-            this.canvasModifiedData = canvasData;
+            this.canvasModifier = canvasNgx;
         } else throw new Error('Canvas name not found');
     }
 
     getCanvasUrlData(canvasName: string): string {
         if (canvasName === this.originalCanvas) {
-            return this.canvasOriginalData;
+            return this.canvasOriginal.getCanvasUrlData();
         } else if (canvasName === this.modifiedCanvas) {
-            return this.canvasModifiedData;
+            return this.canvasOriginal.getCanvasUrlData();
         } else throw new Error('Canvas name not found');
     }
     getCanvasData(canvasName: string): Uint8ClampedArray {
         if (canvasName === this.originalCanvas) {
-            return this.canvasOriginal;
+            return this.canvasOriginal.getCanvasData();
         } else if (canvasName === this.modifiedCanvas) {
-            return this.canvasModifier;
+            return this.canvasModifier.getCanvasData();
         } else throw new Error('Canvas name not found');
-    }
-
-    clearCanvas(): void {
-        this.canvasOriginal = new Uint8ClampedArray();
-        this.canvasModifier = new Uint8ClampedArray();
-        this.canvasOriginalData = '';
-        this.canvasModifiedData = '';
     }
 }

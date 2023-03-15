@@ -7,7 +7,7 @@ import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { Game, GameRecord } from '@common/game';
-import { SocketClientService } from './socket-client.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Injectable({
     providedIn: 'root',
@@ -85,12 +85,6 @@ export class GameService {
         });
     }
 
-    // findDiff(pos: number, gameName: string) {
-    //     this.gameDataBase.(pos, gameName).subscribe((res: Game) => {
-    //         this.game = res;
-    //     });
-    // }
-
     displayIcons(): void {
         if (this.gameType === 'solo') {
             for (let i = 0; i < this.nDifferencesNotFound; i++) {
@@ -144,12 +138,11 @@ export class GameService {
         this.gameTime = 0;
         this.gameType = '';
         this.nDifferencesFound = 0;
-        this.socket.leaveRoom();
         this.game = {
             gameName: '',
             difficulty: '',
-            originalImageData: '',
-            modifiedImageData: '',
+            originalImageData: '../../assets/image_empty.bmp',
+            modifiedImageData: '../../assets/image_empty.bmp',
             listDifferences: [],
         };
         this.gameInformation = {
@@ -186,33 +179,30 @@ export class GameService {
         this.opponentDifferencesArray.unshift(this.path.differenceFound);
     }
 
-    isEven(number: number) {
-        return number % 2 === 0;
-    }
 
     multiGameEnd(): boolean {
-        if (this.isEven(this.nDifferencesNotFound)) {
+        if (this.nDifferencesNotFound % 2 === 0) {
             return this.nDifferencesFound === this.nDifferencesNotFound / 2;
         }
         return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
     }
 
     endGame(): void {
-        console.log('end game', this.socket.getRoomName());
         this.socket.stopTimer(this.socket.getRoomName());
-        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName()); // change to server time
-        console.log(this.gameTime, this.gameInformation.gameMode);
+        console.log('end game', this.socket.getRoomName());
+        this.socket.gameEnded(this.socket.getRoomName());
+        this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
+        console.log(this.gameTime, this.gameInformation.gameMode, this.gameType);
         this.isGameFinished = true;
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
-        this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();
     }
 
     saveGameRecord(): void {
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
-            typeGame: this.gameType,
+            typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),

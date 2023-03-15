@@ -8,9 +8,7 @@ import { INDEX_NOT_FOUND } from './consts-player-service';
 export class PlayerService {
     rooms: Room[] = [];
     roomNamesMulti: string[] = [];
-    // maxPlayers: number = 2;
-    // add logic for multiplayer room
-    // add logic to add two players
+
     async addRoomSolo(roomName: string, host: PlayerEntity, startTime: Date): Promise<void> {
         this.rooms.push({ name: roomName, host, players: [host], maxPlayers: 1, startTime });
     }

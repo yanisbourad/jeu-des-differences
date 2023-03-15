@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ClientTimeService } from '@app/services/client-time.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
@@ -14,14 +13,7 @@ export class MessageDialogComponent {
     type: string;
     formatTime: string;
 
-    // TODO: reduce the number of constructor parameters
-    // eslint-disable-next-line max-params
-    constructor(
-        @Inject(MAT_DIALOG_DATA) data: string,
-        private router: Router,
-        private readonly socket: SocketClientService,
-        private readonly clientTimeService: ClientTimeService,
-    ) {
+    constructor(@Inject(MAT_DIALOG_DATA) data: string, private router: Router, private readonly socket: SocketClientService) {
         this.message = data[0];
         this.type = data[1];
         this.formatTime = data[2];
@@ -30,6 +22,5 @@ export class MessageDialogComponent {
     redirection(): void {
         this.router.navigate(['/home']);
         this.socket.leaveRoom();
-        this.clientTimeService.resetTimer();
     }
 }

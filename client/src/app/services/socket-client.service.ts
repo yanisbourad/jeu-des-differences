@@ -20,6 +20,8 @@ export class SocketClientService {
     playerFoundDiff$: Observable<string> = this.playerFoundDiff.asObservable();
     infoDiff: { playerName: string };
 
+    diffFounded = new Subject<Set<number>>();
+    diffFounded$: Observable<Set<number>> = this.diffFounded.asObservable();
     constructor(private readonly socketClient: SocketClient) {}
 
     get socketId() {
@@ -57,6 +59,7 @@ export class SocketClientService {
         });
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
+            console.log('elapsedTimes', this.elapsedTimes);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -70,7 +73,6 @@ export class SocketClientService {
         });
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
-            console.log(data.userName);
             if (data) {
                 this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
             }
@@ -83,12 +85,19 @@ export class SocketClientService {
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
             this.playerFoundDiff.next(data.playerName);
         });
+
+        this.socketClient.on('feedbackDifference', (diff: Set<number>) => {
+            const data = new Set<number>(diff);
+            console.log('diff', data);
+            this.diffFounded.next(data);
+        });
     }
 
     disconnect() {
         // this.timer.stopTimer();
         this.socketClient.disconnect();
     }
+
     joinRoomSolo(playerName: string) {
         const room = this.getRoom();
         this.socketClient.send('joinRoomSolo', [playerName, room?.name]);
@@ -103,6 +112,7 @@ export class SocketClientService {
     }
 
     gameEnded(roomName: string): void {
+        console.log('gameEnded you called for me!!');
         this.socketClient.send('gameEnded', roomName);
     }
 
@@ -112,6 +122,8 @@ export class SocketClientService {
     }
 
     stopTimer(roomName: string) {
+        console.log('stopTimer you called for me!!');
+        console.log('roomName', roomName);
         this.socketClient.send('stopTimer', roomName);
     }
 
@@ -123,7 +135,16 @@ export class SocketClientService {
     findDifference(information: { playerName: string; roomName: string }) {
         this.socketClient.send('findDifference', information);
     }
-    sendMessage(message: string, playerName: string, color: string, pos: string, gameId: string) {
-        this.socketClient.send('message', [message, playerName, color, pos, gameId]);
+
+    // sendMessage(message: string, playerName: string, color: string, pos: string, gameId: string) {
+    //     this.socketClient.send('message', [message, playerName, color, pos, gameId]);
+    // }
+    sendMessage(data: { message: string; playerName: string; color: string; pos: string; gameId: string }) {
+        this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId]);
+    }
+
+    sendDifference(diff: Set<number>, roomName: string) {
+        console.log('sendDifference', diff);
+        this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
 }

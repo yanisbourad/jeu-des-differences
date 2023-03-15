@@ -2,8 +2,6 @@ export enum ChatEvents {
     Connect = 'connect',
     Message = 'message',
     JoinRoomSolo = 'joinRoomSolo',
-    // JoinRoomMulti = 'joinRoomMulti',
-    // JoinRoom = 'joinRoom',
     LeaveRoom = 'leaveRoom',
     ServerTime = 'serverTime',
     StopTimer = 'stopTimer',
@@ -15,4 +13,5 @@ export enum ChatEvents {
     GameEnded = 'gameEnded',
     StartMultiGame = 'startMultiGame',
     FindDifference = 'findDifference',
+    FeedbackDifference = 'feedbackDifference',
 }

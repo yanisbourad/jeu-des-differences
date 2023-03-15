@@ -86,6 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(socket.id);
     }
 
+    // TODO:  handle timer deletion
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, roomName: string) {
         socket.to(roomName).emit('gameEnded', true);
@@ -95,8 +96,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string]) {
-        console.log('message', data);
         socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3] });
+    }
+
+    @SubscribeMessage(ChatEvents.FeedbackDifference)
+    async differenceFound(socket: Socket, data) {
+        socket.to(data[1]).emit('feedbackDifference', data[0]);
     }
 
     @SubscribeMessage(ChatEvents.GameEnded)
@@ -110,30 +115,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(roomName);
     }
 
-    @SubscribeMessage(ChatEvents.FindDifference)
-    findDifference(socket: Socket, information: { playerName: string; roomName: string }) {
-        this.logger.log('findDifference', information);
-        const data = {
-            playerName: information.playerName,
-        };
-        const yo = information.playerName + ' a trouvé une difference';
-        socket.to(information.roomName).emit('findDifference-return', data);
-
-        this.logger.log('sould be sent to client', yo);
-    }
-
-    // startGame(): void {
-    //     // to be private
-    //     this.playerService.rooms.forEach((room) => {
-    //         if (room.maxPlayers === room.players.length) {
-    //             if (!this.serverTime.timers[room.name]) {
-    //                 this.serverTime.startChronometer(room.name);
-    //             }
-    //         }
-    //     });
-    // }
-
-    // add event game finished to stop the timer
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
         // console.log(this.playerService.rooms);
@@ -141,9 +122,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.emit(ChatEvents.GetRooms, this.playerService.rooms);
     }
 
+    // TODO:  handle rooms deletion
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
         // await this.playerService.removeRoom(socket.id);
+        // socket.leave(this.roomName);
         socket.leave(socket.id);
     }
 

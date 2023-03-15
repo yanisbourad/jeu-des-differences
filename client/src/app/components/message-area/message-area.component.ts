@@ -31,7 +31,14 @@ export class MessageAreaComponent implements OnInit {
         return this.date.toLocaleTimeString();
     }
     sendMessage() {
-        this.socketClient.sendMessage(this.message, this.playerName, this.defaultColor[0], this.position[0], this.roomName);
+        const dataToSend = {
+            message: this.message,
+            playerName: this.playerName,
+            color: this.defaultColor[0],
+            pos: this.position[0],
+            gameId: this.roomName,
+        };
+        this.socketClient.sendMessage(dataToSend);
         this.socketClient.messageList.push({
             message: this.message,
             userName: this.playerName,

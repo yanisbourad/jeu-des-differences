@@ -83,5 +83,11 @@ export class DrawService {
         context.font = '20px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
+        // only clear the word after 1 seconde on the canvas only where it is located
     }
+
+    // clearWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
+    //     const context = this.getContext(canvas);
+    //     context.clearRect(position.x, position.y - 20, 20 * word.length, 20);
+    // }
 }

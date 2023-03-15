@@ -13,6 +13,7 @@ export class MessageDialogComponent {
     message: string;
     type: string;
     formatTime: string;
+    winner: string = this.gameServ.playerName;
 
     // TODO: reduce the number of constructor parameters
     // eslint-disable-next-line max-params

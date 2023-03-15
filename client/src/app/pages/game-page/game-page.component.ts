@@ -69,8 +69,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         });
         this.socket.gameState$.subscribe((newValue) => {
+            const opponentName: string = this.gameService.opponentName;
+            const msg: string = 'Vous avez perdu la partie, le vainqueur est : ' + opponentName;
             if (newValue === true) {
-                this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
+                this.gameService.displayGameEnded(msg, 'finished');
             }
         });
 

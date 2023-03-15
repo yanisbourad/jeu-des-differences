@@ -10,7 +10,7 @@
         </button>
     </div>
     <div class="tool-parial" id="line-width">
-        <input type="range" (min)="(const.MIN_LINE_WIDTH)" (max)="(const.MAX_LINE_WIDTH)" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
+        <input type="range" min="10" max="30" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
         <p>{{ lineWidth }}</p>
     </div>
     

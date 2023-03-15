@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
+import * as keys from '@app/configuration/const-hotkeys';
 import * as styler from '@app/configuration/const-styler-type';
 import { Drawing } from '@app/interfaces/drawing';
 import { Point } from '@app/interfaces/point';
 import { Vec2 } from '@app/interfaces/vec2';
+import { HotkeysService } from './hotkeys.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -13,18 +15,9 @@ export class DrawService {
     private lineWidth: number = constants.DEFAULT_LINE_WIDTH;
     private rectangleIsSquare: boolean = false;
     private tool: string = styler.PEN;
-    constructor() {
-        document.addEventListener('keydown', (event: KeyboardEvent) => {
-            if (event.key === 'Shift') {
-                this.rectangleIsSquare = true;
-            }
-        });
-
-        document.addEventListener('keyup', (event: KeyboardEvent) => {
-            if (event.key === 'Shift') {
-                this.rectangleIsSquare = false;
-            }
-        });
+    constructor(private readonly hotkeysService: HotkeysService) {
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], true, this.isRectangle.bind(this));
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], false, this.isSquare.bind(this));
     }
 
     get usedTool(): string {
@@ -65,6 +58,14 @@ export class DrawService {
 
     set setRectangleIsSquare(isSquare: boolean) {
         this.rectangleIsSquare = isSquare;
+    }
+
+    isRectangle(): void {
+        this.rectangleIsSquare = true;
+    }
+
+    isSquare(): void {
+        this.rectangleIsSquare = false;
     }
 
     drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {

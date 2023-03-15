@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DrawDuplicateDrawing } from '@app/classes/commands/draw-duplicate-drawing';
 import { DrawExchange } from '@app/classes/commands/draw-exchange-drawing';
@@ -12,7 +12,7 @@ import { CommandService } from '@app/services/command.service';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent {
     @ViewChild('originalCanvasComponent') originalCanvasComponent: CanvasNgxComponent;
     @ViewChild('modifiedCanvasComponent') modifiedCanvasComponent: CanvasNgxComponent;
     @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef<HTMLInputElement>;
@@ -33,18 +33,21 @@ export class GameCreationPageComponent implements OnInit {
     get modifiedCanvas(): string {
         return this.canvasHolderService.modifiedCanvas;
     }
-
-    ngOnInit(): void {
-        this.canvasHolderService.clearCanvas();
-    }
-
     leftSwapDrawing() {
-        const command = new DrawDuplicateDrawing(this.modifiedCanvasComponent.getCanvasDraw, this.originalCanvasComponent.getCanvasDraw, 'Exchange');
+        const command = new DrawDuplicateDrawing(
+            this.modifiedCanvasComponent.getCanvasDraw,
+            this.originalCanvasComponent.getCanvasDraw,
+            this.modifiedCanvas,
+        );
         this.commandService.do(command);
     }
 
     rightSwapDrawing() {
-        const command = new DrawDuplicateDrawing(this.originalCanvasComponent.getCanvasDraw, this.modifiedCanvasComponent.getCanvasDraw, 'Exchange');
+        const command = new DrawDuplicateDrawing(
+            this.originalCanvasComponent.getCanvasDraw,
+            this.modifiedCanvasComponent.getCanvasDraw,
+            this.originalCanvas,
+        );
         this.commandService.do(command);
     }
 

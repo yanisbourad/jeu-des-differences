@@ -65,6 +65,8 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        this.canvasHolderService.setCanvas(this, this.type);
+
         this.canvasDrawNative.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
@@ -80,7 +82,6 @@ export class CanvasNgxComponent implements AfterViewInit {
     loadImage(img: ImageBitmap) {
         const command = new DrawImageCommand(img, this.canvasImage, this.type);
         this.commandService.do(command);
-        this.saveCanvas();
     }
 
     async onFileSelected(e: Event) {
@@ -158,7 +159,6 @@ export class CanvasNgxComponent implements AfterViewInit {
         if (saveTheCommand && this.tempCommand) {
             this.commandService.do(this.tempCommand);
             this.tempCommand = undefined;
-            this.saveCanvas();
         } else this.tempCommand?.do(true);
     }
 
@@ -171,24 +171,31 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.currentDrawing = { points: [] };
     }
 
-    saveCanvas(): void {
-        this.commandService.executeAllOnCanvas(this.canvasTemp, this.type);
+    getUpdatedTempCanvasCtx(): CanvasRenderingContext2D {
         const ctx = this.canvasTemp.nativeElement.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-        const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
-        const canvasData = imageData.data;
-        const canvasDataStr = ctx.canvas.toDataURL('image/bmp');
-        if (canvasData) this.canvasHolderService.setCanvas(canvasData, this.type);
-        if (canvasDataStr) this.canvasHolderService.setCanvasData(canvasDataStr, this.type);
+        ctx.drawImage(this.canvasImageNative, 0, 0);
+        ctx.drawImage(this.canvasDrawNative, 0, 0);
+        return ctx;
     }
 
+    getCanvasData(): Uint8ClampedArray {
+        const ctx = this.getUpdatedTempCanvasCtx();
+        const imageData = ctx.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+        const canvasData = imageData.data;
+        return canvasData;
+    }
+
+    getCanvasUrlData(): string {
+        const ctx = this.getUpdatedTempCanvasCtx();
+        const canvasDataStr = ctx.canvas.toDataURL('image/bmp');
+        return canvasDataStr;
+    }
     clearCanvas(): void {
         this.drawService.clearCanvas(this.canvasImage.nativeElement);
         this.drawService.clearDiff(this.canvasDraw.nativeElement);
-        this.saveCanvas();
     }
 
     clearCanvasDraw(): void {
         this.drawService.clearDiff(this.canvasDraw.nativeElement);
-        this.saveCanvas();
     }
 }

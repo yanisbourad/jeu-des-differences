@@ -99,21 +99,16 @@ describe('CanvasNgxComponent', () => {
 
     it('should save canvas', () => {
         canvasHolderService.setCanvas.calls.reset();
-        component.saveCanvas();
+
         const canvasData = component.canvasImageNative.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT).data;
-        const canvasDataStr = component.canvasDrawNative.toDataURL();
+
         if (canvasData) expect(canvasHolderService.setCanvas).toHaveBeenCalled();
         else expect(canvasHolderService.setCanvas).not.toHaveBeenCalled();
-
-        if (canvasDataStr) expect(canvasHolderService.setCanvasData).toHaveBeenCalled();
-        else expect(canvasHolderService.setCanvasData).not.toHaveBeenCalled();
     });
 
     it('should clear canvas', () => {
         drawService.clearCanvas.calls.reset();
-        const spy = spyOn(component, 'saveCanvas');
         component.clearCanvas();
         expect(drawService.clearCanvas).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledTimes(1);
     });
 });

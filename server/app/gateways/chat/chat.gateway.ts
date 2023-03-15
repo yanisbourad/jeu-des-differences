@@ -96,14 +96,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string]) {
-        console.log('message', data);
         socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3] });
     }
-    // differenceFound
+
     @SubscribeMessage(ChatEvents.FeedbackDifference)
     async differenceFound(socket: Socket, data) {
-        console.log('differenceFound', data);
-        console.log('data rooms', socket.rooms);
         socket.to(data[1]).emit('feedbackDifference', data[0]);
     }
 
@@ -117,17 +114,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(this.roomName);
         socket.leave(roomName);
     }
-
-    // startGame(): void {
-    //     // to be private
-    //     this.playerService.rooms.forEach((room) => {
-    //         if (room.maxPlayers === room.players.length) {
-    //             if (!this.serverTime.timers[room.name]) {
-    //                 this.serverTime.startChronometer(room.name);
-    //             }
-    //         }
-    //     });
-    // }
 
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);

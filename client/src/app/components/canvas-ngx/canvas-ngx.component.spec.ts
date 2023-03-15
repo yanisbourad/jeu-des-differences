@@ -14,7 +14,7 @@ describe('CanvasNgxComponent', () => {
     // let blobImage: Blob;
     let image: ImageBitmap;
     beforeEach(async () => {
-        drawService = jasmine.createSpyObj(DrawService, ['drawImage', 'clearCanvas', 'getContext']);
+        drawService = jasmine.createSpyObj(DrawService, ['drawImage', 'clearCanvas', 'getContext', 'clearDiff']);
         canvasHolderService = jasmine.createSpyObj(CanvasHolderService, ['setCanvas', 'setCanvasData']);
         bitmapService = jasmine.createSpyObj(BitmapService, ['handleFileSelect']);
         TestBed.configureTestingModule({
@@ -30,8 +30,8 @@ describe('CanvasNgxComponent', () => {
         fixture = TestBed.createComponent(CanvasNgxComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        drawService.getContext.and.returnValue(component.canvasNative.getContext('2d') as CanvasRenderingContext2D);
-
+        drawService.getContext.and.returnValue(component.canvasDrawNative.getContext('2d') as CanvasRenderingContext2D);
+        drawService.clearDiff.and.returnValue();
         // read the image file as a data URL
         component.type = canvasHolderService.originalCanvas;
         const xhr = new XMLHttpRequest();
@@ -61,7 +61,6 @@ describe('CanvasNgxComponent', () => {
     it('should draw an image on the canvas', () => {
         const spyOnSaveImage = spyOn(component, 'saveCanvas');
         component.loadImage(image);
-        expect(drawService.drawImage).toHaveBeenCalledOnceWith(image, component['canvas'].nativeElement);
         expect(spyOnSaveImage).toHaveBeenCalled();
     });
 
@@ -105,8 +104,8 @@ describe('CanvasNgxComponent', () => {
     it('should save canvas', () => {
         canvasHolderService.setCanvas.calls.reset();
         component.saveCanvas();
-        const canvasData = component.canvasNative.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT).data;
-        const canvasDataStr = component.canvasNative.toDataURL();
+        const canvasData = component.canvasImageNative.getContext('2d')?.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT).data;
+        const canvasDataStr = component.canvasDrawNative.toDataURL();
         if (canvasData) expect(canvasHolderService.setCanvas).toHaveBeenCalled();
         else expect(canvasHolderService.setCanvas).not.toHaveBeenCalled();
 

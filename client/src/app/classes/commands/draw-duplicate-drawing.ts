@@ -13,6 +13,7 @@ export class DrawDuplicateDrawing extends CommandSpecific {
         if (saveForUndo) {
             this.previousCanvasData = this.getScreenShot(this.canvas);
         }
+        this.clearCanvas(this.canvas);
         this.putsCanvasData(this.canvas, this.oldCanvasData);
     }
     undo(): void {

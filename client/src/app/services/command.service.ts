@@ -43,9 +43,18 @@ export class CommandService {
     }
     executeAllOnCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
         this.drawService.clearCanvas(canvas.nativeElement);
-        this.pastCommand.forEach((command) => {
-            command.doOnOtherCanvas(canvas, canvasName);
-        });
+
+        // we will do the drawImageCommand first
+        this.pastCommand
+            .filter((a: CommandSpecific) => a.constructor.name === 'DrawImageCommand')
+            .forEach((command) => {
+                command.doOnOtherCanvas(canvas, canvasName);
+            });
+        this.pastCommand
+            .filter((a: CommandSpecific) => a.constructor.name !== 'DrawImageCommand')
+            .forEach((command) => {
+                command.doOnOtherCanvas(canvas, canvasName);
+            });
     }
 
     clear(): void {

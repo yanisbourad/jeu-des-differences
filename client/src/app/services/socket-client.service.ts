@@ -3,6 +3,8 @@ import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
 import { Room } from '@common/rooms';
 import { Observable, Subject } from 'rxjs';
+import { GiveupmessagePopupComponent } from '@app/components/giveupmessage-popup/giveupmessage-popup.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
     providedIn: 'root',
@@ -19,10 +21,11 @@ export class SocketClientService {
     playerFoundDiff = new Subject<string>();
     playerFoundDiff$: Observable<string> = this.playerFoundDiff.asObservable();
     infoDiff: { playerName: string };
+    playerGaveUp: string;
 
     diffFounded = new Subject<Set<number>>();
     diffFounded$: Observable<Set<number>> = this.diffFounded.asObservable();
-    constructor(private readonly socketClient: SocketClient) {}
+    constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
     get socketId() {
         return this.socketClient.socket.id ? this.socketClient.socket.id : '';
@@ -59,7 +62,7 @@ export class SocketClientService {
         });
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
-            console.log('elapsedTimes', this.elapsedTimes);
+            // console.log('elapsedTimes', this.elapsedTimes);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -88,8 +91,23 @@ export class SocketClientService {
 
         this.socketClient.on('feedbackDifference', (diff: Set<number>) => {
             const data = new Set<number>(diff);
-            console.log('diff', data);
+            // console.log('diff', data);
             this.diffFounded.next(data);
+        });
+
+        this.socketClient.on('giveup-return', (data: { playerName: string }) => {
+            this.playerGaveUp = data.playerName;
+            const dialog = this.dialog.open(GiveupmessagePopupComponent, {
+                data: { name: this.playerGaveUp },
+                disableClose: true,
+                width: '544px',
+                height: '255px',
+            });
+
+            dialog.afterClosed().subscribe(() => {
+                this.leaveRoom();
+                this.gameEnded(this.getRoomName());
+            });
         });
     }
 
@@ -143,8 +161,12 @@ export class SocketClientService {
         this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId]);
     }
 
+    sendGiveUp(information: { playerName: string; roomName: string }) {
+        this.socketClient.send('sendGiveUp', information);
+        console.log('should send to server');
+    }
     sendDifference(diff: Set<number>, roomName: string) {
-        console.log('sendDifference', diff);
+        // console.log('sendDifference', diff);
         this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
 }

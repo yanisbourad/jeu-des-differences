@@ -31,6 +31,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
 import { PlayerWaitPopupComponent } from './components/player-wait-popup/player-wait-popup.component';
+import { GiveupmessagePopupComponent } from './components/giveupmessage-popup/giveupmessage-popup.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -61,6 +62,7 @@ import { PlayerWaitPopupComponent } from './components/player-wait-popup/player-
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,
+        GiveupmessagePopupComponent,
     ],
     imports: [
         AppMaterialModule,

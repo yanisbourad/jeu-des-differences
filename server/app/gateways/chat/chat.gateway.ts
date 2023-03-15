@@ -119,6 +119,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(this.roomName);
         socket.leave(roomName);
     }
+    @SubscribeMessage(ChatEvents.SendGiveUp)
+    async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
+        this.logger.log(information);
+        socket.broadcast.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
+        this.logger.log('should send to client');
+    }
 
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);

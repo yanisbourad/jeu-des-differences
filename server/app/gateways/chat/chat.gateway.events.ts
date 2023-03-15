@@ -14,4 +14,5 @@ export enum ChatEvents {
     StartMultiGame = 'startMultiGame',
     FindDifference = 'findDifference',
     FeedbackDifference = 'feedbackDifference',
+    SendGiveUp = 'sendGiveUp',
 }

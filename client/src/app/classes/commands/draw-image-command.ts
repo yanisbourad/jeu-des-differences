@@ -4,8 +4,8 @@ export class DrawImageCommand extends CommandSpecific {
     image: ImageBitmap;
     oldCanvasData: string;
 
-    constructor(image: ImageBitmap, canvas: ElementRef<HTMLCanvasElement>) {
-        super(canvas);
+    constructor(image: ImageBitmap, canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
+        super(canvas, canvasName);
         this.canvas = canvas;
         this.image = image;
     }

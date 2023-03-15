@@ -8,8 +8,8 @@ export class DrawRectangleCommand extends CommandSpecific {
     oldPointsColor: [ImageData, number, number];
     saved = false;
     // eslint-disable-next-line max-params
-    constructor(firstPoint: Point, lastPoint: Point, color: string, isSquare: boolean, canvas: ElementRef<HTMLCanvasElement>) {
-        super(canvas);
+    constructor(firstPoint: Point, lastPoint: Point, color: string, isSquare: boolean, canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
+        super(canvas, canvasName);
         if (isSquare) {
             this.coords = this.getCoordsSquare(firstPoint, lastPoint);
         } else {

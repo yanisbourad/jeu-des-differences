@@ -6,8 +6,8 @@ export class DrawErasLineCommand extends CommandSpecific {
     oldPointsColor: Map<string, ImageData>;
     points: Point[];
     lineWidth: number;
-    constructor(points: Point[], lineWidth: number, canvas: ElementRef<HTMLCanvasElement>) {
-        super(canvas);
+    constructor(points: Point[], lineWidth: number, canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
+        super(canvas, canvasName);
         this.points = points;
         this.lineWidth = lineWidth;
     }

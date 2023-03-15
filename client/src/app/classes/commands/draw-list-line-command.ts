@@ -7,8 +7,8 @@ export class DrawListLineCommand extends CommandSpecific {
     lineWidth: number;
     oldPointsColor: Map<string, ImageData>;
     // eslint-disable-next-line max-params
-    constructor(points: Point[], color: string, width: number, canvas: ElementRef<HTMLCanvasElement>) {
-        super(canvas);
+    constructor(points: Point[], color: string, width: number, canvas: ElementRef<HTMLCanvasElement>, canvasName: string) {
+        super(canvas, canvasName);
         this.points = points;
         this.color = color;
         this.lineWidth = width;

@@ -35,12 +35,28 @@ export abstract class CommandSpecific {
         return this.canvas.nativeElement.height;
     }
 
+    clearCanvas(canvas: ElementRef<HTMLCanvasElement>): void {
+        const context = canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        context.clearRect(0, 0, this.width, this.height);
+    }
+
     doOnOtherCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
         if (this.canvasName !== canvasName) return;
         const tempCanvas = this.canvas;
         this.canvas = canvas;
         this.do(false);
         this.canvas = tempCanvas;
+    }
+
+    protected getScreenShot(canvasOld: ElementRef<HTMLCanvasElement>): string {
+        return canvasOld.nativeElement.toDataURL();
+    }
+
+    protected putsCanvasData(canvas: ElementRef<HTMLCanvasElement>, data: string): void {
+        const img = new Image();
+        img.src = data;
+        const ctx = canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        img.onload = () => ctx.drawImage(img, 0, 0);
     }
 
     protected rgbToHex(r: number, g: number, b: number): string {
@@ -121,7 +137,6 @@ export abstract class CommandSpecific {
             }
         }
     }
-
     abstract do(saveForUndo: boolean): void;
     abstract undo(): void;
 }

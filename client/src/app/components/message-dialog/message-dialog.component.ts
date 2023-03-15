@@ -23,23 +23,25 @@ export class MessageDialogComponent {
     }
 
     redirection(): void {
-        const dataToSend = {
-            message: this.gameServ.playerName + ' a quitté la partie',
-            playerName: this.gameServ.playerName,
-            color: '#FF0000',
-            pos: '50%',
-            gameId: this.socket.getRoomName(),
-            event: true,
-        };
-        this.socket.sendMessage(dataToSend);
-        this.socket.messageList.push({
-            message: this.gameServ.playerName + ' a quitté la partie',
-            userName: this.gameServ.playerName,
-            mine: true,
-            color: '#FF0000',
-            pos: '50%',
-            event: true,
-        });
+        if (this.type === 'giveUp') {
+            const dataToSend = {
+                message: this.gameServ.playerName + ' a quitté la partie',
+                playerName: this.gameServ.playerName,
+                color: '#FF0000',
+                pos: '50%',
+                gameId: this.socket.getRoomName(),
+                event: true,
+            };
+            this.socket.sendMessage(dataToSend);
+            this.socket.messageList.push({
+                message: this.gameServ.playerName + ' a quitté la partie',
+                userName: this.gameServ.playerName,
+                mine: true,
+                color: '#FF0000',
+                pos: '50%',
+                event: true,
+            });
+        }
         this.router.navigate(['/home']);
         this.socket.leaveRoom();
     }

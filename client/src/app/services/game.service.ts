@@ -19,6 +19,7 @@ export class GameService {
     nDifferencesNotFound: number;
     nDifferencesFound: number;
     differencesArray: string[];
+    opponentDifferencesArray: string[];
     isGameFinished: boolean;
     nHintsUnused: number;
     nHintsUsed: number;
@@ -72,6 +73,7 @@ export class GameService {
         this.nDifferencesNotFound = this.gameInformation.nDifferences;
         this.nHintsUnused = this.gameInformation.nHints;
         this.differencesArray = new Array(this.nDifferencesNotFound);
+        this.opponentDifferencesArray = new Array(this.nDifferencesNotFound);
         this.hintsArray = new Array(this.nHintsUnused);
         this.playersName = [this.playerName, this.opponentName];
     }
@@ -90,8 +92,16 @@ export class GameService {
     // }
 
     displayIcons(): void {
-        for (let i = 0; i < this.nDifferencesNotFound; i++) {
-            this.differencesArray[i] = this.path.differenceNotFound;
+        if (this.gameType === 'solo') {
+            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+                this.differencesArray[i] = this.path.differenceNotFound;
+            }
+        }
+        if (this.gameType === 'double') {
+            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+                this.differencesArray[i] = this.path.differenceNotFound;
+                this.opponentDifferencesArray[i] = this.path.differenceNotFound;
+            }
         }
     }
 
@@ -124,7 +134,6 @@ export class GameService {
     reinitializeGame(): void {
         this.nDifferencesNotFound = 0;
         this.nHintsUnused = 0;
-        this.nDifferencesFound = 0;
         this.differencesArray = [];
         this.playerName = '';
         this.playersName = [];
@@ -154,19 +163,27 @@ export class GameService {
         };
     }
 
-    clickDifferencesFound(): void {
-        if (this.nDifferencesFound < this.nDifferencesNotFound) {
-            this.nDifferencesFound++;
-            this.differencesArray.pop();
-            this.differencesArray.unshift(this.path.differenceFound);
+    handleDifferenceFound(): void {
+        this.nDifferencesFound++;
+        this.differencesArray.pop();
+        this.differencesArray.unshift(this.path.differenceFound);
+
+        if (this.gameType === 'double') {
+            this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
         }
+
         if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
             this.endGame();
         }
-        console.log(this.nDifferencesFound, this.nDifferencesNotFound, this.gameType);
+
         if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
+    }
+
+    handlePlayerDifference() {
+        this.opponentDifferencesArray.pop();
+        this.opponentDifferencesArray.unshift(this.path.differenceFound);
     }
 
     isEven(number: number) {

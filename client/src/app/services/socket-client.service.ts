@@ -16,6 +16,9 @@ export class SocketClientService {
     rooms: Room[] = [];
     gameState = new Subject<boolean>(); // to be private
     gameState$: Observable<boolean> = this.gameState.asObservable();
+    playerFoundDiff = new Subject<string>();
+    playerFoundDiff$: Observable<string> = this.playerFoundDiff.asObservable();
+    infoDiff: { playerName: string };
 
     constructor(private readonly socketClient: SocketClient) {}
 
@@ -76,6 +79,10 @@ export class SocketClientService {
         this.socketClient.on('gameEnded', (gameEnded: boolean) => {
             this.gameState.next(gameEnded);
         });
+
+        this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
+            this.playerFoundDiff.next(data.playerName);
+        });
     }
 
     disconnect() {
@@ -113,6 +120,9 @@ export class SocketClientService {
         this.disconnect();
     }
 
+    findDifference(information: { playerName: string; roomName: string }) {
+        this.socketClient.send('findDifference', information);
+    }
     sendMessage(message: string, playerName: string, color: string, pos: string, gameId: string) {
         this.socketClient.send('message', [message, playerName, color, pos, gameId]);
     }

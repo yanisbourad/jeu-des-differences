@@ -209,23 +209,23 @@ describe('GameService', () => {
         expect(time).toBe(mockTime);
     });
 
-    it('clickDifferencesFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
+    it('handleDifferenceFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
         gameService.nDifferencesFound = 0;
         gameService.nDifferencesNotFound = 3;
         gameService.differencesArray = [path.differenceNotFound, path.differenceNotFound, path.differenceNotFound];
-        gameService.clickDifferencesFound();
+        gameService.handleDifferenceFound();
         expect(gameService.nDifferencesFound).toBe(1);
         expect(gameService.differencesArray).toEqual([path.differenceFound, path.differenceNotFound, path.differenceNotFound]);
     });
 
-    it('clickDifferencesFound should call stopTimer, saveGameRecord, displayGameEnded and reinitializeGame when game ended', () => {
+    it('handleDifferenceFound should call stopTimer, saveGameRecord, displayGameEnded and reinitializeGame when game ended', () => {
         gameService.nDifferencesFound = 3;
         gameService.nDifferencesNotFound = 3;
         gameService.isGameFinished = false;
         const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
         const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
         const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
-        gameService.clickDifferencesFound();
+        gameService.handleDifferenceFound();
         expect(clientTimeServiceSpy.stopTimer).toHaveBeenCalled();
         expect(gameService.isGameFinished).toBe(true);
         expect(saveGameRecordSpy).toHaveBeenCalled();

@@ -110,6 +110,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.leave(roomName);
     }
 
+    @SubscribeMessage(ChatEvents.FindDifference)
+    findDifference(socket: Socket, information: { playerName: string; roomName: string }) {
+        this.logger.log('findDifference', information);
+        const data = {
+            playerName: information.playerName,
+        };
+        const yo = information.playerName + ' a trouvé une difference';
+        socket.to(information.roomName).emit('findDifference-return', data);
+
+        this.logger.log('sould be sent to client', yo);
+    }
+
     // startGame(): void {
     //     // to be private
     //     this.playerService.rooms.forEach((room) => {

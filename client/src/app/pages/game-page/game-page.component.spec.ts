@@ -47,7 +47,7 @@ describe('GamePageComponent', () => {
             'displayIcons',
             'playFailureAudio',
             'playSuccessAudio',
-            'clickDifferencesFound',
+            'handleDifferenceFound',
             'blinkDifference',
             'getGame',
             'getSetDifference',
@@ -227,12 +227,12 @@ describe('GamePageComponent', () => {
         jasmine.clock().uninstall();
     });
 
-    it('should play success audio, draw word on both canvases, call clickDifferencesFound and blinkCanvas when word is not "Erreur"', () => {
+    it('should play success audio, draw word on both canvases, call handleDifferenceFound and blinkCanvas when word is not "Erreur"', () => {
         component.displayWord('Test');
         expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
         expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas1.nativeElement, component.mousePosition);
         expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas2.nativeElement, component.mousePosition);
-        expect(gameServiceSpy.clickDifferencesFound).toHaveBeenCalled();
+        expect(gameServiceSpy.handleDifferenceFound).toHaveBeenCalled();
     });
 
     it('should set errorPenalty to true and display word "Erreur" when no diff is found', () => {

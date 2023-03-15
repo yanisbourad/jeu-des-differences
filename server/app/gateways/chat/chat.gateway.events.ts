@@ -14,4 +14,5 @@ export enum ChatEvents {
     GetMessage = 'getMessage',
     GameEnded = 'gameEnded',
     StartMultiGame = 'startMultiGame',
+    FindDifference = 'findDifference',
 }

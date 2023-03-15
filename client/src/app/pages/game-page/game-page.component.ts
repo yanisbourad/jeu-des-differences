@@ -78,6 +78,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
             }
         });
+
+        this.socket.playerFoundDiff$.subscribe((newValue) => {
+            if (newValue === this.gameService.opponentName) {
+                this.gameService.handlePlayerDifference();
+            }
+        });
     }
 
     getRouterParams() {
@@ -86,10 +92,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
         this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameId = this.route.snapshot.paramMap.get('gameId') as string;
-        console.log('playerName', this.playerName);
-        console.log('gameName', this.gameName);
-        console.log('gameType', this.gameType);
-        console.log('opponentName', this.opponentName);
     }
 
     ngOnInit(): void {
@@ -121,8 +123,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 // remove difference found from unfundedDifference
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
                 this.displayWord('Trouvé');
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                // setTimeout(() => this.drawDifference(diff), 1000);
+                this.gameService.handleDifferenceFound();
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
@@ -132,18 +133,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     displayWord(word: string): void {
+        this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
+        this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
         if (word === 'Erreur') {
             this.gameService.playFailureAudio();
-            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
-            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
             setTimeout(() => {
                 this.errorPenalty = false;
             }, constantsTime.BLINKING_TIME);
         } else {
             this.gameService.playSuccessAudio();
-            this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
-            this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
-            this.gameService.clickDifferencesFound();
             this.blinkCanvas();
         }
     }

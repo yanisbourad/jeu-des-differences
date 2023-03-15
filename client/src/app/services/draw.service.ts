@@ -11,8 +11,21 @@ export class DrawService {
     private canvasSize: Point = { x: constants.DEFAULT_WIDTH, y: constants.DEFAULT_HEIGHT };
     private color: string = constants.DEFAULT_LINE_COLOR;
     private lineWidth: number = constants.DEFAULT_LINE_WIDTH;
-    private rectangleIsSquare: boolean = true;
+    private rectangleIsSquare: boolean = false;
     private tool: string = styler.PEN;
+    constructor() {
+        document.addEventListener('keydown', (event: KeyboardEvent) => {
+            if (event.key === 'Shift') {
+                this.rectangleIsSquare = true;
+            }
+        });
+
+        document.addEventListener('keyup', (event: KeyboardEvent) => {
+            if (event.key === 'Shift') {
+                this.rectangleIsSquare = false;
+            }
+        });
+    }
 
     get usedTool(): string {
         return this.tool;

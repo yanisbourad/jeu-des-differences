@@ -8,7 +8,20 @@ export class CommandService {
     pastCommand: CommandSpecific[] = [];
     futureCommand: CommandSpecific[] = [];
 
-    constructor(private readonly drawService: DrawService) {}
+    constructor(private readonly drawService: DrawService) {
+        // add event listener for do undo
+        document.addEventListener('keydown', (event: KeyboardEvent): void => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+                if (event.shiftKey) {
+                    // Redo action
+                    this.redo();
+                } else {
+                    // Undo action
+                    this.undo();
+                }
+            }
+        });
+    }
     do(command: CommandSpecific): void {
         command.do(true);
         this.pastCommand.push(command);

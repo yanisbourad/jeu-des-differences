@@ -33,32 +33,30 @@ export class GameCardHandlerGateway {
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
         switch (stackedPlayerNumber) {
+            // when this is the creator
             case 1: {
                 this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
                 break;
             }
+            // when this is the opponent
             case 2: {
                 const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
                 const creator = this.gameCardHandlerService.getPlayer(players[0]);
                 const opponent = this.gameCardHandlerService.getPlayer(players[1]);
                 this.server.to(players[0]).emit('feedbackOnAccept', opponent.name);
                 this.server.to(players[1]).emit('feedbackOnWait', creator.name);
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
                 break;
             }
+            // when this is an opponent but there is 1 or more opponent in the stack
             default: {
                 // call a function to remove player from queue and send feedback to player
                 // make new pairs of players
-                this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
+                this.server.to(player.id).emit('feedbackOnWaitLonger', 'Attente de disponibilte du createur');
                 break;
             }
             // No default
         }
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
     @SubscribeMessage('cancelGame')
@@ -71,13 +69,20 @@ export class GameCardHandlerGateway {
     }
 
     @SubscribeMessage('rejectOpponent')
-    reject(@ConnectedSocket() gamer: Socket) {
-        const opponent = this.gameCardHandlerService.deleteOponent(gamer.id);
+    reject(@ConnectedSocket() gamerCreator: Socket) {
+        // remove this opponent then fetches the next opponent
+        const gamerCreatorName = this.gameCardHandlerService.getPlayer(gamerCreator.id).name;
+        const opponent = this.gameCardHandlerService.deleteOponent(gamerCreator.id);
         if (opponent) {
-            this.server.to(gamer.id).emit('feedbackOnReject', true);
-            this.server.to(opponent.id).emit('feedbackOnReject', false);
+            this.server.to(opponent.id).emit('feedbackOnReject', true);
+        }
+        const nextOpponent = this.gameCardHandlerService.handleReject(gamerCreator.id);
+        if (nextOpponent) {
+            this.server.to(nextOpponent.id).emit('feedbackOnWait', gamerCreatorName);
+            this.server.to(gamerCreator.id).emit('feedbackOnAccept', nextOpponent.name);
         } else {
-            this.server.to(gamer.id).emit('feedbackOnReject', false);
+            // if no more Opponent
+            this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
         }
     }
 

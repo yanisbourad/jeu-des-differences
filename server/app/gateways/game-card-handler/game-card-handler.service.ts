@@ -3,6 +3,7 @@ import { EMPTY, MAX_CAPACITY, OVER_CROWDED, PLAYER_PAIR } from './entities/const
 import { Player } from './entities/player.entity';
 @Injectable()
 export class GameCardHandlerService {
+    // string: gameName, string[]: [nameCreator, nameOponent]
     gamesQueue: Map<string, string[]>;
     players: Map<string, Player>;
     joiningPlayersQueue: Map<string, string[]>;
@@ -143,9 +144,27 @@ export class GameCardHandlerService {
         }
     }
 
-    getPlayer(playerId: string): Player {
+    getPlayer(playerId: string): Player | null {
         if (this.players.has(playerId)) return this.players.get(playerId);
         return null;
+    }
+
+    handleReject(creatorId: string): Player | undefined {
+        // get the game name
+        const gameName = this.players.get(creatorId).gameName;
+        if (this.joiningPlayersQueue.has(gameName) && this.gamesQueue.has(gameName)) {
+            // if this game has a list of waiting players
+
+            const nextOpponentName = this.joiningPlayersQueue.get(gameName).shift();
+            if (nextOpponentName) {
+                // if we got a player
+                const gameQueue = this.gamesQueue.get(gameName);
+                gameQueue.push(nextOpponentName);
+                this.gamesQueue.set(gameName, gameQueue);
+                return this.getPlayer(nextOpponentName);
+            }
+        }
+        return undefined;
     }
 
     // remove(id: string): boolean {

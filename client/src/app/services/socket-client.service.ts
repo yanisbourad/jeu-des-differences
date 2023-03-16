@@ -97,6 +97,7 @@ export class SocketClientService {
 
         this.socketClient.on('giveup-return', (data: { playerName: string }) => {
             this.playerGaveUp = data.playerName;
+            this.stopTimer(this.getRoomName());
             const dialog = this.dialog.open(GiveupmessagePopupComponent, {
                 data: { name: this.playerGaveUp },
                 disableClose: true,
@@ -105,7 +106,7 @@ export class SocketClientService {
             });
 
             dialog.afterClosed().subscribe(() => {
-                this.leaveRoom();
+                // this.leaveRoom();
                 this.gameEnded(this.getRoomName());
             });
         });

@@ -33,7 +33,7 @@ export class MessageDialogComponent {
                 roomName: this.socket.getRoomName(),
             });
         }
-        this.socket.leaveRoom();
+        // this.socket.leaveRoom();
         this.router.navigate(['/home']);
     }
 }

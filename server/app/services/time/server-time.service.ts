@@ -34,7 +34,7 @@ export class ServerTimeService {
         this.elapsedTime = 0;
     }
 
-    resetAllTimers(): void {
+    resetAllTimers(): void { // to be checked if used
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
     }

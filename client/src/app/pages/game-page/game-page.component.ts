@@ -24,12 +24,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
+    // list of all the subscriptions to be unsubscribed on destruction
     diffFoundedSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
-    // list of all the subscritions to be unsubscribed on destruction
 
-    // TODO: reduce the number of parameters
+    // TODO: reduce the number of parameters + move some functions to service, the logic shouldn't be here!!
     // eslint-disable-next-line max-params
     constructor(
         private readonly drawService: DrawService,
@@ -83,7 +83,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const msg: string = 'Vous avez perdu la partie, le vainqueur est : ' + opponentName;
             if (newValue === true && this.socket.statusPlayer !== this.gameService.playerName) {
                 this.gameService.displayGameEnded(msg, 'finished');
-                // this.socket.gameEnded(this.socket.getRoomName());
                 this.socket.disconnect();
             }
         });
@@ -117,16 +116,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         }, timeout);
     }
 
-    mouseHitDetect(event: MouseEvent) {
+    // TODO: draw differences on the other canvas when difference found, should stay on it during the game after blinking
+    mouseHitDetect(event: MouseEvent) { // to reduce it's way too big!!!!
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const differ = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (differ) {
                 this.drawDifference(differ);
-                // remove difference found from unfundedDifference
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== differ);
-                console.log(this.socket.getRoomName());
                 this.socket.sendDifference(differ, this.socket.getRoomName());
                 this.displayWord('Trouvé');
                 const dataToSend = {

@@ -85,19 +85,6 @@ describe('ChatGateway', () => {
         expect(logger.log.calledOnce).toBeTruthy();
     });
 
-    // it('joinRoom() should start the chronometer', async () => {
-    //     timeService.timers = {};
-    //     const playerName = 'test';
-    //     jest.spyOn(playerService, 'addPlayer').mockImplementation(async () => {
-    //         return Promise.resolve();
-    //     });
-    //     jest.spyOn(timeService, 'startChronometer').mockImplementation(jest.fn());
-    //     jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(0);
-    //     await gateway.joinRoom(socket, playerName);
-    //     expect(timeService.startChronometer).toBeCalled();
-    //     expect(playerService.addPlayer).toHaveBeenCalled();
-    // });
-
     it('leaveRoom() should leave the socket room and call removeRoom() from playerService', async () => {
         jest.spyOn(playerService, 'removeRoom').mockImplementation(async () => {
             return Promise.resolve();

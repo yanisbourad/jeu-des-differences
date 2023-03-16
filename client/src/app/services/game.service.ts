@@ -182,7 +182,6 @@ export class GameService {
         this.opponentDifferencesArray.unshift(this.path.differenceFound);
     }
 
-
     multiGameEnd(): boolean {
         if (this.nDifferencesNotFound % 2 === 0) {
             return this.nDifferencesFound === this.nDifferencesNotFound / 2;
@@ -230,10 +229,6 @@ export class GameService {
         audio.load();
         audio.play();
     }
-
-    // async deleteGame(gameName: string) {
-    //     this.gameDataBase.deleteGame(gameName).subscribe();
-    // }
 
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.gameDataBase.deleteGame(gameName);

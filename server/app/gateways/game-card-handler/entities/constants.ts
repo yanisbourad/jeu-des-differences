@@ -29,3 +29,4 @@ export const FAKE_QUEUE = [
     'x',
     'y',
 ];
+export const MINUS_ONE = -1;

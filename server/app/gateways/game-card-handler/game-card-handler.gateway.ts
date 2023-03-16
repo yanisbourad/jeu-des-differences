@@ -5,6 +5,7 @@ import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
+// export class GameCardHandlerGateway implements OnGatewayDisconnect {
 export class GameCardHandlerGateway {
     @WebSocketServer()
     server: Server;
@@ -28,10 +29,12 @@ export class GameCardHandlerGateway {
             gameName: payload.gameName,
         };
         this.logger.log(`${player.name} asks to play ${player.gameName} in 1vs1 mode`);
+        this.logger.log(`${player.name} has the id of ${player.id}`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
+        this.logger.log(`${stackedPlayerNumber} are stacked in either queue or join`);
         switch (stackedPlayerNumber) {
             // when this is the creator
             case 1: {
@@ -60,19 +63,43 @@ export class GameCardHandlerGateway {
     }
 
     @SubscribeMessage('cancelGame')
-    cancel(@ConnectedSocket() gamer: Socket): boolean {
-        // if player is alone remove him from queue
-        const player = this.gameCardHandlerService.getPlayer(gamer.id);
-        // const stackedPlayerNumber = this.gameCardHandlerService.getStackedPlayers();
-        // if player is with opponent remove him from queue and send message to opponent
-        if (player) return true;
+    cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
+        const player = this.gameCardHandlerService.deletePlayer(client.id);
+        if (player) {
+            const isRemoved = this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, gameName);
+            if (isRemoved) {
+                this.server.to(client.id).emit('feedBackOnLeave');
+                this.logger.log(`${player.name} left the queue`);
+            }
+        }
+
+        // if player was waiting, delete him and next player in the queue become the creator
+        // then delete the creator and send message to the next player in the queue
+        const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, gameName);
+        if (isPlaying) {
+            // remove last player in the queue
+            const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
+            // remove the player from the stack
+            const opponent = this.gameCardHandlerService.deletePlayer(playerId);
+            this.server.to(opponent.id).emit('feedBackOnLeave');
+            this.server.to(client.id).emit('feedBackOnLeave');
+            this.logger.log(`${opponent.name} left the queue`);
+            this.logger.log(`${player.name} left the queue`);
+            // delete all waiting playersList
+            const players = this.gameCardHandlerService.removePlayers(player.gameName);
+            players.forEach((gamer) => {
+                this.server.to(gamer).emit('feedBackOnLeave');
+            });
+        }
+        // this.logger.log(`${player.name} has disconnected`);
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
     @SubscribeMessage('rejectOpponent')
     reject(@ConnectedSocket() gamerCreator: Socket) {
         // remove this opponent then fetches the next opponent
         const gamerCreatorName = this.gameCardHandlerService.getPlayer(gamerCreator.id).name;
-        const opponent = this.gameCardHandlerService.deleteOponent(gamerCreator.id);
+        const opponent = this.gameCardHandlerService.deleteOpponent(gamerCreator.id);
         if (opponent) {
             this.server.to(opponent.id).emit('feedbackOnReject', true);
         }
@@ -89,7 +116,7 @@ export class GameCardHandlerGateway {
     @SubscribeMessage('startGame')
     accept(@ConnectedSocket() gamer: Socket) {
         // send message to everyone opponent
-        // remove oponent and delete game queue
+        // remove opponent and delete game queue
         // send signal to start game
         const playersList: Player[] = this.gameCardHandlerService.acceptOpponent(gamer.id);
         const gameInfo = {
@@ -110,4 +137,23 @@ export class GameCardHandlerGateway {
         });
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
+    // on disconnect
+    // remove player from queue
+    // send message to opponent
+    // handleDisconnect(client: Socket) {
+    //     const player = this.gameCardHandlerService.deletePlayer(client.id);
+    //     if (player) this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, player.gameName);
+    //     // if player was waiting, delete him and next player in the queue become the creator
+    //     // then delete the creator and send message to the next player in the queue
+    //     const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, player.gameName);
+    //     if (isPlaying) {
+    //         const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
+    //         const opponent = this.gameCardHandlerService.deletePlayer(playerId);
+    //         this.server.to(playerId).emit('feedBackOnLeave', player.name);
+    //         this.logger.log(`${opponent.name} left the queue`);
+    //     }
+    //     this.logger.log(`${player.name} has disconnected`);
+    //     this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
+    // }
+    // }
 }

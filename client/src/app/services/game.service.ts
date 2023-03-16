@@ -140,6 +140,7 @@ export class GameService {
         this.gameTime = 0;
         this.gameType = '';
         this.nDifferencesFound = 0;
+        this.socket.messageList = [];
         this.game = {
             gameName: '',
             difficulty: '',

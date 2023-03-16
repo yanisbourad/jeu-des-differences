@@ -113,12 +113,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         // to be private
+        this.playerService.getRooms();
         this.serverTime.removeTimer(roomName);
         this.playerService.removeRoom(roomName);
         this.playerService.roomNamesMulti.filter((name) => name !== roomName);
         this.logger.log('game ended');
         this.logger.log(this.roomName);
         socket.leave(roomName);
+        this.playerService.getRooms();
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {

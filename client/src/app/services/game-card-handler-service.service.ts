@@ -63,6 +63,7 @@ export class GameCardHandlerService {
 
     join(game: Game) {
         this.socket.emit('joinGame', game);
+        this.isLeaving = false;
         this.socket.on('feedbackOnJoin', () => {
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
@@ -85,16 +86,25 @@ export class GameCardHandlerService {
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });
-        this.socket.on('feedbackOnLeave', () => {
-            this.resetGameVariables();
+
+        this.socket.on('feedBackOnLeave', () => {
+            // send pop up to player
+            this.isLeaving = true;
         });
 
         this.socket.on('feedbackOnReject', () => {
             // this.opponentPlayer = nextOpponentName;
             // console.log(nextOpponentName);
+            // console.log('feedbackOnReject, $$$$$$$$$$$$$$$$$$$$');
+            this.isLeaving = true;
         });
 
         this.socket.on('byeTillNext', () => {
+            this.isLeaving = true;
+            this.resetGameVariables();
+        });
+
+        this.socket.on('disconnect', () => {
             this.isLeaving = true;
             this.resetGameVariables();
         });
@@ -112,7 +122,19 @@ export class GameCardHandlerService {
     }
 
     leave(gameName: string): void {
-        this.socket.emit('leaveGame', gameName);
+        this.socket.emit('cancelGame', gameName);
+        this.socket.on('feedBackOnLeave', () => {
+            // send pop up to player
+            this.isLeaving = true;
+        });
+        this.socket.on('feedbackOnJoin', () => {
+            this.isCreator = true;
+            this.opponentPlayer = "Attente d'un adversaire";
+        });
+        this.socket.on('feedbackOnAccept', (name) => {
+            this.opponentPlayer = name;
+            if (this.isCreator) this.state = 'Accepter';
+        });
     }
 
     startGame(gameName: string): void {

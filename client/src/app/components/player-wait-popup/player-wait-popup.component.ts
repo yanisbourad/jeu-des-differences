@@ -46,6 +46,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         if (this.gameCardHandlerService.getCreatorStatus() && this.game.opponentName !== "Attente d'un adversaire") {
             this.isReady = true;
             this.acceptState = this.gameCardHandlerService.getGameState();
+        } else {
+            this.isReady = false;
         }
         this.isUpdated = this.gameCardHandlerService.getNewUpdate();
         if (this.isUpdated) {
@@ -60,12 +62,12 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.isLeaving = this.gameCardHandlerService.getLeavingState();
         if (this.isLeaving) {
             this.dialogReff.close();
+            this.gameCardHandlerService.resetGameVariables();
         }
     }
 
     leaveGame(): void {
         this.gameCardHandlerService.leave(this.game.gameName);
-        this.dialogReff.close();
     }
 
     startGame(): void {

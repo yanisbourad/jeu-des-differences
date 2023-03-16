@@ -60,12 +60,15 @@ export class DrawRectangleCommand extends CommandSpecific {
     }
 
     private getCoordsSquare(firstPoint: Point, lastPoint: Point): [number, number, number, number] {
-        const width = Math.abs(lastPoint.x - firstPoint.x);
-        const height = Math.abs(lastPoint.y - firstPoint.y);
-        const size = Math.max(width, height);
-        const minX = Math.min(lastPoint.x, firstPoint.x);
-        const minY = Math.min(lastPoint.y, firstPoint.y);
-
-        return [minX, minY, size, size];
+        const width = firstPoint.x - lastPoint.x;
+        const height = firstPoint.y - lastPoint.y;
+        const size = Math.min(Math.abs(width), Math.abs(height));
+        if (width < 0) {
+            if (height < 0) return [firstPoint.x, firstPoint.y, size, size];
+            else return [firstPoint.x, firstPoint.y - size, size, size];
+        } else {
+            if (height < 0) return [firstPoint.x - size, firstPoint.y, size, size];
+            else return [firstPoint.x - size, firstPoint.y - size, size, size];
+        }
     }
 }

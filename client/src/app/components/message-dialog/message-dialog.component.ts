@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameService, GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({

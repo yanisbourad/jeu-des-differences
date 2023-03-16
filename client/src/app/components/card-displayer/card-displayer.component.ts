@@ -25,6 +25,7 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
     }
     ngOnInit(): void {
         this.isViewable = false;
+        this.gameCardHandlerService.clearService();
         this.updateCards();
     }
 

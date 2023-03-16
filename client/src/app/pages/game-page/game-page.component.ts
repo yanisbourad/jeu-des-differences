@@ -10,6 +10,7 @@ import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-game-page',
@@ -23,6 +24,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
+    diffFoundedSubscription: Subscription = new Subscription();
+    // list of all the subscritions to be unsubscribed on destruction
 
     // TODO: reduce the number of parameters
     // eslint-disable-next-line max-params
@@ -47,6 +50,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.gameService.reinitializeGame();
+        // this.socket.diffFounded.unsubscribe();
+        this.diffFoundedSubscription.unsubscribe();
+        // this.socket.gameState.unsubscribe();
+        // this.socket.playerFoundDiff.unsubscribe();
+        this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.socket.leaveRoom();
     }
@@ -61,7 +70,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
-        this.socket.diffFounded$.subscribe((newValue) => {
+        this.diffFoundedSubscription = this.socket.diffFounded$.subscribe((newValue) => {
             if (newValue !== undefined) {
                 this.drawService.setColor = 'black';
                 this.drawDifference(newValue);

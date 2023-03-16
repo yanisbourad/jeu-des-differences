@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ONE, TWO } from '@app/configuration/const-game';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
-import { Socket, io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { SocketClientService } from './socket-client.service';
 // eslint-disable-next-line no-restricted-imports
@@ -29,6 +29,16 @@ export class GameCardHandlerService {
         this.isLeaving = false;
     }
 
+    clearService(): void {
+        this.isCreator = false;
+        this.state = '';
+        this.isReadyToPlay = false;
+        this.opponentPlayer = '';
+        this.games = new Map<string, number>();
+        this.isNewUpdate = false;
+        this.isLeaving = false;
+        this.socket?.disconnect();
+    }
     getGameState(): string {
         return this.state;
     }

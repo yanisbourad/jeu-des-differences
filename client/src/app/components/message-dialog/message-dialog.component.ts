@@ -52,5 +52,6 @@ export class MessageDialogComponent {
             });
         }
         this.router.navigate(['/home']);
+        this.socket.leaveRoom();
     }
 }

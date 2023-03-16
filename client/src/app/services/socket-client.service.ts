@@ -24,8 +24,8 @@ export class SocketClientService {
     infoDiff: { playerName: string };
     playerGaveUp: string;
 
-    diffFounded = new Subject<Set<number>>();
-    diffFounded$: Observable<Set<number>> = this.diffFounded.asObservable();
+    private diffFounded = new Subject<Set<number>>();
+    diffFounded$ = this.diffFounded.asObservable();
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
     get socketId() {
@@ -123,6 +123,7 @@ export class SocketClientService {
 
     disconnect() {
         // this.timer.stopTimer();
+        this.messageList = [];
         this.socketClient.disconnect();
     }
 
@@ -156,8 +157,10 @@ export class SocketClientService {
     }
 
     leaveRoom() {
-        this.socketClient.send('leaveRoom');
+
         this.disconnect();
+        this.socketClient.send('leaveRoom');
+        
     }
 
     findDifference(information: { playerName: string; roomName: string }) {

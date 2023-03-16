@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { GameService, GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { GameService } from '@app/services/game.service';
 
 @Component({
     selector: 'app-message-dialog',
@@ -13,6 +13,7 @@ export class MessageDialogComponent {
     message: string;
     type: string;
     formatTime: string;
+    winner: string = this.gameService.playerName;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
@@ -32,8 +33,24 @@ export class MessageDialogComponent {
                 playerName: this.gameService.playerName,
                 roomName: this.socket.getRoomName(),
             });
+            const dataToSend = {
+                message: this.gameService.playerName + ' a quitté la partie',
+                playerName: this.gameService.playerName,
+                color: '#FF0000',
+                pos: '50%',
+                gameId: this.socket.getRoomName(),
+                event: true,
+            };
+            this.socket.sendMessage(dataToSend);
+            this.socket.messageList.push({
+                message: this.gameService.playerName + ' a quitté la partie',
+                userName: this.gameService.playerName,
+                mine: true,
+                color: '#FF0000',
+                pos: '50%',
+                event: true,
+            });
         }
-        // this.socket.leaveRoom();
         this.router.navigate(['/home']);
     }
 }

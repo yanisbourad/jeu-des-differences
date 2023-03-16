@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
-import { Socket } from 'socket.io-client';
 import { Room } from '@common/rooms';
 import { Observable, Subject } from 'rxjs';
 import { GiveupmessagePopupComponent } from '@app/components/giveupmessage-popup/giveupmessage-popup.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Socket } from 'socket.io-client';
+// import { ClientTimeService } from './client-time.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,7 +14,7 @@ export class SocketClientService {
     socket: Socket;
     serverMessage: string = '';
     roomName: string = '';
-    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string }[] = [];
+    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
     gameState = new Subject<boolean>(); // to be private
@@ -75,9 +76,17 @@ export class SocketClientService {
             this.rooms = rooms;
         });
 
-        this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string }) => {
+        this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
+            console.log(data);
             if (data) {
-                this.messageList.push({ message: data.message, userName: data.userName, mine: false, color: data.color, pos: data.pos });
+                this.messageList.push({
+                    message: data.message,
+                    userName: data.userName,
+                    mine: false,
+                    color: data.color,
+                    pos: data.pos,
+                    event: data.event,
+                });
             }
         });
 
@@ -158,8 +167,8 @@ export class SocketClientService {
     // sendMessage(message: string, playerName: string, color: string, pos: string, gameId: string) {
     //     this.socketClient.send('message', [message, playerName, color, pos, gameId]);
     // }
-    sendMessage(data: { message: string; playerName: string; color: string; pos: string; gameId: string }) {
-        this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId]);
+    sendMessage(data: { message: string; playerName: string; color: string; pos: string; gameId: string; event: boolean }) {
+        this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId, data.event]);
     }
 
     sendGiveUp(information: { playerName: string; roomName: string }) {

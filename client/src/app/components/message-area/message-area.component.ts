@@ -13,6 +13,7 @@ export class MessageAreaComponent implements OnInit {
     @Input() playerName: string = '';
     @Input() message: string = '';
     playerInitials: string;
+    giveUp: boolean;
     date: Date = new Date();
     userList: string[] = [];
     socket: SocketClient;
@@ -37,6 +38,7 @@ export class MessageAreaComponent implements OnInit {
             color: this.defaultColor[0],
             pos: this.position[0],
             gameId: this.roomName,
+            event: false,
         };
         this.socketClient.sendMessage(dataToSend);
         this.socketClient.messageList.push({
@@ -45,6 +47,7 @@ export class MessageAreaComponent implements OnInit {
             mine: true,
             color: this.defaultColor[1],
             pos: this.position[1],
+            event: false,
         });
         this.message = '';
     }

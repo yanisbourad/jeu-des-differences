@@ -69,8 +69,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         });
         this.socket.gameState$.subscribe((newValue) => {
+            const opponentName: string = this.gameService.opponentName;
+            const msg: string = 'Vous avez perdu la partie, le vainqueur est : ' + opponentName;
             if (newValue === true) {
-                this.gameService.displayGameEnded('Vous avez perdu la partie', 'finished');
+                this.gameService.displayGameEnded(msg, 'finished');
             }
         });
 
@@ -121,6 +123,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 console.log(this.socket.getRoomName());
                 this.socket.sendDifference(differ, this.socket.getRoomName());
                 this.displayWord('Trouvé');
+                const dataToSend = {
+                    message: this.gameService.playerName + ' a trouvé une différence',
+                    playerName: this.gameService.playerName,
+                    color: '#FF0000',
+                    pos: '50%',
+                    gameId: this.socket.getRoomName(),
+                    event: true,
+                };
+                this.socket.sendMessage(dataToSend);
+                this.socket.messageList.push({
+                    message: this.gameService.playerName + ' a trouvé une différence',
+                    userName: this.gameService.playerName,
+                    mine: true,
+                    color: '#FF0000',
+                    pos: '50%',
+                    event: true,
+                });
                 this.gameService.handleDifferenceFound();
             } else {
                 this.errorPenalty = true;

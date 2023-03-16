@@ -103,6 +103,10 @@ export class GameCardHandlerService {
             this.isLeaving = true;
             this.resetGameVariables();
         });
+        this.socket.on('updateStatus', (gamesStatus) => {
+            this.games = new Map(gamesStatus);
+            this.isNewUpdate = true;
+        });
 
         this.socket.on('disconnect', () => {
             this.isLeaving = true;
@@ -134,6 +138,10 @@ export class GameCardHandlerService {
         this.socket.on('feedbackOnAccept', (name) => {
             this.opponentPlayer = name;
             if (this.isCreator) this.state = 'Accepter';
+        });
+        this.socket.on('updateStatus', (gamesStatus) => {
+            this.games = new Map(gamesStatus);
+            this.isNewUpdate = true;
         });
     }
 

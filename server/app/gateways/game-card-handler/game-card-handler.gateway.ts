@@ -5,6 +5,7 @@ import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
+// export class GameCardHandlerGateway implements OnGatewayDisconnect {
 export class GameCardHandlerGateway {
     @WebSocketServer()
     server: Server;
@@ -28,61 +29,94 @@ export class GameCardHandlerGateway {
             gameName: payload.gameName,
         };
         this.logger.log(`${player.name} asks to play ${player.gameName} in 1vs1 mode`);
+        this.logger.log(`${player.name} has the id of ${player.id}`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
+        this.logger.log(`${stackedPlayerNumber} are stacked in either queue or join`);
         switch (stackedPlayerNumber) {
+            // when this is the creator
             case 1: {
                 this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
                 break;
             }
+            // when this is the opponent
             case 2: {
                 const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
                 const creator = this.gameCardHandlerService.getPlayer(players[0]);
                 const opponent = this.gameCardHandlerService.getPlayer(players[1]);
                 this.server.to(players[0]).emit('feedbackOnAccept', opponent.name);
                 this.server.to(players[1]).emit('feedbackOnWait', creator.name);
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
                 break;
             }
-            case 0: {
-                this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
-                this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-
+            // when this is an opponent but there is 1 or more opponent in the stack
+            default: {
+                // call a function to remove player from queue and send feedback to player
+                // make new pairs of players
+                this.server.to(player.id).emit('feedbackOnWaitLonger', 'Attente de disponibilte du createur');
                 break;
             }
             // No default
         }
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
     @SubscribeMessage('cancelGame')
-    cancel(@ConnectedSocket() gamer: Socket): boolean {
-        // if player is alone remove him from queue
-        const player = this.gameCardHandlerService.getPlayer(gamer.id);
-        // const stackedPlayerNumber = this.gameCardHandlerService.getStackedPlayers();
-        // if player is with opponent remove him from queue and send message to opponent
-        if (player) return true;
+    cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
+        const player = this.gameCardHandlerService.deletePlayer(client.id);
+        if (player) {
+            const isRemoved = this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, gameName);
+            if (isRemoved) {
+                this.server.to(client.id).emit('feedBackOnLeave');
+                this.logger.log(`${player.name} left the queue`);
+            }
+        }
+
+        // if player was waiting, delete him and next player in the queue become the creator
+        // then delete the creator and send message to the next player in the queue
+        const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, gameName);
+        if (isPlaying) {
+            // remove last player in the queue
+            const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
+            // remove the player from the stack
+            const opponent = this.gameCardHandlerService.deletePlayer(playerId);
+            this.server.to(opponent.id).emit('feedBackOnLeave');
+            this.server.to(client.id).emit('feedBackOnLeave');
+            this.logger.log(`${opponent.name} left the queue`);
+            this.logger.log(`${player.name} left the queue`);
+            // delete all waiting playersList
+            const players = this.gameCardHandlerService.removePlayers(player.gameName);
+            players.forEach((gamer) => {
+                this.server.to(gamer).emit('feedBackOnLeave');
+            });
+        }
+        // this.logger.log(`${player.name} has disconnected`);
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
     @SubscribeMessage('rejectOpponent')
-    reject(@ConnectedSocket() gamer: Socket) {
-        const opponent = this.gameCardHandlerService.deleteOponent(gamer.id);
+    reject(@ConnectedSocket() gamerCreator: Socket) {
+        // remove this opponent then fetches the next opponent
+        const gamerCreatorName = this.gameCardHandlerService.getPlayer(gamerCreator.id).name;
+        const opponent = this.gameCardHandlerService.deleteOpponent(gamerCreator.id);
         if (opponent) {
-            this.server.to(gamer.id).emit('feedbackOnReject', true);
-            this.server.to(opponent.id).emit('feedbackOnReject', false);
+            this.server.to(opponent.id).emit('feedbackOnReject', true);
+        }
+        const nextOpponent = this.gameCardHandlerService.handleReject(gamerCreator.id);
+        if (nextOpponent) {
+            this.server.to(nextOpponent.id).emit('feedbackOnWait', gamerCreatorName);
+            this.server.to(gamerCreator.id).emit('feedbackOnAccept', nextOpponent.name);
         } else {
-            this.server.to(gamer.id).emit('feedbackOnReject', false);
+            // if no more Opponent
+            this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
         }
     }
 
     @SubscribeMessage('startGame')
     accept(@ConnectedSocket() gamer: Socket) {
         // send message to everyone opponent
-        // remove oponent and delete game queue
+        // remove opponent and delete game queue
         // send signal to start game
         const playersList: Player[] = this.gameCardHandlerService.acceptOpponent(gamer.id);
         const gameInfo = {
@@ -93,5 +127,33 @@ export class GameCardHandlerGateway {
         };
         this.server.to(playersList[0].id).emit('feedbackOnStart', gameInfo);
         this.server.to(playersList[1].id).emit('feedbackOnStart', gameInfo);
+        // call a function to remove player from queue and send feedback to player
+        // make new pairs of players
+        // const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
+        const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[0].gameName);
+        this.logger.log(removedPlayers);
+        removedPlayers.forEach((playerId) => {
+            this.server.to(playerId).emit('byeTillNext', 'refuser par createur');
+        });
+        this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
+    // on disconnect
+    // remove player from queue
+    // send message to opponent
+    // handleDisconnect(client: Socket) {
+    //     const player = this.gameCardHandlerService.deletePlayer(client.id);
+    //     if (player) this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, player.gameName);
+    //     // if player was waiting, delete him and next player in the queue become the creator
+    //     // then delete the creator and send message to the next player in the queue
+    //     const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, player.gameName);
+    //     if (isPlaying) {
+    //         const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
+    //         const opponent = this.gameCardHandlerService.deletePlayer(playerId);
+    //         this.server.to(playerId).emit('feedBackOnLeave', player.name);
+    //         this.logger.log(`${opponent.name} left the queue`);
+    //     }
+    //     this.logger.log(`${player.name} has disconnected`);
+    //     this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
+    // }
+    // }
 }

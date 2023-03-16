@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ONE } from '@app/configuration/const-game';
+import { ONE, TWO } from '@app/configuration/const-game';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -16,6 +16,8 @@ export class GameCardHandlerService {
     state: string;
     opponentPlayer: string;
     isReadyToPlay: boolean;
+    isNewUpdate: boolean;
+    isLeaving: boolean;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
@@ -23,6 +25,8 @@ export class GameCardHandlerService {
         this.isReadyToPlay = false;
         this.opponentPlayer = '';
         this.games = new Map<string, number>();
+        this.isNewUpdate = false;
+        this.isLeaving = false;
     }
 
     getGameState(): string {
@@ -46,11 +50,21 @@ export class GameCardHandlerService {
         this.socket.emit('findAllGamesStatus', gameNames);
         this.socket.on('updateStatus', (gamesStatus) => {
             this.games = new Map(gamesStatus);
+            this.isNewUpdate = true;
         });
+    }
+
+    getNewUpdate() {
+        return this.isNewUpdate;
+    }
+
+    setNewUpdate(isNewUpdate: boolean) {
+        this.isNewUpdate = isNewUpdate;
     }
 
     join(game: Game) {
         this.socket.emit('joinGame', game);
+        this.isLeaving = false;
         this.socket.on('feedbackOnJoin', () => {
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
@@ -76,30 +90,67 @@ export class GameCardHandlerService {
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });
-        this.socket.on('feedbackOnLeave', () => {
-            // console.log(a);
+
+        this.socket.on('feedBackOnLeave', () => {
+            // send pop up to player
+            this.isLeaving = true;
         });
 
         this.socket.on('feedbackOnReject', () => {
             // this.opponentPlayer = nextOpponentName;
             // console.log(nextOpponentName);
+            // console.log('feedbackOnReject, $$$$$$$$$$$$$$$$$$$$');
+            this.isLeaving = true;
+        });
+
+        this.socket.on('byeTillNext', () => {
+            this.isLeaving = true;
+            this.resetGameVariables();
+        });
+
+        this.socket.on('disconnect', () => {
+            this.isLeaving = true;
+            this.resetGameVariables();
         });
     }
 
-    leave(gameName: string) {
-        this.socket.emit('leaveGame', gameName);
+    resetGameVariables(): void {
+        this.isCreator = false;
+        this.state = '';
+        this.isReadyToPlay = false;
+        this.opponentPlayer = '';
     }
 
-    startGame(gameName: string) {
+    getLeavingState(): boolean {
+        return this.isLeaving;
+    }
+
+    leave(gameName: string): void {
+        this.socket.emit('cancelGame', gameName);
+        this.socket.on('feedBackOnLeave', () => {
+            // send pop up to player
+            this.isLeaving = true;
+        });
+        this.socket.on('feedbackOnJoin', () => {
+            this.isCreator = true;
+            this.opponentPlayer = "Attente d'un adversaire";
+        });
+        this.socket.on('feedbackOnAccept', (name) => {
+            this.opponentPlayer = name;
+            if (this.isCreator) this.state = 'Accepter';
+        });
+    }
+
+    startGame(gameName: string): void {
         this.socket.emit('startGame', gameName);
     }
 
-    rejectOpponent(gameName: string) {
+    rejectOpponent(gameName: string): void {
         this.socket.emit('rejectOpponent', gameName);
     }
 
     toggleCreateJoin(gameName: string): string {
-        if (this.games.has(gameName)) return this.games.get(gameName) === ONE ? 'Joindre' : 'Créer';
+        if (this.games.has(gameName)) return this.games.get(gameName) === ONE || this.games.get(gameName) === TWO ? 'Joindre' : 'Créer';
         return 'Créer';
     }
 

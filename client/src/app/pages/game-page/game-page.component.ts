@@ -144,6 +144,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
+                const dataToSend2 = {
+                    message: this.gameService.playerName + ' a fait une erreur',
+                    playerName: this.gameService.playerName,
+                    color: '#FF0000',
+                    pos: '50%',
+                    gameId: this.socket.getRoomName(),
+                    event: true,
+                };
+                this.socket.sendMessage(dataToSend2);
+                this.socket.messageList.push({
+                    message: dataToSend2.message,
+                    userName: dataToSend2.playerName,
+                    mine: true,
+                    color: dataToSend2.color,
+                    pos: dataToSend2.pos,
+                    event: dataToSend2.event,
+                });
             }
             this.clearCanvas();
         }

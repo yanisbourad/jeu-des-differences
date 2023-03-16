@@ -191,11 +191,9 @@ export class GameService {
     }
 
     endGame(): void {
-        this.socket.stopTimer(this.socket.getRoomName());
-        console.log('end game', this.socket.getRoomName());
+        this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.socket.gameEnded(this.socket.getRoomName());
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
-        console.log(this.gameTime, this.gameInformation.gameMode, this.gameType);
         this.isGameFinished = true;
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketClient } from '@app/utils/socket-client';
 import { Room } from '@common/rooms';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { GiveupmessagePopupComponent } from '@app/components/giveupmessage-popup/giveupmessage-popup.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Socket } from 'socket.io-client';
@@ -17,12 +17,13 @@ export class SocketClientService {
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
     rooms: Room[] = [];
-    gameState = new Subject<boolean>(); // to be private
-    gameState$: Observable<boolean> = this.gameState.asObservable();
+    gameState = new Subject<boolean>();
+    gameState$ = this.gameState.asObservable();
     playerFoundDiff = new Subject<string>();
-    playerFoundDiff$: Observable<string> = this.playerFoundDiff.asObservable();
+    playerFoundDiff$ = this.playerFoundDiff.asObservable();
     infoDiff: { playerName: string };
     playerGaveUp: string;
+    statusPlayer: string;
 
     private diffFounded = new Subject<Set<number>>();
     diffFounded$ = this.diffFounded.asObservable();
@@ -36,6 +37,7 @@ export class SocketClientService {
         if (!this.socketClient.isSocketAlive()) {
             this.socketClient.connect();
             this.configureBaseSocketFeatures();
+            console.log('connection au socket', this.socketClient.socket.id);
         }
     }
 
@@ -72,10 +74,6 @@ export class SocketClientService {
             }
         });
 
-        this.socketClient.on('getRooms', (rooms: Room[]) => {
-            this.rooms = rooms;
-        });
-
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
             console.log(data);
             if (data) {
@@ -90,8 +88,10 @@ export class SocketClientService {
             }
         });
 
-        this.socketClient.on('gameEnded', (gameEnded: boolean) => {
-            this.gameState.next(gameEnded);
+        this.socketClient.on('gameEnded', (data: [gameEnded: boolean, player: string]) => {
+            this.gameState.next(data[0]);
+            this.statusPlayer = data[1];
+            console.log('gameEnded', data);
         });
 
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
@@ -106,7 +106,8 @@ export class SocketClientService {
 
         this.socketClient.on('giveup-return', (data: { playerName: string }) => {
             this.playerGaveUp = data.playerName;
-            this.stopTimer(this.getRoomName());
+            console.log('on giveup-return', data);
+            this.stopTimer(this.getRoomName(), data.playerName);
             const dialog = this.dialog.open(GiveupmessagePopupComponent, {
                 data: { name: this.playerGaveUp },
                 disableClose: true,
@@ -115,8 +116,8 @@ export class SocketClientService {
             });
 
             dialog.afterClosed().subscribe(() => {
-                // this.leaveRoom();
-                this.gameEnded(this.getRoomName());
+               // this.leaveRoom();
+                this.disconnect();
             });
         });
     }
@@ -128,8 +129,7 @@ export class SocketClientService {
     }
 
     joinRoomSolo(playerName: string) {
-        const room = this.getRoom();
-        this.socketClient.send('joinRoomSolo', [playerName, room?.name]);
+        this.socketClient.send('joinRoomSolo', playerName);
     }
 
     sendRoomName(roomName: string) {
@@ -150,17 +150,15 @@ export class SocketClientService {
         return this.rooms.find((room) => room.players.length === 1);
     }
 
-    stopTimer(roomName: string) {
+    stopTimer(roomName: string, playerName: string) {
         console.log('stopTimer you called for me!!');
         console.log('roomName', roomName);
-        this.socketClient.send('stopTimer', roomName);
+        this.socketClient.send('stopTimer', [roomName, playerName]);
     }
 
     leaveRoom() {
-
         this.disconnect();
         this.socketClient.send('leaveRoom');
-        
     }
 
     findDifference(information: { playerName: string; roomName: string }) {

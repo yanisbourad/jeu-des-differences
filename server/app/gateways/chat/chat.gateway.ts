@@ -83,20 +83,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
         await this.playerService.removeRoom(socket.id);
-        socket.leave(socket.id);
+        socket.to(this.roomName).socketsLeave(this.roomName);
+        socket.disconnect();
     }
 
     // TODO:  handle timer deletion
     @SubscribeMessage(ChatEvents.StopTimer)
-    async stopTimer(socket: Socket, roomName: string) {
-        socket.to(roomName).emit('gameEnded', true);
-        this.serverTime.stopChronometer(roomName); // maybe change the return value
-        this.serverTime.removeTimer(roomName);
+    async stopTimer(socket: Socket, data: [string, string]) {
+        socket.to(data[0]).emit('gameEnded', [true, data[1]]);
+        this.serverTime.stopChronometer(data[0]); // maybe change the return value
+        this.serverTime.removeTimer(data[0]);
     }
 
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string, boolean]) {
-        console.log('message send by client',data)
+        console.log('message send by client',data )
         socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
     }
 
@@ -119,7 +120,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.playerService.roomNamesMulti.filter((name) => name !== roomName);
         this.logger.log('game ended');
         this.logger.log(this.roomName);
-        socket.leave(roomName);
+        socket.to(roomName).socketsLeave(roomName);
         this.playerService.getRooms();
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
@@ -130,17 +131,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     async handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id} `);
-        // console.log(this.playerService.rooms);
+        this.logger.log(`Connexion par l'utilisateur avec id  here!!!!!!: ${socket.id} `);
         this.socketId = socket.id;
-        socket.emit(ChatEvents.GetRooms, this.playerService.rooms);
+        socket.setMaxListeners(2);
     }
 
     // TODO:  handle rooms deletion
     async handleDisconnect(socket: Socket) {
-        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id} `);
-        // await this.playerService.removeRoom(socket.id);
-        // socket.leave(this.roomName);
+        this.logger.log(`Déconnexion par l'utilisateur avec id leave!!!!!! : ${socket.id} `);
+        await this.playerService.removeRoom(socket.id);
+        socket.leave(this.roomName);
         socket.leave(socket.id);
     }
 

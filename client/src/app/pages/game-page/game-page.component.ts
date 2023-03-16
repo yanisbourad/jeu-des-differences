@@ -25,6 +25,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
     diffFoundedSubscription: Subscription = new Subscription();
+    playerFoundDiffSubscription: Subscription = new Subscription();
+    gameStateSubscription: Subscription = new Subscription();
     // list of all the subscritions to be unsubscribed on destruction
 
     // TODO: reduce the number of parameters
@@ -50,19 +52,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.gameService.reinitializeGame();
-        // this.socket.diffFounded.unsubscribe();
         this.diffFoundedSubscription.unsubscribe();
-        // this.socket.gameState.unsubscribe();
-        // this.socket.playerFoundDiff.unsubscribe();
+        this.playerFoundDiffSubscription.unsubscribe();
+        this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.socket.leaveRoom();
     }
 
     ngAfterViewInit(): void {
-        this.socket.connect();
         if (this.gameService.gameType === 'solo') {
+            this.socket.connect();
             this.socket.joinRoomSolo(this.gameService.playerName);
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
@@ -77,15 +77,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.drawService.setColor = 'yellow';
             }
         });
-        this.socket.gameState$.subscribe((newValue) => {
+
+        this.gameStateSubscription = this.socket.gameState$.subscribe((newValue) => {
             const opponentName: string = this.gameService.opponentName;
             const msg: string = 'Vous avez perdu la partie, le vainqueur est : ' + opponentName;
-            if (newValue === true) {
+            if (newValue === true && this.socket.statusPlayer !== this.gameService.playerName) {
                 this.gameService.displayGameEnded(msg, 'finished');
+                // this.socket.gameEnded(this.socket.getRoomName());
+                this.socket.disconnect();
             }
         });
 
-        this.socket.playerFoundDiff$.subscribe((newValue) => {
+        this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
             if (newValue === this.gameService.opponentName) {
                 this.gameService.handlePlayerDifference();
             }
@@ -93,12 +96,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     getRouterParams() {
-        // this.playerName = this.route.snapshot.paramMap.get('player') as string;
-        // this.gameName = this.route.snapshot.paramMap.get('gameName') as string;
-        // this.gameType = this.route.snapshot.paramMap.get('gameType') as string;
-        // this.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
-        // this.gameId = this.route.snapshot.paramMap.get('gameId') as string;
-
         this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
         this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
         this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;

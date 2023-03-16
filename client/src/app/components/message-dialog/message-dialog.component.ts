@@ -51,7 +51,7 @@ export class MessageDialogComponent {
                 event: true,
             });
         }
-        this.router.navigate(['/home']);
         this.socket.leaveRoom();
+        this.router.navigate(['/home']);
     }
 }

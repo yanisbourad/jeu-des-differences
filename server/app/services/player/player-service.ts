@@ -59,41 +59,6 @@ export class PlayerService {
         return this.rooms.findIndex((room) => room.name === roomName);
     }
 
-    // async addPlayerMul(roomName: string, player: Player, startTime: Date): Promise<void> {
-    //     const rIndex = await this.getRoomIndex(roomName);
-    //     if (rIndex !== INDEX_NOT_FOUND) {
-    //         if (
-    //             this.rooms[rIndex].players.length < 2 &&
-    //             this.rooms[rIndex].players.findIndex((p) => p?.socketId === player.socketId) === INDEX_NOT_FOUND &&
-    //             this.rooms[rIndex].players.findIndex((p) => p?.playerName === player.playerName) === INDEX_NOT_FOUND
-    //         ) {
-    //             this.rooms[rIndex].players.push(player);
-    //         } else {
-    //             await this.addRoomMul(roomName, player, startTime);
-    //         }
-    //     } else {
-    //         await this.addRoomMul(roomName, player, startTime);
-    //     }
-    //     // if (
-    //     //     this.rooms[rIndex].players.length < 2 &&
-    //     //     this.rooms[rIndex].players.findIndex((p) => p?.socketId === player.socketId) === INDEX_NOT_FOUND &&
-    //     //     this.rooms[rIndex].players.findIndex((p) => p?.playerName === player.playerName) === INDEX_NOT_FOUND
-    //     // ) {
-    //     //     this.rooms[rIndex].players.push(player);
-    //     // } else {
-    //     //     await this.addRoomMul(roomName, player, startTime);
-    //     // }
-    // }
-
-    // validatePlayer(rIndex: number, player: Player): boolean {
-    //     if (!this.rooms[rIndex]) return false;
-    //     return (
-    //         this.rooms[rIndex].players.findIndex((p) => p.socketId === player.socketId) === INDEX_NOT_FOUND &&
-    //         this.rooms[rIndex].players.findIndex((p) => p.playerName === player.playerName) === INDEX_NOT_FOUND &&
-    //         this.rooms[rIndex].maxPlayers === this.maxPlayers
-    //     );
-    // }
-
     async removeRoom(roomName: string): Promise<void> {
         const rIndex = await this.getRoomIndex(roomName);
         this.rooms.splice(rIndex, 1);

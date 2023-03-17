@@ -19,10 +19,12 @@ import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-t
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
 import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
+import { GiveUpMessagePopupComponent } from './components/give-up-message-popup/give-up-message-popup.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { NamePopupComponent } from './components/name-popup/name-popup.component';
+import { PlayerWaitPopupComponent } from './components/player-wait-popup/player-wait-popup.component';
 import { TimePopupComponent } from './components/time-popup/time-popup.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
@@ -30,8 +32,6 @@ import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/co
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
-import { PlayerWaitPopupComponent } from './components/player-wait-popup/player-wait-popup.component';
-import { GiveupmessagePopupComponent } from './components/giveupmessage-popup/giveupmessage-popup.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -62,7 +62,7 @@ import { GiveupmessagePopupComponent } from './components/giveupmessage-popup/gi
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,
-        GiveupmessagePopupComponent,
+        GiveUpMessagePopupComponent,
     ],
     imports: [
         AppMaterialModule,

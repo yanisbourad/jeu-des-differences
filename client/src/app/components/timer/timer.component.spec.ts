@@ -1,18 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ClientTimeService } from '@app/services/client-time.service';
 import { TimerComponent } from './timer.component';
-import SpyObj = jasmine.SpyObj;
 
 describe('TimerComponent', () => {
     let component: TimerComponent;
-    let timer: SpyObj<ClientTimeService>;
     let fixture: ComponentFixture<TimerComponent>;
-
+    // TODO : implement it using the time received from the server
     beforeEach(async () => {
-        timer = jasmine.createSpyObj('ClientTimeService', ['getCount']);
+        // timer = jasmine.createSpyObj('ClientTimeService', ['getCount']);
         await TestBed.configureTestingModule({
             declarations: [TimerComponent],
-            providers: [{ provide: ClientTimeService, useValue: timer }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TimerComponent);
@@ -40,18 +36,18 @@ describe('TimerComponent', () => {
         expect(component.setTime).toHaveBeenCalled();
     });
 
+    // TODO
     it('should return the time in the correct format when second and minute are under 10', () => {
         const expectedResult = '01:05';
-        const countStub = 65;
-        timer.getCount.and.returnValue(countStub);
         component.transform();
         expect(component.transform()).toEqual(expectedResult);
     });
 
+    // TODO
     it('should return the time in the correct format when second and minute are over 10', () => {
         const expectedResult = '20:15';
-        const countStub = 1215;
-        timer.getCount.and.returnValue(countStub);
+        // const countStub = 1215;
+        // timer.getCount.and.returnValue(countStub);
         component.transform();
         expect(component.transform()).toEqual(expectedResult);
     });

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import * as constants from '@app/configuration/const-time';
 import { Time } from '@app/interfaces/time';
-import { ClientTimeService } from '@app/services/client-time.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 @Component({
     selector: 'app-timer',
@@ -10,7 +9,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 })
 export class TimerComponent {
     time: Time;
-    constructor(readonly clientTimeService: ClientTimeService, readonly socket: SocketClientService) {
+    constructor(readonly socket: SocketClientService) {
         this.time = { minute: 0, second: 0 };
     }
 

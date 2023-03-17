@@ -3,11 +3,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-giveupmessage-popup',
-    templateUrl: './giveupmessage-popup.component.html',
-    styleUrls: ['./giveupmessage-popup.component.scss'],
+    selector: 'app-give-up-message-popup',
+    templateUrl: './give-up-message-popup.component.html',
+    styleUrls: ['./give-up-message-popup.component.scss'],
 })
-export class GiveupmessagePopupComponent {
+export class GiveUpMessagePopupComponent {
     constructor(private router: Router, public dialog: MatDialog) {}
 
     redirect(): void {

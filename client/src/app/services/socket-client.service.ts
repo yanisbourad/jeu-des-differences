@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
 import { Subject } from 'rxjs';
-import { GiveupmessagePopupComponent } from '@app/components/giveupmessage-popup/giveupmessage-popup.component';
-import { MatDialog } from '@angular/material/dialog';
 import { Socket } from 'socket.io-client';
 
 @Injectable({
@@ -95,7 +95,7 @@ export class SocketClientService {
         this.socketClient.on('giveup-return', (data: { playerName: string }) => {
             this.playerGaveUp = data.playerName;
             this.stopTimer(this.getRoomName(), data.playerName);
-            const dialog = this.dialog.open(GiveupmessagePopupComponent, {
+            const dialog = this.dialog.open(GiveUpMessagePopupComponent, {
                 data: { name: this.playerGaveUp },
                 disableClose: true,
                 width: '544px',

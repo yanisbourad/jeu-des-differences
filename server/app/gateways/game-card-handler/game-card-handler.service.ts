@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EMPTY, MAX_CAPACITY, MINUS_ONE, OVER_CROWDED, PLAYER_PAIR } from './entities/constants';
+import { CREATOR_INDEX, EMPTY, MAX_CAPACITY, MINUS_ONE, OVER_CROWDED, PLAYER_PAIR } from './entities/constants';
 import { Player } from './entities/player.entity';
 @Injectable()
 export class GameCardHandlerService {
@@ -53,14 +53,26 @@ export class GameCardHandlerService {
         }
         return false;
     }
+    getCreatorId(gameName: string): string {
+        return this.gamesQueue.get(gameName)[CREATOR_INDEX];
+    }
 
-    deleteCreator(gameName: string): string {
-        if (!this.gamesQueue.has(gameName)) {
-            return;
-        }
-        const playerId = this.gamesQueue.get(gameName).shift();
+    isCreator(id: string, gameName: string): boolean {
+        return this.gamesQueue.get(gameName).indexOf(id) === CREATOR_INDEX;
+    }
+    deleteCreator(gameName: string): string[] {
+        const players = this.gamesQueue.get(gameName);
         this.gamesQueue.set(gameName, []);
-        return playerId;
+        return players;
+    }
+    removeOpponent(gameName: string): string[] {
+        const oldOpponent = this.gamesQueue.get(gameName).pop();
+        if (this.joiningPlayersQueue.get(gameName).length !== EMPTY) {
+            const newOpponent = this.joiningPlayersQueue.get(gameName).shift();
+            this.gamesQueue.get(gameName).push(newOpponent);
+            return [oldOpponent, newOpponent];
+        }
+        return [oldOpponent];
     }
 
     deletePlayer(playerId: string): Player {
@@ -73,8 +85,8 @@ export class GameCardHandlerService {
         if (this.joiningPlayersQueue.has(gameName)) {
             const index = this.joiningPlayersQueue.get(gameName).indexOf(playerId);
             if (index !== MINUS_ONE) {
-                this.joiningPlayersQueue.get(gameName).splice(index, 1);
-                return true;
+                const element = this.joiningPlayersQueue.get(gameName).splice(index, 1);
+                return element[0] === playerId;
             }
         }
         return false;
@@ -100,6 +112,9 @@ export class GameCardHandlerService {
 
     getStackedPlayers(gameName: string): string[] {
         return this.gamesQueue.get(gameName);
+    }
+    getTotalRequest(gameName: string): number {
+        return this.getStackedPlayers(gameName).length + this.joiningPlayersQueue.get(gameName).length;
     }
 
     // add second player at the stack fifo and return the number of players waiting

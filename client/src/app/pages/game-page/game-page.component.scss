@@ -71,12 +71,6 @@ canvas {
     }
 }
 
-@media (min-width: 1920px) {
-    .container {
-        width: 1920px;
-    }
-}
-
 .superposeImageCanvas {
     width: 640px;
     height: 480px;
@@ -87,7 +81,6 @@ canvas {
     }
     canvas {
         position: relative ;
-        border: none;
         top: -108% ;
         left: -5% ;
     }    

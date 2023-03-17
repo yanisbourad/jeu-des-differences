@@ -53,7 +53,6 @@ export class GameCardHandlerService {
 
     connect() {
         this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
-        console.log('connected in game card', this.socket);
     }
 
     updateGameStatus(gameNames: string[]) {
@@ -95,10 +94,8 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
-            console.log('i called this function ohhhh!');
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
-            console.log(gameIdentifier);
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
         });

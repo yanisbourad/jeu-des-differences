@@ -67,6 +67,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     }
 
     leaveGame(): void {
+        this.dialogReff.close();
         this.gameCardHandlerService.leave(this.game.gameName);
     }
 

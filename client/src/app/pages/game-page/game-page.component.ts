@@ -25,6 +25,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
+    found: boolean;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundedSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
@@ -104,6 +105,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
             if (newValue === this.gameService.opponentName) {
+                this.found = true;
                 this.gameService.handlePlayerDifference();
             }
         });
@@ -123,6 +125,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            // TODO : remove diff when already found by opponent
+            if (this.found) {
+                this.isAlreadyFound(diff ? diff : new Set());
+                return;
+            }
             if (diff) {
                 this.displayWord('Trouvé');
                 this.drawDifference(diff);
@@ -137,8 +144,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gameService.sendErrorMessage();
                 this.clearCanvas();
             }
-            this.drawDifference(diff ? diff : new Set());
+            // this.drawDifference(diff ? diff : new Set());
         }
+    }
+
+    isAlreadyFound(diff: Set<number>): void {
+        this.found = false;
+        this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+        this.displayWord('Erreur');
+        this.gameService.sendErrorMessage();
+        this.clearCanvas();
     }
 
     displayWord(word: string): void {

@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CREATOR_INDEX, CREATOR_WITH_OPPONENT, ONLY_CREATOR, OPPONENT_INDEX } from './entities/constants';
 import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
@@ -28,21 +29,19 @@ export class GameCardHandlerGateway {
             name: payload.name,
             gameName: payload.gameName,
         };
-        this.logger.log(`${player.name} asks to play ${player.gameName} in 1vs1 mode`);
-        this.logger.log(`${player.name} has the id of ${player.id}`);
+        this.logger.log(`New request from ${player.name} to play ${player.gameName} in 1vs1 mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
-        this.logger.log(`${stackedPlayerNumber} are stacked in either queue or join`);
         switch (stackedPlayerNumber) {
             // when this is the creator
-            case 1: {
+            case ONLY_CREATOR: {
                 this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
                 break;
             }
             // when this is the opponent
-            case 2: {
+            case CREATOR_WITH_OPPONENT: {
                 const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
                 const creator = this.gameCardHandlerService.getPlayer(players[0]);
                 const opponent = this.gameCardHandlerService.getPlayer(players[1]);
@@ -57,62 +56,61 @@ export class GameCardHandlerGateway {
                 this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
                 break;
             }
-            // No default
         }
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
     @SubscribeMessage('cancelGame')
     cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
-        // Case 1 : Player alone in the gameQueue and is the game creator
-        // remove player
-        const stackedPlayers = this.gameCardHandlerService.getStackedPlayers(gameName);
-        if (stackedPlayers.length === 1) {
+        const totalRequest = this.gameCardHandlerService.getTotalRequest(gameName);
+        // if there is only one player in the queue
+        if (totalRequest === ONLY_CREATOR) {
             const creator = this.gameCardHandlerService.deletePlayer(client.id);
-            if (creator) {
-                this.server.to(client.id).emit('feedBackOnLeave');
-                this.logger.log(`${creator.name} left the queue`);
-                this.server.to(client.id).emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-            }
-        }
-
-        // Case 2 : Player is the opponent in the gameQueue
-        // remove the opponent and if the joiningQueue is not empty
-        // make the next player the opponent
-
-        // Case 3 : Player is in the joiningQueue
-        // remove player from joining queue
-
-        const player = this.gameCardHandlerService.deletePlayer(client.id);
-        if (player) {
-            const isRemoved = this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, gameName);
-            if (isRemoved) {
+            this.gameCardHandlerService.deleteCreator(gameName);
+            this.server.to(client.id).emit('feedBackOnLeave');
+            this.logger.log(`The ${gameName} creator ${creator.name} left, room is empty`);
+        } else {
+            // if there is more than one player in the queue
+            const player = this.gameCardHandlerService.deletePlayer(client.id);
+            const isCreator = this.gameCardHandlerService.isCreator(client.id, gameName);
+            // if the player is the creator delete the creator and the opponent
+            // remove all other players in the join queue
+            if (isCreator) {
+                this.logger.log(`The ${gameName} game creator left, room is empty`);
+                const players = this.gameCardHandlerService.deleteCreator(gameName);
+                const opponent = this.gameCardHandlerService.deletePlayer(players[OPPONENT_INDEX]);
+                this.server.to(opponent.id).emit('feedBackOnLeave');
                 this.server.to(client.id).emit('feedBackOnLeave');
                 this.logger.log(`${player.name} left the queue`);
+                this.logger.log(`${opponent.name} left the queue`);
+                const joiningPlayers = this.gameCardHandlerService.removePlayers(gameName);
+                joiningPlayers.forEach((gamer) => {
+                    this.server.to(gamer).emit('feedBackOnLeave');
+                });
+            } else {
+                // could have been match with creator or waiting in the join queue
+                // if the player is the opponent delete the opponent
+                // send feedback to the creator and the new opponent
+                // if there are other players in the join queue
+                const isDeleted = this.gameCardHandlerService.removePlayerInJoiningQueue(gameName, client.id);
+                if (!isDeleted) {
+                    const opponents = this.gameCardHandlerService.removeOpponent(gameName);
+                    const creator = this.gameCardHandlerService.getPlayer(this.gameCardHandlerService.getCreatorId(gameName));
+                    if (opponents.length === 2) {
+                        const newOpponent = this.gameCardHandlerService.getPlayer(opponents[1]);
+                        this.server.to(client.id).emit('feedBackOnLeave');
+                        this.server.to(newOpponent.id).emit('feedbackOnWait', creator.name);
+                        this.server.to(creator.id).emit('feedbackOnAccept', newOpponent.name);
+                    } else {
+                        this.server.to(opponents[CREATOR_INDEX]).emit('feedBackOnLeave');
+                        this.server.to(creator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                    }
+                    this.logger.log(`The ${gameName} game opponent left`);
+                }
+                this.server.to(client.id).emit('feedBackOnLeave');
+                this.logger.log(`Player ${player.name} left the ${gameName} game joining queue`);
             }
         }
-
-        // remove player from gameQueue and his opponent
-        // if player was waiting, delete him and next player in the queue become the creator
-        // then delete the creator and send message to the next player in the queue
-        // const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, gameName);
-        // this.logger.log(`isPlaying: ${isPlaying}`);
-        // if (isPlaying) {
-        //     // remove last player in the queue
-        //     const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
-        //     // remove the player from the stack
-        //     const opponent = this.gameCardHandlerService.deletePlayer(playerId);
-        //     this.server.to(opponent.id).emit('feedBackOnLeave');
-        //     this.server.to(client.id).emit('feedBackOnLeave');
-        //     this.logger.log(`${opponent.name} left the queue`);
-        //     this.logger.log(`${player.name} left the queue`);
-        //     // delete all waiting playersList
-        //     const players = this.gameCardHandlerService.removePlayers(player.gameName);
-        //     players.forEach((gamer) => {
-        //         this.server.to(gamer).emit('feedBackOnLeave');
-        //     });
-        //     return;
-        // }
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 
@@ -142,16 +140,16 @@ export class GameCardHandlerGateway {
         const playersList: Player[] = this.gameCardHandlerService.acceptOpponent(gamer.id);
         const gameInfo = {
             gameId: this.countGame++,
-            gameName: playersList[0].gameName,
-            creatorName: playersList[0].name,
-            opponentName: playersList[1].name,
+            gameName: playersList[CREATOR_INDEX].gameName,
+            creatorName: playersList[CREATOR_INDEX].name,
+            opponentName: playersList[OPPONENT_INDEX].name,
         };
-        this.server.to(playersList[0].id).emit('feedbackOnStart', gameInfo);
-        this.server.to(playersList[1].id).emit('feedbackOnStart', gameInfo);
+        this.server.to(playersList[CREATOR_INDEX].id).emit('feedbackOnStart', gameInfo);
+        this.server.to(playersList[OPPONENT_INDEX].id).emit('feedbackOnStart', gameInfo);
         // call a function to remove player from queue and send feedback to player
         // make new pairs of players
         // const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
-        const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[0].gameName);
+        const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[CREATOR_INDEX].gameName);
         this.logger.log(removedPlayers);
         removedPlayers.forEach((playerId) => {
             this.server.to(playerId).emit('byeTillNext', 'refuser par createur');

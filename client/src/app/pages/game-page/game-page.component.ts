@@ -19,6 +19,8 @@ import { Subscription } from 'rxjs';
 export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('canvas3', { static: true }) canvas3!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2;
     errorPenalty: boolean;
@@ -122,24 +124,26 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
+                this.displayWord('Trouvé');
                 this.drawDifference(diff);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
                 this.socket.sendDifference(diff, this.socket.getRoomName());
-                this.displayWord('Trouvé');
                 this.gameService.sendFoundMessage();
                 this.gameService.handleDifferenceFound();
+                this.clearCanvas();
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
                 this.gameService.sendErrorMessage();
+                this.clearCanvas();
             }
-            this.clearCanvas();
+            this.drawDifference(diff ? diff : new Set());
         }
     }
 
     displayWord(word: string): void {
-        this.drawService.drawWord(word, this.canvas1.nativeElement, this.mousePosition);
-        this.drawService.drawWord(word, this.canvas2.nativeElement, this.mousePosition);
+        this.drawService.drawWord(word, this.canvas0.nativeElement, this.mousePosition);
+        this.drawService.drawWord(word, this.canvas3.nativeElement, this.mousePosition);
         if (word === 'Erreur') {
             this.gameService.playFailureAudio();
             setTimeout(() => {
@@ -162,8 +166,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     clearCanvas(): void {
         setTimeout(() => {
-            this.drawService.clearDiff(this.canvas1.nativeElement);
-            this.drawService.clearDiff(this.canvas2.nativeElement);
+            this.drawService.clearDiff(this.canvas0.nativeElement);
+            this.drawService.clearDiff(this.canvas3.nativeElement);
         }, constantsTime.BLINKING_TIME);
     }
 

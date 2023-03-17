@@ -2,14 +2,16 @@ import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import * as constants from '@app/configuration/const-game';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
+// import { Vec2 } from '@app/interfaces/vec2';
+// import { MouseButton } from '@app/components/play-area/play-area.component';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
+import * as constants from '@app/configuration/const-canvas';
 
 @Injectable({
     providedIn: 'root',
@@ -18,14 +20,10 @@ export class GameService {
     path: ImagePath;
     game: Game;
     gameInformation: GameInformation;
-    nDifferencesNotFound: number;
+    totalDifferences: number;
     nDifferencesFound: number;
     differencesArray: string[];
     opponentDifferencesArray: string[];
-    isGameFinished: boolean;
-    nHintsUnused: number;
-    nHintsUsed: number;
-    hintsArray: string[];
     playerName: string;
     playersName: string[];
     gameTime: number;
@@ -33,6 +31,8 @@ export class GameService {
     opponentName: string;
     gameId: string;
     gameName: string;
+    // errorPenalty: boolean;
+    // mousePosition: Vec2;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -42,24 +42,28 @@ export class GameService {
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
     ) {
+        // this.errorPenalty = false;
+        // this.mousePosition = { x: 0, y: 0 };
         this.path = {
             differenceNotFound: './assets/img/difference-not-found.png',
             differenceFound: './assets/img/difference-found.png',
-            hintUnused: './assets/img/hint-unused.png',
-            hintUsed: './assets/img/hint-used.png',
         };
         this.gameInformation = {
             gameTitle: '',
             gameMode: '',
             gameDifficulty: '',
             nDifferences: 0,
-            nHints: constants.NUMBER_OF_HINTS,
-            hintsPenalty: 0,
-            isClassical: false,
         };
         this.nDifferencesFound = 0;
-        this.isGameFinished = false;
         this.renderer = rendererFactory.createRenderer(null, null);
+    }
+
+    get width(): number {
+        return constants.DEFAULT_WIDTH;
+    }
+
+    get height(): number {
+        return constants.DEFAULT_HEIGHT;
     }
 
     defineVariables(): void {
@@ -68,15 +72,10 @@ export class GameService {
             gameMode: this.gameType,
             gameDifficulty: this.game.difficulty,
             nDifferences: this.game.listDifferences.length,
-            nHints: constants.NUMBER_OF_HINTS,
-            hintsPenalty: constants.HINTS_PENALTY,
-            isClassical: false,
         };
-        this.nDifferencesNotFound = this.gameInformation.nDifferences;
-        this.nHintsUnused = this.gameInformation.nHints;
-        this.differencesArray = new Array(this.nDifferencesNotFound);
-        this.opponentDifferencesArray = new Array(this.nDifferencesNotFound);
-        this.hintsArray = new Array(this.nHintsUnused);
+        this.totalDifferences = this.gameInformation.nDifferences;
+        this.differencesArray = new Array(this.totalDifferences);
+        this.opponentDifferencesArray = new Array(this.totalDifferences);
         this.playersName = [this.playerName, this.opponentName];
     }
 
@@ -89,12 +88,12 @@ export class GameService {
 
     displayIcons(): void {
         if (this.gameType === 'solo') {
-            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+            for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.path.differenceNotFound;
             }
         }
         if (this.gameType === 'double') {
-            for (let i = 0; i < this.nDifferencesNotFound; i++) {
+            for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.path.differenceNotFound;
                 this.opponentDifferencesArray[i] = this.path.differenceNotFound;
             }
@@ -128,13 +127,12 @@ export class GameService {
     }
 
     reinitializeGame(): void {
-        this.nDifferencesNotFound = 0;
-        this.nHintsUnused = 0;
+        this.totalDifferences = 0;
         this.differencesArray = [];
+        this.opponentDifferencesArray = [];
         this.playerName = '';
         this.playersName = [];
         this.opponentName = '';
-        this.isGameFinished = false;
         this.gameId = '';
         this.gameName = '';
         this.gameTime = 0;
@@ -144,8 +142,8 @@ export class GameService {
         this.game = {
             gameName: '',
             difficulty: '',
-            originalImageData: '../../assets/image_empty.bmp',
-            modifiedImageData: '../../assets/image_empty.bmp',
+            originalImageData: './assets/image_empty.bmp',
+            modifiedImageData: './assets/image_empty.bmp',
             listDifferences: [],
         };
         this.gameInformation = {
@@ -153,9 +151,6 @@ export class GameService {
             gameMode: '',
             gameDifficulty: '',
             nDifferences: 0,
-            nHints: constants.NUMBER_OF_HINTS,
-            hintsPenalty: 0,
-            isClassical: false,
         };
     }
 
@@ -168,7 +163,7 @@ export class GameService {
             this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
         }
 
-        if (this.nDifferencesFound === this.nDifferencesNotFound && this.gameType === 'solo') {
+        if (this.nDifferencesFound === this.totalDifferences && this.gameType === 'solo') {
             this.endGame();
         }
 
@@ -183,17 +178,56 @@ export class GameService {
     }
 
     multiGameEnd(): boolean {
-        if (this.nDifferencesNotFound % 2 === 0) {
-            return this.nDifferencesFound === this.nDifferencesNotFound / 2;
+        if (this.totalDifferences % 2 === 0) {
+            return this.nDifferencesFound === this.totalDifferences / 2;
         }
-        return this.nDifferencesFound === (this.nDifferencesNotFound + 1) / 2;
+        return this.nDifferencesFound === (this.totalDifferences + 1) / 2;
+    }
+
+    sendFoundMessage(): void {
+        const foundMessage = {
+            message: this.playerName + ' a trouvé une différence',
+            playerName: this.playerName,
+            color: '#00FF00',
+            pos: '50%',
+            gameId: this.socket.getRoomName(),
+            event: true,
+        };
+        this.socket.sendMessage(foundMessage);
+        this.socket.messageList.push({
+            message: foundMessage.message,
+            userName: foundMessage.playerName,
+            mine: true,
+            color: foundMessage.color,
+            pos: foundMessage.pos,
+            event: foundMessage.event,
+        });
+    }
+
+    sendErrorMessage(): void {
+        const errorMessage = {
+            message: this.playerName + ' a fait une erreur',
+            playerName: this.playerName,
+            color: '#FF0000',
+            pos: '50%',
+            gameId: this.socket.getRoomName(),
+            event: true,
+        };
+        this.socket.sendMessage(errorMessage);
+        this.socket.messageList.push({
+            message: errorMessage.message,
+            userName: errorMessage.playerName,
+            mine: true,
+            color: errorMessage.color,
+            pos: errorMessage.pos,
+            event: errorMessage.event,
+        });
     }
 
     endGame(): void {
         this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.socket.gameEnded(this.socket.getRoomName());
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
-        this.isGameFinished = true;
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
         this.reinitializeGame();
@@ -233,4 +267,25 @@ export class GameService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.gameDataBase.deleteGame(gameName);
     }
+
+    // mouseHitDetect(event: MouseEvent) {
+    //     if (event.button === MouseButton.Left && !this.errorPenalty) {
+    //         this.mousePosition = { x: event.offsetX, y: event.offsetY };
+    //         const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
+    //         const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+    //         if (diff) {
+    //             this.drawDifference(diff);
+    //             this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+    //             this.socket.sendDifference(diff, this.socket.getRoomName());
+    //             this.displayWord('Trouvé');
+    //             this.sendFoundMessage();
+    //             this.handleDifferenceFound();
+    //         } else {
+    //             this.errorPenalty = true;
+    //             this.displayWord('Erreur');
+    //             this.sendErrorMessage();
+    //         }
+    //         this.clearCanvas();
+    //     }
+    // }
 }

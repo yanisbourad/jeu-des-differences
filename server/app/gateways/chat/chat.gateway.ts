@@ -123,7 +123,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        await this.playerService.removeRoom(socket.id);
+        await this.playerService.removeRoom(this.roomName);
         // await this.playerService.removeRoom(this.roomName);??
         // socket.to(this.roomName).socketsLeave(this.roomName); ??
         socket.leave(this.roomName);

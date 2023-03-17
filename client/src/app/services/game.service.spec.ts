@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { GameInformation } from '@app/interfaces/game-information';
@@ -66,9 +66,6 @@ describe('GameService', () => {
             gameMode: 'solo',
             gameDifficulty: 'Facile',
             nDifferences: 3,
-            nHints: 3,
-            hintsPenalty: 0,
-            isClassical: false,
         };
         gameInfo = {
             gameName: 'Test Game',
@@ -82,8 +79,6 @@ describe('GameService', () => {
         path = {
             differenceNotFound: './assets/img/difference-not-found.png',
             differenceFound: './assets/img/difference-found.png',
-            hintUnused: './assets/img/hint-unused.png',
-            hintUsed: './assets/img/hint-used.png',
         };
     });
 
@@ -95,20 +90,13 @@ describe('GameService', () => {
         gameService.game = game;
         gameService.gameInformation = gameInformation;
         const nDifferencesNotFound = 3;
-        const nHintsUnused = 3;
-        const hintsPenalty = 5;
         gameService.defineVariables();
         expect(gameService.gameInformation.gameTitle).toBe(game.gameName);
         expect(gameService.gameInformation.gameMode).toBe('solo');
         expect(gameService.gameInformation.gameDifficulty).toBe(game.difficulty);
         expect(gameService.gameInformation.nDifferences).toBe(game.listDifferences.length);
-        expect(gameService.gameInformation.nHints).toBe(3);
-        expect(gameService.gameInformation.hintsPenalty).toBe(hintsPenalty);
-        expect(gameService.gameInformation.isClassical).toBe(false);
-        expect(gameService.nDifferencesNotFound).toBe(gameInformation.nDifferences);
-        expect(gameService.nHintsUnused).toBe(gameInformation.nHints);
+        expect(gameService.totalDifferences).toBe(gameInformation.nDifferences);
         expect(gameService.differencesArray.length).toEqual(nDifferencesNotFound);
-        expect(gameService.hintsArray.length).toEqual(nHintsUnused);
     });
 
     it('getGame should retrieve the game from the server and call defineVariables', () => {
@@ -125,12 +113,11 @@ describe('GameService', () => {
     });
 
     it('displayIcons should fill the array of differences and hints', () => {
-        gameService.nDifferencesNotFound = 3;
-        gameService.nHintsUnused = 1;
+        gameService.totalDifferences = 3;
         gameService.path = path;
         gameService.differencesArray = new Array(3);
         gameService.displayIcons();
-        for (let i = 0; i < gameService.nDifferencesNotFound; i++) {
+        for (let i = 0; i < gameService.totalDifferences; i++) {
             expect(gameService.differencesArray[i]).toEqual(gameService.path.differenceNotFound);
         }
         expect(gameService.differencesArray.length).toBe(3);
@@ -148,8 +135,7 @@ describe('GameService', () => {
     });
 
     it('reinitializeGame should reinitialize the game', () => {
-        gameService.nDifferencesNotFound = 3;
-        gameService.nHintsUnused = 3;
+        gameService.totalDifferences = 3;
         gameService.nDifferencesFound = 3;
         gameService.differencesArray = new Array(3);
         gameService.playerName = 'player';
@@ -157,8 +143,7 @@ describe('GameService', () => {
         gameService.game = game;
         gameService.gameInformation = gameInformation;
         gameService.reinitializeGame();
-        expect(gameService.nDifferencesNotFound).toBe(0);
-        expect(gameService.nHintsUnused).toBe(0);
+        expect(gameService.totalDifferences).toBe(0);
         expect(gameService.nDifferencesFound).toBe(0);
         expect(gameService.differencesArray.length).toBe(0);
         expect(gameService.playerName).toBe('');
@@ -173,9 +158,6 @@ describe('GameService', () => {
         expect(gameService.gameInformation.gameMode).toBe('solo');
         expect(gameService.gameInformation.gameDifficulty).toBe('');
         expect(gameService.gameInformation.nDifferences).toBe(0);
-        expect(gameService.gameInformation.nHints).toBe(3);
-        expect(gameService.gameInformation.hintsPenalty).toBe(0);
-        expect(gameService.gameInformation.isClassical).toBe(false);
     });
 
     it('should playSuccessAudio', () => {
@@ -211,7 +193,7 @@ describe('GameService', () => {
 
     it('handleDifferenceFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
         gameService.nDifferencesFound = 0;
-        gameService.nDifferencesNotFound = 3;
+        gameService.totalDifferences = 3;
         gameService.differencesArray = [path.differenceNotFound, path.differenceNotFound, path.differenceNotFound];
         gameService.handleDifferenceFound();
         expect(gameService.nDifferencesFound).toBe(1);
@@ -220,14 +202,12 @@ describe('GameService', () => {
 
     it('handleDifferenceFound should call stopTimer, saveGameRecord, displayGameEnded and reinitializeGame when game ended', () => {
         gameService.nDifferencesFound = 3;
-        gameService.nDifferencesNotFound = 3;
-        gameService.isGameFinished = false;
+        gameService.totalDifferences = 3;
         const saveGameRecordSpy = spyOn(gameService, 'saveGameRecord');
         const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
         const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
         gameService.handleDifferenceFound();
         expect(clientTimeServiceSpy.stopTimer).toHaveBeenCalled();
-        expect(gameService.isGameFinished).toBe(true);
         expect(saveGameRecordSpy).toHaveBeenCalled();
         expect(displayGameEndedSpy).toHaveBeenCalled();
         expect(reinitializeGameSpy).toHaveBeenCalled();

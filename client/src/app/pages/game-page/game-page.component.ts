@@ -6,7 +6,6 @@ import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import * as constantsTime from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
-import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -35,7 +34,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
-        readonly clientTimeService: ClientTimeService,
         public dialog: MatDialog,
         public route: ActivatedRoute,
     ) {
@@ -51,13 +49,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return constants.DEFAULT_HEIGHT;
     }
 
-    ngOnDestroy(): void {
-        this.diffFoundedSubscription.unsubscribe();
-        this.playerFoundDiffSubscription.unsubscribe();
-        this.gameStateSubscription.unsubscribe();
-        this.gameService.reinitializeGame();
-        this.socket.disconnect();
-        this.socket.leaveRoom();
+    ngOnInit(): void {
+        this.getRouterParams();
+        this.gameService.getGame(this.gameService.gameName);
+        this.loading();
+    }
+
+    loading(): void {
+        const timeout = 500;
+        setTimeout(() => {
+            this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+        }, timeout);
     }
 
     ngAfterViewInit(): void {
@@ -68,8 +70,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
         }
-        this.gameService.displayIcons();
         this.drawService.setColor = 'yellow';
+        this.subscriptions();
+    }
+
+    ngOnDestroy(): void {
+        this.diffFoundedSubscription.unsubscribe();
+        this.playerFoundDiffSubscription.unsubscribe();
+        this.gameStateSubscription.unsubscribe();
+        this.gameService.reinitializeGame();
+        // this.socket.leaveRoom();
+    }
+
+    subscriptions(): void {
         this.diffFoundedSubscription = this.socket.diffFounded$.subscribe((newValue) => {
             if (newValue !== undefined) {
                 this.drawService.setColor = 'black';
@@ -94,7 +107,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
 
-    getRouterParams() {
+    getRouterParams(): void {
         this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
         this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
         this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
@@ -102,69 +115,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
     }
 
-    ngOnInit(): void {
-        this.getRouterParams();
-        this.gameService.getGame(this.gameService.gameName);
-        this.gameService.displayIcons();
-        this.loading();
-    }
-
-    loading(): void {
-        const timeout = 500;
-        setTimeout(() => {
-            this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
-        }, timeout);
-    }
-
     // TODO: draw differences on the other canvas when difference found, should stay on it during the game after blinking
-    mouseHitDetect(event: MouseEvent) { // to reduce it's way too big!!!!
+    mouseHitDetect(event: MouseEvent): void {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            const differ = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            if (differ) {
-                this.drawDifference(differ);
-                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== differ);
-                this.socket.sendDifference(differ, this.socket.getRoomName());
+            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
+            if (diff) {
+                this.drawDifference(diff);
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+                this.socket.sendDifference(diff, this.socket.getRoomName());
                 this.displayWord('Trouvé');
-                const dataToSend = {
-                    message: this.gameService.playerName + ' a trouvé une différence',
-                    playerName: this.gameService.playerName,
-                    color: '#FF0000',
-                    pos: '50%',
-                    gameId: this.socket.getRoomName(),
-                    event: true,
-                };
-                this.socket.sendMessage(dataToSend);
-                this.socket.messageList.push({
-                    message: this.gameService.playerName + ' a trouvé une différence',
-                    userName: this.gameService.playerName,
-                    mine: true,
-                    color: '#FF0000',
-                    pos: '50%',
-                    event: true,
-                });
+                this.gameService.sendFoundMessage();
                 this.gameService.handleDifferenceFound();
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
-                const dataToSend2 = {
-                    message: this.gameService.playerName + ' a fait une erreur',
-                    playerName: this.gameService.playerName,
-                    color: '#FF0000',
-                    pos: '50%',
-                    gameId: this.socket.getRoomName(),
-                    event: true,
-                };
-                this.socket.sendMessage(dataToSend2);
-                this.socket.messageList.push({
-                    message: dataToSend2.message,
-                    userName: dataToSend2.playerName,
-                    mine: true,
-                    color: dataToSend2.color,
-                    pos: dataToSend2.pos,
-                    event: dataToSend2.event,
-                });
+                this.gameService.sendErrorMessage();
             }
             this.clearCanvas();
         }
@@ -180,7 +147,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }, constantsTime.BLINKING_TIME);
         } else {
             this.gameService.playSuccessAudio();
-            this.blinkCanvas();
+            this.gameService.blinkDifference(this.canvas1, this.canvas2);
         }
     }
 
@@ -188,23 +155,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    drawDifference(diff: Set<number>) {
+    drawDifference(diff: Set<number>): void {
         this.drawService.drawDiff(diff, this.canvas1.nativeElement);
         this.drawService.drawDiff(diff, this.canvas2.nativeElement);
     }
 
-    blinkCanvas() {
-        this.gameService.blinkDifference(this.canvas1, this.canvas2);
-    }
-
-    clearCanvas() {
+    clearCanvas(): void {
         setTimeout(() => {
             this.drawService.clearDiff(this.canvas1.nativeElement);
             this.drawService.clearDiff(this.canvas2.nativeElement);
         }, constantsTime.BLINKING_TIME);
     }
 
-    displayGiveUp(msg: string, type: string) {
+    displayGiveUp(msg: string, type: string): void {
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type],
             minWidth: '250px',

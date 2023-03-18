@@ -35,9 +35,12 @@ export class ServerTimeService {
     }
 
     resetAllTimers(): void {
-        // to be checked if used
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
+        // unsubscribe to every timers
+        Object.keys(this.timers).forEach((key) => {
+            this.timers[key].unsubscribe();
+        });
     }
 
     removeTimer(id: string): void {

@@ -117,6 +117,11 @@ describe('GameCardHandlerService', () => {
             }),
         ).toBe(OVER_CROWDED);
     });
+    it('should remove player id from joining queue', () => {
+        service.gamesQueue.set('uno', ['rac', 'bac']);
+        service.joiningPlayersQueue.set('uno', ['tas', 'z', 'dos', 'tres']);
+        expect(service.removePlayerInJoiningQueue('uno', 'z')).toBeTruthy();
+    });
 
     it('should return 1 if player is waiting', () => {
         const spy = jest.spyOn(service, 'isPlayerWaiting');

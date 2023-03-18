@@ -152,7 +152,7 @@ describe('GameCardHandlerService', () => {
         service.gamesQueue.set('uno', ['rac', 'ric']);
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
         service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno' });
-        expect(JSON.stringify(service.deleteOponent('ric'))).toBe(JSON.stringify({ id: 'ric', name: 'Best', gameName: 'uno' }));
+        expect(JSON.stringify(service.deleteOpponent('ric'))).toBe(JSON.stringify({ id: 'ric', name: 'Best', gameName: 'uno' }));
     });
 
     it('should return player object if there is the provided player id', () => {

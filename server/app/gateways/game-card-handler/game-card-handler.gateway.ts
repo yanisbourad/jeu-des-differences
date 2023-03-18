@@ -120,14 +120,15 @@ export class GameCardHandlerGateway {
         const gamerCreatorName = this.gameCardHandlerService.getPlayer(gamerCreator.id).name;
         const opponent = this.gameCardHandlerService.deleteOpponent(gamerCreator.id);
         if (opponent) {
-            this.server.to(opponent.id).emit('feedbackOnReject', true);
+            this.server.to(opponent.id).emit('feedbackOnReject', gamerCreatorName);
+            this.logger.log(`The game creator ${gamerCreatorName} rejected ${opponent.name}`);
         }
         const nextOpponent = this.gameCardHandlerService.handleReject(gamerCreator.id);
         if (nextOpponent) {
             this.server.to(nextOpponent.id).emit('feedbackOnWait', gamerCreatorName);
             this.server.to(gamerCreator.id).emit('feedbackOnAccept', nextOpponent.name);
         } else {
-            // if no more Opponent
+            // if no more waiting Opponent in joining queue
             this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
         }
     }
@@ -146,14 +147,13 @@ export class GameCardHandlerGateway {
         };
         this.server.to(playersList[CREATOR_INDEX].id).emit('feedbackOnStart', gameInfo);
         this.server.to(playersList[OPPONENT_INDEX].id).emit('feedbackOnStart', gameInfo);
-        // call a function to remove player from queue and send feedback to player
-        // make new pairs of players
-        // const newPair = this.gameCardHandlerService.getStackedPlayers(gameInfo.gameName);
+
+        // call a function to remove players from joining queue and send feedback to them
         const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[CREATOR_INDEX].gameName);
-        this.logger.log(removedPlayers);
         removedPlayers.forEach((playerId) => {
             this.server.to(playerId).emit('byeTillNext', 'refuser par createur');
         });
+        this.logger.log(`Players were matched, ${removedPlayers.length} players left ${gameInfo.gameName} queue`);
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
     // on disconnect

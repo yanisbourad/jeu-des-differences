@@ -34,7 +34,7 @@ export class GameCardHandlerService {
         });
         return gamesStatus;
     }
-
+    // pull out updated number of player waiting for each game in the game queue
     updateGameStatus(): Map<string, number> {
         const gamesStatus = new Map<string, number>();
         this.gamesQueue.forEach((value, key) => {
@@ -42,7 +42,8 @@ export class GameCardHandlerService {
         });
         return gamesStatus;
     }
-
+    // return true if the player is already in the game queue not the joining queue
+    // false otherwise
     isAboutToPlay(playerId: string, gameName: string): boolean {
         if (this.gamesQueue.get(gameName)) {
             const index = this.gamesQueue.get(gameName).indexOf(playerId);
@@ -56,15 +57,19 @@ export class GameCardHandlerService {
     getCreatorId(gameName: string): string {
         return this.gamesQueue.get(gameName)[CREATOR_INDEX];
     }
-
+    // return true if the player is the creator of the game
     isCreator(id: string, gameName: string): boolean {
         return this.gamesQueue.get(gameName).indexOf(id) === CREATOR_INDEX;
     }
+    // return the creator info and remove him and his most likely opponent
+    // from the game queue
     deleteCreator(gameName: string): string[] {
         const players = this.gamesQueue.get(gameName);
         this.gamesQueue.set(gameName, []);
         return players;
     }
+    // remove the opponent the game queue and replace him by another player
+    // from the joining queue if there is one and return their id for feedback purpose
     removeOpponent(gameName: string): string[] {
         const oldOpponent = this.gamesQueue.get(gameName).pop();
         if (this.joiningPlayersQueue.get(gameName).length !== EMPTY) {
@@ -74,15 +79,17 @@ export class GameCardHandlerService {
         }
         return [oldOpponent];
     }
-
+    // delete the player from the players map and return the player
     deletePlayer(playerId: string): Player {
         const player = this.players.get(playerId);
-        this.players.delete(playerId);
-        if (player) return player;
+        if (player) {
+            this.players.delete(playerId);
+            return player;
+        }
     }
 
-    removePlayerInJoiningQueue(playerId: string, gameName: string): boolean {
-        if (this.joiningPlayersQueue.has(gameName)) {
+    removePlayerInJoiningQueue(gameName: string, playerId: string) {
+        if (this.gamesQueue.get(gameName)) {
             const index = this.joiningPlayersQueue.get(gameName).indexOf(playerId);
             if (index !== MINUS_ONE) {
                 const element = this.joiningPlayersQueue.get(gameName).splice(index, 1);
@@ -148,7 +155,8 @@ export class GameCardHandlerService {
         this.players.delete(playerId);
         return [playerId];
     }
-
+    // remove all players from the joining queue and return their id
+    // to be able to delete them from the players map
     removePlayers(gameName: string): string[] {
         const waitingPlayers: string[] = this.joiningPlayersQueue.get(gameName);
         waitingPlayers.forEach((id) => {
@@ -161,23 +169,8 @@ export class GameCardHandlerService {
 
     acceptOpponent(playerId: string): Player[] {
         const gameName = this.players.get(playerId).gameName;
-
-        // check if there is a player waiting after the initial pair of players is allowed to play
-        // let newCreatorId = '';
-        // let newOpponentId = '';
-        // if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
-        //     newCreatorId = this.joiningPlayersQueue.get(gameName).shift();
-        //     newOpponentId = this.joiningPlayersQueue.get(gameName).shift();
-        // }
-        // empty the queue for the game to receive new players
         const opponentId = this.gamesQueue.get(gameName).pop();
         const creatorId = this.gamesQueue.get(gameName).pop();
-
-        // player pair who is about to play together -- developer choice
-        // if (newCreatorId && newOpponentId) {
-        //     this.gamesQueue.get(gameName).push(newCreatorId);
-        //     this.gamesQueue.get(gameName).push(newOpponentId);
-        // }
         const opponentPlayer = this.players.get(opponentId);
         const creatorPlayer = this.players.get(creatorId);
 
@@ -200,21 +193,19 @@ export class GameCardHandlerService {
         return null;
     }
 
-    handleReject(creatorId: string): Player {
+    handleReject(creatorId: string): Player | null {
         // get the game name
         const gameName = this.players.get(creatorId).gameName;
-        if (this.joiningPlayersQueue.has(gameName) && this.gamesQueue.has(gameName)) {
+        if (this.joiningPlayersQueue.get(gameName).length > EMPTY) {
             // if this game has a list of waiting players
-            const nextOpponentName = this.joiningPlayersQueue.get(gameName).shift();
-            if (nextOpponentName) {
+            const nextOpponentId = this.joiningPlayersQueue.get(gameName).shift();
+            if (nextOpponentId) {
                 // if we got a player
-                const gameQueue = this.gamesQueue.get(gameName);
-                gameQueue.push(nextOpponentName);
-                this.gamesQueue.set(gameName, gameQueue);
-                return this.getPlayer(nextOpponentName);
+                this.gamesQueue.get(gameName).push(nextOpponentId);
+                return this.getPlayer(nextOpponentId);
             }
         }
-        return undefined;
+        return null;
     }
 
     // remove(id: string): boolean {

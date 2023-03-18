@@ -31,8 +31,7 @@ describe('ClientTimeService', () => {
         expect(service.getElapsedTime('1')).toBe(1);
         const time = service.stopChronometer('1');
         expect(time).toBe(1);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        clock.tick(2000);
+        clock.tick(DELAY_BEFORE_EMITTING_TIME * 2);
         const time2 = service.stopChronometer('2');
         expect(time2).toBe(3);
     });

@@ -44,7 +44,7 @@ describe('GameService', () => {
     afterAll(() => {
         jest.clearAllMocks();
         // service.deleteGame(mockGame.gameName);
-        fs.rmdirSync(service.rootPath, { recursive: true });
+        fs.rmSync(service.rootPath, { recursive: true }); // i changed fs.rmdirSync to fs.rmSync cause it's outdated
     });
 
     it('should be defined', () => {

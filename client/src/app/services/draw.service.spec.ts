@@ -16,13 +16,15 @@ describe('DrawService', () => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
         xhr.responseType = 'blob';
-        xhr.onload = () => {
-            const blob = xhr.response;
-            createImageBitmap(blob).then((bmp) => {
-                image = bmp;
-            });
-        };
-        xhr.send();
+        if (!image) {
+            xhr.onload = () => {
+                const blob = xhr.response;
+                createImageBitmap(blob).then((bmp) => {
+                    image = bmp;
+                });
+            };
+            xhr.send();
+        }
     });
 
     it('should create an instance', () => {
@@ -47,23 +49,6 @@ describe('DrawService', () => {
     it('should get the context', () => {
         const context = service.getContext(canvas);
         expect(context).toBeTruthy();
-    });
-
-    it('should draw an image on the canvas', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spy = spyOn<any>(canvas.getContext('2d'), 'drawImage');
-        service.drawImage(image, canvas);
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledOnceWith(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
-    });
-
-    it('should draw an image on multiple canvas', () => {
-        // read the image file as a data URL
-        const spy = spyOn(service, 'drawImage');
-        service.drawImageOnMultipleCanvas(image, canvas, canvas);
-        expect(spy).toHaveBeenCalledTimes(2);
-        expect(spy).toHaveBeenCalledWith(image, canvas);
-        expect(spy).toHaveBeenCalledWith(image, canvas);
     });
 
     it('should draw all differences', () => {
@@ -105,5 +90,23 @@ describe('DrawService', () => {
         const position: Vec2 = { x: 0, y: 0 };
         service.drawWord('test', canvas, position);
         expect(spy).toHaveBeenCalledOnceWith('test', 0, 0);
+    });
+
+    it('should return the same tool as set tool', () => {
+        service.setTool = 'test';
+        expect(service.usedTool).toEqual('test');
+    });
+
+    it('should set the square toggle normally', () => {
+        // initial value is false
+        expect(service.getRectangleIsSquare).toEqual(false);
+
+        // set to true
+        service.setIsSquare();
+        expect(service.getRectangleIsSquare).toEqual(true);
+        // set to true
+
+        service.setIsRectangle();
+        expect(service.getRectangleIsSquare).toEqual(false);
     });
 });

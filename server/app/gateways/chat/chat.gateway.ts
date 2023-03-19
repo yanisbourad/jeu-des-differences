@@ -114,7 +114,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
-        socket.broadcast.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
+        socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
 
     async handleConnection(socket: Socket) {
@@ -141,7 +141,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }, DELAY_BEFORE_EMITTING_TIME);
     }
 
-    private playersMatch(): PlayerMulti[] {
+    playersMatch(): PlayerMulti[] {
         const playerMap = new Map<string, PlayerMulti>();
         for (const player of this.playersQueue) {
             if (playerMap.has(player.id)) {
@@ -154,7 +154,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return [];
     }
 
-    private removePlayerFromQueue(player: PlayerMulti): void {
+    removePlayerFromQueue(player: PlayerMulti): void {
         this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
     }
 }

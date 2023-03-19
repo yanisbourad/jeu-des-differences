@@ -30,3 +30,8 @@ export const FAKE_QUEUE = [
     'y',
 ];
 export const MINUS_ONE = -1;
+export const ONLY_CREATOR = 1;
+export const CREATOR_OR_OPPONENT = 2;
+export const CREATOR_WITH_OPPONENT = 2;
+export const CREATOR_INDEX = 0;
+export const OPPONENT_INDEX = 1;

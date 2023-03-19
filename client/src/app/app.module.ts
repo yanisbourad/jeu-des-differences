@@ -19,7 +19,7 @@ import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-t
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
 import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
-import { GiveUpMessagePopupComponent } from './components/give-up-message-popup/give-up-message-popup.component';
+import { GeneralFeedbackComponent } from './components/general-feedback/general-feedback.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
@@ -62,7 +62,7 @@ import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,
-        GiveUpMessagePopupComponent,
+        GeneralFeedbackComponent,
     ],
     imports: [
         AppMaterialModule,

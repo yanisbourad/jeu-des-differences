@@ -1,36 +1,37 @@
 /* eslint-disable no-restricted-imports */
 /* eslint-disable deprecation/deprecation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-
 import { PlayerWaitPopupComponent } from '../player-wait-popup/player-wait-popup.component';
 import { NamePopupComponent } from './name-popup.component';
+import SpyObj = jasmine.SpyObj;
 
 describe('NamePopupComponent', () => {
     let component: NamePopupComponent;
     let fixture: ComponentFixture<NamePopupComponent>;
     let route: Router;
-    let dialogSpy: jasmine.SpyObj<MatDialog>;
-
-    const dialogRefSpy = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        close: () => {},
-    };
+    const data = { name: 'test', gameName: 'gameName', gameType: 'double' };
+    let dialogRefSpy: SpyObj<MatDialogRef<NamePopupComponent>>;
 
     beforeEach(() => {
-        dialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef<NamePopupComponent>', ['close', 'afterClosed']);
+        // dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    });
+
+    beforeEach(async () => {
+        // dialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
         TestBed.configureTestingModule({
             imports: [MatDialogModule, RouterTestingModule],
             declarations: [NamePopupComponent, PlayerWaitPopupComponent],
             providers: [
-                { provider: MatDialog, useValue: dialogSpy },
-                { provide: MatDialogRef, useValue: dialogRefSpy },
+                // { provider: MatDialog, useValue: dialogSpy },
+                { provide: MatDialogRef<NamePopupComponent>, useValue: dialogRefSpy },
                 {
                     provide: MAT_DIALOG_DATA,
-                    useValue: { name: '', gameName: 'gameName', gameType: 'double' },
+                    useValue: data,
                 },
             ],
         }).compileComponents();
@@ -38,6 +39,7 @@ describe('NamePopupComponent', () => {
         fixture = TestBed.createComponent(NamePopupComponent);
         component = fixture.componentInstance;
         route = TestBed.get(Router);
+        fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -47,26 +49,16 @@ describe('NamePopupComponent', () => {
         component.ngOnInit();
         expect(component.data.name).toBe(' ');
     });
-    it('should call close', () => {
-        const spy = spyOn(component.dialogRef, 'close').and.callThrough();
-        component.onNoClick();
-        expect(spy).toHaveBeenCalled();
+    it('should return true if the name is valid', () => {
+        expect(component.validateGameName('test')).toBeTrue();
+        expect(component.validateGameName('      ')).toBeFalse();
+        expect(component.validateGameName('te')).toBeFalse();
+        expect(component.validateGameName('VIRTUAL QUEST')).toBeFalse();
     });
-    // it('should open dialog calling launchDialog for 1v1 popup', () => {
-    //     const dialogCloseSpy = jasmine.createSpyObj('MatDialog', ['afterClosed']);
-    //     dialogSpy.open.and.returnValue(dialogCloseSpy);
-    //     component.data.gameType = 'double';
-    //     component.data.gameName = 'gameName';
-    //     component.data.name = 'player';
-    //     component.launchDialog();
-    //     // expect(dialogSpy.open).toHaveBeenCalledWith(PlayerWaitPopupComponent, {
-    //     //     data: { name: component.data.name, gameName: component.data.gameName, gameType: component.data.gameType },
-    //     //     disableClose: true,
-    //     //     height: '600px',
-    //     //     width: '500px',
-    //     // });
-    //     expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
-    // });
+    it('should call close', () => {
+        component.onNoClick();
+        expect(dialogRefSpy.close).toHaveBeenCalled();
+    });
 
     it('should call onNoClick when button is pressed', () => {
         spyOn(component, 'onNoClick');

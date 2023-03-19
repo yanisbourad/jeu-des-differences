@@ -1,6 +1,8 @@
 import { ElementRef } from '@angular/core';
 import { CommandSpecific } from '@app/classes/command-specific';
+import { DEFAULT_LINE_CAP } from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
+
 export class DrawListLineCommand extends CommandSpecific {
     points: Point[];
     color: string;
@@ -22,5 +24,21 @@ export class DrawListLineCommand extends CommandSpecific {
 
     undo(): void {
         this.restoreLastCanvasState(this.oldPointsColor);
+    }
+
+    protected drawListLine(drawing: Point[], color: string, lineWidth: number): void {
+        if (drawing.length <= 1) return;
+        const context = this.ctx;
+        context.lineCap = DEFAULT_LINE_CAP;
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+        for (let i = 1; i < drawing.length; i++) {
+            const lastPoint = drawing[i - 1];
+            const point = drawing[i];
+            context.beginPath();
+            context.moveTo(lastPoint.x, lastPoint.y);
+            context.lineTo(point.x, point.y);
+            context.stroke();
+        }
     }
 }

@@ -47,8 +47,8 @@ export class NamePopupComponent implements OnInit {
     }
 
     launchDialog(): void {
-        if (this.validateGameName(this.data.name) === false) {
-            const message = 'Veuillez entrer un nom ayant au moins 2 caractères et moins de 10 caractères.';
+        if (this.validatePlayerName(this.data.name) === false) {
+            const message = 'Veuillez entrer un nom valide (2-10 caractères alphanumeriques).';
             this.launchFeedback(message);
             return;
         }
@@ -58,18 +58,21 @@ export class NamePopupComponent implements OnInit {
             height: '600px',
             width: '600px',
         });
-
-        // dialog.afterClosed().subscribe((result) => {
-        //     // this.name = result;
-        // });
-        dialog.afterClosed().subscribe(() => {
-            // this.name = result;
+        dialog.afterClosed().subscribe((result) => {
+            this.name = result;
         });
     }
 
-    validateGameName(name: string): boolean {
+    validatePlayerName(name: string): boolean {
         const len = name.trim() === '';
-        if (!len && name.length > this.lowerLimitNameLength && name.length < this.upperLimitNameLength) return true;
+        if (
+            !len &&
+            name.length > this.lowerLimitNameLength &&
+            name.length < this.upperLimitNameLength &&
+            !name.startsWith('<') &&
+            !name.endsWith('>')
+        )
+            return true;
         return false;
     }
 

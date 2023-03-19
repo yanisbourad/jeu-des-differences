@@ -15,9 +15,6 @@ export class DrawImageCommand extends CommandSpecific {
         canvas.drawImage(this.image, 0, 0);
     }
     undo(): void {
-        const canvas = this.ctx;
-        const img = new Image();
-        img.src = this.oldCanvasData;
-        img.onload = () => canvas.drawImage(img, 0, 0);
+        this.putsCanvasData(this.canvas, this.oldCanvasData);
     }
 }

@@ -11,9 +11,10 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent {
     @Input() iconUsed: boolean;
+    newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
-    constructor(public dialog: MatDialog, private router: Router) {}
+    constructor(public dialog: MatDialog, public router: Router) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
             height: '774px',
@@ -22,7 +23,7 @@ export class HeaderComponent {
         dialogRef.afterClosed();
     }
     redirect(): boolean {
-        const newUrl = this.router.url.split(';')[0];
-        return newUrl !== '/game';
+        this.newUrl = this.router.url.split(';')[0];
+        return this.newUrl !== '/game';
     }
 }

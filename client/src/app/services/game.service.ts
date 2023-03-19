@@ -186,7 +186,15 @@ export class GameService {
 
     sendFoundMessage(): void {
         const foundMessage = {
-            message: this.playerName + ' a trouvé une différence',
+            message:
+                new Date().getHours() +
+                ':' +
+                new Date().getMinutes() +
+                ':' +
+                new Date().getSeconds() +
+                ' - ' +
+                ' Différence trouvée par ' +
+                this.playerName,
             playerName: this.playerName,
             color: '#00FF00',
             pos: '50%',
@@ -206,7 +214,7 @@ export class GameService {
 
     sendErrorMessage(): void {
         const errorMessage = {
-            message: this.playerName + ' a fait une erreur',
+            message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur par ' + this.playerName,
             playerName: this.playerName,
             color: '#FF0000',
             pos: '50%',

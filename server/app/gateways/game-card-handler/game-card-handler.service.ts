@@ -145,16 +145,16 @@ export class GameCardHandlerService {
 
     // check playerJoiningQueue and add the first two players to the game queue
     // return the number of players waiting
-    checkJoiningPlayersQueue(gameName: string): string[] {
-        if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
-            this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
-            this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
-            return this.gamesQueue.get(gameName);
-        }
-        const playerId = this.joiningPlayersQueue.get(gameName).shift();
-        this.players.delete(playerId);
-        return [playerId];
-    }
+    // checkJoiningPlayersQueue(gameName: string): string[] {
+    //     if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
+    //         this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
+    //         this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
+    //         return this.gamesQueue.get(gameName);
+    //     }
+    //     const playerId = this.joiningPlayersQueue.get(gameName).shift();
+    //     this.players.delete(playerId);
+    //     return [playerId];
+    // }
     // remove all players from the joining queue and return their id
     // to be able to delete them from the players map
     removePlayers(gameName: string): string[] {

@@ -8,6 +8,7 @@ import * as constantsTime from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
+import { HotkeysService } from '@app/services/hotkeys.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Subscription } from 'rxjs';
 
@@ -26,6 +27,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
     found: boolean;
+    isCheating: boolean = false;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundedSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
@@ -39,6 +41,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         readonly socket: SocketClientService,
         public dialog: MatDialog,
         public route: ActivatedRoute,
+        private readonly hotkeysService: HotkeysService,
     ) {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
@@ -72,6 +75,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
+
+            this.hotkeysService.hotkeysEventListener(['t'], true, () => {
+                this.isCheating = !this.isCheating;
+                this.cheatMode();
+            });
         }
         this.drawService.setColor = 'yellow';
         this.subscriptions();
@@ -197,5 +205,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     giveUp(): void {
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
+    }
+
+    cheatMode(): void {
+        const blinking = setInterval(() => {
+            this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
+            for (const set of this.unfoundedDifference) {
+                this.drawDifference(set);
+            }
+            if (!this.isCheating) {
+                this.clearCanvas();
+                this.drawService.setColor = 'yellow';
+                clearInterval(blinking);
+            }
+        }, constantsTime.BLINKING_TIMEOUT);
     }
 }

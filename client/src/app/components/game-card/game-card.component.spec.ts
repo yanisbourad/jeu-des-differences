@@ -117,9 +117,9 @@ describe('GameCardComponent', () => {
         expect(firstRanking.querySelector('#firstMulti').textContent).toContain('1:23 joueur 1');
     });
     it('should call deleteGame() on delete click', () => {
-        spyOn(component, 'deleteGame');
+        spyOn(component, 'onDelete');
         const deleteButton: DebugElement = fixture.debugElement.query(By.css('.deleteButton'));
         deleteButton.triggerEventHandler('click', null);
-        expect(component.deleteGame).toHaveBeenCalled();
+        expect(component.onDelete).toHaveBeenCalled();
     });
 });

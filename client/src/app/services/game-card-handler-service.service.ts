@@ -18,6 +18,7 @@ export class GameCardHandlerService {
     isReadyToPlay: boolean;
     isNewUpdate: boolean;
     isLeaving: boolean;
+    isRejected: boolean;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
@@ -27,6 +28,7 @@ export class GameCardHandlerService {
         this.games = new Map<string, number>();
         this.isNewUpdate = false;
         this.isLeaving = false;
+        this.isRejected = false;
     }
 
     clearService(): void {
@@ -51,6 +53,10 @@ export class GameCardHandlerService {
         return this.isReadyToPlay;
     }
 
+    getRejectionStatus(): boolean {
+        return this.isRejected;
+    }
+
     connect() {
         this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
     }
@@ -72,9 +78,7 @@ export class GameCardHandlerService {
         this.isNewUpdate = isNewUpdate;
     }
 
-    join(game: Game) {
-        this.socket.emit('joinGame', game);
-        this.isLeaving = false;
+    listenToFeedBack() {
         this.socket.on('feedbackOnJoin', () => {
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
@@ -106,15 +110,17 @@ export class GameCardHandlerService {
         });
 
         this.socket.on('feedbackOnReject', () => {
-            // this.opponentPlayer = nextOpponentName;
-            // console.log(nextOpponentName);
-            // console.log('feedbackOnReject, $$$$$$$$$$$$$$$$$$$$');
             this.isLeaving = true;
+            this.isRejected = true;
         });
 
         this.socket.on('byeTillNext', () => {
             this.isLeaving = true;
             this.resetGameVariables();
+        });
+        this.socket.on('updateStatus', (gamesStatus) => {
+            this.games = new Map(gamesStatus);
+            this.isNewUpdate = true;
         });
 
         this.socket.on('disconnect', () => {
@@ -123,11 +129,18 @@ export class GameCardHandlerService {
         });
     }
 
+    join(game: Game) {
+        this.socket.emit('joinGame', game);
+        this.isLeaving = false;
+        this.listenToFeedBack();
+    }
+
     resetGameVariables(): void {
         this.isCreator = false;
         this.state = '';
         this.isReadyToPlay = false;
         this.opponentPlayer = '';
+        this.isRejected = false;
     }
 
     getLeavingState(): boolean {
@@ -136,18 +149,7 @@ export class GameCardHandlerService {
 
     leave(gameName: string): void {
         this.socket.emit('cancelGame', gameName);
-        this.socket.on('feedBackOnLeave', () => {
-            // send pop up to player
-            this.isLeaving = true;
-        });
-        this.socket.on('feedbackOnJoin', () => {
-            this.isCreator = true;
-            this.opponentPlayer = "Attente d'un adversaire";
-        });
-        this.socket.on('feedbackOnAccept', (name) => {
-            this.opponentPlayer = name;
-            if (this.isCreator) this.state = 'Accepter';
-        });
+        this.listenToFeedBack();
     }
 
     startGame(gameName: string): void {
@@ -156,6 +158,7 @@ export class GameCardHandlerService {
 
     rejectOpponent(gameName: string): void {
         this.socket.emit('rejectOpponent', gameName);
+        this.listenToFeedBack();
     }
 
     toggleCreateJoin(gameName: string): string {

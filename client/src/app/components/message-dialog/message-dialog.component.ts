@@ -18,7 +18,7 @@ export class MessageDialogComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,
-        private readonly socket: SocketClientService,
+        readonly socket: SocketClientService,
         private readonly gameService: GameService,
         public dialog: MatDialog,
     ) {

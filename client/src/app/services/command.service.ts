@@ -1,7 +1,6 @@
-import { ElementRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { CommandSpecific } from '@app/classes/command-specific';
 import * as keys from '@app/configuration/const-hotkeys';
-import { DrawService } from './draw.service';
 import { HotkeysService } from './hotkeys.service';
 @Injectable({
     providedIn: 'root',
@@ -10,7 +9,7 @@ export class CommandService {
     pastCommand: CommandSpecific[] = [];
     futureCommand: CommandSpecific[] = [];
 
-    constructor(private readonly drawService: DrawService, private readonly hotkeysService: HotkeysService) {
+    constructor(private readonly hotkeysService: HotkeysService) {
         // add event listener for redo undo
         this.hotkeysService.hotkeysEventListener([keys.CTRL, 'z'], true, this.undo.bind(this));
         this.hotkeysService.hotkeysEventListener([keys.CTRL, keys.SHIFT, 'z'], true, this.redo.bind(this));
@@ -35,21 +34,6 @@ export class CommandService {
         if (!command) return;
         command.undo();
         this.futureCommand.push(command as CommandSpecific);
-    }
-    executeAllOnCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
-        this.drawService.clearCanvas(canvas.nativeElement);
-
-        // we will do the drawImageCommand first
-        this.pastCommand
-            .filter((a: CommandSpecific) => a.constructor.name === 'DrawImageCommand')
-            .forEach((command) => {
-                command.doOnOtherCanvas(canvas, canvasName);
-            });
-        this.pastCommand
-            .filter((a: CommandSpecific) => a.constructor.name !== 'DrawImageCommand')
-            .forEach((command) => {
-                command.doOnOtherCanvas(canvas, canvasName);
-            });
     }
 
     clear(): void {

@@ -1,5 +1,4 @@
 import { ElementRef } from '@angular/core';
-import { DEFAULT_LINE_CAP } from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
 const NBR_PIXELS_SQUARE = 10;
 // this is the base class for all the commands regards to drawing
@@ -40,14 +39,6 @@ export abstract class CommandSpecific {
         context.clearRect(0, 0, this.width, this.height);
     }
 
-    doOnOtherCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
-        if (this.canvasName !== canvasName) return;
-        const tempCanvas = this.canvas;
-        this.canvas = canvas;
-        this.do(false);
-        this.canvas = tempCanvas;
-    }
-
     protected getScreenShot(canvasOld: ElementRef<HTMLCanvasElement>): string {
         return canvasOld.nativeElement.toDataURL();
     }
@@ -59,33 +50,6 @@ export abstract class CommandSpecific {
         img.onload = () => ctx.drawImage(img, 0, 0);
     }
 
-    protected rgbToHex(r: number, g: number, b: number): string {
-        const nbrBites = 16;
-        return [r, g, b].map((x) => x.toString(nbrBites).padStart(2, '0')).join('');
-    }
-
-    protected drawPoint(point: Point, color: string) {
-        const context = this.ctx;
-        context.fillStyle = color;
-        context.fillRect(point.x, point.y, 1, 1);
-    }
-
-    protected drawListLine(drawing: Point[], color: string, lineWidth: number): void {
-        if (drawing.length <= 1) return;
-        const context = this.ctx;
-        context.lineCap = DEFAULT_LINE_CAP;
-        context.strokeStyle = color;
-        context.lineWidth = lineWidth;
-        for (let i = 1; i < drawing.length; i++) {
-            const lastPoint = drawing[i - 1];
-            const point = drawing[i];
-            context.beginPath();
-            context.moveTo(lastPoint.x, lastPoint.y);
-            context.lineTo(point.x, point.y);
-            context.stroke();
-        }
-    }
-
     protected saveLineOldColors(points: Point[], lineWidth: number): Map<string, ImageData> {
         const squares = this.getSquareList(points, lineWidth);
         const oldPointsColor = new Map<string, ImageData>();
@@ -94,6 +58,7 @@ export abstract class CommandSpecific {
         }
         return oldPointsColor;
     }
+
     // function that will take a list of points and return a list of 50x50 squares that the line are in
     protected getSquareList(points: Point[], lineWidth: number): Point[] {
         const setKeys = new Set<string>();
@@ -137,6 +102,7 @@ export abstract class CommandSpecific {
             }
         }
     }
+
     abstract do(saveForUndo: boolean): void;
     abstract undo(): void;
 }

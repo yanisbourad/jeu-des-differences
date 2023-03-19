@@ -27,6 +27,7 @@ export class GameCardHandlerService {
         this.games = new Map<string, number>();
         this.isNewUpdate = false;
         this.isLeaving = false;
+        this.isRejected = false;
     }
 
     getGameState(): string {
@@ -41,7 +42,7 @@ export class GameCardHandlerService {
         return this.isReadyToPlay;
     }
 
-    getRejectedStatus(): boolean {
+    getRejectionStatus(): boolean {
         return this.isRejected;
     }
 

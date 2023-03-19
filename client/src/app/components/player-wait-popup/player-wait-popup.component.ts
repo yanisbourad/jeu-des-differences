@@ -20,7 +20,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
         public gameCardHandlerService: GameCardHandlerService,
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string }, // private route: Router,
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
     ) {
         this.game = {
             name: '',
@@ -66,7 +66,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
         }
-        this.isRejected = this.gameCardHandlerService.getRejectedStatus();
+        this.isRejected = this.gameCardHandlerService.getRejectionStatus();
         if (this.isRejected) {
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();

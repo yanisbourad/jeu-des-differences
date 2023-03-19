@@ -15,8 +15,8 @@ export class DrawService {
     private rectangleIsSquare: boolean = false;
     private tool: string = styler.PEN;
     constructor(private readonly hotkeysService: HotkeysService) {
-        this.hotkeysService.hotkeysEventListener([keys.SHIFT], true, this.isRectangle.bind(this));
-        this.hotkeysService.hotkeysEventListener([keys.SHIFT], false, this.isSquare.bind(this));
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], false, this.setIsRectangle.bind(this));
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], true, this.setIsSquare.bind(this));
     }
 
     get usedTool(): string {
@@ -55,15 +55,11 @@ export class DrawService {
         this.lineWidth = width;
     }
 
-    set setRectangleIsSquare(isSquare: boolean) {
-        this.rectangleIsSquare = isSquare;
-    }
-
-    isRectangle(): void {
+    setIsSquare(): void {
         this.rectangleIsSquare = true;
     }
 
-    isSquare(): void {
+    setIsRectangle(): void {
         this.rectangleIsSquare = false;
     }
 

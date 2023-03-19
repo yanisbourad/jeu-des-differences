@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import * as keys from '@app/configuration/const-hotkeys';
 import * as styler from '@app/configuration/const-styler-type';
-import { Drawing } from '@app/interfaces/drawing';
 import { Point } from '@app/interfaces/point';
 import { Vec2 } from '@app/interfaces/vec2';
 import { HotkeysService } from './hotkeys.service';
@@ -68,24 +67,6 @@ export class DrawService {
         this.rectangleIsSquare = false;
     }
 
-    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
-    }
-
-    drawDataUrl(dataUrl: string, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        const img = new Image();
-        img.onload = () => {
-            context.drawImage(img, 0, 0);
-        };
-    }
-
-    drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
-        this.drawImage(image, canvas1);
-        this.drawImage(image, canvas2);
-    }
-
     drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
         differences.forEach((diff) => {
             this.drawDiff(diff, canvas);
@@ -101,36 +82,6 @@ export class DrawService {
             context.fillStyle = this.color;
             context.fillRect(x, y, 1, 1);
         });
-    }
-
-    getCoordsSquare(firstPoint: Point, lastPoint: Point): [number, number, number, number] {
-        const width = Math.abs(lastPoint.x - firstPoint.x);
-        const height = Math.abs(lastPoint.y - firstPoint.y);
-        const size = Math.max(width, height);
-        if (lastPoint.x < firstPoint.x) {
-            if (lastPoint.y < firstPoint.y) {
-                return [firstPoint.x - size, firstPoint.y - size, size, size];
-            } else {
-                return [firstPoint.x - size, firstPoint.y, size, size];
-            }
-        } else {
-            if (lastPoint.y < firstPoint.y) {
-                return [firstPoint.x, firstPoint.y - size, size, size];
-            } else {
-                return [firstPoint.x, firstPoint.y, size, size];
-            }
-        }
-    }
-
-    drawLine(point: Point, lastPoint: Point, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.beginPath();
-        context.moveTo(lastPoint.x, lastPoint.y);
-        context.lineTo(point.x, point.y);
-        context.lineCap = constants.DEFAULT_LINE_CAP;
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.stroke();
     }
 
     clearCanvas(canvas: HTMLCanvasElement) {
@@ -151,12 +102,6 @@ export class DrawService {
         return context;
     }
 
-    drawListLine(drawing: Drawing, nativeElement: HTMLCanvasElement) {
-        if (drawing.points.length <= 1) return;
-        for (let i = 1; i < drawing.points.length; i++) {
-            this.drawLine(drawing.points[i], drawing.points[i - 1], nativeElement);
-        }
-    }
     drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
         const context = this.getContext(canvas);
         context.font = '25px system-ui';

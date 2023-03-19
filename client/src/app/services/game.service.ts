@@ -31,6 +31,7 @@ export class GameService {
     opponentName: string;
     gameId: string;
     gameName: string;
+    message: string;
     // errorPenalty: boolean;
     // mousePosition: Vec2;
     private renderer: Renderer2;
@@ -213,8 +214,12 @@ export class GameService {
     }
 
     sendErrorMessage(): void {
+        this.message = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur';
+        if (this.gameType === 'multi') {
+            this.message = this.message + ' par ' + this.playerName;
+        }
         const errorMessage = {
-            message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur par ' + this.playerName,
+            message: this.message,
             playerName: this.playerName,
             color: '#FF0000',
             pos: '50%',

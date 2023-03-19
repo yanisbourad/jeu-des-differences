@@ -253,4 +253,40 @@ describe('GameCardHandlerService', () => {
     //     service.joiningPlayersQueue.set('uno', ['rac']);
     //     expect(service.checkJoiningPlayersQueue('uno')).toBe(1);
     // });
+    // test for removePlayers
+    it('should return 0 as no player is waiting', () => {
+        service.gamesQueue.set('uno', []);
+        service.joiningPlayersQueue.set('uno', []);
+        expect(JSON.stringify(service.removePlayers('uno'))).toBe(JSON.stringify([]));
+    });
+
+    it('should return 1 as one player is waiting', () => {
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.gamesQueue.set('uno', ['dac', 'pat']);
+        service.joiningPlayersQueue.set('uno', ['rac']);
+        expect(JSON.stringify(service.removePlayers('uno'))).toBe(JSON.stringify(['rac']));
+    });
+
+    // test for handleReject
+    it('should return 1 player is waiting', () => {
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno' });
+        service.gamesQueue.set('uno', ['rac']);
+        service.joiningPlayersQueue.set('uno', ['tas']);
+        expect(JSON.stringify(service.handleReject('rac'))).toBe(
+            JSON.stringify({
+                id: 'tas',
+                name: 'Baddy',
+                gameName: 'uno',
+            }),
+        );
+    });
+
+    it('should return null as no player is waiting', () => {
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno' });
+        service.gamesQueue.set('uno', ['rac']);
+        service.joiningPlayersQueue.set('uno', []);
+        expect(JSON.stringify(service.handleReject('rac'))).toBe(JSON.stringify(null));
+    });
 });

@@ -29,6 +29,9 @@ export class GameService {
     opponentName: string;
     gameId: string;
     gameName: string;
+    message: string;
+    // errorPenalty: boolean;
+    // mousePosition: Vec2;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -183,16 +186,12 @@ export class GameService {
     }
 
     sendFoundMessage(): void {
+        this.message = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Différence trouvée';
+        if (this.gameType === 'double') {
+            this.message = this.message + ' par ' + this.playerName;
+        }
         const foundMessage = {
-            message:
-                new Date().getHours() +
-                ':' +
-                new Date().getMinutes() +
-                ':' +
-                new Date().getSeconds() +
-                ' - ' +
-                ' Différence trouvée par ' +
-                this.playerName,
+            message: this.message,
             playerName: this.playerName,
             color: '#00FF00',
             pos: '50%',
@@ -211,8 +210,12 @@ export class GameService {
     }
 
     sendErrorMessage(): void {
+        this.message = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur';
+        if (this.gameType === 'double') {
+            this.message = this.message + ' par ' + this.playerName;
+        }
         const errorMessage = {
-            message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur par ' + this.playerName,
+            message: this.message,
             playerName: this.playerName,
             color: '#FF0000',
             pos: '50%',

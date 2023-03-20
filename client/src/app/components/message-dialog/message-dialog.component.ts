@@ -18,7 +18,7 @@ export class MessageDialogComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,
-        private readonly socket: SocketClientService,
+        readonly socket: SocketClientService,
         private readonly gameService: GameService,
         public dialog: MatDialog,
     ) {
@@ -34,7 +34,7 @@ export class MessageDialogComponent {
                 roomName: this.socket.getRoomName(),
             });
             const dataToSend = {
-                message: this.gameService.playerName + ' a quitté la partie',
+                message: this.gameService.playerName + ' a abandonné la partie.',
                 playerName: this.gameService.playerName,
                 color: '#FF0000',
                 pos: '50%',
@@ -43,7 +43,7 @@ export class MessageDialogComponent {
             };
             this.socket.sendMessage(dataToSend);
             this.socket.messageList.push({
-                message: this.gameService.playerName + ' a quitté la partie',
+                message: this.gameService.playerName + ' a abandonné la partie.',
                 userName: this.gameService.playerName,
                 mine: true,
                 color: '#FF0000',

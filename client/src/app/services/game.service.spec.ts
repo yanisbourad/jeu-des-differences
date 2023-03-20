@@ -10,9 +10,10 @@ import { of } from 'rxjs';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
+import * as constants from '@app/configuration/const-canvas';
 import SpyObj = jasmine.SpyObj;
 
-fdescribe('GameService', () => {
+describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
     let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
@@ -81,6 +82,14 @@ fdescribe('GameService', () => {
     it('should be created', () => {
         expect(gameService).toBeTruthy();
     });
+
+    it('getHeight should return default height', fakeAsync(() => {
+        expect(gameService.height).toBe(constants.DEFAULT_HEIGHT);
+    }));
+
+    it('getHeight should return height', fakeAsync(() => {
+        expect(gameService.width).toBe(constants.DEFAULT_WIDTH);
+    }));
 
     it('should call defineVariables', () => {
         gameService.game = game;
@@ -253,6 +262,7 @@ fdescribe('GameService', () => {
 
     it('sendFoundMessage should sendMessage and push to messageList', () => {
         gameService.playerName = 'test';
+        gameService.gameType = 'double';
         const message = {
             message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Différence trouvée par test',
             userName: 'test',
@@ -269,6 +279,7 @@ fdescribe('GameService', () => {
 
     it('sendErrorMessage should sendMessage and push to messageList', () => {
         gameService.playerName = 'test';
+        gameService.gameType = 'double';
         const message = {
             message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur par test',
             userName: 'test',

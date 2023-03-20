@@ -100,7 +100,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     subscriptions(): void {
         this.diffFoundedSubscription = this.socket.diffFounded$.subscribe((newValue) => {
-            if (newValue !== undefined) {
+            if (newValue) {
                 this.drawService.setColor = 'black';
                 this.drawDifference(newValue);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
@@ -218,19 +218,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     toggleCheating(): void {
         this.isCheating = !this.isCheating;
-        this.cheatMode();
+        if (this.isCheating) this.cheatMode();
+        else {
+            clearInterval(this.blinking);
+            this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
+            this.drawService.setColor = 'black';
+        }
     }
 
     cheatModeKeyBinding(): number {
-        return this.hotkeysService.hotkeysEventListener(['t'], true, () => {
-            this.isCheating = !this.isCheating;
-            if (this.isCheating) this.cheatMode();
-            else {
-                clearInterval(this.blinking);
-                this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
-                this.drawService.setColor = 'black';
-            }
-        });
+        return this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
     }
 
     // deep comparison of 2 set<number>

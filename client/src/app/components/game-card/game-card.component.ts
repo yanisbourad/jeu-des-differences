@@ -31,6 +31,7 @@ export class GameCardComponent implements OnInit {
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
+            disableClose: true,
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -45,6 +46,7 @@ export class GameCardComponent implements OnInit {
     launchDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'double' },
+            disableClose: true,
         });
 
         dialogRef.afterClosed().subscribe((result) => {

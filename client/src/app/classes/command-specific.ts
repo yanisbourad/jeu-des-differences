@@ -1,5 +1,4 @@
 import { ElementRef } from '@angular/core';
-import { DEFAULT_LINE_CAP } from '@app/configuration/const-canvas';
 import { Point } from '@app/interfaces/point';
 const NBR_PIXELS_SQUARE = 10;
 // this is the base class for all the commands regards to drawing
@@ -19,19 +18,19 @@ export abstract class CommandSpecific {
         this.canvas = canvas;
     }
 
-    protected get canvasElement(): HTMLCanvasElement {
+    get canvasElement(): HTMLCanvasElement {
         return this.canvas.nativeElement;
     }
 
-    protected get ctx(): CanvasRenderingContext2D {
+    get ctx(): CanvasRenderingContext2D {
         return this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
     }
 
-    protected get width(): number {
+    get width(): number {
         return this.canvas.nativeElement.width;
     }
 
-    protected get height(): number {
+    get height(): number {
         return this.canvas.nativeElement.height;
     }
 
@@ -40,53 +39,22 @@ export abstract class CommandSpecific {
         context.clearRect(0, 0, this.width, this.height);
     }
 
-    doOnOtherCanvas(canvas: ElementRef<HTMLCanvasElement>, canvasName: string): void {
-        if (this.canvasName !== canvasName) return;
-        const tempCanvas = this.canvas;
-        this.canvas = canvas;
-        this.do(false);
-        this.canvas = tempCanvas;
-    }
-
-    protected getScreenShot(canvasOld: ElementRef<HTMLCanvasElement>): string {
+    getScreenShot(canvasOld: ElementRef<HTMLCanvasElement>): string {
         return canvasOld.nativeElement.toDataURL();
     }
 
-    protected putsCanvasData(canvas: ElementRef<HTMLCanvasElement>, data: string): void {
+    putsCanvasData(canvas: ElementRef<HTMLCanvasElement>, data: string): void {
         const img = new Image();
         img.src = data;
+        this.clearCanvas(canvas);
+
         const ctx = canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        img.onload = () => ctx.drawImage(img, 0, 0);
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+        };
     }
 
-    protected rgbToHex(r: number, g: number, b: number): string {
-        const nbrBites = 16;
-        return [r, g, b].map((x) => x.toString(nbrBites).padStart(2, '0')).join('');
-    }
-
-    protected drawPoint(point: Point, color: string) {
-        const context = this.ctx;
-        context.fillStyle = color;
-        context.fillRect(point.x, point.y, 1, 1);
-    }
-
-    protected drawListLine(drawing: Point[], color: string, lineWidth: number): void {
-        if (drawing.length <= 1) return;
-        const context = this.ctx;
-        context.lineCap = DEFAULT_LINE_CAP;
-        context.strokeStyle = color;
-        context.lineWidth = lineWidth;
-        for (let i = 1; i < drawing.length; i++) {
-            const lastPoint = drawing[i - 1];
-            const point = drawing[i];
-            context.beginPath();
-            context.moveTo(lastPoint.x, lastPoint.y);
-            context.lineTo(point.x, point.y);
-            context.stroke();
-        }
-    }
-
-    protected saveLineOldColors(points: Point[], lineWidth: number): Map<string, ImageData> {
+    saveLineOldColors(points: Point[], lineWidth: number): Map<string, ImageData> {
         const squares = this.getSquareList(points, lineWidth);
         const oldPointsColor = new Map<string, ImageData>();
         for (const square of squares) {
@@ -94,8 +62,9 @@ export abstract class CommandSpecific {
         }
         return oldPointsColor;
     }
+
     // function that will take a list of points and return a list of 50x50 squares that the line are in
-    protected getSquareList(points: Point[], lineWidth: number): Point[] {
+    getSquareList(points: Point[], lineWidth: number): Point[] {
         const setKeys = new Set<string>();
         const returnList: Point[] = [];
         for (let i = 1; i < points.length; i++) {
@@ -119,7 +88,7 @@ export abstract class CommandSpecific {
 
     // for saving last canvas state, we will divide the canvas in squares of 50x50 pixels
     // and save the data of each square that is modified
-    protected saveLastCanvasState(i: number, j: number, lastCanvasState: Map<string, ImageData>): void {
+    saveLastCanvasState(i: number, j: number, lastCanvasState: Map<string, ImageData>): void {
         const ctx = this.ctx;
         const x = Math.round(i * NBR_PIXELS_SQUARE);
         const y = Math.round(j * NBR_PIXELS_SQUARE);
@@ -127,7 +96,7 @@ export abstract class CommandSpecific {
         lastCanvasState.set(`${x},${y}`, imageData);
     }
 
-    protected restoreLastCanvasState(lastCanvasState: Map<string, ImageData>): void {
+    restoreLastCanvasState(lastCanvasState: Map<string, ImageData>): void {
         const ctx = this.ctx;
         for (const keys of lastCanvasState.keys()) {
             const [x, y] = keys.split(',').map((key) => parseInt(key, 10));
@@ -137,6 +106,7 @@ export abstract class CommandSpecific {
             }
         }
     }
+
     abstract do(saveForUndo: boolean): void;
     abstract undo(): void;
 }

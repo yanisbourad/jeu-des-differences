@@ -8,6 +8,7 @@ import * as constantsTime from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
+import { HotkeysService } from '@app/services/hotkeys.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Subscription } from 'rxjs';
 
@@ -25,7 +26,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
-    found: boolean;
+    found: boolean = false;
+    isCheating: boolean = false;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundedSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
@@ -39,6 +41,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         readonly socket: SocketClientService,
         public dialog: MatDialog,
         public route: ActivatedRoute,
+        private readonly hotkeysService: HotkeysService,
     ) {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
@@ -72,6 +75,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
+
+            this.cheatModeKeyBinding();
         }
         this.drawService.setColor = 'yellow';
         this.subscriptions();
@@ -82,7 +87,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
-        // this.socket.leaveRoom();
+        this.found = false;
+        this.cheatModeKeyBinding();
     }
 
     subscriptions(): void {
@@ -119,13 +125,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
     }
 
-    // TODO: draw differences on the other canvas when difference found, should stay on it during the game after blinking
     mouseHitDetect(event: MouseEvent): void {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            // TODO : remove diff when already found by opponent
             if (this.found) {
                 this.isAlreadyFound(diff ? diff : new Set());
                 return;
@@ -137,14 +141,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.socket.sendDifference(diff, this.socket.getRoomName());
                 this.gameService.sendFoundMessage();
                 this.gameService.handleDifferenceFound();
-                this.clearCanvas();
+                this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
             } else {
                 this.errorPenalty = true;
                 this.displayWord('Erreur');
                 this.gameService.sendErrorMessage();
-                this.clearCanvas();
+                this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
             }
-            // this.drawDifference(diff ? diff : new Set());
         }
     }
 
@@ -153,7 +156,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
         this.displayWord('Erreur');
         this.gameService.sendErrorMessage();
-        this.clearCanvas();
+        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
     }
 
     displayWord(word: string): void {
@@ -179,10 +182,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.drawService.drawDiff(diff, this.canvas2.nativeElement);
     }
 
-    clearCanvas(): void {
+    clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
         setTimeout(() => {
-            this.drawService.clearDiff(this.canvas0.nativeElement);
-            this.drawService.clearDiff(this.canvas3.nativeElement);
+            this.drawService.clearDiff(canvasA);
+            this.drawService.clearDiff(canvasB);
         }, constantsTime.BLINKING_TIME);
     }
 
@@ -197,5 +200,26 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     giveUp(): void {
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
+    }
+
+    cheatMode(): void {
+        const blinking = setInterval(() => {
+            this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
+            for (const set of this.unfoundedDifference) {
+                this.drawDifference(set);
+            }
+            if (!this.isCheating) {
+                clearInterval(blinking);
+                this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+                this.drawService.setColor = 'yellow';
+            }
+        }, constantsTime.BLINKING_TIMEOUT);
+    }
+
+    cheatModeKeyBinding(): void {
+        this.hotkeysService.hotkeysEventListener(['t'], true, () => {
+            this.isCheating = !this.isCheating;
+            this.cheatMode();
+        });
     }
 }

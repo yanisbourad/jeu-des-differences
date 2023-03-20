@@ -23,6 +23,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas3', { static: true }) canvas3!: ElementRef<HTMLCanvasElement>;
 
+    blinking: ReturnType<typeof setTimeout>;
+    idEventList: number;
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
@@ -75,14 +77,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
 
-            this.cheatModeKeyBinding();
+            this.idEventList = this.cheatModeKeyBinding();
         }
         this.drawService.setColor = 'yellow';
         this.subscriptions();
     }
 
     ngOnDestroy(): void {
-        this.cheatModeKeyBinding();
+        clearInterval(this.blinking);
+        this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+        this.drawService.setColor = 'black';
+
+        this.hotkeysService.removeHotkeysEventListener(this.idEventList);
         this.diffFoundedSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
@@ -170,10 +176,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
-        setTimeout(() => {
-            this.drawService.clearDiff(canvasA);
-            this.drawService.clearDiff(canvasB);
-        }, constantsTime.BLINKING_TIME);
+        this.drawService.clearDiff(canvasA);
+        this.drawService.clearDiff(canvasB);
     }
 
     displayGiveUp(msg: string, type: string): void {
@@ -190,23 +194,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     cheatMode(): void {
-        const blinking = setInterval(() => {
+        this.blinking = setInterval(() => {
             this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
             for (const set of this.unfoundedDifference) {
                 this.drawDifference(set);
             }
-            if (!this.isCheating) {
-                clearInterval(blinking);
-                this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-                this.drawService.setColor = 'black';
-            }
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
-    cheatModeKeyBinding(): void {
-        this.hotkeysService.hotkeysEventListener(['t'], true, () => {
+    cheatModeKeyBinding(): number {
+        return this.hotkeysService.hotkeysEventListener(['t'], true, () => {
             this.isCheating = !this.isCheating;
-            this.cheatMode();
+            if (this.isCheating) this.cheatMode();
+            else {
+                clearInterval(this.blinking);
+                this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+                this.drawService.setColor = 'black';
+            }
         });
     }
 

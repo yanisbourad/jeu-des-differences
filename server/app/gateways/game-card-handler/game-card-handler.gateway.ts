@@ -1,13 +1,12 @@
 import { Logger } from '@nestjs/common';
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CREATOR_INDEX, CREATOR_WITH_OPPONENT, ONLY_CREATOR, OPPONENT_INDEX } from './entities/constants';
 import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
-// export class GameCardHandlerGateway implements OnGatewayDisconnect {
-export class GameCardHandlerGateway {
+export class GameCardHandlerGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
     countGame: number = 0;
@@ -158,20 +157,9 @@ export class GameCardHandlerGateway {
     // on disconnect
     // remove player from queue
     // send message to opponent
-    // handleDisconnect(client: Socket) {
-    //     const player = this.gameCardHandlerService.deletePlayer(client.id);
-    //     if (player) this.gameCardHandlerService.removePlayerInJoiningQueue(client.id, player.gameName);
-    //     // if player was waiting, delete him and next player in the queue become the creator
-    //     // then delete the creator and send message to the next player in the queue
-    //     const isPlaying = this.gameCardHandlerService.isAboutToPlay(client.id, player.gameName);
-    //     if (isPlaying) {
-    //         const playerId = this.gameCardHandlerService.deleteCreator(player.gameName);
-    //         const opponent = this.gameCardHandlerService.deletePlayer(playerId);
-    //         this.server.to(playerId).emit('feedBackOnLeave', player.name);
-    //         this.logger.log(`${opponent.name} left the queue`);
-    //     }
-    //     this.logger.log(`${player.name} has disconnected`);
-    //     this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
-    // }
-    // }
+    handleDisconnect(client: Socket) {
+        const player = this.gameCardHandlerService.getPlayer(client.id);
+        if (!player) return;
+        this.cancel(player.gameName, client);
+    }
 }

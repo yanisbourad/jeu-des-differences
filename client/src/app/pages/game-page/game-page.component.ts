@@ -45,7 +45,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         readonly socket: SocketClientService,
         public dialog: MatDialog,
         public route: ActivatedRoute,
-        private readonly hotkeysService: HotkeysService,
+        readonly hotkeysService: HotkeysService,
     ) {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;

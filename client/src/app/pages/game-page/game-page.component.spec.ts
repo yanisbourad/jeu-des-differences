@@ -3,17 +3,24 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
+
 import { HeaderComponent } from '@app/components/header/header.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+
+import { RouterTestingModule } from '@angular/router/testing';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import * as constants from '@app/configuration/const-canvas';
-import * as constTest from '@app/configuration/const-test';
 import * as constantsTime from '@app/configuration/const-time';
+import * as constTest from '@app/configuration/const-test';
 // import { ClientTimeService } from '@app/services/client-time.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
+import { HotkeysService } from '@app/services/hotkeys.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+// import { Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
+
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_NAME = 'defaultName';
@@ -36,10 +43,10 @@ describe('GamePageComponent', () => {
     let socketClientServiceSpy: SpyObj<SocketClientService>;
     let drawserviceSpy: SpyObj<DrawService>;
     let dialogSpy: SpyObj<MatDialog>;
+    let hotkeySpy: SpyObj<HotkeysService>;
     let msg: string;
     let type: string;
     let mouseEvent: MouseEvent;
-
     beforeEach(() => {
         mouseEvent = new MouseEvent('click', { button: 0 });
         // timeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['stopTimer', 'resetTimer', 'startTimer', 'getCount']);
@@ -51,8 +58,29 @@ describe('GamePageComponent', () => {
             'blinkDifference',
             'getGame',
             'getSetDifference',
+            'reinitializeGame',
+            'sendFoundMessage',
+            'sendErrorMessage',
         ]);
-        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect', 'joinRoom', 'disconnect', 'leaveRoom']);
+        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
+            'connect',
+            'joinRoomSolo',
+            'disconnect',
+            'leaveRoom',
+            'getRoomName',
+            'getRoomTime',
+            'sendRoomName',
+            'sendDifference',
+        ]);
+        const gameState = new Subject<boolean>();
+        const playerFoundDiff = new Subject<string>();
+        const diffFound = new Subject<Set<number>>();
+
+        socketClientServiceSpy.gameState$ = gameState.asObservable();
+        socketClientServiceSpy.playerFoundDiff$ = playerFoundDiff.asObservable();
+        socketClientServiceSpy.diffFounded$ = diffFound.asObservable();
+
+        hotkeySpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener', 'removeHotkeysEventListener']);
         drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff']);
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         gameServiceSpy.game = {
@@ -76,19 +104,18 @@ describe('GamePageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent, HeaderComponent, GameInfoComponent, TimerComponent],
             providers: [
-                // { provide: ClientTimeService, useValue: timeServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: SocketClientService, useValue: socketClientServiceSpy },
                 { provide: DrawService, useValue: drawserviceSpy },
                 { provide: MatDialog, useValue: dialogSpy },
                 { provide: ActivatedRoute, useValue: ActivatedRouteMock },
+                { provide: HotkeysService, useValue: hotkeySpy },
             ],
-            imports: [MatDialogModule, HttpClientModule],
+            imports: [MatDialogModule, HttpClientModule, RouterTestingModule],
         }).compileComponents();
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-        (component as any).route = new ActivatedRouteMock();
+        component.route = new ActivatedRouteMock() as unknown as ActivatedRoute;
         fixture.detectChanges();
     });
 
@@ -128,11 +155,7 @@ describe('GamePageComponent', () => {
         const spy = spyOn(component, 'ngOnDestroy').and.callThrough();
         component.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
-        // expect(timeServiceSpy.stopTimer).toHaveBeenCalled();
-        expect(socketClientServiceSpy.disconnect).toHaveBeenCalled();
-        // expect(timeServiceSpy.resetTimer).toHaveBeenCalled();
-        expect(socketClientServiceSpy.leaveRoom).toHaveBeenCalled();
-        // expect(component.gameName).toEqual('');
+        expect(gameServiceSpy.reinitializeGame).toHaveBeenCalled();
     });
 
     it('ngOninit() should call getGame() from gameService', () => {
@@ -140,9 +163,10 @@ describe('GamePageComponent', () => {
         expect(gameServiceSpy.getGame).toHaveBeenCalled();
     });
 
-    it('ngOninit() should call displayIcons() from gameService', () => {
+    it('ngOninit() should call getRouterParams() from gameService', () => {
+        const spy = spyOn(component, 'loading').and.callThrough();
         component.ngOnInit();
-        expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('ngOninit() should call loading() from timeService', () => {
@@ -152,23 +176,27 @@ describe('GamePageComponent', () => {
     });
 
     it('ngAfterViewInit() should call connect from SocketClientSerive', () => {
+        gameServiceSpy.gameType = 'solo';
         component.ngAfterViewInit();
         expect(component.socket.connect).toHaveBeenCalled();
     });
 
-    // it('ngAfterViewInit() should call joinRoom from SocketClientSerive', () => {
-    //     component.ngAfterViewInit();
-    //     expect(socketClientServiceSpy.joinRoom).toHaveBeenCalled();
-    // });
-
-    // it('ngAfterViewInit() should call startTimer from timeService', () => {
-    //     component.ngAfterViewInit();
-    //     expect(timeServiceSpy.startTimer).toHaveBeenCalled();
-    // });
+    it('ngAfterViewInit() should call joinRoom from SocketClientSerive', () => {
+        gameServiceSpy.gameType = 'solo';
+        component.ngAfterViewInit();
+        expect(socketClientServiceSpy.connect).toHaveBeenCalled();
+        expect(socketClientServiceSpy.joinRoomSolo).toHaveBeenCalledWith(gameServiceSpy.playerName);
+    });
 
     it('ngAfterViewInit() should call displayIcons() from gameService', () => {
+        gameServiceSpy.gameType = 'double';
+        gameServiceSpy.gameId = '123';
+        gameServiceSpy.gameName = 'Test';
+        const room = gameServiceSpy.gameId + gameServiceSpy.gameName;
         component.ngAfterViewInit();
-        expect(gameServiceSpy.displayIcons).toHaveBeenCalled();
+        expect(socketClientServiceSpy.sendRoomName).toHaveBeenCalledWith(room);
+        expect(hotkeySpy.hotkeysEventListener).toHaveBeenCalled();
+        expect(component.isCheating).toBeFalsy();
     });
 
     it('ngAfterViewInit() should call setColor', () => {
@@ -178,10 +206,10 @@ describe('GamePageComponent', () => {
 
     it('loading() should call getSetDifference()', () => {
         jasmine.clock().install();
-        spyOn(component, 'getSetDifference').and.callThrough();
+        const spy = spyOn(component, 'getSetDifference').and.callThrough();
         component.loading();
         jasmine.clock().tick(constTest.TICK_TIME);
-        expect(component.getSetDifference).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
         jasmine.clock().uninstall();
     });
 
@@ -199,26 +227,26 @@ describe('GamePageComponent', () => {
         expect(drawserviceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvas2.nativeElement);
     });
 
-    // it('should call blinkDifference with canvas1 and canvas2', () => {
-    //     component.blinkCanvas();
-    //     expect(gameServiceSpy.blinkDifference).toHaveBeenCalledWith(component.canvas1, component.canvas2);
-    // });
+    it('should call blinkDifference with canvas1 and canvas2', () => {
+        component.displayWord('Test');
+        expect(gameServiceSpy.blinkDifference).toHaveBeenCalledWith(component.canvas1, component.canvas2);
+    });
 
-    // it('should clear the canvas after a certain time', () => {
-    //     jasmine.clock().install();
-    //     component.clearCanvas();
-    //     jasmine.clock().tick(constantsTime.BLINKING_TIME);
-    //     expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas1.nativeElement);
-    //     expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas2.nativeElement);
-    //     jasmine.clock().uninstall();
-    // });
+    it('should clear the canvas after a certain time', () => {
+        jasmine.clock().install();
+        component.clearCanvas(component.canvas1.nativeElement, component.canvas2.nativeElement);
+        jasmine.clock().tick(constantsTime.BLINKING_TIME);
+        expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas1.nativeElement);
+        expect(drawserviceSpy.clearDiff).toHaveBeenCalledWith(component.canvas2.nativeElement);
+        jasmine.clock().uninstall();
+    });
 
     it('should play failure audio and draw word on both canvases when word is "Erreur"', () => {
         jasmine.clock().install();
         component.displayWord('Erreur');
         expect(gameServiceSpy.playFailureAudio).toHaveBeenCalled();
-        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas1.nativeElement, component.mousePosition);
-        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas2.nativeElement, component.mousePosition);
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas0.nativeElement, component.mousePosition);
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas3.nativeElement, component.mousePosition);
         jasmine.clock().tick(constantsTime.BLINKING_TIME);
         expect(component.errorPenalty).toBeFalsy();
         jasmine.clock().uninstall();
@@ -227,9 +255,10 @@ describe('GamePageComponent', () => {
     it('should play success audio, draw word on both canvases, call handleDifferenceFound and blinkCanvas when word is not "Erreur"', () => {
         component.displayWord('Test');
         expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
-        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas1.nativeElement, component.mousePosition);
-        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas2.nativeElement, component.mousePosition);
-        expect(gameServiceSpy.handleDifferenceFound).toHaveBeenCalled();
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas0.nativeElement, component.mousePosition);
+        expect(drawserviceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas3.nativeElement, component.mousePosition);
+        expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
+        expect(gameServiceSpy.blinkDifference).toHaveBeenCalledWith(component.canvas1, component.canvas2);
     });
 
     it('should set errorPenalty to true and display word "Erreur" when no diff is found', () => {

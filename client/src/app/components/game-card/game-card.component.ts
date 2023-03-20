@@ -1,10 +1,10 @@
-import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameInfo } from '@common/game';
 import { GameService } from '@app/services/game.service';
+import { GameInfo } from '@common/game';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -23,10 +23,10 @@ export class GameCardComponent implements OnInit {
 
     // eslint-disable-next-line max-params
     constructor(
+        readonly gameService: GameService,
         public dialog: MatDialog,
         private router: Router,
         private readonly gameCardHandlerService: GameCardHandlerService,
-        readonly gameService: GameService,
     ) {}
     openDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
@@ -72,7 +72,7 @@ export class GameCardComponent implements OnInit {
             await firstValueFrom(this.gameService.deleteGame(gameName));
             this.gameDeleted.emit();
         } catch (error) {
-            console.error(error);
+            alert(`la suppression du jeu a échoué`);
         }
     }
 }

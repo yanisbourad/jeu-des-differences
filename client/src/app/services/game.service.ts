@@ -13,6 +13,7 @@ import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
 import * as constants from '@app/configuration/const-canvas';
 
+
 @Injectable({
     providedIn: 'root',
 })

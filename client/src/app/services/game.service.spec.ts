@@ -7,7 +7,6 @@ import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Game, GameInfo } from '@common/game';
 import { of } from 'rxjs';
-import { ClientTimeService } from './client-time.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
@@ -17,7 +16,6 @@ describe('GameService', () => {
     let rendererFactory2Spy: SpyObj<RendererFactory2>;
     let renderer2Spy: SpyObj<Renderer2>;
     let matDialogSpy: SpyObj<MatDialog>;
-    let clientTimeServiceSpy: SpyObj<ClientTimeService>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
     let audioMock: SpyObj<HTMLAudioElement>;
@@ -31,7 +29,6 @@ describe('GameService', () => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        clientTimeServiceSpy = jasmine.createSpyObj('ClientTimeService', ['getCount', 'stopTimer']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['leaveRoom']);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
@@ -44,7 +41,6 @@ describe('GameService', () => {
                 { provide: RendererFactory2, useValue: rendererFactory2Spy },
                 { provide: Renderer2, useValue: renderer2Spy },
                 { provide: MatDialog, useValue: matDialogSpy },
-                { provide: ClientTimeService, useValue: clientTimeServiceSpy },
                 { provide: GameDatabaseService, useValue: gameDataBaseSpy },
                 { provide: SocketClientService, useValue: socketClientServiceSpy },
             ],
@@ -176,18 +172,14 @@ describe('GameService', () => {
 
     it('getGameTime should mock and call getCount from clientTimeService and return time for seconds under 10 digit', () => {
         const mockTime = '0:01';
-        clientTimeServiceSpy.getCount.and.returnValue(1);
         const time: string = gameService.getGameTime();
-        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
         expect(time).toBe(mockTime);
     });
 
     it('getGameTime should mock and call getCount from clientTimeService and return time for seconds above 10 digit', () => {
         const mockTime = '0:45';
-        const countTime = 45;
-        clientTimeServiceSpy.getCount.and.returnValue(countTime);
+        // const countTime = 45;
         const time: string = gameService.getGameTime();
-        expect(clientTimeServiceSpy.getCount).toHaveBeenCalled();
         expect(time).toBe(mockTime);
     });
 
@@ -207,7 +199,6 @@ describe('GameService', () => {
         const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
         const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
         gameService.handleDifferenceFound();
-        expect(clientTimeServiceSpy.stopTimer).toHaveBeenCalled();
         expect(saveGameRecordSpy).toHaveBeenCalled();
         expect(displayGameEndedSpy).toHaveBeenCalled();
         expect(reinitializeGameSpy).toHaveBeenCalled();

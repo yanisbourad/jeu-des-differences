@@ -187,7 +187,7 @@ export class GameService {
     }
 
     sendFoundMessage(): void {
-        this.message = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Différence trouvée';
+        this.message = new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée';
         if (this.gameType === 'double') {
             this.message = this.message + ' par ' + this.playerName;
         }
@@ -211,7 +211,7 @@ export class GameService {
     }
 
     sendErrorMessage(): void {
-        this.message = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur';
+        this.message = new Date().toLocaleTimeString() + ' - ' + ' Erreur';
         if (this.gameType === 'double') {
             this.message = this.message + ' par ' + this.playerName;
         }

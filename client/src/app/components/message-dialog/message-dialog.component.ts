@@ -34,7 +34,7 @@ export class MessageDialogComponent {
                 roomName: this.socket.getRoomName(),
             });
             const dataToSend = {
-                message: this.gameService.playerName + ' a abandonné la partie.',
+                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
                 playerName: this.gameService.playerName,
                 color: '#FF0000',
                 pos: '50%',
@@ -43,7 +43,7 @@ export class MessageDialogComponent {
             };
             this.socket.sendMessage(dataToSend);
             this.socket.messageList.push({
-                message: this.gameService.playerName + ' a abandonné la partie.',
+                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
                 userName: this.gameService.playerName,
                 mine: true,
                 color: '#FF0000',

@@ -233,10 +233,32 @@ describe('CanvasNgxComponent', () => {
         expect(component.tempCommand).toBeUndefined();
     });
 
+    it('should do nothing when event mouse mouve is detected and the is drawing is false', () => {
+        component.isDrawing = false;
+        const spy = spyOn(component, 'doTempCommand');
+        component.mouseUpDetection();
+        expect(spy).not.toHaveBeenCalled();
+    });
+
     it('should generte a merge the draw canvas with the image canvas when getUpdatedTempCanvasCtx is called', () => {
         const spy = spyOn(component.getCtxCanvasTemp, 'drawImage');
         const ctx = component.getUpdatedTempCanvasCtx();
         expect(ctx).toBeTruthy();
         expect(spy).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns an array with length equal to the canvas area * 4', () => {
+        const imageData = component.getCanvasData();
+        expect(imageData.length).toEqual(component.canvasDrawNative.width * component.canvasDrawNative.height * 4);
+    });
+
+    it('should return the canvas as element when getCanvasDraw', () => {
+        expect(component.getCanvasUrlData()).toBeInstanceOf(String);
+    });
+
+    it('should call the drawService with the canvas draw when clearDiff is called', () => {
+        const spy = spyOn(drawingService, 'clearDiff');
+        component.clearCanvasDraw();
+        expect(spy).toHaveBeenCalled();
     });
 });

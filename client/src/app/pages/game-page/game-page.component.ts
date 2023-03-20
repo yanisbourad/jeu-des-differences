@@ -89,13 +89,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         clearInterval(this.blinking);
         this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
         this.drawService.setColor = 'black';
-
-        this.hotkeysService.removeHotkeysEventListener(this.idEventList);
+        if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
         this.diffFoundedSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
-        // this.socket.disconnect();
+        this.socket.disconnect();
     }
 
     subscriptions(): void {

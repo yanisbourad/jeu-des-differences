@@ -28,6 +28,7 @@ export class HotkeysService {
     }
 
     removeHotkeysEventListener(id: number): void {
+        if (id >= this.listCallbacks.length) return;
         const { isKeyDown, callback } = this.listCallbacks[id];
         const typeEvent = isKeyDown ? hotkeys.KEYDOWN : hotkeys.KEYUP;
         document.removeEventListener(typeEvent, callback);

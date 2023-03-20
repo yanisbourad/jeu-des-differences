@@ -89,17 +89,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         clearInterval(this.blinking);
         this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
         this.drawService.setColor = 'black';
-
-        this.hotkeysService.removeHotkeysEventListener(this.idEventList);
+        if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
         this.diffFoundedSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
+        this.socket.disconnect();
     }
 
     subscriptions(): void {
         this.diffFoundedSubscription = this.socket.diffFounded$.subscribe((newValue) => {
-            if (newValue !== undefined) {
+            if (newValue) {
                 this.drawService.setColor = 'black';
                 this.drawDifference(newValue);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
@@ -215,16 +215,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
+    toggleCheating(): void {
+        this.isCheating = !this.isCheating;
+        if (this.isCheating) this.cheatMode();
+        else {
+            clearInterval(this.blinking);
+            this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
+            this.drawService.setColor = 'black';
+        }
+    }
+
     cheatModeKeyBinding(): number {
-        return this.hotkeysService.hotkeysEventListener(['t'], true, () => {
-            this.isCheating = !this.isCheating;
-            if (this.isCheating) this.cheatMode();
-            else {
-                clearInterval(this.blinking);
-                this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
-                this.drawService.setColor = 'black';
-            }
-        });
+        return this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
     }
 
     // deep comparison of 2 set<number>

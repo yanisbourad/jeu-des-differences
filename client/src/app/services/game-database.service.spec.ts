@@ -15,6 +15,7 @@ describe('GameDatabaseService', () => {
     let canvasHolderService: CanvasHolderService;
     let imageDiffService: ImageDiffService;
     const baseUrl = environment.serverUrl;
+    let httpMock: HttpTestingController;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -24,10 +25,11 @@ describe('GameDatabaseService', () => {
         canvasHolderService = TestBed.inject(CanvasHolderService);
         imageDiffService = TestBed.inject(ImageDiffService);
         service = TestBed.inject(GameDatabaseService);
+        httpMock = TestBed.inject(HttpTestingController);
     });
 
     afterEach(() => {
-        // httpTestingController.verify();
+        httpMock.verify();
     });
 
     it('should be created', () => {
@@ -142,17 +144,19 @@ describe('GameDatabaseService', () => {
         expect(spyDiffDifficulty).toHaveBeenCalledTimes(1);
     });
 
-    it('should delete game', () => {
-        const data: Game = {
-            gameName: 'test',
-            originalImageData: 'test',
-            modifiedImageData: 'test',
-            listDifferences: ['test'],
-            difficulty: 'Facile',
-        };
-        service.createGame(data).subscribe();
-        service.deleteGame(data.gameName).subscribe((game) => {
-            expect(game.ok).toEqual(true);
+    describe('deleteGame', () => {
+        it('should delete game', () => {
+            const gameName = 'test';
+
+            service.deleteGame(gameName).subscribe((response) => {
+                expect(response.status).toEqual(200);
+                expect(response.body).toEqual('Successfully deleted game');
+            });
+
+            const req = httpMock.expectOne(`${baseUrl}/game/${gameName}`);
+            expect(req.request.method).toBe('DELETE');
+
+            req.flush('Successfully deleted game', { status: 200, statusText: 'OK' });
         });
     });
 });

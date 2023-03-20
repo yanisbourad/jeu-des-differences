@@ -1,21 +1,25 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameInfo } from '@common/game';
 // eslint-disable-next-line no-restricted-imports
+import { HttpClientModule, HttpResponse } from '@angular/common/http';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardComponent } from './game-card.component';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+// import { DebugElement } from '@angular/core';
+// import { of } from 'rxjs';
+// import { GameDatabaseService } from '@app/services/game-database.service';
+import { of } from 'rxjs';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
+    // let gameDatabaseService: GameDatabaseService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCardComponent, NamePopupComponent],
-            imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
+            imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule, HttpClientModule],
             providers: [{ provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }],
         }).compileComponents();
         fixture = TestBed.createComponent(GameCardComponent);
@@ -122,10 +126,141 @@ describe('GameCardComponent', () => {
         const firstRanking = fixture.nativeElement;
         expect(firstRanking.querySelector('#firstMulti').textContent).toContain('1:23 joueur 1');
     });
-    it('should call deleteGame() on delete click', () => {
-        spyOn(component, 'onDelete');
-        const deleteButton: DebugElement = fixture.debugElement.query(By.css('.deleteButton'));
-        deleteButton.triggerEventHandler('click', null);
-        expect(component.onDelete).toHaveBeenCalled();
-    });
+
+    // it('should call onDelete() on delete click', () => {
+    //     spyOn(component, 'onDelete');
+    //     const deleteButton: DebugElement = fixture.debugElement.query(By.css('.deleteButton'));
+    //     deleteButton.triggerEventHandler('click', null);
+    //     expect(component.onDelete).toHaveBeenCalled();
+    // });
+
+    it('should emit gameDeleted event when onDelete is called', fakeAsync(() => {
+        component.card = {
+            gameName: 'difference 1',
+            difficulty: 'Facile',
+            originalImageData: 'imageOriginal1',
+            modifiedImageData: 'imageModifie1',
+            listDifferences: ['diffrence 1', 'difference 2'],
+            rankingMulti: [
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:23',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:24',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:25',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+            ],
+            rankingSolo: [
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'mlyi',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+            ],
+        } as GameInfo;
+        fixture.detectChanges();
+        spyOn(component.gameService, 'deleteGame').and.returnValue(of(new HttpResponse<string>({ status: 200 })));
+        spyOn(component.gameDeleted, 'emit');
+        fixture.detectChanges();
+        component.onDelete(component.card.gameName);
+        tick();
+        expect(component.gameService.deleteGame).toHaveBeenCalledWith(component.card.gameName);
+        expect(component.gameDeleted.emit).toHaveBeenCalled();
+
+    }));
+
+    it('should alert the user that the delete call failed', fakeAsync(() => {
+        component.card = {
+            gameName: 'difference 1',
+            difficulty: 'Facile',
+            originalImageData: 'imageOriginal1',
+            modifiedImageData: 'imageModifie1',
+            listDifferences: ['diffrence 1', 'difference 2'],
+            rankingMulti: [
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:23',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:24',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:25',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+            ],
+            rankingSolo: [
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'mlyi',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+            ],
+        } as GameInfo;
+        fixture.detectChanges();
+        spyOn(component.gameService, 'deleteGame').and.throwError('blabla');
+        spyOn(component.gameDeleted, 'emit');
+        const spyOnAlert = spyOn(window, 'alert');
+        fixture.detectChanges();
+        component.onDelete(component.card.gameName);
+        tick();
+        expect(component.gameService.deleteGame).toHaveBeenCalledWith(component.card.gameName);
+        expect(spyOnAlert).toHaveBeenCalledOnceWith('la suppression du jeu a échoué');
+    }));
 });

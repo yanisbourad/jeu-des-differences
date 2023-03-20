@@ -82,11 +82,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.cheatModeKeyBinding();
         this.diffFoundedSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
-        this.cheatModeKeyBinding();
     }
 
     subscriptions(): void {
@@ -129,6 +129,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
+                this.drawService.setColor = 'yellow';
                 this.displayWord('Trouvé');
                 this.drawDifference(diff);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
@@ -197,7 +198,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (!this.isCheating) {
                 clearInterval(blinking);
                 this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-                this.drawService.setColor = 'yellow';
+                this.drawService.setColor = 'black';
             }
         }, constantsTime.BLINKING_TIMEOUT);
     }

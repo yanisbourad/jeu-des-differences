@@ -102,7 +102,7 @@ export class GameCardHandlerGateway {
                         this.server.to(newOpponent.id).emit('feedbackOnWait', creator.name);
                         this.server.to(creator.id).emit('feedbackOnAccept', newOpponent.name);
                     } else {
-                        this.server.to(opponents[CREATOR_INDEX]).emit('feedBackOnLeave');
+                        this.server.to(client.id).emit('feedBackOnLeave');
                         this.server.to(creator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
                     }
                     this.logger.log(`The ${gameName} game opponent left`);
@@ -147,7 +147,6 @@ export class GameCardHandlerGateway {
         };
         this.server.to(playersList[CREATOR_INDEX].id).emit('feedbackOnStart', gameInfo);
         this.server.to(playersList[OPPONENT_INDEX].id).emit('feedbackOnStart', gameInfo);
-
         // call a function to remove players from joining queue and send feedback to them
         const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[CREATOR_INDEX].gameName);
         removedPlayers.forEach((playerId) => {

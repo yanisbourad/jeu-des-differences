@@ -87,6 +87,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
+        // this.socket.disconnect();
     }
 
     subscriptions(): void {
@@ -203,11 +204,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
+    toggleCheating(): void {
+        this.isCheating = !this.isCheating;
+        this.cheatMode();
+    }
+
     cheatModeKeyBinding(): void {
-        this.hotkeysService.hotkeysEventListener(['t'], true, () => {
-            this.isCheating = !this.isCheating;
-            this.cheatMode();
-        });
+        this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
     }
 
     // deep comparison of 2 set<number>

@@ -47,6 +47,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async sendRoomName(socket: Socket, roomName: string) {
         this.roomName = roomName;
         socket.emit('sendRoomName', ['multi', this.roomName]);
+        socket.join(this.roomName);
         if (!this.serverTime.timers[this.roomName]) {
             this.serverTime.startChronometer(this.roomName);
         }
@@ -62,7 +63,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             opponentName: player.opponentName,
         });
         const myPlayers: PlayerMulti[] = this.playersMatch();
-        socket.join(player.gameId + player.gameName);
         if (myPlayers.length === 2) {
             const player1: PlayerEntity = {
                 playerName: myPlayers[0].creatorName,
@@ -124,10 +124,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
         await this.playerService.removeRoom(this.roomName);
-        // await this.playerService.removeRoom(this.roomName);??
-        // socket.to(this.roomName).socketsLeave(this.roomName); ??
         socket.leave(this.roomName);
-        // socket.leave(socket.id);
     }
 
     afterInit() {

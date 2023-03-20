@@ -34,7 +34,7 @@ describe('CanvasHolderService', () => {
     });
 
     it('should get the data URL of the original canvas', () => {
-        canvas.getCanvasUrlData.and.returnValue('data: image / png; base64,...');
+        canvas.getCanvasUrlData.and.returnValue('data:image/png;base64,...');
         service['canvasOriginal'] = canvas;
         expect(service.getCanvasUrlData('Image Original')).toEqual('data:image/png;base64,...');
         expect(canvas.getCanvasUrlData).toHaveBeenCalled();

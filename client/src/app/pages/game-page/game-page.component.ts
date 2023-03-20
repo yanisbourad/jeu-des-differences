@@ -26,7 +26,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
-    found: boolean = false;
     isCheating: boolean = false;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundedSubscription: Subscription = new Subscription();
@@ -87,7 +86,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
-        this.found = false;
         this.cheatModeKeyBinding();
     }
 
@@ -96,6 +94,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (newValue !== undefined) {
                 this.drawService.setColor = 'black';
                 this.drawDifference(newValue);
+                this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
                 this.drawService.setColor = 'yellow';
             }
         });
@@ -111,7 +110,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
             if (newValue === this.gameService.opponentName) {
-                this.found = true;
                 this.gameService.handlePlayerDifference();
             }
         });
@@ -130,10 +128,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            if (this.found) {
-                this.isAlreadyFound(diff ? diff : new Set());
-                return;
-            }
             if (diff) {
                 this.displayWord('Trouvé');
                 this.drawDifference(diff);
@@ -149,14 +143,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
             }
         }
-    }
-
-    isAlreadyFound(diff: Set<number>): void {
-        this.found = false;
-        this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
-        this.displayWord('Erreur');
-        this.gameService.sendErrorMessage();
-        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
     }
 
     displayWord(word: string): void {
@@ -221,5 +207,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isCheating = !this.isCheating;
             this.cheatMode();
         });
+    }
+
+    // deep comparison of 2 set<number>
+    eqSet(set1: Set<number>, set2: Set<number>): boolean {
+        return (
+            set1.size === set2.size &&
+            [...set1].every((x) => {
+                return set2.has(x);
+            })
+        );
     }
 }

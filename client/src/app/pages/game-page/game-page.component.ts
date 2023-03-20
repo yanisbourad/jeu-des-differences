@@ -76,10 +76,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
 
-            this.hotkeysService.hotkeysEventListener(['t'], true, () => {
-                this.isCheating = !this.isCheating;
-                this.cheatMode();
-            });
+            this.cheatModeKeyBinding();
         }
         this.drawService.setColor = 'yellow';
         this.subscriptions();
@@ -91,6 +88,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
         this.found = false;
+        this.cheatModeKeyBinding();
     }
 
     subscriptions(): void {
@@ -216,5 +214,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.drawService.setColor = 'yellow';
             }
         }, constantsTime.BLINKING_TIMEOUT);
+    }
+
+    cheatModeKeyBinding(): void {
+        this.hotkeysService.hotkeysEventListener(['t'], true, () => {
+            this.isCheating = !this.isCheating;
+            this.cheatMode();
+        });
     }
 }

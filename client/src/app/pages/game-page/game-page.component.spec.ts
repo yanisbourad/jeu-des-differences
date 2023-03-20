@@ -3,8 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
+
 import { HeaderComponent } from '@app/components/header/header.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+
 import { RouterTestingModule } from '@angular/router/testing';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import * as constants from '@app/configuration/const-canvas';
@@ -18,6 +20,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 // import { Subject } from 'rxjs';
 import { Subject } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
+
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_NAME = 'defaultName';
@@ -77,7 +80,7 @@ describe('GamePageComponent', () => {
         socketClientServiceSpy.playerFoundDiff$ = playerFoundDiff.asObservable();
         socketClientServiceSpy.diffFounded$ = diffFound.asObservable();
 
-        hotkeySpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener']);
+        hotkeySpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener', 'removeHotkeysEventListener']);
         drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff']);
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         gameServiceSpy.game = {

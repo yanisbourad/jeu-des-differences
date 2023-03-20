@@ -15,9 +15,9 @@ export class SocketClientService {
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
-    private gameState = new Subject<boolean>();
-    private playerFoundDiff = new Subject<string>();
-    private diffFounded = new Subject<Set<number>>();
+    gameState = new Subject<boolean>();
+    playerFoundDiff = new Subject<string>();
+    diffFounded = new Subject<Set<number>>();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     gameState$ = this.gameState.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering

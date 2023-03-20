@@ -3,21 +3,30 @@
     <app-game-info></app-game-info>
     <div class="mainView">
         <div class="superposeImageCanvas">
-            <img [src]="this.gameService.game.originalImageData" [attr.width]="width" [attr.height]="height">
+            <img
+                *ngIf="this.gameService.game.originalImageData"
+                [src]="this.gameService.game.originalImageData"
+                [attr.width]="width"
+                [attr.height]="height"
+            />
             <canvas #canvas0 [attr.width]="width" [attr.height]="height"></canvas>
-            <canvas #canvas1 style="top: -221%;"  [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <canvas #canvas1 style="top: -221%" [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
         </div>
         <div class="superposeImageCanvas">
-            <img [src]="this.gameService.game.modifiedImageData" [attr.width]="width" [attr.height]="height" />
+            <img
+                *ngIf="this.gameService.game.modifiedImageData"
+                [src]="this.gameService.game.modifiedImageData"
+                [attr.width]="width"
+                [attr.height]="height"
+            />
             <canvas #canvas3 [attr.width]="width" [attr.height]="height"></canvas>
-            <canvas #canvas2 style="top: -221%;"  [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <canvas #canvas2 style="top: -221%" [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
         </div>
     </div>
     <div class="footer">
         <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
     </div>
     <div class="message">
-       <app-message-area [playerName] = "this.gameService.playerName"></app-message-area>
+        <app-message-area [playerName]="this.gameService.playerName"></app-message-area>
     </div>
-
 </div>

@@ -119,8 +119,8 @@ describe('GameCardHandlerService', () => {
     });
     it('should redirect player as method is being called', () => {
         service.redirect({
-            id: 1,
-            name: 'test',
+            gameId: 1,
+            creatorName: 'test',
             opponentName: 'test',
             gameName: 'test',
         });

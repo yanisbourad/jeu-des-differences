@@ -1,19 +1,38 @@
 import { Injectable } from '@angular/core';
 import * as hotkeys from '@app/configuration/const-hotkeys';
+
+export interface Hotkeys {
+    isKeyDown: boolean;
+    callback: (event: KeyboardEvent) => void;
+}
 @Injectable({
     providedIn: 'root',
 })
 export class HotkeysService {
-    hotkeysEventListener(keys: string[], isKeyDown: boolean, functionToCall: () => void) {
+    listCallbacks: Hotkeys[] = [];
+
+    hotkeysEventListener(keys: string[], isKeyDown: boolean, functionToCall: () => void): number {
         const typeEvent = isKeyDown ? hotkeys.KEYDOWN : hotkeys.KEYUP;
 
-        document.addEventListener(typeEvent, (event: KeyboardEvent): void => {
+        const callback = ((event: KeyboardEvent): void => {
             if (!this.handleCtrl(keys, event)) return;
 
             if (!this.handleShift(keys, event)) return;
 
             if (this.handleNormalKeys(keys, event)) functionToCall();
-        });
+        }).bind(this);
+
+        document.addEventListener(typeEvent, callback);
+        this.listCallbacks.push({ isKeyDown, callback });
+        return this.listCallbacks.length - 1;
+    }
+
+    removeHotkeysEventListener(id: number): void {
+        const { isKeyDown, callback } = this.listCallbacks[id];
+        const typeEvent = isKeyDown ? hotkeys.KEYDOWN : hotkeys.KEYUP;
+        document.removeEventListener(typeEvent, callback);
+        // delete this.listCallbacks[id];
+        this.listCallbacks = this.listCallbacks.splice(id, 1);
     }
 
     handleNormalKeys(keys: string[], event: KeyboardEvent): boolean {

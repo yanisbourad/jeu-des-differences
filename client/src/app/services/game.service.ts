@@ -5,13 +5,12 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
-// import { Vec2 } from '@app/interfaces/vec2';
-// import { MouseButton } from '@app/components/play-area/play-area.component';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
 import * as constants from '@app/configuration/const-canvas';
+
 
 @Injectable({
     providedIn: 'root',
@@ -43,8 +42,6 @@ export class GameService {
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
     ) {
-        // this.errorPenalty = false;
-        // this.mousePosition = { x: 0, y: 0 };
         this.path = {
             differenceNotFound: './assets/img/difference-not-found.png',
             differenceFound: './assets/img/difference-found.png',
@@ -164,13 +161,17 @@ export class GameService {
             this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
         }
 
-        if (this.nDifferencesFound === this.totalDifferences && this.gameType === 'solo') {
+        if (this.totalDifferenceReached() && this.gameType === 'solo') {
             this.endGame();
         }
 
         if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
+    }
+
+    totalDifferenceReached(): boolean {
+        return this.nDifferencesFound === this.totalDifferences;
     }
 
     handlePlayerDifference() {
@@ -276,25 +277,4 @@ export class GameService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.gameDataBase.deleteGame(gameName);
     }
-
-    // mouseHitDetect(event: MouseEvent) {
-    //     if (event.button === MouseButton.Left && !this.errorPenalty) {
-    //         this.mousePosition = { x: event.offsetX, y: event.offsetY };
-    //         const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-    //         const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-    //         if (diff) {
-    //             this.drawDifference(diff);
-    //             this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
-    //             this.socket.sendDifference(diff, this.socket.getRoomName());
-    //             this.displayWord('Trouvé');
-    //             this.sendFoundMessage();
-    //             this.handleDifferenceFound();
-    //         } else {
-    //             this.errorPenalty = true;
-    //             this.displayWord('Erreur');
-    //             this.sendErrorMessage();
-    //         }
-    //         this.clearCanvas();
-    //     }
-    // }
 }

@@ -23,6 +23,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas3', { static: true }) canvas3!: ElementRef<HTMLCanvasElement>;
 
+    @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
+
     blinking: ReturnType<typeof setTimeout>;
     idEventList: number;
     mousePosition: Vec2;
@@ -76,7 +79,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
-
             this.idEventList = this.cheatModeKeyBinding();
         }
         this.drawService.setColor = 'yellow';
@@ -170,12 +172,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    drawDifference(diff: Set<number>): void {
-        this.drawService.drawDiff(diff, this.canvas1.nativeElement);
-        this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+    drawDifference(diff: Set<number>, isCheating: boolean = false): void {
+        if (!isCheating) {
+            this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+            this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+        } else {
+            this.drawService.drawDiff(diff, this.canvasCheat0.nativeElement);
+            this.drawService.drawDiff(diff, this.canvasCheat1.nativeElement);
+        }
     }
 
     clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
+        setTimeout(() => {
+            this.drawService.clearDiff(canvasA);
+            this.drawService.clearDiff(canvasB);
+        }, constantsTime.BLINKING_TIME);
+    }
+    clearCanvasCheat(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
         this.drawService.clearDiff(canvasA);
         this.drawService.clearDiff(canvasB);
     }
@@ -197,7 +210,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.blinking = setInterval(() => {
             this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
             for (const set of this.unfoundedDifference) {
-                this.drawDifference(set);
+                this.drawDifference(set, true);
             }
         }, constantsTime.BLINKING_TIMEOUT);
     }
@@ -208,7 +221,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (this.isCheating) this.cheatMode();
             else {
                 clearInterval(this.blinking);
-                this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+                this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
                 this.drawService.setColor = 'black';
             }
         });

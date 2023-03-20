@@ -23,6 +23,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas3', { static: true }) canvas3!: ElementRef<HTMLCanvasElement>;
 
+    @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
+
+    blinking: ReturnType<typeof setTimeout>;
+    idEventList: number;
     mousePosition: Vec2;
     errorPenalty: boolean;
     unfoundedDifference: Set<number>[];
@@ -40,7 +45,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         readonly socket: SocketClientService,
         public dialog: MatDialog,
         public route: ActivatedRoute,
-        private readonly hotkeysService: HotkeysService,
+        readonly hotkeysService: HotkeysService,
     ) {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
@@ -74,15 +79,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
-
-            this.cheatModeKeyBinding();
+            this.idEventList = this.cheatModeKeyBinding();
         }
         this.drawService.setColor = 'yellow';
         this.subscriptions();
     }
 
     ngOnDestroy(): void {
-        this.cheatModeKeyBinding();
+        clearInterval(this.blinking);
+        this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+        this.drawService.setColor = 'black';
+
+        this.hotkeysService.removeHotkeysEventListener(this.idEventList);
         this.diffFoundedSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
@@ -165,9 +173,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    drawDifference(diff: Set<number>): void {
-        this.drawService.drawDiff(diff, this.canvas1.nativeElement);
-        this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+    drawDifference(diff: Set<number>, isCheating: boolean = false): void {
+        if (!isCheating) {
+            this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+            this.drawService.drawDiff(diff, this.canvas2.nativeElement);
+        } else {
+            this.drawService.drawDiff(diff, this.canvasCheat0.nativeElement);
+            this.drawService.drawDiff(diff, this.canvasCheat1.nativeElement);
+        }
     }
 
     clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
@@ -175,6 +188,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.drawService.clearDiff(canvasA);
             this.drawService.clearDiff(canvasB);
         }, constantsTime.BLINKING_TIME);
+    }
+    clearCanvasCheat(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
+        this.drawService.clearDiff(canvasA);
+        this.drawService.clearDiff(canvasB);
     }
 
     displayGiveUp(msg: string, type: string): void {
@@ -191,15 +208,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     cheatMode(): void {
-        const blinking = setInterval(() => {
+        this.blinking = setInterval(() => {
             this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
             for (const set of this.unfoundedDifference) {
-                this.drawDifference(set);
-            }
-            if (!this.isCheating) {
-                clearInterval(blinking);
-                this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-                this.drawService.setColor = 'black';
+                this.drawDifference(set, true);
             }
         }, constantsTime.BLINKING_TIMEOUT);
     }
@@ -209,8 +221,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatMode();
     }
 
-    cheatModeKeyBinding(): void {
-        this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
+    cheatModeKeyBinding(): number {
+        return this.hotkeysService.hotkeysEventListener(['t'], true, () => {
+            this.isCheating = !this.isCheating;
+            if (this.isCheating) this.cheatMode();
+            else {
+                clearInterval(this.blinking);
+                this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
+                this.drawService.setColor = 'black';
+            }
+        });
     }
 
     // deep comparison of 2 set<number>

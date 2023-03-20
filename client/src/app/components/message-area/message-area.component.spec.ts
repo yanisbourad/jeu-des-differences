@@ -77,6 +77,6 @@ describe('MessageAreaComponent', () => {
     it('should get timestamp', () => {
         const timestamp = component.getTimestamp();
         expect(typeof timestamp).toBe('string');
-        expect(timestamp).not.toMatch(new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds());
+        expect(timestamp).toMatch(new Date().toLocaleTimeString());
     });
 });

@@ -64,6 +64,10 @@ export class CanvasNgxComponent implements AfterViewInit {
         return this.canvasImage;
     }
 
+    get getCtxCanvasTemp(): CanvasRenderingContext2D {
+        return this.canvasTemp.nativeElement.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+    }
+
     ngAfterViewInit(): void {
         this.drawService.setColor = constants.DEFAULT_LINE_COLOR;
         this.canvasHolderService.setCanvas(this, this.type);
@@ -71,9 +75,15 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvasDrawNative.addEventListener('mousedown', (e: MouseEvent) => {
             this.mouseHitDetection(e);
         });
+
         this.canvasDrawNative.addEventListener('mousemove', (event: MouseEvent) => {
             this.mouseMoveDetection(event);
         });
+
+        this.canvasDrawNative.addEventListener('mouseleave', () => {
+            this.mouseUpDetection();
+        });
+
         this.canvasDrawNative.addEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
@@ -173,7 +183,7 @@ export class CanvasNgxComponent implements AfterViewInit {
     }
 
     getUpdatedTempCanvasCtx(): CanvasRenderingContext2D {
-        const ctx = this.canvasTemp.nativeElement.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+        const ctx = this.getCtxCanvasTemp;
         ctx.drawImage(this.canvasImageNative, 0, 0);
         ctx.drawImage(this.canvasDrawNative, 0, 0);
         return ctx;

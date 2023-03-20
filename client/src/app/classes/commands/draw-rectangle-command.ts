@@ -37,17 +37,14 @@ export class DrawRectangleCommand extends CommandSpecific {
     }
 
     private saveRectangleData(): [ImageData, number, number] {
-        if (this.coords[0] > 0 && this.coords[1] > 0 && this.coords[2] > 0 && this.coords[3] > 0) {
-            // I don't know why but the rectangle is not saved correctly without this gap
-            const gap = 10;
-            const x = Math.max(0, this.coords[0] - gap);
-            const y = Math.max(0, this.coords[1] - gap);
-            // also the size of the rectangle is not correct without this gap
-            const imageData = this.ctx.getImageData(x, y, this.coords[2] + gap * 2, this.coords[3] + gap * 2);
-            this.saved = true;
-            return [imageData, x, y];
-        }
-        return [new ImageData(0, 0), 0, 0];
+        // I don't know why but the rectangle is not saved correctly without this gap
+        const gap = 10;
+        const x = Math.max(0, this.coords[0] - gap);
+        const y = Math.max(0, this.coords[1] - gap);
+        // also the size of the rectangle is not correct without this gap
+        const imageData = this.ctx.getImageData(x, y, this.coords[2] + gap * 2, this.coords[3] + gap * 2);
+        this.saved = true;
+        return [imageData, x, y];
     }
 
     private restoreRectangleData(imageData: ImageData, minX: number, minY: number): void {

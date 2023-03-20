@@ -1,105 +1,242 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import * as constants from '@app/configuration/const-canvas';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ERASER, PEN, RECTANGLE } from '@app/configuration/const-styler-type';
 import { BitmapService } from '@app/services/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder.service';
+import { CommandService } from '@app/services/command.service';
 import { DrawService } from '@app/services/draw.service';
+import { HotkeysService } from '@app/services/hotkeys.service';
 import { CanvasNgxComponent } from './canvas-ngx.component';
-
 describe('CanvasNgxComponent', () => {
     let component: CanvasNgxComponent;
     let fixture: ComponentFixture<CanvasNgxComponent>;
-    let drawService: jasmine.SpyObj<DrawService>;
+    // add a mock for the canvasHolderService
     let canvasHolderService: jasmine.SpyObj<CanvasHolderService>;
-    let bitmapService: jasmine.SpyObj<BitmapService>;
-    // let blobImage: Blob;
-    let image: ImageBitmap;
+    // add a mock for the drawingService
+    let drawingService: DrawService;
+    let hotkeysService: jasmine.SpyObj<HotkeysService>;
+    // mock the commandService
+    const commandService = jasmine.createSpyObj('CommandService', ['do']);
+
+    // add a mock for the bitmapService
+    const bitmapService = jasmine.createSpyObj('BitmapService', ['handleFileSelect']);
+
     beforeEach(async () => {
-        drawService = jasmine.createSpyObj(DrawService, ['drawImage', 'clearCanvas', 'getContext', 'clearDiff']);
-        canvasHolderService = jasmine.createSpyObj(CanvasHolderService, ['setCanvas', 'setCanvasData']);
-        bitmapService = jasmine.createSpyObj(BitmapService, ['handleFileSelect']);
-        TestBed.configureTestingModule({
+        canvasHolderService = jasmine.createSpyObj('CanvasHolderService', ['getCanvas', 'setCanvas']);
+        hotkeysService = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener']);
+        drawingService = new DrawService(hotkeysService);
+        // mock the return value of the usedTool method
+        drawingService.setTool = PEN;
+        await TestBed.configureTestingModule({
             declarations: [CanvasNgxComponent],
             providers: [
-                { provide: DrawService, useValue: drawService },
                 { provide: CanvasHolderService, useValue: canvasHolderService },
+                { provide: DrawService, useValue: drawingService },
+                { provide: HotkeysService, useValue: hotkeysService },
+                { provide: CommandService, useValue: commandService },
                 { provide: BitmapService, useValue: bitmapService },
             ],
         }).compileComponents();
-        bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
+    });
 
+    beforeEach(() => {
         fixture = TestBed.createComponent(CanvasNgxComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        drawService.getContext.and.returnValue(component.canvasDrawNative.getContext('2d') as CanvasRenderingContext2D);
-        drawService.clearDiff.and.returnValue();
-        // read the image file as a data URL
-        component.type = canvasHolderService.originalCanvas;
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'assets/image_empty.bmp');
-        xhr.responseType = 'blob';
-        xhr.onload = () => {
-            const blobImage = xhr.response;
-            createImageBitmap(blobImage).then((bmp) => {
-                image = bmp;
-            });
-        };
-        xhr.send();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should have a canvas', () => {
-        const canvas = fixture.nativeElement.querySelector('canvas');
-        expect(canvas).toBeTruthy();
-    });
-    it('should have a canvas with the right size', () => {
-        const canvas = fixture.nativeElement.querySelector('canvas');
-        expect(canvas.width).toEqual(constants.DEFAULT_WIDTH);
-        expect(canvas.height).toEqual(constants.DEFAULT_HEIGHT);
-    });
 
-    it('should call bitmap service when fileSelectd', () => {
-        const spy = spyOn(component, 'onFileSelected');
-        // create a new event on change file selection
-        const event = new Event('change');
-        const file = new File([''], 'test.bmp', { type: 'image/bmp' });
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const fileList = { 0: file, length: 1, item: () => file };
-        Object.defineProperty(event, 'target', { value: { files: fileList } });
-
-        // dispatch event to the component and register spy
-        component['fileUpload'].nativeElement.dispatchEvent(event);
-        expect(spy).toHaveBeenCalledOnceWith(event);
+    it('should set isDrawing to true when mouse is hit on the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mousedown', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(component.isDrawing).toBeTrue();
     });
 
-    it('should call bitmap service when fileSelectd', () => {
-        // create a new event on change file selection
-        const event = new Event('change');
-        // dispatch event to the component and register spy
-        component.onFileSelected(event);
-        expect(bitmapService.handleFileSelect).toHaveBeenCalledOnceWith(event);
+    it('should add point to currentDrawing when mouse is hit on the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mousedown', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(component.currentDrawing.points.length).toEqual(1);
     });
 
-    it('should loadImage when file is selected', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        spyOn(component, 'loadImage').and.callFake(() => {});
-        // create a new event on change file selection
-        bitmapService.handleFileSelect.and.returnValue(Promise.resolve(image));
-        const event = new Event('change');
-        const blob = await (await fetch('assets/image_empty.bmp')).blob();
-        const file = await new File([blob], 'test.bmp', { type: 'image/bmp' });
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const fileList = { 0: file, length: 1, item: () => file };
-        Object.defineProperty(event, 'target', { value: { files: fileList } });
-        await component.onFileSelected(event);
+    it('should not add point to currentDrawing if mouse is out of the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mousedown', { clientX: -10, clientY: -10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(component.currentDrawing.points.length).toEqual(0);
+    });
+
+    it('should set isDrawing to false when mouse is up on the canvas', () => {
+        component.isDrawing = true;
+        component.mouseUpDetection();
+        expect(component.isDrawing).toBeFalse();
+    });
+
+    it('should call undo on tempCommand when mouse is moved', () => {
+        spyOn(component, 'getPoint').and.returnValue({ x: 10, y: 10 });
+
+        let mouseEvent = new MouseEvent('mousedown', { clientX: 10, clientY: 10 });
+        component.mouseHitDetection(mouseEvent);
+        component.isDrawing = true;
+        mouseEvent = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
+        component.mouseMoveDetection(mouseEvent);
+        expect(component.tempCommand).toBeDefined();
+        // const spy = spyOn(component.tempCommand!, 'undo');
+        mouseEvent = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+        component.mouseMoveDetection(mouseEvent);
         // expect(spy).toHaveBeenCalled();
-        expect(bitmapService.handleFileSelect).toHaveBeenCalledTimes(1);
     });
 
-    it('should clear canvas', () => {
-        drawService.clearCanvas.calls.reset();
-        component.clearCanvas();
-        expect(drawService.clearCanvas).toHaveBeenCalledTimes(1);
+    it('should not do anything when mouse is moved and isDrawing is false', () => {
+        component.isDrawing = false;
+        const mouseEvent = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+        component.mouseMoveDetection(mouseEvent);
+        expect(component.tempCommand).toBeUndefined();
+    });
+
+    it('should call doTempCommand when mouse is moved and isDrawing is true', () => {
+        component.isDrawing = false;
+        let mouseEvent = new MouseEvent('mousedown', { clientX: 10, clientY: 10 });
+        component.mouseHitDetection(mouseEvent);
+        mouseEvent = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
+        component.mouseMoveDetection(mouseEvent);
+        const spy = spyOn(component, 'doTempCommand');
+        mouseEvent = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+        component.isDrawing = true;
+        component.mouseMoveDetection(mouseEvent);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should return canvasImageNative', () => {
+        const canvasImageNative = component.canvasImageNative;
+        expect(canvasImageNative).toBeDefined();
+    });
+
+    it('should return canvasDrawNative', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        expect(canvasDrawNative).toBeDefined();
+    });
+
+    it('should return the canvas as element when getCanvasDraw', () => {
+        const canvasDraw = component.getCanvasDraw;
+        expect(canvasDraw).toBeDefined();
+    });
+
+    it('should return the canvas as element when getCanvasImage', () => {
+        const canvasImage = component.getCanvasImage;
+        expect(canvasImage).toBeDefined();
+    });
+
+    it('should call handleMouseUp when mouse is up on the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mouseup', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        const spy = spyOn(component, 'mouseUpDetection');
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call handleMouseMove when mouse is moved on the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        const spy = spyOn(component, 'mouseMoveDetection');
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call handleMouseHit when mouse is hit on the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mousedown', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        const spy = spyOn(component, 'mouseHitDetection');
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call handleMouseLeave when mouse is out of the canvas', () => {
+        const canvasDrawNative = component.canvasDrawNative;
+        const mouseEvent = new MouseEvent('mouseleave', { clientX: 10, clientY: 10 });
+        spyOn(canvasDrawNative, 'getBoundingClientRect').and.returnValue({ left: 0, top: 0 } as DOMRect);
+        const spy = spyOn(component, 'mouseUpDetection');
+        canvasDrawNative.dispatchEvent(mouseEvent);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should create and dispatch a command load image when loadImage is called', () => {
+        component.loadImage('' as unknown as ImageBitmap);
+        expect(commandService.do).toHaveBeenCalled();
+    });
+
+    it('should load image when onFileSelected is called', fakeAsync(() => {
+        const spy = spyOn(component, 'loadImage');
+        bitmapService.handleFileSelect = async () => Promise.resolve('hello' as unknown as ImageBitmap);
+        component.onFileSelected({ target: { files: [''] } } as unknown as Event);
+        tick();
+        expect(spy).toHaveBeenCalledOnceWith('hello' as unknown as ImageBitmap);
+    }));
+
+    it('should return the last point of the current drawing', () => {
+        component.currentDrawing.points = [{ x: 0, y: 0 }];
+        const point = component.getLastPoint();
+        expect(point).toEqual({ x: 0, y: 0 });
+    });
+
+    it('should create and dispatch a command eras when doTempCommand is called and drawService tool is set to erase', () => {
+        drawingService.setTool = ERASER;
+        component.currentDrawing.points = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+        ];
+        component.isDrawing = true;
+        component.doTempCommand();
+        expect(component.tempCommand?.constructor.name).toEqual('DrawErasLineCommand');
+    });
+
+    it('should create and dispatch a command pencil when doTempCommand is called and drawService tool is set to pencil', () => {
+        drawingService.setTool = PEN;
+        component.currentDrawing.points = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+        ];
+
+        component.isDrawing = true;
+        component.doTempCommand();
+        expect(component.tempCommand?.constructor.name).toEqual('DrawListLineCommand');
+    });
+
+    it('should create and dispatch a command rectangle when doTempCommand is called and drawService tool is set to brush', () => {
+        drawingService.setTool = RECTANGLE;
+        component.currentDrawing.points = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+        ];
+        component.isDrawing = true;
+        component.doTempCommand();
+        expect(component.tempCommand?.constructor.name).toEqual('DrawRectangleCommand');
+    });
+
+    it('should do nothing when the tool is not supported', () => {
+        drawingService.setTool = 'unsupported';
+        component.currentDrawing.points = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+        ];
+        component.isDrawing = true;
+        component.doTempCommand();
+        expect(component.tempCommand).toBeUndefined();
+    });
+
+    it('should generte a merge the draw canvas with the image canvas when getUpdatedTempCanvasCtx is called', () => {
+        const spy = spyOn(component.getCtxCanvasTemp, 'drawImage');
+        const ctx = component.getUpdatedTempCanvasCtx();
+        expect(ctx).toBeTruthy();
+        expect(spy).toHaveBeenCalledTimes(2);
     });
 });

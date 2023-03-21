@@ -99,6 +99,7 @@ export class GameCardHandlerService {
         return false;
     }
 
+    // dele the game so it could not be access by players wanting to join
     deleteGame(gameName: string): void {
         this.gamesQueue.delete(gameName);
         this.joiningPlayersQueue.delete(gameName);
@@ -121,6 +122,7 @@ export class GameCardHandlerService {
         }
     }
 
+    // return only the two players who are most likely to play together at a given time
     getStackedPlayers(gameName: string): string[] {
         return this.gamesQueue.get(gameName);
     }
@@ -158,18 +160,6 @@ export class GameCardHandlerService {
         }
     }
 
-    // check playerJoiningQueue and add the first two players to the game queue
-    // return the number of players waiting
-    // checkJoiningPlayersQueue(gameName: string): string[] {
-    //     if (this.joiningPlayersQueue.get(gameName).length >= PLAYER_PAIR) {
-    //         this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
-    //         this.gamesQueue.get(gameName).push(this.joiningPlayersQueue.get(gameName).shift());
-    //         return this.gamesQueue.get(gameName);
-    //     }
-    //     const playerId = this.joiningPlayersQueue.get(gameName).shift();
-    //     this.players.delete(playerId);
-    //     return [playerId];
-    // }
     // remove all players from the joining queue and return their id
     // to be able to delete them from the players map
     removePlayers(gameName: string): string[] {
@@ -182,6 +172,7 @@ export class GameCardHandlerService {
         return waitingPlayers;
     }
 
+    // return the creator and the opponent player who are ready to play
     acceptOpponent(playerId: string): Player[] {
         const gameName = this.players.get(playerId).gameName;
         const opponentId = this.gamesQueue.get(gameName).pop();
@@ -195,6 +186,7 @@ export class GameCardHandlerService {
         return [creatorPlayer, opponentPlayer];
     }
 
+    // remove the opponent from the players map and the gameQueue map plus return the player
     deleteOpponent(playerId: string): Player {
         const opponentId = this.gamesQueue.get(this.players.get(playerId).gameName).pop();
         const opponent = this.players.get(opponentId);
@@ -203,6 +195,7 @@ export class GameCardHandlerService {
         }
     }
 
+    // get the player from the players map with name and id
     getPlayer(playerId: string): Player | null {
         if (this.players.has(playerId)) return this.players.get(playerId);
         return null;
@@ -222,21 +215,4 @@ export class GameCardHandlerService {
         }
         return null;
     }
-
-    // remove(id: string): boolean {
-    //     const player = this.players.get(id);
-    //     this.players.delete(id);
-    //     if (this.gamesQueue.has(player.gameName) && this.gamesQueue.get(player.gameName).length > EMPTY) {
-    //         const size = this.gamesQueue.get(player.gameName).length;
-    //         if (size === 1) {
-    //             this.gamesQueue.get(player.gameName).pop();
-    //         } else if (size === 2) {
-    //             const opponent = this.gamesQueue.get(player.gameName).pop();
-    //             this.players.delete(opponent);
-    //             this.gamesQueue.get(player.gameName).pop();
-    //         }
-    //         return true;
-    //     }
-    //     return false;
-    // }
 }

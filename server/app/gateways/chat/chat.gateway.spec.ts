@@ -176,16 +176,10 @@ describe('ChatGateway', () => {
         expect(socket.disconnect.calledOnce).toBeTruthy();
     });
 
-    it('startMultiGame should join room', async () => {
-        jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(INDEX_NOT_FOUND);
-        const mockPlayer = {
-            gameId: '89',
-            creatorName: 'testCreator',
-            gameName: 'gameTest',
-            opponentName: 'hey',
-        };
-        await gateway.startMultiGame(socket, mockPlayer);
-        expect(socket.join.calledOnce).toBeTruthy();
+    it('sendRoomName should join room', async () => {
+        const roomName = 'test';
+        await gateway.sendRoomName(socket, roomName);
+        expect(socket.join.calledWith(roomName)).toBeTruthy();
     });
 
     it('startMultiGame should call addRoomMulti if playerQueue length == 2', async () => {

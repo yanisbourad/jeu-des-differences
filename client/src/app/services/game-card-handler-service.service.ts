@@ -19,6 +19,7 @@ export class GameCardHandlerService {
     isNewUpdate: boolean;
     isLeaving: boolean;
     isRejected: boolean;
+    isCreatorLeft: boolean;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
@@ -29,6 +30,7 @@ export class GameCardHandlerService {
         this.isNewUpdate = false;
         this.isLeaving = false;
         this.isRejected = false;
+        this.isCreatorLeft = false;
     }
 
     getGameState(): string {
@@ -41,6 +43,10 @@ export class GameCardHandlerService {
 
     getReadinessStatus(): boolean {
         return this.isReadyToPlay;
+    }
+
+    getCancelingState(): boolean {
+        return this.isCreatorLeft;
     }
 
     getRejectionStatus(): boolean {
@@ -70,60 +76,52 @@ export class GameCardHandlerService {
 
     listenToFeedBack() {
         this.socket.on('feedbackOnJoin', () => {
-            console.log('feedbackOnJoin');
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
         });
         this.socket.on('feedbackOnAccept', (name) => {
-            console.log('feedbackOnAccept');
             this.opponentPlayer = name;
             if (this.isCreator) this.state = 'Accepter';
         });
 
         this.socket.on('feedbackOnWait', (name) => {
-            console.log('feedbackOnWait');
             this.opponentPlayer = name;
         });
 
         this.socket.on('feedbackOnWaitLonger', (name) => {
-            console.log('feedbackOnWaitLonger');
             this.opponentPlayer = name;
         });
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
-            console.log('feedbackOnStart');
             // call method to redirect to game from service with gameIdentifier
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
+            this.resetGameVariables();
             this.redirect(gameIdentifier);
         });
 
         this.socket.on('feedBackOnLeave', () => {
-            console.log('feedBackOnLeave');
             // send pop up to player
+            this.isCreatorLeft = true;
             this.isLeaving = true;
         });
 
         this.socket.on('feedbackOnReject', () => {
-            console.log('feedbackOnReject');
             this.isRejected = true;
             this.isLeaving = true;
         });
 
         this.socket.on('byeTillNext', () => {
-            console.log('byeTillNext');
+            this.isCreatorLeft = true;
             this.isLeaving = true;
-            this.resetGameVariables();
         });
         this.socket.on('updateStatus', (gamesStatus) => {
-            console.log('updateStatus');
             this.games = new Map(gamesStatus);
             this.isNewUpdate = true;
         });
 
         this.socket.on('disconnect', () => {
-            console.log('disconnect');
             this.isLeaving = true;
             this.resetGameVariables();
         });
@@ -138,9 +136,9 @@ export class GameCardHandlerService {
     resetGameVariables(): void {
         this.isCreator = false;
         this.state = '';
-        this.isReadyToPlay = false;
         this.opponentPlayer = '';
         this.isRejected = false;
+        this.isLeaving = false;
     }
 
     getLeavingState(): boolean {

@@ -6,7 +6,7 @@ import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { GameCardHandlerGateway } from './game-card-handler.gateway';
 import { GameCardHandlerService } from './game-card-handler.service';
 
-fdescribe('GameCardHandlerGateway', () => {
+describe('GameCardHandlerGateway', () => {
     let gateway: GameCardHandlerGateway;
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
@@ -168,5 +168,47 @@ fdescribe('GameCardHandlerGateway', () => {
         gateway.join(payload, socket);
         expect(logger.log).toHaveBeenCalled();
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
+    });
+    it('Should call reject player in the stack of two()', async () => {
+        const player1 = { id: '123', name: 'test', gameName: 'uno' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const player3 = { id: '144', name: 'test', gameName: 'uno' };
+        stub(socket, 'rooms').value(new Set(['test']));
+        jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
+        jest.spyOn(gameCardHandlerService, 'deleteOpponent').mockReturnValueOnce(player2);
+        jest.spyOn(gameCardHandlerService, 'handleReject').mockReturnValueOnce(player3);
+        jest.spyOn(logger, 'log').mockImplementation(() => {
+            return;
+        });
+        jest.spyOn(server, 'to').mockReturnValue({
+            emit: (event: string) => {
+                if (event === 'feedbackOnReject') expect(event).toEqual('feedbackOnReject');
+                if (event === 'feedbackOnWait') expect(event).toEqual('feedbackOnWait');
+                if (event === 'feedbackOnJoin') expect(event).toEqual('feedbackOnJoin');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        gateway.reject(socket);
+        expect(logger.log).toHaveBeenCalled();
+    });
+    it('Should call reject player and do nothing when creator is alone()', async () => {
+        const player1 = { id: '123', name: 'test', gameName: 'uno' };
+        stub(socket, 'rooms').value(new Set(['test']));
+        jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
+        jest.spyOn(gameCardHandlerService, 'deleteOpponent').mockReturnValueOnce(null);
+        jest.spyOn(gameCardHandlerService, 'handleReject').mockReturnValueOnce(null);
+        jest.spyOn(logger, 'log').mockImplementation(() => {
+            return;
+        });
+        jest.spyOn(server, 'to').mockReturnValue({
+            emit: (event: string) => {
+                if (event === 'feedbackOnReject') expect(event).toEqual('feedbackOnReject');
+                if (event === 'feedbackOnWait') expect(event).toEqual('feedbackOnWait');
+                if (event === 'feedbackOnJoin') expect(event).toEqual('feedbackOnJoin');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        gateway.reject(socket);
+        expect(logger.log).toHaveBeenCalled();
     });
 });

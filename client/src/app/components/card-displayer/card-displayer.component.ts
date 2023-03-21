@@ -60,7 +60,11 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);
         if (this.allCards.length % this.cardByPage === constants.ZERO) {
-            this.allPages = this.allCards.length / this.cardByPage - constants.ONE;
+            if (this.allCards.length === constants.ZERO) {
+                this.allPages = 0;
+            } else {
+                this.allPages = this.allCards.length / this.cardByPage - constants.ONE;
+            }
         } else {
             this.allPages = Math.floor(this.allCards.length / this.cardByPage);
         }

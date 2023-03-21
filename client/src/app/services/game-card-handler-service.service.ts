@@ -124,6 +124,7 @@ export class GameCardHandlerService {
         this.socket.on('feedbackOnReject', () => {
             this.isRejected = true;
             this.isLeaving = true;
+            this.resetGameVariables();
         });
 
         this.socket.on('byeTillNext', () => {
@@ -137,7 +138,7 @@ export class GameCardHandlerService {
 
         this.socket.on('disconnect', () => {
             this.isLeaving = true;
-            this.resetGameVariables();
+            // this.resetGameVariables();
         });
     }
 

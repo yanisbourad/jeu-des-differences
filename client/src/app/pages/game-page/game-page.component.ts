@@ -218,8 +218,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     toggleCheating(): void {
         this.isCheating = !this.isCheating;
-        if (this.isCheating) this.cheatMode();
-        else {
+        const chatBox = document.getElementById('chat-box');
+        if (this.isCheating) {
+            if (document.activeElement !== chatBox) this.cheatMode();
+        } else {
             clearInterval(this.blinking);
             this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
             this.drawService.setColor = 'black';

@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
-
 @Component({
     selector: 'app-message-area',
     templateUrl: './message-area.component.html',

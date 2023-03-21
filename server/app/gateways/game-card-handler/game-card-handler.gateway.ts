@@ -154,6 +154,12 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         this.logger.log(`Players were matched, ${removedPlayers.length} players left ${gameInfo.gameName} queue`);
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
+
+    @SubscribeMessage('handleDelete')
+    delete(@ConnectedSocket() client: Socket, @MessageBody() gameName: string) {
+        this.logger.log(gameName);
+    }
+
     // on disconnect
     // remove player from queue
     // send message to opponent

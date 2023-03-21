@@ -10,6 +10,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
 import * as constants from '@app/configuration/const-canvas';
+import { GameCardHandlerService } from './game-card-handler-service.service';
 
 
 @Injectable({
@@ -38,6 +39,7 @@ export class GameService {
     // eslint-disable-next-line max-params
     constructor(
         rendererFactory: RendererFactory2,
+        private readonly gameCardHandlerService: GameCardHandlerService,
         public dialog: MatDialog,
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
@@ -275,6 +277,7 @@ export class GameService {
     }
 
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        this.gameCardHandlerService.handleDelete(gameName);
         return this.gameDataBase.deleteGame(gameName);
     }
 }

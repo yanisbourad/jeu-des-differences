@@ -264,7 +264,7 @@ describe('GameService', () => {
         gameService.playerName = 'test';
         gameService.gameType = 'double';
         const message = {
-            message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Différence trouvée par test',
+            message: new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée par test',
             userName: 'test',
             mine: true,
             color: '#00FF00',
@@ -281,7 +281,7 @@ describe('GameService', () => {
         gameService.playerName = 'test';
         gameService.gameType = 'double';
         const message = {
-            message: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds() + ' - ' + ' Erreur par test',
+            message: new Date().toLocaleTimeString() + ' - ' + ' Erreur par test',
             userName: 'test',
             mine: true,
             color: '#FF0000',

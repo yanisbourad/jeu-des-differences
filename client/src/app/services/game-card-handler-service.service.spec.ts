@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Socket } from 'socket.io-client';
 import { GameCardHandlerService } from './game-card-handler-service.service';
@@ -7,10 +8,12 @@ import SpyObj = jasmine.SpyObj;
 describe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
+    // let socketClientServiceSpy: SpyObj<SocketClientService>;
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     beforeEach(() => {
-        socketSpy = jasmine.createSpyObj('Socket', ['on', 'emit']);
+        socketSpy = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect', 'connect']);
+        // socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect']);
         TestBed.configureTestingModule({
             providers: [
                 {
@@ -18,6 +21,7 @@ describe('GameCardHandlerService', () => {
                     useValue: routerSpy,
                 },
             ],
+            imports: [MatDialogModule],
         });
         service = TestBed.inject(GameCardHandlerService);
         // service.socket = new SocketTestHelper() as unknown as Socket;
@@ -59,12 +63,12 @@ describe('GameCardHandlerService', () => {
         expect(service.socket).toBeTruthy();
     });
 
-    // test for updateGameStatus
+    // // test for updateGameStatus
     // it('should call emit findAllGamesStatus when updating game status', () => {
     //     const gameNames = ['test', 'toaster', 'dad'];
     //     service.connect();
     //     service.updateGameStatus(gameNames);
-    //     expect(socketSpy.emit).toHaveBeenCalledWith('findAllGamesStatus', gameNames);
+    //     expect(socketSpy.on).toHaveBeenCalled();
     // });
 
     // test for get new update
@@ -125,5 +129,6 @@ describe('GameCardHandlerService', () => {
             gameName: 'test',
         });
         expect(routerSpy.navigate).toHaveBeenCalled();
+        expect(socketSpy.disconnect).toHaveBeenCalled();
     });
 });

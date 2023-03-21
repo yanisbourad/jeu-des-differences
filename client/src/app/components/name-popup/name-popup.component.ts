@@ -77,8 +77,7 @@ export class NamePopupComponent implements OnInit {
     }
 
     redirect(): void {
-        if (this.data.gameType === 'solo')
-            this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName, gameType: this.data.gameType }]);
+        if (this.data.gameType === 'solo') this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName }]);
         if (this.data.gameType === 'double') this.launchDialog();
     }
 }

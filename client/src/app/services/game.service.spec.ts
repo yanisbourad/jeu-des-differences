@@ -264,7 +264,7 @@ describe('GameService', () => {
         gameService.playerName = 'test';
         gameService.gameType = 'double';
         const message = {
-            message: new Date().toLocaleTimeString + ' - ' + ' Différence trouvée par test',
+            message: new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée par test',
             userName: 'test',
             mine: true,
             color: '#00FF00',

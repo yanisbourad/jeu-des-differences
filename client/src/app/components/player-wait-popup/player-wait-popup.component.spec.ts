@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { PlayerWaitPopupComponent } from './player-wait-popup.component';
 
@@ -29,7 +30,8 @@ describe('PlayerWaitPopupComponent', () => {
             'getRejectionStatus',
         ]);
         await TestBed.configureTestingModule({
-            declarations: [PlayerWaitPopupComponent],
+            imports: [MatDialogModule, BrowserAnimationsModule],
+            declarations: [PlayerWaitPopupComponent, GeneralFeedbackComponent],
             providers: [
                 { provide: MatDialogRef, useValue: dialogRefSpy },
                 {
@@ -99,5 +101,13 @@ describe('PlayerWaitPopupComponent', () => {
         component.leaveGame();
         expect(gameCardHandlerServiceSpy.leave).toHaveBeenCalled();
         expect(dialogRefSpy.close).toHaveBeenCalled();
+    });
+    it('should call sendFeedback when button is pressed', () => {
+        const spy = spyOn(component.dialog, 'open').and.callThrough();
+        component.sendFeedback('test');
+        expect(spy).toHaveBeenCalledWith(GeneralFeedbackComponent, {
+            data: { message: 'test' },
+            disableClose: true,
+        });
     });
 });

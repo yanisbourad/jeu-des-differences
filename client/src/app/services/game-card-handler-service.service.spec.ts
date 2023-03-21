@@ -7,7 +7,7 @@ import { Socket } from 'socket.io-client';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 import SpyObj = jasmine.SpyObj;
 
-describe('GameCardHandlerService', () => {
+fdescribe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
     let socketClient: SpyObj<SocketClient>;
@@ -116,13 +116,13 @@ describe('GameCardHandlerService', () => {
     //     expect(socketClient.on).toHaveBeenCalledWith('updateStatus', jasmine.any(Function));
     // });
 
-    // // test for updateGameStatus
-    // it('should call emit findAllGamesStatus when updating game status', () => {
-    //     const gameNames = ['test', 'toaster', 'dad'];
-    //     service.connect();
-    //     service.updateGameStatus(gameNames);
-    //     expect(socketSpy.on).toHaveBeenCalled();
-    // });
+    // test for updateGameStatus
+    it('should call emit findAllGamesStatus when updating game status', () => {
+        const gameNames = ['test', 'toaster', 'dad'];
+        service.connect();
+        service.updateGameStatus(gameNames);
+        expect(socketSpy.on).toHaveBeenCalled();
+    });
 
     // test for get new update
     it('should return true if there is a new update', () => {
@@ -157,10 +157,18 @@ describe('GameCardHandlerService', () => {
         expect(service.isLeaving).toBeFalsy();
         expect(service.isReadyToPlay).toBeFalsy();
         expect(service.isRejected).toBeFalsy();
+        expect(service.isGameAvailable).toBeTruthy();
         expect(service.state).toEqual('');
     });
     it('should return leaving state', () => {
         expect(service.getLeavingState()).toBeFalsy();
+    });
+    it('should return true as the game is available', () => {
+        expect(service.getGameAvailability()).toBeTruthy();
+    });
+    it('should set readiness status of the player to start the game', () => {
+        service.setReadinessStatus(false);
+        expect(service.isReadyToPlay).toBeFalsy();
     });
     it('should call emit cancel game when leaving a game', () => {
         service.leave('test');
@@ -174,6 +182,10 @@ describe('GameCardHandlerService', () => {
         service.rejectOpponent('test');
         expect(socketSpy.emit).toHaveBeenCalledWith('rejectOpponent', 'test');
     });
+    it('should call emit reject opponent when rejecting a game', () => {
+        service.handleDelete('test');
+        expect(socketSpy.emit).toHaveBeenCalledWith('handleDelete', 'test');
+    });
     it('should redirect player as method is being called', () => {
         service.redirect({
             gameId: 1,
@@ -181,6 +193,11 @@ describe('GameCardHandlerService', () => {
             opponentName: 'test',
             gameName: 'test',
         });
+        expect(routerSpy.navigate).toHaveBeenCalled();
+        expect(socketSpy.disconnect).toHaveBeenCalled();
+    });
+    it('should redirect player to home page as method is being called', () => {
+        service.redirectToHomePage();
         expect(routerSpy.navigate).toHaveBeenCalled();
         expect(socketSpy.disconnect).toHaveBeenCalled();
     });

@@ -21,6 +21,7 @@ export class GameCardHandlerService {
     isRejected: boolean;
     isCreatorLeft: boolean;
     games: Map<string, number>;
+    isGameAvailable: boolean;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
         this.state = '';
@@ -31,6 +32,7 @@ export class GameCardHandlerService {
         this.isLeaving = false;
         this.isRejected = false;
         this.isCreatorLeft = false;
+        this.isGameAvailable = true;
     }
 
     getGameState(): string {
@@ -57,6 +59,10 @@ export class GameCardHandlerService {
         return this.isRejected;
     }
 
+    getGameAvailability(): boolean {
+        return this.isGameAvailable;
+    }
+
     connect() {
         this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
     }
@@ -79,6 +85,10 @@ export class GameCardHandlerService {
     }
 
     listenToFeedBack() {
+        this.socket.on('gameUnavailable', () => {
+            this.redirectToHomePage();
+            this.isGameAvailable = false;
+        });
         this.socket.on('feedbackOnJoin', () => {
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
@@ -98,7 +108,6 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
-            console.log(gameIdentifier);
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
@@ -145,11 +154,11 @@ export class GameCardHandlerService {
         this.opponentPlayer = '';
         this.isRejected = false;
         this.isLeaving = false;
+        this.isGameAvailable = true;
     }
 
     handleDelete(gameName: string) {
         this.socket.emit('handleDelete', gameName);
-        console.log('yeahhhhhhhhhhhhhhhhhhhhhhh');
         this.listenToFeedBack();
     }
     getLeavingState(): boolean {
@@ -186,6 +195,10 @@ export class GameCardHandlerService {
                 gameId: gamersIdentifier.gameId,
             },
         ]);
+        this.socket.disconnect();
+    }
+    redirectToHomePage(): void {
+        this.router.navigate(['/home']);
         this.socket.disconnect();
     }
 }

@@ -25,7 +25,6 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
     }
     ngOnInit(): void {
         this.isViewable = false;
-        this.gameCardHandlerService.clearService();
         this.updateCards();
     }
 
@@ -66,11 +65,5 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
             this.allPages = Math.floor(this.allCards.length / this.cardByPage);
         }
         return pageSliced;
-    }
-
-    onGameDeleted(game: GameInfo): void {
-        this.allCards = this.allCards.filter((g) => g !== game);
-        this.updateCards();
-        this.getCurrentPageCards();
     }
 }

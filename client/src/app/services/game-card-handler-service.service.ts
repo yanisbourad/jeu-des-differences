@@ -98,11 +98,12 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
+            console.log(gameIdentifier);
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
-            this.resetGameVariables();
             this.redirect(gameIdentifier);
+            this.resetGameVariables();
         });
 
         this.socket.on('feedBackOnLeave', () => {

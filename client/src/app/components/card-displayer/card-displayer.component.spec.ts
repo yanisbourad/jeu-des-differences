@@ -23,7 +23,7 @@ describe('CardDisplayerComponent', () => {
 
     beforeEach(() => {
         communicationServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getAllGames']);
-        gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['updateGameStatus']);
+        gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['updateGameStatus', 'clearService']);
         changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
         TestBed.configureTestingModule({
             imports: [HttpClientModule, MatGridListModule],
@@ -112,5 +112,65 @@ describe('CardDisplayerComponent', () => {
     it('should display max 4 game cards by page', () => {
         const gridList = fixture.nativeElement.querySelector('mat-grid-list');
         expect(gridList.getAttribute('cols')).toEqual(constants.FOUR.toString());
+    });
+
+    it('should delete game', () => {
+        spyOn(component, 'onGameDeleted');
+        const gameMock = {
+            gameName: 'difference 1',
+            difficulty: 'Facile',
+            originalImageData: 'imageOriginal1',
+            modifiedImageData: 'imageModifie1',
+            listDifferences: ['diffrence 1', 'difference 2'],
+            rankingMulti: [
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:23',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:24',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:25',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+            ],
+            rankingSolo: [
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'mlyi',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+            ],
+        } as GameInfo;
+        component.allCards = [gameMock];
+        component.onGameDeleted(gameMock);
+        expect(component.onGameDeleted).toHaveBeenCalled();
     });
 });

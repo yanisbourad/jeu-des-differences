@@ -101,7 +101,7 @@ describe('NamePopupComponent', () => {
         component.data.name = 'player';
         component.data.gameType = 'solo';
         component.redirect();
-        expect(route.navigate).toHaveBeenCalledWith(['/game', { player: 'player', gameName: 'gameName' }]);
+        expect(route.navigate).toHaveBeenCalledWith(['/game', Object({ player: 'player', gameName: 'gameName', gameType: 'solo' })]);
     });
     it('should launch modal on calling redirect', () => {
         spyOn(component, 'launchDialog');

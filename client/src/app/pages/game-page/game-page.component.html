@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="header"><app-header></app-header></div>
+    <div id= "gameContainer" class="header"><app-header></app-header></div>
     <app-game-info></app-game-info>
     <div class="mainView">
         <div class="superposeImageCanvas">
@@ -29,6 +29,6 @@
         <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
     </div>
     <div class="message">
-        <app-message-area [playerName]="this.gameService.playerName"></app-message-area>
+        <app-message-area id="chat" [playerName]="this.gameService.playerName"></app-message-area>
     </div>
 </div>

@@ -219,11 +219,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isCheating = !this.isCheating;
         const chatBox = document.getElementById('chat-box');
         if (this.isCheating) {
-            if (document.activeElement !== chatBox) this.cheatMode();
+            if (document.activeElement !== chatBox) {
+                this.cheatMode();
+            }
         } else {
-            clearInterval(this.blinking);
-            this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
-            this.drawService.setColor = 'black';
+            if (document.activeElement !== chatBox) 
+                clearInterval(this.blinking);
+                this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
+                this.drawService.setColor = 'black';
         }
     }
 

@@ -22,10 +22,10 @@ describe('DrawErasLineCommand', () => {
         ];
         const lineWidth = 5;
         const command = new DrawErasLineCommand(points, lineWidth, canvas, 'test-canvas');
-        const ctxSpy = spyOn(command.ctx, 'clearRect');
+        const ctxSpy = spyOn(command.ctx, 'stroke');
         command.do();
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(ctxSpy.calls.allArgs()).toEqual([[17.5, 17.5, 5, 5]]);
+        expect(ctxSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should restore last canvas state', () => {

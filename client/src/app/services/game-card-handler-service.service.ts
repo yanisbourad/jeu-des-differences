@@ -19,6 +19,7 @@ export class GameCardHandlerService {
     isNewUpdate: boolean;
     isLeaving: boolean;
     isRejected: boolean;
+    isCreatorLeft: boolean;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
@@ -29,6 +30,7 @@ export class GameCardHandlerService {
         this.isNewUpdate = false;
         this.isLeaving = false;
         this.isRejected = false;
+        this.isCreatorLeft = false;
     }
 
     getGameState(): string {
@@ -41,6 +43,10 @@ export class GameCardHandlerService {
 
     getReadinessStatus(): boolean {
         return this.isReadyToPlay;
+    }
+
+    getCancelingState(): boolean {
+        return this.isCreatorLeft;
     }
 
     getRejectionStatus(): boolean {
@@ -91,22 +97,24 @@ export class GameCardHandlerService {
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
+            this.resetGameVariables();
             this.redirect(gameIdentifier);
         });
 
         this.socket.on('feedBackOnLeave', () => {
             // send pop up to player
+            this.isCreatorLeft = true;
             this.isLeaving = true;
         });
 
         this.socket.on('feedbackOnReject', () => {
-            this.isLeaving = true;
             this.isRejected = true;
+            this.isLeaving = true;
         });
 
         this.socket.on('byeTillNext', () => {
+            this.isCreatorLeft = true;
             this.isLeaving = true;
-            this.resetGameVariables();
         });
         this.socket.on('updateStatus', (gamesStatus) => {
             this.games = new Map(gamesStatus);
@@ -128,9 +136,9 @@ export class GameCardHandlerService {
     resetGameVariables(): void {
         this.isCreator = false;
         this.state = '';
-        this.isReadyToPlay = false;
         this.opponentPlayer = '';
         this.isRejected = false;
+        this.isLeaving = false;
     }
 
     getLeavingState(): boolean {

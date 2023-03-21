@@ -6,8 +6,9 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GeneralFeedbackComponent } from '../general-feedback/general-feedback.component';
-import { PlayerWaitPopupComponent } from '../player-wait-popup/player-wait-popup.component';
+
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 import { NamePopupComponent } from './name-popup.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -101,7 +102,7 @@ describe('NamePopupComponent', () => {
         component.data.name = 'player';
         component.data.gameType = 'solo';
         component.redirect();
-        expect(route.navigate).toHaveBeenCalledWith(['/game', { player: 'player', gameName: 'gameName' }]);
+        expect(route.navigate).toHaveBeenCalledWith(['/game', Object({ player: 'player', gameName: 'gameName', gameType: 'solo' })]);
     });
     it('should launch modal on calling redirect', () => {
         spyOn(component, 'launchDialog');

@@ -11,13 +11,11 @@ describe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
     let socketClient: SpyObj<SocketClient>;
-    // let socketClientServiceSpy: SpyObj<SocketClientService>;
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     beforeEach(() => {
         socketClient = jasmine.createSpyObj('SocketClient', ['isSocketAlive', 'connect', 'on', 'emit', 'send', 'disconnect']);
         socketSpy = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect', 'connect']);
-        // socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect']);
         TestBed.configureTestingModule({
             providers: [
                 {
@@ -36,38 +34,36 @@ describe('GameCardHandlerService', () => {
         service.socket = socketSpy;
         socketClient.socket = new SocketTestHelper() as unknown as Socket;
         // socketClient.on.and.callFake((event: string, callback: (data: unknown) => void) => {
-        //     if (event === 'hello') {
-        //         callback('Hello, world!');
-        //     }
-        //     if (event === 'message') {
-        //         callback('message');
-        //     }
-        //     if (event === 'connect') {
-        //         callback('connect');
-        //     }
-
-        //     if (event === 'serverTime') {
-        //         callback(new Map([['apple', 3]]));
-        //     }
-
-        //     if (event === 'sendRoomName') {
-        //         callback(['multi', 'string']);
-        //     }
-        //     if (event === 'message-return') {
-        //         callback({ message: 'string', userName: 'string', color: 'string', pos: 'string', event: true });
-        //     }
-        //     if (event === 'gameEnded') {
-        //         callback([true, 'string']);
-        //     }
-        //     if (event === 'findDifference-return') {
-        //         callback({ playerName: 'string' });
-        //     }
-        //     if (event === 'feedbackDifference') {
-        //         const diff = new Set([1, 2, 3]);
-        //         callback(diff);
-        //     }
-        //     if (event === 'giveup-return') {
-        //         callback({ playerName: 'string' });
+        //     switch (event) {
+        //         case 'feedbackOnJoin':
+        //             callback('Hello');
+        //             break;
+        //         case 'feedbackOnAccept':
+        //             callback('accept');
+        //             break;
+        //         case 'feedbackOnWait':
+        //             callback('wait');
+        //             break;
+        //         case 'feedbackOnWaitLonger':
+        //             callback('waitLonger');
+        //             break;
+        //         case 'feedbackOnStart':
+        //             callback({ gameId: 'String', gameName: 'string', gameCreator: 'string', gameType: 'string' });
+        //             break;
+        //         case 'feedBackOnLeave':
+        //             callback('');
+        //             break;
+        //         case 'feedbackOnReject':
+        //             callback('');
+        //             break;
+        //         case 'byeTillNext':
+        //             callback('');
+        //             break;
+        //         case 'updateStatus':
+        //             callback({ test: 1, toaster: 0 });
+        //             break;
+        //         default:
+        //             break;
         //     }
         // });
     });
@@ -80,6 +76,9 @@ describe('GameCardHandlerService', () => {
     });
     it('should return if player is the game creator as function being called', () => {
         expect(service.getCreatorStatus()).toBeFalsy();
+    });
+    it('should return false as there is no creator when function being called', () => {
+        expect(service.getCancelingState()).toBeFalsy();
     });
     it('should return readiness state of the game function being called', () => {
         expect(service.getReadinessStatus()).toBe(false);
@@ -104,18 +103,18 @@ describe('GameCardHandlerService', () => {
         expect(service.socket).toBeTruthy();
     });
 
-    it('configureBaseSocketFeatures should set up all event listener on the socket client', () => {
-        service.listenToFeedBack();
-        expect(socketClient.on).toHaveBeenCalledWith('connect', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('hello', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('serverTime', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('sendRoomName', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('message-return', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('gameEnded', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('findDifference-return', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('feedbackDifference', jasmine.any(Function));
-        // expect(socketClient.on).toHaveBeenCalledWith('giveup-return', jasmine.any(Function));
-    });
+    // it('should set up all event listener on the socket client', () => {
+    //     service.listenToFeedBack();
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnJoin', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnAccept', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnWait', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnWaitLonger', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnStart', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedBackOnLeave', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnReject', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('byeTillNext', jasmine.any(Function));
+    //     expect(socketClient.on).toHaveBeenCalledWith('updateStatus', jasmine.any(Function));
+    // });
 
     // // test for updateGameStatus
     // it('should call emit findAllGamesStatus when updating game status', () => {

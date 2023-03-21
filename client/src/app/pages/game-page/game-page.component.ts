@@ -231,7 +231,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
     }
 
-    // deep comparison of 2 set<number>
     eqSet(set1: Set<number>, set2: Set<number>): boolean {
         return (
             set1.size === set2.size &&

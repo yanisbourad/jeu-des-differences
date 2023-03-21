@@ -2,9 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 // eslint-disable-next-line no-restricted-imports
-import { GeneralFeedbackComponent } from '../general-feedback/general-feedback.component';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 // eslint-disable-next-line no-restricted-imports
-import { PlayerWaitPopupComponent } from '../player-wait-popup/player-wait-popup.component';
+import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 
 export interface DialogData {
     name: string;

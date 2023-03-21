@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { PlayerWaitPopupComponent } from './player-wait-popup.component';
 
@@ -27,9 +28,11 @@ describe('PlayerWaitPopupComponent', () => {
             'resetGameVariables',
             'getLeavingState',
             'getRejectionStatus',
+            'getCancelingState',
         ]);
         await TestBed.configureTestingModule({
-            declarations: [PlayerWaitPopupComponent],
+            imports: [MatDialogModule, BrowserAnimationsModule],
+            declarations: [PlayerWaitPopupComponent, GeneralFeedbackComponent],
             providers: [
                 { provide: MatDialogRef, useValue: dialogRefSpy },
                 {
@@ -74,7 +77,9 @@ describe('PlayerWaitPopupComponent', () => {
     });
 
     it('should call for updating when new change', () => {
+        component.isTriggered = false;
         gameCardHandlerServiceSpy.getCreatorStatus.and.returnValue(true);
+        gameCardHandlerServiceSpy.getCancelingState.and.returnValue(true);
         gameCardHandlerServiceSpy.getGameState.and.returnValue('waiting');
         gameCardHandlerServiceSpy.getReadinessStatus.and.returnValue(true);
         gameCardHandlerServiceSpy.getNewUpdate.and.returnValue(true);
@@ -85,6 +90,7 @@ describe('PlayerWaitPopupComponent', () => {
         expect(gameCardHandlerServiceSpy.setNewUpdate).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.getRejectionStatus).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.resetGameVariables).toHaveBeenCalled();
+        expect(component.sendFeedback).toHaveBeenCalled();
     });
     it('should reject the opponent when method called', () => {
         component.rejectOpponent();
@@ -99,5 +105,13 @@ describe('PlayerWaitPopupComponent', () => {
         component.leaveGame();
         expect(gameCardHandlerServiceSpy.leave).toHaveBeenCalled();
         expect(dialogRefSpy.close).toHaveBeenCalled();
+    });
+    it('should call sendFeedback when button is pressed', () => {
+        const spy = spyOn(component.dialog, 'open').and.callThrough();
+        component.sendFeedback('test');
+        expect(spy).toHaveBeenCalledWith(GeneralFeedbackComponent, {
+            data: { message: 'test' },
+            disableClose: true,
+        });
     });
 });

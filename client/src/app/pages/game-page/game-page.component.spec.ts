@@ -81,7 +81,7 @@ describe('GamePageComponent', () => {
         socketClientServiceSpy.diffFounded$ = diffFound.asObservable();
 
         hotkeySpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener', 'removeHotkeysEventListener']);
-        drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff']);
+        drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff', 'setColor','getColor']);
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         gameServiceSpy.game = {
             gameName: 'game1',
@@ -291,5 +291,52 @@ describe('GamePageComponent', () => {
         expect(component.unfoundedDifference).toEqual([]);
         expect(spyDrawDiff).toHaveBeenCalledWith(new Set([0]));
         expect(spyDisplayWord).toHaveBeenCalledWith('Trouvé');
+    });
+
+    it('should toggle isCheating when toggleCheating is called', () => {
+        component.isCheating = false;
+        component.toggleCheating();
+        expect(component.isCheating).toBe(true);
+        component.toggleCheating();
+        expect(component.isCheating).toBe(false);
+    });
+
+    it('should call drawDiff on canvasCheat0 and canvasCheat1', () => {
+        const diff = new Set<number>();
+        component.drawDifference(diff, true);
+        expect(drawserviceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvasCheat0.nativeElement);
+        expect(drawserviceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvasCheat1.nativeElement);
+    });
+
+    it('should call inside setInterval drawDifference when cheatMode is called and setColor is black', () => {
+        const drawDifferenceSpy = spyOn(component, 'drawDifference').and.callThrough();
+        jasmine.clock().install();
+        component.unfoundedDifference = [new Set([1, 2, 3])];
+        component.cheatMode();
+        jasmine.clock().tick(constantsTime.BLINKING_TIME);
+        expect(drawserviceSpy.setColor).toEqual('black');
+        for (const set of component.unfoundedDifference) {
+            expect(drawDifferenceSpy).toHaveBeenCalledWith(set, true);
+        }
+        jasmine.clock().uninstall();
+    });
+
+    it('should return true if sets are equal', () => {
+        const set1 = new Set([1, 2, 3]);
+        const set2 = new Set([3, 2, 1]);
+        expect(component.eqSet(set1, set2)).toBe(true);
+    });
+
+    it('should return false if sets are not equal', () => {
+        const set1 = new Set([1, 2, 3]);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const set2 = new Set([4, 5, 6]);
+        expect(component.eqSet(set1, set2)).toBe(false);
+    });
+
+    it('should return false if sets are different sizes', () => {
+        const set1 = new Set([1, 2, 3]);
+        const set2 = new Set([1, 2]);
+        expect(component.eqSet(set1, set2)).toBe(false);
     });
 });

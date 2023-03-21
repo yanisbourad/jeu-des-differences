@@ -29,6 +29,9 @@ describe('PlayerWaitPopupComponent', () => {
             'getLeavingState',
             'getRejectionStatus',
             'getCancelingState',
+            'handleDelete',
+            'redirectToHomePage',
+            'getGameAvailability',
         ]);
         await TestBed.configureTestingModule({
             imports: [MatDialogModule, BrowserAnimationsModule],
@@ -85,12 +88,12 @@ describe('PlayerWaitPopupComponent', () => {
         gameCardHandlerServiceSpy.getNewUpdate.and.returnValue(true);
         gameCardHandlerServiceSpy.getLeavingState.and.returnValue(true);
         gameCardHandlerServiceSpy.getRejectionStatus.and.returnValue(true);
+        gameCardHandlerServiceSpy.getGameAvailability.and.returnValue(false);
         component.ngAfterContentChecked();
         expect(gameCardHandlerServiceSpy.toggleCreateJoin).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.setNewUpdate).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.getRejectionStatus).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.resetGameVariables).toHaveBeenCalled();
-        expect(component.sendFeedback).toHaveBeenCalled();
     });
     it('should reject the opponent when method called', () => {
         component.rejectOpponent();

@@ -248,18 +248,22 @@ describe('CanvasNgxComponent', () => {
     });
 
     it('returns an array with length equal to the canvas area * 4', () => {
-        const multiplier = 4;
         const imageData = component.getCanvasData();
-        expect(imageData.length).toEqual(component.canvasDrawNative.width * component.canvasDrawNative.height * multiplier);
+        const nbrNumByPixel = 4;
+        expect(imageData.length).toEqual(component.canvasDrawNative.width * component.canvasDrawNative.height * nbrNumByPixel);
     });
 
     it('should return the canvas as element when getCanvasDraw', () => {
         expect(component.getCanvasUrlData()).toBeInstanceOf(String);
     });
 
-    it('should call the drawService with the canvas draw when clearDiff is called', () => {
-        const spy = spyOn(drawingService, 'clearDiff');
+    it('should create command draw-clear with the canvas draw when clearDiff is called', () => {
         component.clearCanvasDraw();
-        expect(spy).toHaveBeenCalled();
+        expect(commandService.do).toHaveBeenCalled();
+    });
+
+    it('should create command draw-clear with the canvas imag when clearTemp is called', () => {
+        component.clearCanvas();
+        expect(commandService.do).toHaveBeenCalled();
     });
 });

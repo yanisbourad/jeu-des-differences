@@ -8,11 +8,11 @@ export class DrawExchange extends CommandSpecific {
     constructor(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>, canvasName: string) {
         super(canvas1, canvasName);
         this.canvas2 = canvas2;
-        this.canvas2Data = this.getScreenShot(this.canvas2);
-        this.canvas1Data = this.getScreenShot(this.canvas);
     }
 
     do(saveForUndo = true): void {
+        this.canvas2Data = this.getScreenShot(this.canvas2);
+        this.canvas1Data = this.getScreenShot(this.canvas);
         if (saveForUndo) {
             this.saved = true;
         }

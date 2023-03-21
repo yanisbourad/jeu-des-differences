@@ -103,7 +103,7 @@ export class GameCardHandlerService {
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
-            this.resetGameVariables();
+            // this.resetGameVariables();
         });
 
         this.socket.on('feedBackOnLeave', () => {
@@ -128,7 +128,7 @@ export class GameCardHandlerService {
 
         this.socket.on('disconnect', () => {
             this.isLeaving = true;
-            this.resetGameVariables();
+            // this.resetGameVariables();
         });
     }
 
@@ -149,7 +149,6 @@ export class GameCardHandlerService {
 
     handleDelete(gameName: string) {
         this.socket.emit('handleDelete', gameName);
-        console.log('yeahhhhhhhhhhhhhhhhhhhhhhh');
         this.listenToFeedBack();
     }
     getLeavingState(): boolean {

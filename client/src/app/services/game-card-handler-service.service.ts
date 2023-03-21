@@ -45,6 +45,10 @@ export class GameCardHandlerService {
         return this.isReadyToPlay;
     }
 
+    setReadinessStatus(status: boolean) {
+        this.isReadyToPlay = status;
+    }
+
     getCancelingState(): boolean {
         return this.isCreatorLeft;
     }
@@ -130,6 +134,7 @@ export class GameCardHandlerService {
     join(game: Game) {
         this.socket.emit('joinGame', game);
         this.isLeaving = false;
+        this.isReadyToPlay = false;
         this.listenToFeedBack();
     }
 

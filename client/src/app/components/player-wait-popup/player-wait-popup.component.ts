@@ -66,6 +66,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         if (this.isReadyToPlay) {
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
+            this.gameCardHandlerService.setNewUpdate(false);
         }
         this.isRejected = this.gameCardHandlerService.getRejectionStatus();
         if (this.isRejected) {
@@ -105,5 +106,15 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         dialog.afterClosed().subscribe(() => {
             return;
         });
+    }
+
+    resetState(): void {
+        this.isReady = false;
+        this.isUpdated = false;
+        this.isLeaving = false;
+        this.isReadyToPlay = false;
+        this.isRejected = false;
+        this.isCancelled = false;
+        this.isTriggered = false;
     }
 }

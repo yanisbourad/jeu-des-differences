@@ -75,6 +75,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.sendFeedback('Votre adversaire a refusé de jouer avec vous');
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
+            this.resetState();
         }
         this.isLeaving = this.gameCardHandlerService.getLeavingState();
         this.isCancelled = this.gameCardHandlerService.getCancelingState();

@@ -141,6 +141,11 @@ export class GameCardHandlerService {
         this.isLeaving = false;
     }
 
+    handleDelete(gameName: string) {
+        this.socket.emit('handleDelete', gameName);
+        console.log('yeahhhhhhhhhhhhhhhhhhhhhhh');
+        this.listenToFeedBack();
+    }
     getLeavingState(): boolean {
         return this.isLeaving;
     }

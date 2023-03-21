@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
-// import * as constants from '@app/configuration/const-game';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
@@ -22,7 +21,7 @@ export class MessageAreaComponent implements OnInit {
     roomName: string = '';
     constructor(readonly socketClient: SocketClientService, readonly gameService: GameService) {}
     ngOnInit() {
-        this.playerInitials = this.playerName[0];
+        this.playerInitials = this.playerName[1];
         this.defaultColor = ['#69bd84', '#6ca2c7'];
         this.position = ['1%', '50%'];
         this.roomName = this.gameService.gameId + this.gameService.gameName;

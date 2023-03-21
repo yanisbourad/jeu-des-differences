@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { SocketClient } from '@app/utils/socket-client';
+import { SocketTestHelper } from '@app/utils/socket-helper';
 import { Socket } from 'socket.io-client';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 import SpyObj = jasmine.SpyObj;
@@ -8,10 +10,12 @@ import SpyObj = jasmine.SpyObj;
 describe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
+    let socketClient: SpyObj<SocketClient>;
     // let socketClientServiceSpy: SpyObj<SocketClientService>;
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     beforeEach(() => {
+        socketClient = jasmine.createSpyObj('SocketClient', ['isSocketAlive', 'connect', 'on', 'emit', 'send', 'disconnect']);
         socketSpy = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect', 'connect']);
         // socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['connect']);
         TestBed.configureTestingModule({
@@ -20,6 +24,7 @@ describe('GameCardHandlerService', () => {
                     provide: Router,
                     useValue: routerSpy,
                 },
+                { provide: SocketClient, useValue: socketClient },
             ],
             imports: [MatDialogModule],
         });
@@ -29,6 +34,42 @@ describe('GameCardHandlerService', () => {
         service.games.set('toaster', 0);
         service.games.set('dad', 0);
         service.socket = socketSpy;
+        socketClient.socket = new SocketTestHelper() as unknown as Socket;
+        // socketClient.on.and.callFake((event: string, callback: (data: unknown) => void) => {
+        //     if (event === 'hello') {
+        //         callback('Hello, world!');
+        //     }
+        //     if (event === 'message') {
+        //         callback('message');
+        //     }
+        //     if (event === 'connect') {
+        //         callback('connect');
+        //     }
+
+        //     if (event === 'serverTime') {
+        //         callback(new Map([['apple', 3]]));
+        //     }
+
+        //     if (event === 'sendRoomName') {
+        //         callback(['multi', 'string']);
+        //     }
+        //     if (event === 'message-return') {
+        //         callback({ message: 'string', userName: 'string', color: 'string', pos: 'string', event: true });
+        //     }
+        //     if (event === 'gameEnded') {
+        //         callback([true, 'string']);
+        //     }
+        //     if (event === 'findDifference-return') {
+        //         callback({ playerName: 'string' });
+        //     }
+        //     if (event === 'feedbackDifference') {
+        //         const diff = new Set([1, 2, 3]);
+        //         callback(diff);
+        //     }
+        //     if (event === 'giveup-return') {
+        //         callback({ playerName: 'string' });
+        //     }
+        // });
     });
 
     it('should be created', () => {
@@ -61,6 +102,19 @@ describe('GameCardHandlerService', () => {
     it('should connect client to the server using websocket', () => {
         service.connect();
         expect(service.socket).toBeTruthy();
+    });
+
+    it('configureBaseSocketFeatures should set up all event listener on the socket client', () => {
+        service.listenToFeedBack();
+        expect(socketClient.on).toHaveBeenCalledWith('connect', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('hello', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('serverTime', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('sendRoomName', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('message-return', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('gameEnded', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('findDifference-return', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('feedbackDifference', jasmine.any(Function));
+        // expect(socketClient.on).toHaveBeenCalledWith('giveup-return', jasmine.any(Function));
     });
 
     // // test for updateGameStatus

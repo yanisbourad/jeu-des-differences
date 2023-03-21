@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 // import * as constants from '@app/configuration/const-game';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -11,6 +11,7 @@ import { SocketClient } from '@app/utils/socket-client';
 export class MessageAreaComponent implements OnInit {
     @Input() playerName: string = '';
     @Input() message: string = '';
+    @ViewChild('chatBox') chatBoxRef: ElementRef;
     playerInitials: string;
     giveUp: boolean;
     date: Date = new Date();
@@ -49,5 +50,16 @@ export class MessageAreaComponent implements OnInit {
             event: false,
         });
         this.message = '';
+        document.getElementById('chat-box')?.blur();
+    }
+    handleGameClick(event: MouseEvent) {
+        const targetElement = event.target as HTMLElement;
+        //const chatBoxElement = this.chatBoxRef.nativeElement;
+        // Check if click target is the chat box or a child of the chat box
+        if (targetElement !== document.getElementById('chat')) {
+            return;
+        }
+        // Click target is not the chat box, so remove focus from it
+        document.getElementById('chat')?.blur();
     }
 }

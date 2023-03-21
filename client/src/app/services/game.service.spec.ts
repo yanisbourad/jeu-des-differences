@@ -320,16 +320,13 @@ describe('GameService', () => {
 
     it('saveGameRecord should call createGameRecord from gameDataBaseService for multi mode', () => {
         gameService.gameType = 'solo';
-        const gameTitle = 'gameName';
-        const gameMode = 'solo';
         const playerName = 'playerName';
         const dateStart = new Date().getTime().toString();
-        const gameTime = '01:00';
-        const gameRecordMock = { gameName: gameTitle, typeGame: gameMode, playerName, dateStart, time: gameTime };
-        gameService.gameInformation.gameTitle = gameTitle;
-        gameService.gameInformation.gameMode = gameMode;
+        const gameRecordMock = { gameName: 'gameName', typeGame: 'solo', playerName, dateStart, time: '01:00' };
+        gameService.gameInformation.gameTitle = 'gameName';
+        gameService.gameInformation.gameMode = 'solo';
         gameService.playerName = playerName;
-        spyOn(gameService, 'getGameTime').and.returnValue(gameTime);
+        spyOn(gameService, 'getGameTime').and.returnValue('01:00');
         const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
         gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
         gameService.saveGameRecord();

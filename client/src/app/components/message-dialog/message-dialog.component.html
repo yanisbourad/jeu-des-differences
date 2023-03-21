@@ -1,12 +1,12 @@
 <div class="container">
   <h1 mat-dialog-title > {{message}}</h1>
   <div mat-dialog-content *ngIf="this.type === 'finished' && this.formatTime; else elseBlock">
-    <h1 class="time">  Vous avez fini la partie en : {{formatTime}} minutes.</h1>
-    <h1>Le vainqueur est {{winner}}</h1>
+    <h1 class="align-text">  Vous avez fini la partie en : {{formatTime}} minutes.</h1>
+    <h1 class="align-text">Le vainqueur est {{winner}}</h1>
   </div>
   <ng-template #elseBlock>
     <div mat-dialog-content>
-      <h1 class="time"> Meilleure chance la prochaine fois! </h1>
+      <h1 class="align-text"> Meilleure chance la prochaine fois! </h1>
     </div>
   </ng-template>
   <div mat-dialog-actions >

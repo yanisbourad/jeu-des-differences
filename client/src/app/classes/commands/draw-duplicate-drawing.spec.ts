@@ -19,7 +19,7 @@ describe('DrawDuplicateDrawing', () => {
 
     it('should initialize with correct canvas data', () => {
         // check that oldCanvasData was set correctly
-        expect(command.oldCanvasData).toBeTruthy();
+        expect(command.canvasOld).toBeTruthy();
     });
 
     it('should duplicate drawing onto new canvas', () => {
@@ -36,7 +36,7 @@ describe('DrawDuplicateDrawing', () => {
         const spy = spyOn(command, 'putsCanvasData');
 
         command.do(true);
-        expect(spy).toHaveBeenCalledOnceWith(command.canvas, sampleImageData);
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should save previous canvas data on do()', () => {

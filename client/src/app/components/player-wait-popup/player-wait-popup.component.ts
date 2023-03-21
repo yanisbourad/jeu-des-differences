@@ -17,6 +17,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     isLeaving: boolean;
     isReadyToPlay: boolean;
     isRejected: boolean;
+    isCancelled: boolean;
+    isTriggered: boolean;
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
@@ -34,6 +36,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.isLeaving = false;
         this.isReadyToPlay = false;
         this.isRejected = false;
+        this.isCancelled = false;
+        this.isTriggered = false;
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
@@ -70,14 +74,17 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.gameCardHandlerService.resetGameVariables();
         }
         this.isLeaving = this.gameCardHandlerService.getLeavingState();
+        this.isCancelled = this.gameCardHandlerService.getCancelingState();
         if (this.isLeaving) {
             this.dialogReff.close();
+            if (!this.isTriggered && this.isCancelled) this.sendFeedback('Le createur de la partie a quitté');
             this.gameCardHandlerService.resetGameVariables();
         }
     }
 
     leaveGame(): void {
         this.dialogReff.close();
+        this.isTriggered = true;
         this.gameCardHandlerService.leave(this.game.gameName);
     }
 

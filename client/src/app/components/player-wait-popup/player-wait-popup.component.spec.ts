@@ -28,6 +28,7 @@ describe('PlayerWaitPopupComponent', () => {
             'resetGameVariables',
             'getLeavingState',
             'getRejectionStatus',
+            'getCancelingState',
         ]);
         await TestBed.configureTestingModule({
             imports: [MatDialogModule, BrowserAnimationsModule],
@@ -76,7 +77,9 @@ describe('PlayerWaitPopupComponent', () => {
     });
 
     it('should call for updating when new change', () => {
+        component.isTriggered = false;
         gameCardHandlerServiceSpy.getCreatorStatus.and.returnValue(true);
+        gameCardHandlerServiceSpy.getCancelingState.and.returnValue(true);
         gameCardHandlerServiceSpy.getGameState.and.returnValue('waiting');
         gameCardHandlerServiceSpy.getReadinessStatus.and.returnValue(true);
         gameCardHandlerServiceSpy.getNewUpdate.and.returnValue(true);
@@ -87,6 +90,7 @@ describe('PlayerWaitPopupComponent', () => {
         expect(gameCardHandlerServiceSpy.setNewUpdate).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.getRejectionStatus).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.resetGameVariables).toHaveBeenCalled();
+        expect(component.sendFeedback).toHaveBeenCalled();
     });
     it('should reject the opponent when method called', () => {
         component.rejectOpponent();

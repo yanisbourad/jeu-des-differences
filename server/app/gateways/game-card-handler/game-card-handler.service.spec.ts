@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FAKE_QUEUE, OVER_CROWDED } from './entities/constants';
+import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 describe('GameCardHandlerService', () => {
@@ -111,13 +112,12 @@ describe('GameCardHandlerService', () => {
 
     it('should return true if player is waiting', () => {
         service.gamesQueue.set('uno', ['rac']);
-        expect(
-            service.isPlayerWaiting({
-                id: 'rac',
-                name: 'John Do',
-                gameName: 'uno',
-            }),
-        ).toBeTruthy();
+        const player: Player = {
+            id: 'rac',
+            name: 'John Do',
+            gameName: 'uno',
+        };
+        expect(service.isPlayerWaiting(player)).toBeTruthy();
     });
 
     it('should be true as a player is waiting', () => {

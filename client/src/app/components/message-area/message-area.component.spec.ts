@@ -62,6 +62,8 @@ describe('MessageAreaComponent', () => {
     it('should send a message', () => {
         component.playerName = 'John Doe';
         component.message = 'Hello World';
+        const blurSpy = jasmine.createSpy('blur');
+        blurSpy.and.callThrough();
         component.sendMessage();
         expect(socketClientMock.sendMessage).toHaveBeenCalledWith({
             message: 'Hello World',
@@ -72,11 +74,32 @@ describe('MessageAreaComponent', () => {
             event: false,
         });
         expect(component.message).toBe('');
+        expect(blurSpy).not.toHaveBeenCalled();
     });
 
     it('should get timestamp', () => {
         const timestamp = component.getTimestamp();
         expect(typeof timestamp).toBe('string');
         expect(timestamp).toMatch(new Date().toLocaleTimeString());
+    });
+    it('should not blur chat element when handleGameClick is called with a target element other than chat', () => {
+        // Arrange
+        const mockMouseEvent = new MouseEvent('click', { bubbles: true });
+        const spy = spyOn(document, 'getElementById').and.returnValue(document.getElementById('chat'));
+        const blurSpy = jasmine.createSpy('blur');
+        // Act
+        component.handleGameClick(mockMouseEvent);
+
+        // Assert
+        expect(spy).toHaveBeenCalledWith('chat');
+        expect(blurSpy).not.toHaveBeenCalled();
+    });
+    it('should blur chat element when handleGameClick is called', () => {
+        // Arrange
+        const mockMouseEvent = new MouseEvent('click', { bubbles: true });
+        const blurSpy = jasmine.createSpy('blur');
+        blurSpy.and.callThrough();
+        component.handleGameClick(mockMouseEvent);
+        expect(blurSpy).not.toHaveBeenCalled();
     });
 });

@@ -78,7 +78,7 @@ describe('GamePageComponent', () => {
 
         socketClientServiceSpy.gameState$ = gameState.asObservable();
         socketClientServiceSpy.playerFoundDiff$ = playerFoundDiff.asObservable();
-        socketClientServiceSpy.diffFounded$ = diffFound.asObservable();
+        socketClientServiceSpy.diffFound$ = diffFound.asObservable();
 
         hotkeySpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener', 'removeHotkeysEventListener']);
         drawserviceSpy = jasmine.createSpyObj('DrawService', ['drawWord', 'drawDiff', 'clearDiff', 'setColor','getColor']);

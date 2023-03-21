@@ -50,16 +50,11 @@ export class MessageAreaComponent implements OnInit {
             event: false,
         });
         this.message = '';
-        document.getElementById('chat-box')?.blur();
     }
     handleGameClick(event: MouseEvent) {
         const targetElement = event.target as HTMLElement;
-        //const chatBoxElement = this.chatBoxRef.nativeElement;
-        // Check if click target is the chat box or a child of the chat box
         if (targetElement !== document.getElementById('chat')) {
             return;
         }
-        // Click target is not the chat box, so remove focus from it
-        document.getElementById('chat')?.blur();
     }
 }

@@ -99,6 +99,10 @@ export class GameCardHandlerService {
         return false;
     }
 
+    deleteGame(gameName: string): void {
+        this.gamesQueue.delete(gameName);
+        this.joiningPlayersQueue.delete(gameName);
+    }
     // methods to manage player queues
     // true if not empty false if it is empty
     isPlayerWaiting(player: Player): boolean {
@@ -120,6 +124,17 @@ export class GameCardHandlerService {
     getStackedPlayers(gameName: string): string[] {
         return this.gamesQueue.get(gameName);
     }
+
+    deleteAllWaitingPlayerByGame(gameName: string): string[] {
+        const players = this.getStackedPlayers(gameName).concat(this.joiningPlayersQueue.get(gameName));
+        players.forEach((playerId) => {
+            this.players.delete(playerId);
+        });
+        this.gamesQueue.delete(gameName);
+        this.joiningPlayersQueue.delete(gameName);
+        return players;
+    }
+
     getTotalRequest(gameName: string): number {
         return this.getStackedPlayers(gameName).length + this.joiningPlayersQueue.get(gameName).length;
     }

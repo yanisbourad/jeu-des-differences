@@ -33,7 +33,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     unfoundedDifference: Set<number>[];
     isCheating: boolean = false;
     // list of all the subscriptions to be unsubscribed on destruction
-    diffFoundedSubscription: Subscription = new Subscription();
+    diffFoundSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
 
@@ -62,6 +62,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         this.getRouterParams();
         this.gameService.getGame(this.gameService.gameName);
+        console.log(this.gameService.game, this.gameService.playerName);
         this.loading();
     }
 
@@ -90,7 +91,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
         this.drawService.setColor = 'black';
         if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
-        this.diffFoundedSubscription.unsubscribe();
+        this.diffFoundSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.gameService.reinitializeGame();
@@ -98,7 +99,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     subscriptions(): void {
-        this.diffFoundedSubscription = this.socket.diffFounded$.subscribe((newValue) => {
+        this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
             if (newValue) {
                 this.drawService.setColor = 'black';
                 this.drawDifference(newValue);

@@ -74,7 +74,7 @@ export class GameCardComponent implements OnInit {
             await firstValueFrom(this.gameService.deleteGame(gameName));
             this.gameDeleted.emit();
         } catch (error) {
-            alert(`la suppression du jeu a échoué`);
+            alert('la suppression du jeu a échoué');
         }
     }
 }

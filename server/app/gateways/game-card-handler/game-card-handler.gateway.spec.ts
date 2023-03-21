@@ -211,4 +211,30 @@ describe('GameCardHandlerGateway', () => {
         gateway.reject(socket);
         expect(logger.log).toHaveBeenCalled();
     });
+    it('Should call accept player when creator agreed()', async () => {
+        const player1 = { id: '123', name: 'test', gameName: 'uno' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const map = new Map();
+        map.set('test', 1);
+        map.set('best', 1);
+        stub(socket, 'rooms').value(new Set(['123']));
+        jest.spyOn(gameCardHandlerService, 'updateGameStatus').mockImplementation(() => {
+            return map;
+        });
+        jest.spyOn(gameCardHandlerService, 'acceptOpponent').mockReturnValueOnce([player1, player2]);
+        jest.spyOn(gameCardHandlerService, 'removePlayers').mockReturnValueOnce(['234']);
+        jest.spyOn(logger, 'log').mockImplementation(() => {
+            return;
+        });
+        jest.spyOn(server, 'to').mockReturnValue({
+            emit: (event: string) => {
+                if (event === 'feedbackOnStart') expect(event).toEqual('feedbackOnStart');
+                if (event === 'byeTillNext') expect(event).toEqual('byeTillNext');
+                if (event === 'updateStatus') expect(event).toEqual('updateStatus');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        gateway.accept(socket);
+        expect(logger.log).toHaveBeenCalled();
+    });
 });

@@ -1,5 +1,6 @@
 import { AfterContentChecked, Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { Game } from '@app/interfaces/game-handler';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 
@@ -19,6 +20,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
+        public dialog: MatDialog,
         public gameCardHandlerService: GameCardHandlerService,
         @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
     ) {
@@ -61,13 +63,14 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
         }
-        this.isLeaving = this.gameCardHandlerService.getLeavingState();
-        if (this.isLeaving) {
+        this.isRejected = this.gameCardHandlerService.getRejectionStatus();
+        if (this.isRejected) {
+            this.sendFeedback('Votre adversaire a refusé de jouer avec vous');
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
         }
-        this.isRejected = this.gameCardHandlerService.getRejectionStatus();
-        if (this.isRejected) {
+        this.isLeaving = this.gameCardHandlerService.getLeavingState();
+        if (this.isLeaving) {
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
         }
@@ -85,5 +88,15 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
 
     rejectOpponent(): void {
         this.gameCardHandlerService.rejectOpponent(this.game.gameName);
+    }
+
+    sendFeedback(showedMessage: string): void {
+        const dialog = this.dialog.open(GeneralFeedbackComponent, {
+            data: { message: showedMessage },
+            disableClose: true,
+        });
+        dialog.afterClosed().subscribe(() => {
+            return;
+        });
     }
 }

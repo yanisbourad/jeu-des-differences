@@ -62,7 +62,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         this.getRouterParams();
         this.gameService.getGame(this.gameService.gameName);
-        console.log(this.gameService.game, this.gameService.playerName);
         this.loading();
     }
 

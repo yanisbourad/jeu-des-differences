@@ -70,23 +70,28 @@ export class GameCardHandlerService {
 
     listenToFeedBack() {
         this.socket.on('feedbackOnJoin', () => {
+            console.log('feedbackOnJoin');
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
         });
         this.socket.on('feedbackOnAccept', (name) => {
+            console.log('feedbackOnAccept');
             this.opponentPlayer = name;
             if (this.isCreator) this.state = 'Accepter';
         });
 
         this.socket.on('feedbackOnWait', (name) => {
+            console.log('feedbackOnWait');
             this.opponentPlayer = name;
         });
 
         this.socket.on('feedbackOnWaitLonger', (name) => {
+            console.log('feedbackOnWaitLonger');
             this.opponentPlayer = name;
         });
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
+            console.log('feedbackOnStart');
             // call method to redirect to game from service with gameIdentifier
             this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
@@ -95,25 +100,30 @@ export class GameCardHandlerService {
         });
 
         this.socket.on('feedBackOnLeave', () => {
+            console.log('feedBackOnLeave');
             // send pop up to player
             this.isLeaving = true;
         });
 
         this.socket.on('feedbackOnReject', () => {
-            this.isLeaving = true;
+            console.log('feedbackOnReject');
             this.isRejected = true;
+            this.isLeaving = true;
         });
 
         this.socket.on('byeTillNext', () => {
+            console.log('byeTillNext');
             this.isLeaving = true;
             this.resetGameVariables();
         });
         this.socket.on('updateStatus', (gamesStatus) => {
+            console.log('updateStatus');
             this.games = new Map(gamesStatus);
             this.isNewUpdate = true;
         });
 
         this.socket.on('disconnect', () => {
+            console.log('disconnect');
             this.isLeaving = true;
             this.resetGameVariables();
         });

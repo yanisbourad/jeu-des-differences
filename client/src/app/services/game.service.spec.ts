@@ -53,7 +53,7 @@ describe('GameService', () => {
                 { provide: RendererFactory2, useValue: rendererFactory2Spy },
                 { provide: Renderer2, useValue: renderer2Spy },
                 { provide: MatDialog, useValue: matDialogSpy },
-                { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy }, 
+                { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy },
                 { provide: GameDatabaseService, useValue: gameDataBaseSpy },
                 { provide: SocketClientService, useValue: socketClientServiceSpy },
             ],

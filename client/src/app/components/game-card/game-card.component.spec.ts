@@ -196,7 +196,6 @@ describe('GameCardComponent', () => {
         tick();
         expect(component.gameService.deleteGame).toHaveBeenCalledWith(component.card.gameName);
         expect(component.gameDeleted.emit).toHaveBeenCalled();
-
     }));
 
     it('should alert the user that the delete call failed', fakeAsync(() => {

@@ -147,9 +147,9 @@ describe('GameDatabaseService', () => {
     describe('deleteGame', () => {
         it('should delete game', () => {
             const gameName = 'test';
-
+            const status = 200;
             service.deleteGame(gameName).subscribe((response) => {
-                expect(response.status).toEqual(200);
+                expect(response.status).toEqual(status);
                 expect(response.body).toEqual('Successfully deleted game');
             });
 

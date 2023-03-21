@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MessageAreaComponent } from './message-area.component';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-// import { SocketClient } from '@app/utils/socket-client';
 
 describe('MessageAreaComponent', () => {
     let component: MessageAreaComponent;
@@ -49,7 +48,7 @@ describe('MessageAreaComponent', () => {
     });
 
     it('should set player initials', () => {
-        component.playerName = 'John Doe';
+        component.playerName = ' John Doe';
         component.ngOnInit();
         expect(component.playerInitials).toBe('J');
     });

@@ -14,7 +14,7 @@ export class MessageDialogComponent {
     type: string;
     formatTime: string;
     winner: string = this.gameService.playerName;
-
+    // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,

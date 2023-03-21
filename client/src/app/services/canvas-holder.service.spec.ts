@@ -54,7 +54,8 @@ describe('CanvasHolderService', () => {
     });
 
     it('should get the data of the original canvas', () => {
-        const data = new Uint8ClampedArray(4);
+        const length = 4;
+        const data = new Uint8ClampedArray(length);
         canvas.getCanvasData.and.returnValue(data);
         service['canvasOriginal'] = canvas;
         expect(service.getCanvasData('Image Original')).toEqual(data);
@@ -62,7 +63,8 @@ describe('CanvasHolderService', () => {
     });
 
     it('should get the data of the modified canvas', () => {
-        const data = new Uint8ClampedArray(4);
+        const length = 4;
+        const data = new Uint8ClampedArray(length);
         canvas.getCanvasData.and.returnValue(data);
         service['canvasModifier'] = canvas;
         expect(service.getCanvasData('Image Modifiée')).toEqual(data);

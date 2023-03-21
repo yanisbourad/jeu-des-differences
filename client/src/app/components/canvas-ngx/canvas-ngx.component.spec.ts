@@ -248,8 +248,9 @@ describe('CanvasNgxComponent', () => {
     });
 
     it('returns an array with length equal to the canvas area * 4', () => {
+        const multiplier = 4;
         const imageData = component.getCanvasData();
-        expect(imageData.length).toEqual(component.canvasDrawNative.width * component.canvasDrawNative.height * 4);
+        expect(imageData.length).toEqual(component.canvasDrawNative.width * component.canvasDrawNative.height * multiplier);
     });
 
     it('should return the canvas as element when getCanvasDraw', () => {

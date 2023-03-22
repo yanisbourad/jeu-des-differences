@@ -19,6 +19,7 @@ export class GameCardHandlerService {
     isLeaving: boolean;
     isRejected: boolean;
     isCreatorLeft: boolean;
+    isGameAvailable: boolean;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
@@ -30,6 +31,7 @@ export class GameCardHandlerService {
         this.isLeaving = false;
         this.isRejected = false;
         this.isCreatorLeft = false;
+        this.isGameAvailable = true;
     }
 
     getGameState(): string {
@@ -55,6 +57,9 @@ export class GameCardHandlerService {
     getRejectionStatus(): boolean {
         return this.isRejected;
     }
+    getGameAvailability(): boolean {
+        return this.isGameAvailable;
+    }
 
     connect() {
         this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
@@ -78,6 +83,9 @@ export class GameCardHandlerService {
     }
 
     listenToFeedBack() {
+        this.socket.on('gameUnavailable', () => {
+            this.isGameAvailable = false;
+        });
         this.socket.on('feedbackOnJoin', () => {
             this.isCreator = true;
             this.opponentPlayer = "Attente d'un adversaire";
@@ -143,6 +151,7 @@ export class GameCardHandlerService {
         this.opponentPlayer = '';
         this.isRejected = false;
         this.isLeaving = false;
+        this.isGameAvailable = true;
     }
 
     handleDelete(gameName: string) {
@@ -183,6 +192,11 @@ export class GameCardHandlerService {
                 gameId: gamersIdentifier.gameId,
             },
         ]);
+        this.socket.disconnect();
+    }
+
+    redirectToHomePage(): void {
+        this.router.navigate(['/home']);
         this.socket.disconnect();
     }
 }

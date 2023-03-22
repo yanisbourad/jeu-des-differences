@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FAKE_QUEUE, OVER_CROWDED } from './entities/constants';
+import { Player } from './entities/player.entity';
 import { GameCardHandlerService } from './game-card-handler.service';
 
 describe('GameCardHandlerService', () => {
@@ -39,6 +40,19 @@ describe('GameCardHandlerService', () => {
     it('should return true if player is about to play', () => {
         service.gamesQueue.set('uno', ['rac']);
         expect(service.isAboutToPlay('rac', 'uno')).toBeTruthy();
+    });
+    it('should delete game name in stacks', () => {
+        service.gamesQueue.set('uno', ['rac', 'tic']);
+        service.joiningPlayersQueue.set('uno', ['gad']);
+        service.deleteGame('uno');
+        expect(service.gamesQueue.has('uno')).toBeFalsy();
+        expect(service.joiningPlayersQueue.has('uno')).toBeFalsy();
+    });
+    it('should return all players id in the queues', () => {
+        service.gamesQueue.set('uno', ['rac', 'tic']);
+        service.joiningPlayersQueue.set('uno', ['gad']);
+        const players = service.deleteAllWaitingPlayerByGame('uno');
+        expect(JSON.stringify(players)).toBe(JSON.stringify(['rac', 'tic', 'gad']));
     });
     it('should return false if player is not in the gameQueue', () => {
         service.gamesQueue.set('uno', ['rac']);
@@ -98,13 +112,12 @@ describe('GameCardHandlerService', () => {
 
     it('should return true if player is waiting', () => {
         service.gamesQueue.set('uno', ['rac']);
-        expect(
-            service.isPlayerWaiting({
-                id: 'rac',
-                name: 'John Do',
-                gameName: 'uno',
-            }),
-        ).toBeTruthy();
+        const player: Player = {
+            id: 'rac',
+            name: 'John Do',
+            gameName: 'uno',
+        };
+        expect(service.isPlayerWaiting(player)).toBeTruthy();
     });
 
     it('should be true as a player is waiting', () => {

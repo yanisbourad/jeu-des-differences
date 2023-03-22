@@ -103,10 +103,18 @@ describe('GameCardHandlerService', () => {
         expect(service.isLeaving).toBeFalsy();
         expect(service.isReadyToPlay).toBeFalsy();
         expect(service.isRejected).toBeFalsy();
+        expect(service.isGameAvailable).toBeTruthy();
         expect(service.state).toEqual('');
     });
     it('should return leaving state', () => {
         expect(service.getLeavingState()).toBeFalsy();
+    });
+    it('should return true as the game is available', () => {
+        expect(service.getGameAvailability()).toBeTruthy();
+    });
+    it('should set readiness status of the player to start the game', () => {
+        service.setReadinessStatus(false);
+        expect(service.isReadyToPlay).toBeFalsy();
     });
     it('should call emit cancel game when leaving a game', () => {
         service.leave('test');
@@ -119,6 +127,10 @@ describe('GameCardHandlerService', () => {
     it('should call emit reject opponent when rejecting a game', () => {
         service.rejectOpponent('test');
         expect(socketSpy.emit).toHaveBeenCalledWith('rejectOpponent', 'test');
+    });
+    it('should call emit reject opponent when rejecting a game', () => {
+        service.handleDelete('test');
+        expect(socketSpy.emit).toHaveBeenCalledWith('handleDelete', 'test');
     });
     it('should redirect player as method is being called', () => {
         service.redirect({

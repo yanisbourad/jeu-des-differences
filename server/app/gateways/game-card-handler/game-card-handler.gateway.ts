@@ -107,7 +107,6 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                     this.logger.log(`The ${gameName} game opponent left`);
                 }
                 this.server.to(client.id).emit('feedBackOnLeave');
-                this.logger.log(`Player ${player.name} left the ${gameName} game joining queue`);
             }
         }
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
@@ -129,6 +128,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         } else {
             // if no more waiting Opponent in joining queue
             this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+            this.logger.log(`The game creator ${gamerCreatorName} is waiting alone`);
         }
     }
 
@@ -156,8 +156,16 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('handleDelete')
-    delete(@ConnectedSocket() client: Socket, @MessageBody() gameName: string) {
-        this.logger.log(gameName);
+    delete(@MessageBody() gameName: string) {
+        const totalRequest = this.gameCardHandlerService.getTotalRequest(gameName);
+        if (totalRequest === 0) this.gameCardHandlerService.deleteGame(gameName);
+        else {
+            const players = this.gameCardHandlerService.deleteAllWaitingPlayerByGame(gameName);
+            players.forEach((gamer) => {
+                this.server.to(gamer).emit('gameUnavailable', 'game deleted by admin');
+            });
+        }
+        this.logger.log(`The game ${gameName} was deleted by admin`);
     }
 
     // on disconnect

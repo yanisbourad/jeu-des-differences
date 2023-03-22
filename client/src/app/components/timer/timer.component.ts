@@ -15,17 +15,15 @@ export class TimerComponent {
 
     formatTime(): string {
         return (
-            (this.time.minute < constants.UNDER_TEN ? '0' + this.time.minute : this.time.minute) +
+            (this.time.minute < constants.UNIT ? '0' + this.time.minute : this.time.minute) +
             ':' +
-            (this.time.second < constants.UNDER_TEN ? '0' + this.time.second : this.time.second)
+            (this.time.second < constants.UNIT ? '0' + this.time.second : this.time.second)
         );
     }
 
     transform(): string {
         this.setTime();
-        return this.time.second < constants.UNDER_TEN || this.time.minute < constants.UNDER_TEN
-            ? this.formatTime()
-            : this.time.minute + ':' + this.time.second;
+        return this.time.second < constants.UNIT || this.time.minute < constants.UNIT ? this.formatTime() : this.time.minute + ':' + this.time.second;
     }
 
     setTime(): void {
@@ -35,11 +33,11 @@ export class TimerComponent {
 
     getSecond(): number {
         const time = this.socket.getRoomTime(this.socket.getRoomName());
-        return time ? Number(time % constants.SIXTY_SECOND) : 0;
+        return time ? Number(time % constants.MIN_TO_SEC) : 0;
     }
 
     getMinute(): number {
         const time = this.socket.getRoomTime(this.socket.getRoomName());
-        return time ? Number(Math.floor(time / constants.SIXTY_SECOND)) : 0;
+        return time ? Number(Math.floor(time / constants.MIN_TO_SEC)) : 0;
     }
 }

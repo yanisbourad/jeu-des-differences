@@ -1,5 +1,4 @@
-/* eslint-disable import/no-deprecated */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import * as constants from '@app/configuration/const-time';
@@ -9,8 +8,7 @@ describe('TimePopupComponent', () => {
     let component: TimePopupComponent;
     let fixture: ComponentFixture<TimePopupComponent>;
     let decrementButton: HTMLButtonElement;
-    // eslint-disable-next-line deprecation/deprecation
-    beforeEach(async(() => {
+    beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [TimePopupComponent],
             // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -19,7 +17,7 @@ describe('TimePopupComponent', () => {
         fixture = TestBed.createComponent(TimePopupComponent);
         component = fixture.componentInstance;
         decrementButton = fixture.debugElement.query(By.css('#buttonTime3')).nativeElement;
-    }));
+    });
 
     it('should create', () => {
         expect(component).toBeTruthy();

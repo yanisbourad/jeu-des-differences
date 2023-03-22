@@ -51,10 +51,10 @@ export class GameController {
     @Post('/create')
     async createGame(@Body() game: Game, @Res() response: Response) {
         try {
-            const res = await this.gamesService.addGame(game);
-            response.status(HttpStatus.OK).json(res);
+            await this.gamesService.addGame(game);
+            response.status(HttpStatus.OK).json('Game added successfully');
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
 
@@ -73,10 +73,10 @@ export class GameController {
     @Delete('/:id')
     async deleteGame(@Param('id') id: string, @Res() response: Response) {
         try {
-            const res = await this.gamesService.deleteGame(id);
-            response.status(HttpStatus.OK).json(res);
+            await this.gamesService.deleteGame(id);
+            response.status(HttpStatus.OK).json('Game deleted successfully');
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
 }

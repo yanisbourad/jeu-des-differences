@@ -27,45 +27,12 @@ describe('GameCardHandlerService', () => {
             imports: [MatDialogModule],
         });
         service = TestBed.inject(GameCardHandlerService);
-        // service.socket = new SocketTestHelper() as unknown as Socket;
+        socketClient.socket = new SocketTestHelper() as unknown as Socket;
         service.games.set('test', 1);
         service.games.set('toaster', 0);
         service.games.set('dad', 0);
         service.socket = socketSpy;
         socketClient.socket = new SocketTestHelper() as unknown as Socket;
-        // socketClient.on.and.callFake((event: string, callback: (data: unknown) => void) => {
-        //     switch (event) {
-        //         case 'feedbackOnJoin':
-        //             callback('Hello');
-        //             break;
-        //         case 'feedbackOnAccept':
-        //             callback('accept');
-        //             break;
-        //         case 'feedbackOnWait':
-        //             callback('wait');
-        //             break;
-        //         case 'feedbackOnWaitLonger':
-        //             callback('waitLonger');
-        //             break;
-        //         case 'feedbackOnStart':
-        //             callback({ gameId: 'String', gameName: 'string', gameCreator: 'string', gameType: 'string' });
-        //             break;
-        //         case 'feedBackOnLeave':
-        //             callback('');
-        //             break;
-        //         case 'feedbackOnReject':
-        //             callback('');
-        //             break;
-        //         case 'byeTillNext':
-        //             callback('');
-        //             break;
-        //         case 'updateStatus':
-        //             callback({ test: 1, toaster: 0 });
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // });
     });
 
     it('should be created', () => {
@@ -102,27 +69,6 @@ describe('GameCardHandlerService', () => {
         service.connect();
         expect(service.socket).toBeTruthy();
     });
-
-    // it('should set up all event listener on the socket client', () => {
-    //     service.listenToFeedBack();
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnJoin', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnAccept', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnWait', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnWaitLonger', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnStart', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedBackOnLeave', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('feedbackOnReject', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('byeTillNext', jasmine.any(Function));
-    //     expect(socketClient.on).toHaveBeenCalledWith('updateStatus', jasmine.any(Function));
-    // });
-
-    // // test for updateGameStatus
-    // it('should call emit findAllGamesStatus when updating game status', () => {
-    //     const gameNames = ['test', 'toaster', 'dad'];
-    //     service.connect();
-    //     service.updateGameStatus(gameNames);
-    //     expect(socketSpy.on).toHaveBeenCalled();
-    // });
 
     // test for get new update
     it('should return true if there is a new update', () => {
@@ -183,5 +129,15 @@ describe('GameCardHandlerService', () => {
         });
         expect(routerSpy.navigate).toHaveBeenCalled();
         expect(socketSpy.disconnect).toHaveBeenCalled();
+    });
+
+    it('setReadinessStatus() should set the isReadyToPlay value ', () => {
+        service.setReadinessStatus(true);
+        expect(service.isReadyToPlay).toBe(true);
+    });
+    it('handleDelete() should emit handleDelete and call listenToFeedBack ', () => {
+        service.handleDelete('test');
+        expect(socketSpy.emit).toHaveBeenCalledWith('handleDelete', 'test');
+        expect(socketSpy.on).toHaveBeenCalled();
     });
 });

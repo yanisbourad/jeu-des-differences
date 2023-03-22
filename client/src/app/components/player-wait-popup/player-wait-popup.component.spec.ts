@@ -78,6 +78,7 @@ describe('PlayerWaitPopupComponent', () => {
 
     it('should call for updating when new change', () => {
         component.isTriggered = false;
+        const feedBackSpy = spyOn(component, 'sendFeedback').and.callThrough();
         gameCardHandlerServiceSpy.getCreatorStatus.and.returnValue(true);
         gameCardHandlerServiceSpy.getCancelingState.and.returnValue(true);
         gameCardHandlerServiceSpy.getGameState.and.returnValue('waiting');
@@ -90,7 +91,7 @@ describe('PlayerWaitPopupComponent', () => {
         expect(gameCardHandlerServiceSpy.setNewUpdate).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.getRejectionStatus).toHaveBeenCalled();
         expect(gameCardHandlerServiceSpy.resetGameVariables).toHaveBeenCalled();
-        expect(component.sendFeedback).toHaveBeenCalled();
+        expect(feedBackSpy).toHaveBeenCalled();
     });
     it('should reject the opponent when method called', () => {
         component.rejectOpponent();

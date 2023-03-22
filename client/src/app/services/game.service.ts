@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import * as constants from '@app/configuration/const-canvas';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 
-
 @Injectable({
     providedIn: 'root',
 })
@@ -32,8 +31,6 @@ export class GameService {
     gameId: string;
     gameName: string;
     message: string;
-    // errorPenalty: boolean;
-    // mousePosition: Vec2;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params

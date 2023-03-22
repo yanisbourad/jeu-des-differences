@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { CommandSpecific } from '@app/classes/command-specific';
+import { DrawClearCommand } from '@app/classes/commands/draw-clear-command';
 import { DrawErasLineCommand } from '@app/classes/commands/draw-eras-command';
 import { DrawImageCommand } from '@app/classes/commands/draw-image-command';
 import { DrawListLineCommand } from '@app/classes/commands/draw-list-line-command';
@@ -87,7 +88,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvasDrawNative.addEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
-        this.clearCanvas();
+        this.drawService.clearCanvas(this.canvasImage.nativeElement);
     }
 
     loadImage(img: ImageBitmap) {
@@ -202,11 +203,14 @@ export class CanvasNgxComponent implements AfterViewInit {
         return canvasDataStr;
     }
     clearCanvas(): void {
-        this.drawService.clearCanvas(this.canvasImage.nativeElement);
-        this.drawService.clearDiff(this.canvasDraw.nativeElement);
+        const backGroundIsClear = false;
+        const command = new DrawClearCommand(backGroundIsClear, this.canvasImage, this.type);
+        this.commandService.do(command);
     }
 
     clearCanvasDraw(): void {
-        this.drawService.clearDiff(this.canvasDraw.nativeElement);
+        const backGroundIsClear = true;
+        const command = new DrawClearCommand(backGroundIsClear, this.canvasDraw, this.type);
+        this.commandService.do(command);
     }
 }

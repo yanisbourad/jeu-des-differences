@@ -112,7 +112,7 @@ export class GameCardHandlerService {
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
-            this.resetGameVariables();
+            // this.resetGameVariables();
         });
 
         this.socket.on('feedBackOnLeave', () => {

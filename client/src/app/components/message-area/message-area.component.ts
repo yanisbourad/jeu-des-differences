@@ -1,5 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
-// import * as constants from '@app/configuration/const-game';
+import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
@@ -11,6 +10,7 @@ import { SocketClient } from '@app/utils/socket-client';
 export class MessageAreaComponent implements OnInit {
     @Input() playerName: string = '';
     @Input() message: string = '';
+    @ViewChild('chatBox') chatBoxRef: ElementRef;
     playerInitials: string;
     giveUp: boolean;
     date: Date = new Date();
@@ -21,7 +21,7 @@ export class MessageAreaComponent implements OnInit {
     roomName: string = '';
     constructor(readonly socketClient: SocketClientService, readonly gameService: GameService) {}
     ngOnInit() {
-        this.playerInitials = this.playerName[0];
+        this.playerInitials = this.playerName[1];
         this.defaultColor = ['#69bd84', '#6ca2c7'];
         this.position = ['1%', '50%'];
         this.roomName = this.gameService.gameId + this.gameService.gameName;
@@ -49,5 +49,11 @@ export class MessageAreaComponent implements OnInit {
             event: false,
         });
         this.message = '';
+    }
+    handleGameClick(event: MouseEvent) {
+        const targetElement = event.target as HTMLElement;
+        if (targetElement !== document.getElementById('chat')) {
+            return;
+        }
     }
 }

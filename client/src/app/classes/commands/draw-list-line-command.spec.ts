@@ -10,6 +10,7 @@ describe('DrawListLineCommand', () => {
     beforeEach(() => {
         canvas = new ElementRef(document.createElement('canvas'));
         ctx = canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        const width = 5;
         command = new DrawListLineCommand(
             [
                 { x: 0, y: 0 },
@@ -17,7 +18,7 @@ describe('DrawListLineCommand', () => {
                 { x: 200, y: 50 },
             ],
             'red',
-            5,
+            width,
             canvas,
             'test-canvas',
         );
@@ -65,9 +66,10 @@ describe('DrawListLineCommand', () => {
     it('should draw a line between each pair of points', () => {
         const spy = spyOn(ctx, 'lineTo').and.callThrough();
         command.do(true);
+        const coords = { x1: 100, y1: 100, x2: 200, y2: 50 };
         expect(spy.calls.allArgs()).toEqual([
-            [100, 100],
-            [200, 50],
+            [coords.x1, coords.y1],
+            [coords.x2, coords.y2],
         ]);
     });
 });

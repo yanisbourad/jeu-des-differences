@@ -11,6 +11,8 @@ import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
 import * as constants from '@app/configuration/const-canvas';
+import { GameCardHandlerService } from './game-card-handler-service.service';
+
 import SpyObj = jasmine.SpyObj;
 
 describe('GameService', () => {
@@ -19,6 +21,7 @@ describe('GameService', () => {
     let matDialogSpy: SpyObj<MatDialog>;
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
+    let gameCardHandlerServiceSpy: SpyObj<GameCardHandlerService>;
     let audioMock: SpyObj<HTMLAudioElement>;
     let gameService: GameService;
     let path: ImagePath;
@@ -31,6 +34,7 @@ describe('GameService', () => {
         renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord', 'deleteGame']);
+        gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['handleDelete']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
             'getRoomTime',
             'stopTimer',
@@ -49,6 +53,7 @@ describe('GameService', () => {
                 { provide: RendererFactory2, useValue: rendererFactory2Spy },
                 { provide: Renderer2, useValue: renderer2Spy },
                 { provide: MatDialog, useValue: matDialogSpy },
+                { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy },
                 { provide: GameDatabaseService, useValue: gameDataBaseSpy },
                 { provide: SocketClientService, useValue: socketClientServiceSpy },
             ],
@@ -245,6 +250,7 @@ describe('GameService', () => {
 
     it('deleteGame should call deleteGame from gameDatabase with correct parameter', () => {
         gameService.deleteGame('game');
+        expect(gameCardHandlerServiceSpy.handleDelete).toHaveBeenCalled();
         expect(gameDataBaseSpy.deleteGame).toHaveBeenCalledWith('game');
     });
 
@@ -314,16 +320,13 @@ describe('GameService', () => {
 
     it('saveGameRecord should call createGameRecord from gameDataBaseService for multi mode', () => {
         gameService.gameType = 'solo';
-        const gameTitle = 'gameName';
-        const gameMode = 'solo';
         const playerName = 'playerName';
         const dateStart = new Date().getTime().toString();
-        const gameTime = '01:00';
-        const gameRecordMock = { gameName: gameTitle, typeGame: gameMode, playerName, dateStart, time: gameTime };
-        gameService.gameInformation.gameTitle = gameTitle;
-        gameService.gameInformation.gameMode = gameMode;
+        const gameRecordMock = { gameName: 'gameName', typeGame: 'solo', playerName, dateStart, time: '01:00' };
+        gameService.gameInformation.gameTitle = 'gameName';
+        gameService.gameInformation.gameMode = 'solo';
         gameService.playerName = playerName;
-        spyOn(gameService, 'getGameTime').and.returnValue(gameTime);
+        spyOn(gameService, 'getGameTime').and.returnValue('01:00');
         const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
         gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
         gameService.saveGameRecord();

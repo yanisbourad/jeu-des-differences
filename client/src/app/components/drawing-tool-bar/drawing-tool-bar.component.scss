@@ -105,3 +105,21 @@
     align-items: center;
 }
 
+.redo-undo {
+    margin: 0 10px;
+    width: 100px;
+    height: 50px;
+    background-color: #c4abd5c2;
+    border-radius: 10%;
+    border: 2px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    &:hover
+    {
+        background-color: #000;
+        color: #fff;
+    }
+}

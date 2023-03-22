@@ -17,13 +17,13 @@ export class SocketClientService {
     statusPlayer: string;
     gameState = new Subject<boolean>();
     playerFoundDiff = new Subject<string>();
-    diffFounded = new Subject<Set<number>>();
+    private diffFound = new Subject<Set<number>>();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     gameState$ = this.gameState.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     playerFoundDiff$ = this.playerFoundDiff.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering
-    diffFounded$ = this.diffFounded.asObservable();
+    diffFound$ = this.diffFound.asObservable();
 
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
@@ -89,7 +89,7 @@ export class SocketClientService {
 
         this.socketClient.on('feedbackDifference', (diff: Set<number>) => {
             const data = new Set<number>(diff);
-            this.diffFounded.next(data);
+            this.diffFound.next(data);
         });
 
         this.socketClient.on('giveup-return', (data: { playerName: string }) => {

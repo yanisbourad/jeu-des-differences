@@ -22,6 +22,14 @@
             alt="Clear Background"
             (click)="clearCanvas()"
         />
+        <img
+            matTooltip="Réinitialiser l'avant-plan"
+            src="./assets/img/ClearBackground.png"
+            id="ClearBtn"
+            class="btn-tools-Canvas"
+            alt="Clear Background"
+            (click)="clearCanvasDraw()"
+        />
     </div>
     <canvas #CanvasTemp [attr.width]="width" [attr.height]="height" style="display: none;"></canvas>
 

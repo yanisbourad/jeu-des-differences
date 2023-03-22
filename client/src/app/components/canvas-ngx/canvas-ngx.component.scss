@@ -6,6 +6,7 @@
 
 .Canvas-ngx canvas {
     margin: auto;
+    margin-left: 20px;
     width: 640px;
     height: 480px;
     background-color: white;
@@ -19,12 +20,10 @@
 
 .Originale,
 .Modifiée {
-    display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     margin: auto;
-    margin-top: 3%;
     width: 70%;
 }
 
@@ -62,5 +61,19 @@
         top: -101.4% !important;
         left: -0% !important;
         background-color: transparent;
+    }
+}
+@keyframes example {
+    from {content: url(/assets/img/clear-canvas-1.png);}
+    to {content: url(/assets/img/clear-canvas-2.png);}
+}
+
+#ClearCanvas {
+    content: url(/assets/img/clear-canvas-1.png);
+    // border 
+    border: 6px solid gray;
+    border-radius: 25%;
+    &:hover {
+        content: url(/assets/img/clear-canvas-2.png);
     }
 }

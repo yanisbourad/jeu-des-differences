@@ -28,10 +28,10 @@ import { PlayerWaitPopupComponent } from './components/player-wait-popup/player-
 import { TimePopupComponent } from './components/time-popup/time-popup.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
-import { ConfigurationJeuPageComponent } from './pages/configuration-jeu-page/configuration-jeu-page.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
-import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-jeu-page.component';
+import { GamePageConfigurationComponent } from './pages/game-page-configuration/game-page-configuration.component';
+import { GamePageSelectionComponent } from './pages/game-page-selection/game-page-selection.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -52,17 +52,17 @@ import { SelectionJeuPageComponent } from './pages/selection-jeu-page/selection-
         MessageAreaComponent,
         ValidateCreateBtnComponent,
         BannerComponent,
-        SelectionJeuPageComponent,
         GameCardComponent,
         CardDisplayerComponent,
         NamePopupComponent,
-        ConfigurationJeuPageComponent,
         TimePopupComponent,
         GameInfoComponent,
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,
         GeneralFeedbackComponent,
+        GamePageConfigurationComponent,
+        GamePageSelectionComponent,
     ],
     imports: [
         AppMaterialModule,

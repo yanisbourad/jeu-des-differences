@@ -1,12 +1,35 @@
 <div class="drawing-tool-bar">
     <h2>Personnaliser</h2>
+
+    <div class="tool-parial" id="do-undo">
+        <button (click)="undo()" title="undo" class="redo-undo btn">
+            undo
+        </button>
+        <button (click)="redo()" title="redo" class="redo-undo btn">
+            redo
+        </button>
+    </div>
     <div class="tool-parial" id="line-width">
-        <input type="range" (min)="(const.MIN_LINE_WIDTH)" (max)="(const.MAX_LINE_WIDTH)" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
+        <input type="range" min="10" max="30" [(ngModel)]="lineWidth" (change)="setLineWidth()" />
         <p>{{ lineWidth }}</p>
     </div>
-    <div class="tool-parial" id="line-color">
+    
+    <div class="tool-parial" id="line-color">   
         <input type="color" [(ngModel)]="lineColor" (change)="setLineColor()" />
         <p>{{ lineColor }}</p>
+    </div>
+
+    <div class="tool-parial" id="tools">
+        <h3 class="center tool-desc"> Outils: </h3>
+        <a (click)="toggleErase()" title="la gomme">
+            <img src="./assets/img/la-gomme.png" alt="la gomme" [attr.class]="(tool === 'erase') ? 'chosen' : ''" />
+        </a>
+        <a (click)="togglePencil()" title="le stylo">
+            <img src="./assets/img/pencil.png" alt="la stylo" [attr.class]="(tool === 'pencil') ? 'chosen' : ''" />
+        </a>
+        <a (click)="toggleRectangle()" title="le rectangle">
+            <img src="./assets/img/penRect.png" alt="la rectangle" [attr.class]="(tool === 'rectangle') ? 'chosen' : ''" />
+        </a>
     </div>
     <!-- A line to divide the tools from the validator -->
     <div class="tool-parial" id="line"></div>

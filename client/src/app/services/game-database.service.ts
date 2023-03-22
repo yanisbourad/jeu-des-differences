@@ -11,6 +11,7 @@ import { ImageDiffService } from './image-diff.service';
 })
 export class GameDatabaseService {
     twoHundredOkResponse: number;
+
     private readonly baseUrl: string = environment.serverUrl;
 
     constructor(private readonly http: HttpClient, private readonly imageDiff: ImageDiffService, private readonly canvasHolder: CanvasHolderService) {
@@ -37,6 +38,10 @@ export class GameDatabaseService {
         return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`);
     }
 
+    deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
+
     saveGame(_gameName: string): EventEmitter<boolean> {
         const game: Game = {
             gameName: _gameName,
@@ -46,12 +51,9 @@ export class GameDatabaseService {
             difficulty: this.imageDiff.getDifficulty(),
         };
         const isSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
-        this.createGame(game).subscribe((response) => {
-            if (response.status === this.twoHundredOkResponse) {
-                isSaved.emit(true);
-            } else {
-                isSaved.emit(false);
-            }
+        this.createGame(game).subscribe({
+            next: () => isSaved.next(true),
+            error: () => isSaved.next(false),
         });
         return isSaved;
     }

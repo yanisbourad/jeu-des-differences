@@ -1,11 +1,11 @@
 import { HttpClientModule } from '@angular/common/http';
-import { DebugElement } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ChangeDetectorRef, DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { By } from '@angular/platform-browser';
-import * as constants from '@app/configuration/const-game';
 import * as constantsMock from '@app/configuration/const-mock';
 
+import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameInfo } from '@common/game';
 import { of } from 'rxjs';
@@ -17,13 +17,20 @@ describe('CardDisplayerComponent', () => {
     let component: CardDisplayerComponent;
     let fixture: ComponentFixture<CardDisplayerComponent>;
     let communicationServiceSpy: jasmine.SpyObj<GameDatabaseService>;
+    let gameCardHandlerServiceSpy: jasmine.SpyObj<GameCardHandlerService>;
+    let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
 
     beforeEach(() => {
         communicationServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getAllGames']);
-
+        gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['updateGameStatus', 'clearService']);
+        changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
         TestBed.configureTestingModule({
             imports: [HttpClientModule, MatGridListModule],
-            providers: [{ provide: GameDatabaseService, useValue: communicationServiceSpy }],
+            providers: [
+                { provide: GameDatabaseService, useValue: communicationServiceSpy },
+                { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy },
+                { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+            ],
             declarations: [CardDisplayerComponent],
         }).compileComponents();
 
@@ -34,43 +41,56 @@ describe('CardDisplayerComponent', () => {
         fixture.detectChanges();
     });
 
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
     it('should go to next page', () => {
-        component.currentPage = constants.ZERO;
-        component.allPages = constants.THREE;
+        const allPagesLength = 3;
+        component.currentPage = 0;
+        component.allPages = allPagesLength;
         component.goToNext();
-        expect(component.currentPage).toEqual(constants.ONE);
+        expect(component.currentPage).toEqual(1);
     });
 
     it('should not go to next page', () => {
-        component.currentPage = constants.TWO;
-        component.allPages = constants.TWO;
+        const pageNbr = 2;
+        const pagesLength = 2;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToNext();
-        expect(component.currentPage).toEqual(constants.TWO);
+        expect(component.currentPage).toEqual(pageNbr);
     });
 
     it('should go to previous page', () => {
-        component.currentPage = constants.TWO;
-        component.allPages = constants.THREE;
+        const pageNbr = 2;
+        const pagesLength = 3;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToPrevious();
-        expect(component.currentPage).toEqual(constants.ONE);
+        expect(component.currentPage).toEqual(1);
     });
 
     it('should not go to previous page', () => {
-        component.currentPage = constants.ZERO;
-        component.allPages = constants.THREE;
+        const pageNbr = 0;
+        const pagesLength = 2;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToPrevious();
-        expect(component.currentPage).toEqual(constants.ZERO);
+        expect(component.currentPage).toEqual(0);
     });
 
     it('should get the exact number of all pages if mod different of 0', () => {
-        component.allCards.length = constants.FIVE;
+        const pagesLength = 5;
+        component.allCards.length = pagesLength;
         component.getCurrentPageCards();
-        expect(component.allPages).toEqual(constants.ONE);
+        expect(component.allPages).toEqual(1);
     });
     it('should get the exact number of all pages if mod equal of 0', () => {
-        component.allCards.length = constants.EIGHT;
+        const pagesLength = 8;
+        component.allCards.length = pagesLength;
         component.getCurrentPageCards();
-        expect(component.allPages).toEqual(constants.ONE);
+        expect(component.allPages).toEqual(1);
     });
 
     it('should get all cards from the game database service', fakeAsync(() => {
@@ -80,6 +100,7 @@ describe('CardDisplayerComponent', () => {
         component.updateCards();
         expect(component.allCards).toEqual(mockCards);
         expect(communicationServiceSpy.getAllGames).toHaveBeenCalledTimes(1);
+        expect(gameCardHandlerServiceSpy.updateGameStatus).toHaveBeenCalled();
     }));
 
     it('should call goToPrevious() on previous button click', () => {
@@ -97,7 +118,68 @@ describe('CardDisplayerComponent', () => {
     });
 
     it('should display max 4 game cards by page', () => {
+        const nbrGameCard = 4;
         const gridList = fixture.nativeElement.querySelector('mat-grid-list');
-        expect(gridList.getAttribute('cols')).toEqual(constants.FOUR.toString());
+        expect(gridList.getAttribute('cols')).toEqual(nbrGameCard.toString());
+    });
+
+    it('should delete game', () => {
+        spyOn(component, 'onGameDeleted');
+        const gameMock = {
+            gameName: 'difference 1',
+            difficulty: 'Facile',
+            originalImageData: 'imageOriginal1',
+            modifiedImageData: 'imageModifie1',
+            listDifferences: ['diffrence 1', 'difference 2'],
+            rankingMulti: [
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:23',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:24',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+                {
+                    gameName: 'difference 1',
+                    typeGame: 'multi',
+                    time: '1:25',
+                    playerName: 'joueur 1',
+                    dateStart: '2023-01-01',
+                },
+            ],
+            rankingSolo: [
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'solo',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+                {
+                    gameName: 'difference 2',
+                    typeGame: 'mlyi',
+                    time: '2:34',
+                    playerName: 'joueur 2',
+                    dateStart: '2023-02-02',
+                },
+            ],
+        } as GameInfo;
+        component.allCards = [gameMock];
+        component.onGameDeleted(gameMock);
+        expect(component.onGameDeleted).toHaveBeenCalled();
     });
 });

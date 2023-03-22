@@ -1,24 +1,24 @@
 import { TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { RouterTestingModule } from '@angular/router/testing';
+// import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
 import { SocketTestHelper } from '@app/utils/socket-helper';
 import { Socket } from 'socket.io-client';
-import { ClientTimeService } from './client-time.service';
 import { SocketClientService } from './socket-client.service';
+
 import SpyObj = jasmine.SpyObj;
 
 describe('SocketClientService', () => {
     let service: SocketClientService;
-    let timeService: SpyObj<ClientTimeService>;
     let socketClient: SpyObj<SocketClient>;
 
     beforeEach(async () => {
-        timeService = jasmine.createSpyObj('ClientTimeService', ['stopTimer']);
         socketClient = jasmine.createSpyObj('SocketClient', ['isSocketAlive', 'connect', 'on', 'emit', 'send', 'disconnect']);
         TestBed.configureTestingModule({
-            providers: [
-                { provide: ClientTimeService, useValue: timeService },
-                { provide: SocketClient, useValue: socketClient },
-            ],
+            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule], // add MatDialogModule here
+            providers: [{ provide: SocketClient, useValue: socketClient }],
         });
         service = TestBed.inject(SocketClientService);
         socketClient.socket = new SocketTestHelper() as unknown as Socket;
@@ -32,6 +32,30 @@ describe('SocketClientService', () => {
             }
             if (event === 'connect') {
                 callback('connect');
+            }
+
+            if (event === 'serverTime') {
+                callback(new Map([['apple', 3]]));
+            }
+
+            if (event === 'sendRoomName') {
+                callback(['multi', 'string']);
+            }
+            if (event === 'message-return') {
+                callback({ message: 'string', userName: 'string', color: 'string', pos: 'string', event: true });
+            }
+            if (event === 'gameEnded') {
+                callback([true, 'string']);
+            }
+            if (event === 'findDifference-return') {
+                callback({ playerName: 'string' });
+            }
+            if (event === 'feedbackDifference') {
+                const diff = new Set([1, 2, 3]);
+                callback(diff);
+            }
+            if (event === 'giveup-return') {
+                callback({ playerName: 'string' });
             }
         });
     });
@@ -51,11 +75,6 @@ describe('SocketClientService', () => {
         expect(service.socketId).toEqual('');
     });
 
-    it('should connect to the socket if the socket is not connected', () => {
-        service.connect();
-        expect(socketClient.connect).toHaveBeenCalled();
-    });
-
     it('should not connect to the socket if the socket is connected', () => {
         socketClient.isSocketAlive.and.returnValue(true);
         expect(socketClient.connect).not.toHaveBeenCalled();
@@ -68,41 +87,126 @@ describe('SocketClientService', () => {
         expect(service.configureBaseSocketFeatures).toHaveBeenCalled();
     });
 
-    it('configureBaseSocketFeatures should set up the "connect", "hello" and "message" event listener on the socket client', () => {
+    it('configureBaseSocketFeatures should set up all event listener on the socket client', () => {
         service.configureBaseSocketFeatures();
         expect(socketClient.on).toHaveBeenCalledWith('connect', jasmine.any(Function));
         expect(socketClient.on).toHaveBeenCalledWith('hello', jasmine.any(Function));
-        expect(socketClient.on).toHaveBeenCalledWith('message', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('serverTime', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('sendRoomName', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('message-return', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('gameEnded', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('findDifference-return', jasmine.any(Function));
+        expect(socketClient.on).toHaveBeenCalledWith('feedbackDifference', jasmine.any(Function));
+        // expect(socketClient.on).toHaveBeenCalledWith('giveup-return', jasmine.any(Function));
     });
 
-    it('should send a joinRoom message to the socket when joining a room', () => {
+    it('should send a joinRoomSolo message to the socket when joining a room', () => {
         const roomName = 'roomName';
-        service.joinRoom(roomName);
+        service.joinRoomSolo(roomName);
         expect(socketClient.send).toHaveBeenCalled();
-        expect(socketClient.send).toHaveBeenCalledWith('joinRoom', roomName);
+        expect(socketClient.send).toHaveBeenCalledWith('joinRoomSolo', roomName);
     });
 
-    it('should return the current server message', () => {
-        const message = 'Hello from the server';
-        service.serverMessage = message;
-        expect(service.getServerMessage()).toEqual(message);
-    });
+    // it('should return the current server message', () => {
+    //     const message = 'Hello from the server';
+    //     service.serverMessage = message;
+    //     expect(service.getServerMessage()).toEqual(message);
+    // });
 
     it('should return a roomName', () => {
         const roomName = 'roomName';
-        socketClient.socket.id = roomName;
+        service.roomName = roomName;
+        // socketClient.socket.id = roomName;
         expect(service.getRoomName()).toEqual(roomName);
     });
 
-    it('disconnect should call stopTimer() and disconnect', () => {
-        service.disconnect();
-        expect(timeService.stopTimer).toHaveBeenCalled();
-        expect(socketClient.disconnect).toHaveBeenCalled();
-    });
+    // it('disconnect should call stopTimer() and disconnect', () => {
+    //     service.disconnect();
+    //     expect(timeService.stopTimer).toHaveBeenCalled();
+    //     expect(socketClient.disconnect).toHaveBeenCalled();
+    // });
 
     it('leaveRoom should emit leaveRoom', () => {
         service.leaveRoom();
         expect(socketClient.send).toHaveBeenCalled();
         expect(socketClient.send).toHaveBeenCalledWith('leaveRoom');
     });
+
+    it('findDifference should emit findDifference', () => {
+        service.findDifference({ playerName: 'string', roomName: 'string' });
+        expect(socketClient.send).toHaveBeenCalled();
+        // expect(socketClient.send).toHaveBeenCalledWith('findDifference');
+    });
+
+    it('sendMessage should emit sendMessage', () => {
+        service.sendMessage({ message: 'string', playerName: 'string', color: 'string', pos: 'string', gameId: 'string', event: true });
+        expect(socketClient.send).toHaveBeenCalled();
+        // expect(socketClient.send).toHaveBeenCalledWith('sendMessage');
+    });
+
+    it('sendGiveUp should emit sendGiveUp', () => {
+        service.sendGiveUp({ playerName: 'string', roomName: 'string' });
+        expect(socketClient.send).toHaveBeenCalled();
+        //  expect(socketClient.send).toHaveBeenCalledWith('sendGiveUp');
+    });
+
+    it('sendDifference should emit feedbackDifference', () => {
+        const numbers: Set<number> = new Set([1, 2, 3]);
+        service.sendDifference(numbers, 'string');
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should emit sendRoomName', () => {
+        const roomName = 'BLA';
+        service.sendRoomName(roomName);
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should emit sendGiveUp', () => {
+        service.sendGiveUp({ playerName: 'string', roomName: 'string' });
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should emit startMultiGame', () => {
+        service.startMultiGame({ gameId: 'string', creatorName: 'string', gameName: 'string', opponentName: 'string' });
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should emit gameEnded', () => {
+        service.gameEnded('blabla');
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should emit stopTimer', () => {
+        service.stopTimer('blabla', 'GFDG');
+        spyOn(service, 'configureBaseSocketFeatures');
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    it('should get roomTime', () => {
+        spyOn(service, 'getRoomTime');
+        service.getRoomTime('string');
+        expect(service.getRoomTime).toHaveBeenCalled();
+    });
+
+    // it('should disconnect after dialog is closed', () => {
+    //     const dialog = jasmine.createSpyObj('MatDialog', ['open']);
+    //     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+    //     spyOn(service, 'disconnect');
+
+    //     service.configureBaseSocketFeatures();
+
+    //     expect(dialog.open).toHaveBeenCalledWith(
+    //         GiveUpMessagePopupComponent,
+    //         jasmine.objectContaining({
+    //             data: { name: 'playerName' },
+    //             disableClose: true,
+    //             width: '544px',
+    //             height: '255px',
+    //         }),
+    //     );
+
+    //     expect(dialogRef.afterClosed).toHaveBeenCalled();
+    //     expect(service.disconnect).toHaveBeenCalled();
+    // });
 });

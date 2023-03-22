@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
+import * as keys from '@app/configuration/const-hotkeys';
+import * as styler from '@app/configuration/const-styler-type';
 import { Point } from '@app/interfaces/point';
 import { Vec2 } from '@app/interfaces/vec2';
-
+import { HotkeysService } from './hotkeys.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -10,6 +12,16 @@ export class DrawService {
     private canvasSize: Point = { x: constants.DEFAULT_WIDTH, y: constants.DEFAULT_HEIGHT };
     private color: string = constants.DEFAULT_LINE_COLOR;
     private lineWidth: number = constants.DEFAULT_LINE_WIDTH;
+    private rectangleIsSquare: boolean = false;
+    private tool: string = styler.PEN;
+    constructor(private readonly hotkeysService: HotkeysService) {
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], false, this.setIsRectangle.bind(this));
+        this.hotkeysService.hotkeysEventListener([keys.SHIFT], true, this.setIsSquare.bind(this));
+    }
+
+    get usedTool(): string {
+        return this.tool;
+    }
 
     get width(): number {
         return this.canvasSize.x;
@@ -27,6 +39,14 @@ export class DrawService {
         return this.lineWidth;
     }
 
+    get getRectangleIsSquare(): boolean {
+        return this.rectangleIsSquare;
+    }
+
+    set setTool(tool: string) {
+        this.tool = tool;
+    }
+
     set setColor(color: string) {
         this.color = color;
     }
@@ -35,14 +55,12 @@ export class DrawService {
         this.lineWidth = width;
     }
 
-    drawImage(image: ImageBitmap, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        context.drawImage(image, 0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+    setIsSquare(): void {
+        this.rectangleIsSquare = true;
     }
 
-    drawImageOnMultipleCanvas(image: ImageBitmap, canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement): void {
-        this.drawImage(image, canvas1);
-        this.drawImage(image, canvas2);
+    setIsRectangle(): void {
+        this.rectangleIsSquare = false;
     }
 
     drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
@@ -70,6 +88,8 @@ export class DrawService {
 
     clearDiff(canvas: HTMLCanvasElement) {
         const context = this.getContext(canvas);
+        // make it transparent
+        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
         context.clearRect(0, 0, this.width, this.height);
     }
 
@@ -80,7 +100,7 @@ export class DrawService {
 
     drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
         const context = this.getContext(canvas);
-        context.font = '20px system-ui';
+        context.font = '25px system-ui';
         context.fillStyle = 'red';
         context.fillText(word, position.x, position.y);
     }

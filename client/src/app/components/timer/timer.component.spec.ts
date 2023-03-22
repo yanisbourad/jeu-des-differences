@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ClientTimeService } from '@app/services/client-time.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { TimerComponent } from './timer.component';
-import SpyObj = jasmine.SpyObj;
+import spyObj = jasmine.SpyObj;
 
 describe('TimerComponent', () => {
     let component: TimerComponent;
-    let timer: SpyObj<ClientTimeService>;
     let fixture: ComponentFixture<TimerComponent>;
+    let socket: spyObj<SocketClientService>;
 
     beforeEach(async () => {
-        timer = jasmine.createSpyObj('ClientTimeService', ['getCount']);
+        socket = jasmine.createSpyObj('SocketClientService', ['getRoomTime', 'getRoomName']);
         await TestBed.configureTestingModule({
             declarations: [TimerComponent],
-            providers: [{ provide: ClientTimeService, useValue: timer }],
+            providers: [{ provide: SocketClientService, useValue: socket }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TimerComponent);
@@ -41,9 +41,9 @@ describe('TimerComponent', () => {
     });
 
     it('should return the time in the correct format when second and minute are under 10', () => {
-        const expectedResult = '01:05';
-        const countStub = 65;
-        timer.getCount.and.returnValue(countStub);
+        const expectedResult = '05:05';
+        const countStub = 305;
+        socket.getRoomTime.and.returnValue(countStub);
         component.transform();
         expect(component.transform()).toEqual(expectedResult);
     });
@@ -51,7 +51,7 @@ describe('TimerComponent', () => {
     it('should return the time in the correct format when second and minute are over 10', () => {
         const expectedResult = '20:15';
         const countStub = 1215;
-        timer.getCount.and.returnValue(countStub);
+        socket.getRoomTime.and.returnValue(countStub);
         component.transform();
         expect(component.transform()).toEqual(expectedResult);
     });

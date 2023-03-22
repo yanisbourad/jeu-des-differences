@@ -1,20 +1,27 @@
-<div class="message">
-    <div class="container">
+<div class="message" (click)="handleGameClick($event)">
+    <div class="container" >
         <div class="player-circle">
             <p class="player-initials">{{playerInitials | uppercase}}</p>
         </div>
     </div>
     <div class="container">
         <div class="discussion-box">
-            <p class="event-title">message d'événement</p>
+            <p class="event-title">Messages</p>
             <hr>
-            <p *ngFor="let message of chatBox " class="event-message">{{getTimestamp()}} - Différence trouvé par {{playerName}}</p>
+            <div *ngFor="let message of socketClient.messageList">
+                <p *ngIf="message.event === false" class="user-message" [style.background-color]="message.color"
+                [style.margin-left]="message.pos"
+                >{{message.userName}}- {{message.message}}</p>
+                <p *ngIf="message.event === true" class="event-message">{{message.message}}</p>
+            </div>
         </div>
     </div>
     <div class="container">
-        <input type="text" placeholder="Écrire à {{playerName}}…" disabled>
+        <textarea id ="chat-box" [disabled]= "gameService.gameType === 'solo'" type="text" maxlength="200" cols="40"  
+         rows="5"  placeholder="Écrire à {{gameService.opponentName}}… (200 caractères maximum)" [(ngModel)]="message">
+        </textarea>
     </div>
     <div class="container">
-        <button disabled mat-raised-button class="send-btn">Envoyer</button>
+        <button mat-raised-button class="send-btn" (click)="sendMessage()" [disabled]= "gameService.gameType === 'solo'" >Envoyer</button>
     </div>
 </div>

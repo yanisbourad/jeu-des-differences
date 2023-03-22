@@ -3,6 +3,7 @@ import { HeaderComponent } from './header.component';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 // import { of } from 'rxjs';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
+import { RouterTestingModule } from '@angular/router/testing';
 describe('HeaderComponent', () => {
     let component: HeaderComponent;
     let fixture: ComponentFixture<HeaderComponent>;
@@ -11,7 +12,7 @@ describe('HeaderComponent', () => {
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
         await TestBed.configureTestingModule({
-            imports: [MatDialogModule],
+            imports: [MatDialogModule, RouterTestingModule],
             declarations: [HeaderComponent, TimePopupComponent],
             providers: [{ provide: MatDialog, useValue: matDialogSpy }],
         }).compileComponents();
@@ -39,5 +40,10 @@ describe('HeaderComponent', () => {
             width: '1107px',
         });
         expect(dialogRefSpy.afterClosed).toHaveBeenCalled();
+    });
+    it('should redirect to new URL when redirect() is called', () => {
+        component.newUrl = '/classique';
+        const bool = component.redirect();
+        expect(bool).toBe(true);
     });
 });

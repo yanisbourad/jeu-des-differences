@@ -1,7 +1,15 @@
 export enum ChatEvents {
     Connect = 'connect',
-    Message = 'message', // maybe remove later
-    JoinRoom = 'joinRoom',
+    Message = 'message',
+    JoinRoomSolo = 'joinRoomSolo',
     LeaveRoom = 'leaveRoom',
+    ServerTime = 'serverTime',
+    StopTimer = 'stopTimer',
+    SendRoomName = 'sendRoomName',
     Hello = 'hello',
+    GameEnded = 'gameEnded',
+    StartMultiGame = 'startMultiGame',
+    FindDifference = 'findDifference',
+    FeedbackDifference = 'feedbackDifference',
+    SendGiveUp = 'sendGiveUp',
 }

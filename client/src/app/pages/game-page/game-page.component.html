@@ -1,17 +1,34 @@
 <div class="container">
-    <div class="header"><app-header></app-header></div>
+    <div id= "gameContainer" class="header"><app-header></app-header></div>
     <app-game-info></app-game-info>
     <div class="mainView">
         <div class="superposeImageCanvas">
-            <img [src]="this.gameService.game.originalImageData" [attr.width]="width" [attr.height]="height" />
-            <canvas #canvas1 [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <img
+                *ngIf="this.gameService.game.originalImageData"
+                [src]="this.gameService.game.originalImageData"
+                [attr.width]="width"
+                [attr.height]="height"
+            />
+            <canvas #canvas0 style="z-index: 1;" [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <canvas #canvasCheat0 style="top: -221%;" [attr.width]="width" [attr.height]="height"></canvas>
+            <canvas #canvas1 style="top: -333.7%;" [attr.width]="width" [attr.height]="height"></canvas>
         </div>
         <div class="superposeImageCanvas">
-            <img [src]="this.gameService.game.modifiedImageData" [attr.width]="width" [attr.height]="height" />
-            <canvas #canvas2 [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <img
+                *ngIf="this.gameService.game.modifiedImageData"
+                [src]="this.gameService.game.modifiedImageData"
+                [attr.width]="width"
+                [attr.height]="height"
+            />
+            <canvas #canvas3 style="z-index: 1;" [attr.width]="width" [attr.height]="height" (click)="mouseHitDetect($event)"></canvas>
+            <canvas #canvasCheat1 style="top: -221%;" [attr.width]="width" [attr.height]="height"></canvas>
+            <canvas #canvas2 style="top: -333.7%;" [attr.width]="width" [attr.height]="height"></canvas>
         </div>
     </div>
     <div class="footer">
         <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
+    </div>
+    <div class="message">
+        <app-message-area id="chat" [playerName]="this.gameService.playerName"></app-message-area>
     </div>
 </div>

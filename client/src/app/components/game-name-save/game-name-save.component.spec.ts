@@ -1,6 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { EventEmitter } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { ImageDiffService } from '@app/services/image-diff.service';
 import { GameNameSaveComponent } from './game-name-save.component';
@@ -24,7 +27,8 @@ describe('GameNameSaveComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameNameSaveComponent],
+            declarations: [GameNameSaveComponent, GeneralFeedbackComponent],
+            imports: [MatDialogModule, BrowserAnimationsModule],
             providers: [
                 { provide: ImageDiffService, useValue: imageDiffServiceSpy },
                 { provide: MatDialogRef<GameNameSaveComponent>, useValue: dialogSpy },
@@ -55,11 +59,27 @@ describe('GameNameSaveComponent', () => {
         expect(component.validateGameName('VIRTUAL QUEST')).toBeFalse();
     });
 
-    it('should communicate game name to be saved to the server on valid name', () => {
+    it('should communicate game name to be saved to the server on valid name', fakeAsync(() => {
+        const event = new EventEmitter<boolean>();
+        gameDatabaseServiceSpy.saveGame.and.returnValue(event);
         component.gameName = 'papa';
         component.getGameData();
         expect(gameDatabaseServiceSpy.saveGame).toHaveBeenCalled();
-    });
+        event.next(true);
+        tick();
+        expect(component.showFeedback).toBe('');
+    }));
+
+    it('should communicate game was not saved to the server on invalid name', fakeAsync(() => {
+        const event = new EventEmitter<boolean>();
+        gameDatabaseServiceSpy.saveGame.and.returnValue(event);
+        component.gameName = 'uvhde';
+        component.getGameData();
+        expect(gameDatabaseServiceSpy.saveGame).toHaveBeenCalled();
+        event.next(false);
+        tick();
+        expect(component.showFeedback).toBe('The game was not saved');
+    }));
 
     it('should not communicate game name to be saved to the server on invalid name ', () => {
         component.gameName = '     ';

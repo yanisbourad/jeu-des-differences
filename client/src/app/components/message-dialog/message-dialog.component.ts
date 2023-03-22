@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ClientTimeService } from '@app/services/client-time.service';
+import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
@@ -13,14 +13,14 @@ export class MessageDialogComponent {
     message: string;
     type: string;
     formatTime: string;
-
-    // TODO: reduce the number of constructor parameters
+    winner: string = this.gameService.playerName;
     // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA) data: string,
         private router: Router,
-        private readonly socket: SocketClientService,
-        private readonly clientTimeService: ClientTimeService,
+        readonly socket: SocketClientService,
+        private readonly gameService: GameService,
+        public dialog: MatDialog,
     ) {
         this.message = data[0];
         this.type = data[1];
@@ -28,8 +28,30 @@ export class MessageDialogComponent {
     }
 
     redirection(): void {
-        this.router.navigate(['/home']);
+        if (this.type === 'giveUp') {
+            this.socket.sendGiveUp({
+                playerName: this.gameService.playerName,
+                roomName: this.socket.getRoomName(),
+            });
+            const dataToSend = {
+                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
+                playerName: this.gameService.playerName,
+                color: '#FF0000',
+                pos: '50%',
+                gameId: this.socket.getRoomName(),
+                event: true,
+            };
+            this.socket.sendMessage(dataToSend);
+            this.socket.messageList.push({
+                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
+                userName: this.gameService.playerName,
+                mine: true,
+                color: '#FF0000',
+                pos: '50%',
+                event: true,
+            });
+        }
         this.socket.leaveRoom();
-        this.clientTimeService.resetTimer();
+        this.router.navigate(['/home']);
     }
 }

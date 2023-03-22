@@ -45,7 +45,7 @@ export class GameService {
                 return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
             }
         });
-        return Promise.all(await it);
+        return Promise.all(it);
     }
 
     isValidGameName(gameName: string): boolean {
@@ -59,6 +59,16 @@ export class GameService {
         }
         return JSON.parse(this.getFile(_gameName, 'info.json')) as Game;
     }
+
+    // validateDifference(distMousePosition: number, gameName: string): Set<number> {
+    //     const game = this.getGame(gameName);
+    //     const unfoundedDifference: Set<number>[] = this.getSetDifference(game.listDifferences);
+    //     return unfoundedDifference.find((set) => set.has(distMousePosition));
+    // }
+
+    // getSetDifference(differencesStr: string[]): Set<number>[] {
+    //     return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
+    // }
 
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {
@@ -87,14 +97,6 @@ export class GameService {
         this.gameRecordModel.insertMany(basRecords);
     }
 
-    deleteGame(_name: string): void {
-        if (!this.gamesNames.includes(_name)) return;
-        this.deleteDirectory(_name);
-        this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
-        const name = _name + this.key;
-        this.gameRecordModel.deleteMany({ gameName: name });
-    }
-
     createFile(dirName: string, fileName: string, data: string): void {
         if (!fs.existsSync(`${this.rootPath}/${dirName}`)) {
             fs.mkdirSync(`${this.rootPath}/${dirName}`);
@@ -112,5 +114,12 @@ export class GameService {
                 this.logger.error(`Failed to delete directory ${dirName}`);
             }
         });
+    }
+    async deleteGame(_name: string): Promise<void> {
+        if (!this.gamesNames.includes(_name)) throw Error('Does not exist');
+        this.deleteDirectory(_name);
+        this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
+        const name = _name + this.key;
+        await this.gameRecordModel.deleteMany({ gameName: name });
     }
 }

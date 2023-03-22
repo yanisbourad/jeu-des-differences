@@ -10,9 +10,6 @@ const mockCards: GameInformation = {
     gameMode: 'solo',
     gameDifficulty: 'facile',
     nDifferences: 5,
-    nHints: 0,
-    hintsPenalty: 0,
-    isClassical: true,
 };
 describe('GameInfoComponent', () => {
     let component: GameInfoComponent;

@@ -1,9 +1,6 @@
 export interface GameInformation {
     gameTitle: string;
-    gameMode: 'solo' | 'multi';
+    gameMode: string;
     gameDifficulty: string;
     nDifferences: number;
-    nHints: number;
-    hintsPenalty: number;
-    isClassical: boolean;
 }

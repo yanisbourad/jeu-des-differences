@@ -8,6 +8,18 @@
             <app-canvas-ngx class="Canvas-ngx original" [type]="originalCanvas" #originalCanvasComponent></app-canvas-ngx>
             <div class="swapping-canvas">
                 <img
+                    matTooltip="Intervertir les avant-plans"
+                    matTooltipPosition="above"
+                    alt="swapping" src="./assets/img/right-arrow.png" (click)="rightSwapDrawing()" />
+                <img
+                    matTooltip="Intervertir les avant-plans"
+                    matTooltipPosition="above"
+                    alt="swapping" src="./assets/img/left-arrow.png" (click)="leftSwapDrawing()" />
+                <img
+                    matTooltip="Intervertir les avant-plans"
+                    matTooltipPosition="above"
+                    alt="swapping" src="./assets/img/SwappingCanvas.png" (click)="swapDrawing()" />
+                <img
                     matTooltip="Intervertir les arrière-plans"
                     matTooltipPosition="above"
                     alt="swapping"
@@ -30,7 +42,7 @@
                 <button class="btn" routerLink="/config" id="classique">Retour aux configurations</button>
             </div>
             <div class="draw-difference tools">
-                <app-validate-create-btn text="Lancer validation de differences" color="green" (onBtnClick)="openCanvas()"> </app-validate-create-btn>
+                <app-validate-create-btn id="validate-btn" text="Lancer validation de differences" color="green" (onBtnClick)="openCanvas()"> </app-validate-create-btn>
             </div>
         </div>
     </div>

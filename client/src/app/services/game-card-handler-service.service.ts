@@ -20,8 +20,8 @@ export class GameCardHandlerService {
     isLeaving: boolean;
     isRejected: boolean;
     isCreatorLeft: boolean;
-    games: Map<string, number>;
     isGameAvailable: boolean;
+    games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService) {
         this.isCreator = false;
         this.state = '';
@@ -58,7 +58,6 @@ export class GameCardHandlerService {
     getRejectionStatus(): boolean {
         return this.isRejected;
     }
-
     getGameAvailability(): boolean {
         return this.isGameAvailable;
     }
@@ -86,7 +85,6 @@ export class GameCardHandlerService {
 
     listenToFeedBack() {
         this.socket.on('gameUnavailable', () => {
-            this.redirectToHomePage();
             this.isGameAvailable = false;
         });
         this.socket.on('feedbackOnJoin', () => {
@@ -124,7 +122,6 @@ export class GameCardHandlerService {
         this.socket.on('feedbackOnReject', () => {
             this.isRejected = true;
             this.isLeaving = true;
-            this.resetGameVariables();
         });
 
         this.socket.on('byeTillNext', () => {
@@ -198,6 +195,7 @@ export class GameCardHandlerService {
         ]);
         this.socket.disconnect();
     }
+
     redirectToHomePage(): void {
         this.router.navigate(['/home']);
         this.socket.disconnect();

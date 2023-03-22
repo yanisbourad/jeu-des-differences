@@ -75,7 +75,6 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.sendFeedback('Votre adversaire a refusé de jouer avec vous');
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
-            this.resetState();
         }
         this.isLeaving = this.gameCardHandlerService.getLeavingState();
         this.isCancelled = this.gameCardHandlerService.getCancelingState();
@@ -86,6 +85,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         }
         this.isGameAvailable = this.gameCardHandlerService.getGameAvailability();
         if (!this.isGameAvailable) {
+            this.gameCardHandlerService.redirectToHomePage();
             this.dialogReff.close();
             this.sendFeedback("Désolé, le jeu n'est plus disponible, il a été supprimé");
             this.resetState();
@@ -113,8 +113,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             data: { message: showedMessage },
             disableClose: true,
         });
-        dialog.afterClosed().subscribe(() => {
-            return;
+        dialog.afterClosed().subscribe((sms) => {
+            return sms;
         });
     }
 

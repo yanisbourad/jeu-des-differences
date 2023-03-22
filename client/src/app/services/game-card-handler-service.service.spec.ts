@@ -7,7 +7,7 @@ import { Socket } from 'socket.io-client';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 import SpyObj = jasmine.SpyObj;
 
-fdescribe('GameCardHandlerService', () => {
+describe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
     let socketClient: SpyObj<SocketClient>;

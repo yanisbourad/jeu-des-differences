@@ -2,6 +2,7 @@ import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import * as constants from '@app/configuration/const-canvas';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
@@ -9,7 +10,6 @@ import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
-import * as constants from '@app/configuration/const-canvas';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 
 @Injectable({
@@ -254,9 +254,9 @@ export class GameService {
     }
 
     getGameTime(): string {
-        const minutes = Math.floor(this.gameTime / constantsTime.SIXTY_SECOND);
-        const seconds = this.gameTime - minutes * constantsTime.SIXTY_SECOND;
-        return `${minutes}:${seconds < constantsTime.UNDER_TEN ? '0' : ''}${seconds}`;
+        const minutes = Math.floor(this.gameTime / constantsTime.MIN_TO_SEC);
+        const seconds = this.gameTime - minutes * constantsTime.MIN_TO_SEC;
+        return `${minutes}:${seconds < constantsTime.UNIT ? '0' : ''}${seconds}`;
     }
 
     playSuccessAudio(): void {

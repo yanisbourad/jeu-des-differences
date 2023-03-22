@@ -116,7 +116,7 @@ export class GameService {
         });
     }
     async deleteGame(_name: string): Promise<void> {
-        if (!this.gamesNames.includes(_name)) return;
+        if (!this.gamesNames.includes(_name)) throw Error('Does not exist');
         this.deleteDirectory(_name);
         this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
         const name = _name + this.key;

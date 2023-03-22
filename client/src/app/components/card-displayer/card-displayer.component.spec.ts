@@ -3,7 +3,6 @@ import { ChangeDetectorRef, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { By } from '@angular/platform-browser';
-import * as constants from '@app/configuration/const-game';
 import * as constantsMock from '@app/configuration/const-mock';
 
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
@@ -47,42 +46,51 @@ describe('CardDisplayerComponent', () => {
     });
 
     it('should go to next page', () => {
-        component.currentPage = constants.ZERO;
-        component.allPages = constants.THREE;
+        const allPagesLength = 3;
+        component.currentPage = 0;
+        component.allPages = allPagesLength;
         component.goToNext();
-        expect(component.currentPage).toEqual(constants.ONE);
+        expect(component.currentPage).toEqual(1);
     });
 
     it('should not go to next page', () => {
-        component.currentPage = constants.TWO;
-        component.allPages = constants.TWO;
+        const pageNbr = 2;
+        const pagesLength = 2;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToNext();
-        expect(component.currentPage).toEqual(constants.TWO);
+        expect(component.currentPage).toEqual(pageNbr);
     });
 
     it('should go to previous page', () => {
-        component.currentPage = constants.TWO;
-        component.allPages = constants.THREE;
+        const pageNbr = 2;
+        const pagesLength = 3;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToPrevious();
-        expect(component.currentPage).toEqual(constants.ONE);
+        expect(component.currentPage).toEqual(1);
     });
 
     it('should not go to previous page', () => {
-        component.currentPage = constants.ZERO;
-        component.allPages = constants.THREE;
+        const pageNbr = 0;
+        const pagesLength = 2;
+        component.currentPage = pageNbr;
+        component.allPages = pagesLength;
         component.goToPrevious();
-        expect(component.currentPage).toEqual(constants.ZERO);
+        expect(component.currentPage).toEqual(0);
     });
 
     it('should get the exact number of all pages if mod different of 0', () => {
-        component.allCards.length = constants.FIVE;
+        const pagesLength = 5;
+        component.allCards.length = pagesLength;
         component.getCurrentPageCards();
-        expect(component.allPages).toEqual(constants.ONE);
+        expect(component.allPages).toEqual(1);
     });
     it('should get the exact number of all pages if mod equal of 0', () => {
-        component.allCards.length = constants.EIGHT;
+        const pagesLength = 8;
+        component.allCards.length = pagesLength;
         component.getCurrentPageCards();
-        expect(component.allPages).toEqual(constants.ONE);
+        expect(component.allPages).toEqual(1);
     });
 
     it('should get all cards from the game database service', fakeAsync(() => {
@@ -110,8 +118,9 @@ describe('CardDisplayerComponent', () => {
     });
 
     it('should display max 4 game cards by page', () => {
+        const nbrGameCard = 4;
         const gridList = fixture.nativeElement.querySelector('mat-grid-list');
-        expect(gridList.getAttribute('cols')).toEqual(constants.FOUR.toString());
+        expect(gridList.getAttribute('cols')).toEqual(nbrGameCard.toString());
     });
 
     it('should delete game', () => {

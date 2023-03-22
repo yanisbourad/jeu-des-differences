@@ -12,7 +12,7 @@ import { GameInfo } from '@common/game';
 export class CardDisplayerComponent implements AfterViewInit, OnInit {
     currentPage: number;
     allPages: number;
-    cardByPage: number = constants.FOUR;
+    cardByPage: number = constants.GAMES_BY_PAGE;
     allCards: GameInfo[];
     isViewable: boolean;
 
@@ -21,7 +21,7 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
         private changeDetectorRef: ChangeDetectorRef,
         private readonly gameCardHandlerService: GameCardHandlerService,
     ) {
-        this.currentPage = constants.ZERO;
+        this.currentPage = 0;
     }
     ngOnInit(): void {
         this.isViewable = false;
@@ -50,7 +50,7 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
         this.currentPage = newIndex;
     }
     goToPrevious(): void {
-        const isFirstPage = this.currentPage === constants.ZERO;
+        const isFirstPage = this.currentPage === 0;
         const newIndex = isFirstPage ? this.currentPage : this.currentPage - 1;
         this.currentPage = newIndex;
     }
@@ -59,11 +59,11 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
         const startIndex: number = this.cardByPage * this.currentPage;
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);
-        if (this.allCards.length % this.cardByPage === constants.ZERO) {
-            if (this.allCards.length === constants.ZERO) {
+        if (this.allCards.length % this.cardByPage === 0) {
+            if (this.allCards.length === 0) {
                 this.allPages = 0;
             } else {
-                this.allPages = this.allCards.length / this.cardByPage - constants.ONE;
+                this.allPages = this.allCards.length / this.cardByPage - 1;
             }
         } else {
             this.allPages = Math.floor(this.allCards.length / this.cardByPage);

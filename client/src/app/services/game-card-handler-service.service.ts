@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ONE, TWO } from '@app/configuration/const-game';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -178,7 +177,7 @@ export class GameCardHandlerService {
     }
 
     toggleCreateJoin(gameName: string): string {
-        if (this.games.has(gameName)) return this.games.get(gameName) === ONE || this.games.get(gameName) === TWO ? 'Joindre' : 'Créer';
+        if (this.games.has(gameName)) return this.games.get(gameName) === 1 || this.games.get(gameName) === 2 ? 'Joindre' : 'Créer';
         return 'Créer';
     }
 

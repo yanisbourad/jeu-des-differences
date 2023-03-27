@@ -3,13 +3,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
 import { Subject } from 'rxjs';
-import { Socket } from 'socket.io-client';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SocketClientService {
-    socket: Socket;
     roomName: string = '';
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     elapsedTimes: Map<string, number> = new Map<string, number>();
@@ -34,8 +32,8 @@ export class SocketClientService {
     connect() {
         if (!this.socketClient.isSocketAlive()) {
             this.socketClient.connect();
-            this.configureBaseSocketFeatures();
         }
+        this.configureBaseSocketFeatures();
     }
 
     getRoomTime(roomName: string): number {

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
-import { Socket, io } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
+import { SocketClient } from '@app/utils/socket-client';
+import { Socket } from 'socket.io-client';
 import { SocketClientService } from './socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
@@ -21,7 +21,7 @@ export class GameCardHandlerService {
     isCreatorLeft: boolean;
     isGameAvailable: boolean;
     games: Map<string, number>;
-    constructor(private router: Router, private socketClientService: SocketClientService) {
+    constructor(private router: Router, private socketClientService: SocketClientService, private socketClient: SocketClient) {
         this.isCreator = false;
         this.state = '';
         this.isReadyToPlay = false;
@@ -62,16 +62,14 @@ export class GameCardHandlerService {
     }
 
     connect() {
-        this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+        this.socketClient.connect();
+        this.socket = this.socketClient.socket;
     }
 
     updateGameStatus(gameNames: string[]) {
         this.connect();
         this.socket.emit('findAllGamesStatus', gameNames);
-        this.socket.on('updateStatus', (gamesStatus) => {
-            this.games = new Map(gamesStatus);
-            this.isNewUpdate = true;
-        });
+        this.listenToFeedBack();
     }
 
     getNewUpdate() {
@@ -105,7 +103,6 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
-            this.socketClientService.connect();
             this.socketClientService.startMultiGame(gameIdentifier);
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
@@ -192,11 +189,9 @@ export class GameCardHandlerService {
                 gameId: gamersIdentifier.gameId,
             },
         ]);
-        this.socket.disconnect();
     }
 
     redirectToHomePage(): void {
         this.router.navigate(['/home']);
-        this.socket.disconnect();
     }
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import * as constants from '@app/configuration/const-game';
 import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
@@ -9,7 +9,7 @@ import { GameInfo } from '@common/game';
     templateUrl: './card-displayer.component.html',
     styleUrls: ['./card-displayer.component.scss'],
 })
-export class CardDisplayerComponent implements AfterViewInit, OnInit {
+export class CardDisplayerComponent implements OnInit {
     currentPage: number;
     allPages: number;
     cardByPage: number = constants.GAMES_BY_PAGE;
@@ -25,10 +25,6 @@ export class CardDisplayerComponent implements AfterViewInit, OnInit {
     }
     ngOnInit(): void {
         this.isViewable = false;
-        this.updateCards();
-    }
-
-    ngAfterViewInit(): void {
         this.updateCards();
     }
 

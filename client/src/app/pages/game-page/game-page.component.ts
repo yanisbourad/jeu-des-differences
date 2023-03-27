@@ -73,8 +73,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        this.socket.connect();
         if (this.gameService.gameType === 'solo') {
-            this.socket.connect();
             this.socket.joinRoomSolo(this.gameService.playerName);
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;

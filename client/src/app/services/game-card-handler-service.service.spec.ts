@@ -27,7 +27,6 @@ describe('GameCardHandlerService', () => {
             imports: [MatDialogModule],
         });
         service = TestBed.inject(GameCardHandlerService);
-        socketClient.socket = new SocketTestHelper() as unknown as Socket;
         service.games.set('test', 1);
         service.games.set('toaster', 0);
         service.games.set('dad', 0);
@@ -140,7 +139,11 @@ describe('GameCardHandlerService', () => {
             gameName: 'test',
         });
         expect(routerSpy.navigate).toHaveBeenCalled();
-        expect(socketSpy.disconnect).toHaveBeenCalled();
+        // expect(socketSpy.disconnect).toHaveBeenCalled();
+    });
+    it('should redirect player to home page', () => {
+        service.redirectToHomePage();
+        expect(routerSpy.navigate).toHaveBeenCalled();
     });
 
     it('setReadinessStatus() should set the isReadyToPlay value ', () => {

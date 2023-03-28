@@ -79,4 +79,14 @@ export class GameController {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
+
+    @Delete('/')
+    async deleteAllGames(@Res() response: Response) {
+        try {
+            await this.gamesService.deleteAllGames();
+            response.status(HttpStatus.OK).json('Game deleted successfully');
+        } catch (error) {
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+        }
+    }
 }

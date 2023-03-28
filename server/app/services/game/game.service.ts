@@ -8,6 +8,7 @@ import { join } from 'path';
 @Injectable()
 @Controller('file')
 export class GameService {
+
     gamesNames: string[];
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
@@ -121,5 +122,11 @@ export class GameService {
         this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
         const name = _name + this.key;
         await this.gameRecordModel.deleteMany({ gameName: name });
+    }
+
+    async deleteAllGames(): Promise<void> {
+        this.gamesNames.forEach(async (gameName) => {
+            await this.deleteGame(gameName);
+        });
     }
 }

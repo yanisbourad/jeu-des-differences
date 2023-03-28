@@ -57,4 +57,8 @@ export class GameDatabaseService {
         });
         return isSaved;
     }
+
+    deleteAllGames(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/`, { observe: 'response', responseType: 'text' });
+    }
 }

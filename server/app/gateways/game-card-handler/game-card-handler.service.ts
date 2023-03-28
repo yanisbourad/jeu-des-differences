@@ -215,4 +215,8 @@ export class GameCardHandlerService {
         }
         return null;
     }
+
+    isGameAvailable(gameName: string): boolean {
+        return this.gamesQueue.has(gameName);
+    }
 }

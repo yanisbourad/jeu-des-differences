@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable import/no-named-as-default-member */
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -75,6 +76,9 @@ describe('GameCardHandlerGateway', () => {
         jest.spyOn(gameCardHandlerService, 'stackPlayer').mockImplementation(() => {
             return 1;
         });
+        jest.spyOn(gameCardHandlerService, 'isGameAvailable').mockImplementation(() => {
+            return true;
+        });
         jest.spyOn(gameCardHandlerService, 'updateGameStatus').mockImplementation(() => {
             return map;
         });
@@ -83,13 +87,38 @@ describe('GameCardHandlerGateway', () => {
         });
         jest.spyOn(server, 'to').mockReturnValue({
             emit: (event: string) => {
-                expect(event).toEqual('feedbackOnJoin');
+                if (event === 'feedbackOnJoin') expect(event).toEqual('feedbackOnJoin');
+                if (event === 'gameUnavailable') expect(event).toEqual('gameUnavailable');
             },
         } as BroadcastOperator<unknown, unknown>);
 
         gateway.join(payload, socket);
         expect(logger.log).toHaveBeenCalled();
+        expect(gameCardHandlerService.isGameAvailable).toHaveBeenCalled();
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
+    });
+    it('Should call join with one stacked player()', async () => {
+        const payload = { name: 'test', gameName: 'uno' };
+        const map = new Map();
+        map.set('test', 1);
+        map.set('best', 1);
+        stub(socket, 'rooms').value(new Set(['ric']));
+        jest.spyOn(gameCardHandlerService, 'isGameAvailable').mockImplementation(() => {
+            return false;
+        });
+        jest.spyOn(logger, 'log').mockImplementation(() => {
+            return;
+        });
+        jest.spyOn(server, 'to').mockReturnValue({
+            emit: (event: string) => {
+                if (event === 'feedbackOnJoin') expect(event).toEqual('feedbackOnJoin');
+                if (event === 'gameUnavailable') expect(event).toEqual('gameUnavailable');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        gateway.join(payload, socket);
+        expect(logger.log).toHaveBeenCalled();
+        expect(gameCardHandlerService.isGameAvailable).toHaveBeenCalled();
     });
     it('Should call join with two stacked player()', async () => {
         const payload = { name: 'test', gameName: 'uno' };
@@ -113,6 +142,9 @@ describe('GameCardHandlerGateway', () => {
         jest.spyOn(logger, 'log').mockImplementation(() => {
             return;
         });
+        jest.spyOn(gameCardHandlerService, 'isGameAvailable').mockImplementation(() => {
+            return true;
+        });
         jest.spyOn(server, 'to').mockReturnValue({
             emit: (event: string) => {
                 expect(event).toEqual('feedbackOnWait');
@@ -127,6 +159,7 @@ describe('GameCardHandlerGateway', () => {
 
         gateway.join(payload, socket);
         expect(logger.log).toHaveBeenCalled();
+        expect(gameCardHandlerService.isGameAvailable).toHaveBeenCalled();
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
     });
     it('Should call join with more than two stacked player()', async () => {
@@ -151,13 +184,18 @@ describe('GameCardHandlerGateway', () => {
         jest.spyOn(logger, 'log').mockImplementation(() => {
             return;
         });
+        jest.spyOn(gameCardHandlerService, 'isGameAvailable').mockImplementation(() => {
+            return true;
+        });
         jest.spyOn(server, 'to').mockReturnValue({
             emit: (event: string) => {
-                expect(event).toEqual('feedbackOnWaitLonger');
+                if (event === 'feedbackOnWaitLonger') expect(event).toEqual('feedbackOnWaitLonger');
+                if (event === 'gameUnavailable') expect(event).toEqual('gameUnavailable');
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.join(payload, socket);
         expect(logger.log).toHaveBeenCalled();
+        expect(gameCardHandlerService.isGameAvailable).toHaveBeenCalled();
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
     });
     it('Should call reject player in the stack of two()', async () => {

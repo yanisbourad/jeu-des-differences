@@ -254,19 +254,6 @@ describe('GameCardHandlerService', () => {
         expect(service.getPlayer('ric')).toEqual(null);
     });
 
-    // test for checkJoiningPlayersQueue
-    // it('should return 0 as no player is waiting', () => {
-    //     service.gamesQueue.set('uno', []);
-    //     service.joiningPlayersQueue.set('uno', []);
-    //     expect(service.checkJoiningPlayersQueue('uno')).toBe(0);
-    // });
-
-    // it('should return 1 as one player is waiting', () => {
-    //     service.gamesQueue.set('uno', ['dac', 'pat']);
-    //     service.joiningPlayersQueue.set('uno', ['rac']);
-    //     expect(service.checkJoiningPlayersQueue('uno')).toBe(1);
-    // });
-    // test for removePlayers
     it('should return 0 as no player is waiting', () => {
         service.gamesQueue.set('uno', []);
         service.joiningPlayersQueue.set('uno', []);
@@ -301,5 +288,10 @@ describe('GameCardHandlerService', () => {
         service.gamesQueue.set('uno', ['rac']);
         service.joiningPlayersQueue.set('uno', []);
         expect(JSON.stringify(service.handleReject('rac'))).toBe(JSON.stringify(null));
+    });
+    it('should return true if game is available', () => {
+        service.gamesQueue.set('uno', ['rac', 'tas']);
+        expect(service.isGameAvailable('uno')).toBeTruthy();
+        expect(service.isGameAvailable('dos')).toBeFalsy();
     });
 });

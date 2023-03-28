@@ -31,6 +31,11 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         this.logger.log(`New request from ${player.name} to play ${player.gameName} in 1vs1 mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
+        if (!this.gameCardHandlerService.isGameAvailable(player.gameName)) {
+            this.server.to(gamer.id).emit('gameUnavailable', 'game deleted by admin');
+            return;
+        }
+
         gamer.join(player.id);
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
         switch (stackedPlayerNumber) {

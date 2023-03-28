@@ -1,1 +1,13 @@
-<p>gaming-history works!</p>
+<div class="container">
+    <h1>Historique des parties</h1>
+    <div *ngFor="let gameRecord of gameRecords">
+        <div>
+            <p>Jeu : {{gameRecord.name}} - Mode: {{gameRecord.mode}} - Gagnant : {{gameRecord.winner}} - Perdant :
+                {{gameRecord.loser}} - Debut: {{gameRecord.start}} - Duree: {{gameRecord.time}}</p>
+        </div>
+    </div>
+    <div class="buttonContainer2">
+        <button class="bottomButtons" id="eraseButton" (click)="eraseGamingHistory()">Supprimer l'historique</button>
+        <button class="bottomButtons" id="closeButton">Fermer</button>
+    </div>
+</div>

@@ -1,56 +1,45 @@
 <div class="infos">
-  <div  class="left">
-      <p class="title">{{gameService.gameInformation.gameTitle}}</p>
-      <p class="sub-title game-infos" *ngIf="gameService.gameType === 'solo'; else multiBlock">{{gameService.gameType}}</p>
-      <ng-template #multiBlock>
-        <p class="sub-title game-infos">Multijoueur</p>
-      </ng-template>
-      <div *ngIf="gameService.gameType === 'solo'; else elseBlock">
-        <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
-        <div>
-            <img
-                *ngFor="let differences of gameService.differencesArray"
-                class="differences-trouvees-img"
-                src={{differences}}
-                alt="Differences trouvées"
-            />
+    <div class="left">
+        <p class="title">{{gameService.gameInformation.gameTitle}}</p>
+        <p class="sub-title game-infos" *ngIf="gameService.gameType === 'solo'; else multiBlock">
+            {{gameService.gameType}}</p>
+        <ng-template #multiBlock>
+            <p class="sub-title game-infos">Multijoueur</p>
+        </ng-template>
+        <div *ngIf="gameService.gameType === 'solo'; else elseBlock">
+            <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
+            <div>
+                <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
+                    src={{differences}} alt="Differences trouvées" />
+            </div>
         </div>
-      </div>
-      <ng-template #elseBlock>
-        <!-- <div *ngFor="let player of gameService.playersName"> -->
-        <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
-        <div>
-            <img
-                *ngFor="let differences of gameService.differencesArray"
-                class="differences-trouvees-img"
-                src={{differences}}
-                alt="Differences trouvées"
-            />
-        </div>
-        <p class="sub-title">Différences trouvées par - {{gameService.opponentName}}</p>
-        <div>
-            <img
-                *ngFor="let differences of gameService.opponentDifferencesArray"
-                class="differences-trouvees-img"
-                src={{differences}}
-                alt="Differences trouvées"
-            />
-        </div>
-      <!-- </div> -->
-      </ng-template>
-  </div>
-  <div class="middle">
-      <div class="difficulty">
+        <ng-template #elseBlock>
+            <!-- <div *ngFor="let player of gameService.playersName"> -->
+            <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
+            <div>
+                <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
+                    src={{differences}} alt="Differences trouvées" />
+            </div>
+            <p class="sub-title">Différences trouvées par - {{gameService.opponentName}}</p>
+            <div>
+                <img *ngFor="let differences of gameService.opponentDifferencesArray" class="differences-trouvees-img"
+                    src={{differences}} alt="Differences trouvées" />
+            </div>
+            <!-- </div> -->
+        </ng-template>
+    </div>
+    <div class="middle">
+        <div class="difficulty">
             <p>
-                Difficulté : 
+                Difficulté :
                 <span *ngIf="gameService.gameInformation.gameDifficulty === 'Facile'" class="difficulty-easy">
                     {{gameService.gameInformation.gameDifficulty}}
                 </span>
                 <span *ngIf="gameService.gameInformation.gameDifficulty === 'Difficile'" class="difficulty-hard">
-                   {{gameService.gameInformation.gameDifficulty}}
+                    {{gameService.gameInformation.gameDifficulty}}
                 </span>
             </p>
-      </div>
-      <app-timer></app-timer>
-  </div>
+        </div>
+        <app-timer></app-timer>
+    </div>
 </div>

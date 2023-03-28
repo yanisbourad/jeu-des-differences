@@ -12,4 +12,7 @@ export class GamingHistoryComponent implements OnInit {
     ngOnInit(): void {
         this.gameDatabaseService.getAllGames();
     }
+    eraseGamingHistory() {
+        throw new Error('Method not implemented.');
+    }
 }

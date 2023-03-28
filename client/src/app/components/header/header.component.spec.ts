@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HeaderComponent } from './header.component';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 // import { of } from 'rxjs';
-import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
+import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 describe('HeaderComponent', () => {
     let component: HeaderComponent;
     let fixture: ComponentFixture<HeaderComponent>;
@@ -36,6 +37,16 @@ describe('HeaderComponent', () => {
         matDialogSpy.open.and.returnValue(dialogRefSpy);
         component.openSettings();
         expect(matDialogSpy.open).toHaveBeenCalledWith(TimePopupComponent, {
+            height: '774px',
+            width: '1107px',
+        });
+        expect(dialogRefSpy.afterClosed).toHaveBeenCalled();
+    });
+    it('should open gaming History dialog and close', () => {
+        const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        matDialogSpy.open.and.returnValue(dialogRefSpy);
+        component.openGamingHistory();
+        expect(matDialogSpy.open).toHaveBeenCalledWith(GamingHistoryComponent, {
             height: '774px',
             width: '1107px',
         });

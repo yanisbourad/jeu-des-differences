@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 import { Router } from '@angular/router';
+import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
+import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 // import { GameService } from '@app/services/game.service';
 
 @Component({
@@ -17,6 +18,13 @@ export class HeaderComponent {
     constructor(public dialog: MatDialog, public router: Router) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
+            height: '774px',
+            width: '1107px',
+        });
+        dialogRef.afterClosed();
+    }
+    openGamingHistory(): void {
+        const dialogRef = this.dialog.open(GamingHistoryComponent, {
             height: '774px',
             width: '1107px',
         });

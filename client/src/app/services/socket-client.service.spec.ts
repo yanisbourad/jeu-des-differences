@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 // import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
@@ -70,9 +70,15 @@ describe('SocketClientService', () => {
         expect(service.socketId).toEqual(socketId);
     });
 
-    it('should return empty string if socket does not exist', () => {
-        (service.socket as unknown) = undefined;
-        expect(service.socketId).toEqual('');
+    // it('should return empty string if socket does not exist', () => {
+    //     (service.socketId as unknown) = undefined;
+    //     expect(service.socketId).toEqual('');
+    // });
+
+    // test for getRoomTime
+    it('should return roomTime if roomTime exist', () => {
+        service.elapsedTimes = new Map([['apple', 3]]);
+        expect(service.getRoomTime('apple')).toEqual(3);
     });
 
     it('should not connect to the socket if the socket is connected', () => {

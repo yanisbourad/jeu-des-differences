@@ -68,7 +68,8 @@ export class GameCardHandlerService {
 
     updateGameStatus(gameNames: string[]) {
         this.connect();
-        this.socket.emit('findAllGamesStatus', gameNames);
+        // this.socket.emit('findAllGamesStatus', gameNames);
+        this.socketClient.send('findAllGamesStatus', gameNames);
         this.listenToFeedBack();
     }
 

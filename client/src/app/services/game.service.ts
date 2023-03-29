@@ -156,19 +156,42 @@ export class GameService {
         this.differencesArray.pop();
         this.differencesArray.unshift(this.path.differenceFound);
 
-        if (this.gameType === 'double') {
-            this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
+        switch (this.gameType) {
+            case 'solo':
+                this.handleSoloDifference();
+                break;
+            case 'double':
+                this.handleMultiDifference();
+                break;
+            default:
+                break;
         }
+    }
 
-        if (this.totalDifferenceReached() && this.gameType === 'solo') {
-            this.endGame();
-        }
-
+    handleMultiDifference(): void {
+        this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
         if (this.multiGameEnd() && this.gameType === 'double') {
             this.endGame();
         }
     }
 
+    // if (this.gameType === 'double') {
+    //     this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
+    // }
+
+    // if (this.totalDifferenceReached() && this.gameType === 'solo') {
+    //     this.endGame();
+    // }
+
+    // if (this.multiGameEnd() && this.gameType === 'double') {
+    //     this.endGame();
+    // }
+    // }
+    handleSoloDifference(): void {
+        if (this.totalDifferenceReached()) {
+            this.endGame();
+        }
+    }
     totalDifferenceReached(): boolean {
         return this.nDifferencesFound === this.totalDifferences;
     }

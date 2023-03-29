@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
@@ -40,7 +40,7 @@ export class MessageAreaComponent implements OnInit {
             event: false,
         };
         this.socketClient.sendMessage(dataToSend);
-        this.socketClient.messageList.push({
+        this.addMessage({
             message: this.message,
             userName: this.playerName,
             mine: true,
@@ -48,8 +48,14 @@ export class MessageAreaComponent implements OnInit {
             pos: this.position[1],
             event: false,
         });
+        this.socketClient.messageList.push();
         this.message = '';
     }
+
+    addMessage(message: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }) {
+        this.socketClient.messageList.push(message);
+    }
+
     handleGameClick(event: MouseEvent) {
         const targetElement = event.target as HTMLElement;
         if (targetElement !== document.getElementById('chat')) {

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
@@ -25,7 +26,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
+    // a reference to the chatComponent
 
+    @ViewChild('chatComponent', { static: true }) chat!: MessageAreaComponent;
     blinking: ReturnType<typeof setTimeout>;
     idEventList: number;
     mousePosition: Vec2;
@@ -57,6 +60,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     get height(): number {
         return constants.DEFAULT_HEIGHT;
+    }
+
+    get gameTime(): number {
+        return this.gameService.gameTime;
     }
 
     ngOnInit(): void {
@@ -137,26 +144,34 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
-                this.drawService.setColor = 'yellow';
-                this.displayWord('Trouvé');
-                this.drawDifference(diff);
-                this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
-                this.socket.sendDifference(diff, this.socket.getRoomName());
-                this.gameService.sendFoundMessage();
-                this.gameService.handleDifferenceFound();
-                this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
+                this.showDifferenceFoundByMe(diff, this.mousePosition);
             } else {
-                this.errorPenalty = true;
-                this.displayWord('Erreur');
-                this.gameService.sendErrorMessage();
-                this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
+                this.showErrorNotADifference(this.mousePosition);
             }
         }
     }
 
-    displayWord(word: string): void {
-        this.drawService.drawWord(word, this.canvas0.nativeElement, this.mousePosition);
-        this.drawService.drawWord(word, this.canvas3.nativeElement, this.mousePosition);
+    showDifferenceFoundByMe(diff: Set<number>, mousePosition: Vec2): void {
+        this.drawService.setColor = 'yellow';
+        this.displayWord('Trouvé', mousePosition);
+        this.drawDifference(diff);
+        this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+        this.socket.sendDifference(diff, this.socket.getRoomName());
+        this.gameService.sendFoundMessage();
+        this.gameService.handleDifferenceFound();
+        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
+    }
+
+    showErrorNotADifference(mousePosition: Vec2): void {
+        this.errorPenalty = true;
+        this.displayWord('Erreur', mousePosition);
+        this.gameService.sendErrorMessage();
+        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
+    }
+
+    displayWord(word: string, mousePosition: Vec2): void {
+        this.drawService.drawWord(word, this.canvas0.nativeElement, mousePosition);
+        this.drawService.drawWord(word, this.canvas3.nativeElement, mousePosition);
         if (word === 'Erreur') {
             this.gameService.playFailureAudio();
             setTimeout(() => {
@@ -215,18 +230,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
+    stopCheatMode(): void {
+        clearInterval(this.blinking);
+        this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
+        this.drawService.setColor = 'black';
+    }
+
     toggleCheating(): void {
-        this.isCheating = !this.isCheating;
         const chatBox = document.getElementById('chat-box');
-        if (this.isCheating) {
-            if (document.activeElement !== chatBox) {
-                this.cheatMode();
-            }
-        } else {
-            if (document.activeElement !== chatBox) clearInterval(this.blinking);
-            this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
-            this.drawService.setColor = 'black';
-        }
+        if (document.activeElement === chatBox) return;
+
+        this.isCheating = !this.isCheating;
+        if (this.isCheating) this.cheatMode();
+        else this.stopCheatMode();
     }
 
     cheatModeKeyBinding(): number {

@@ -1,8 +1,8 @@
 import { GameService } from '@app/services/game/game.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { Game } from './../../../../common/game';
+import { Game, TimeConfig } from './../../../../common/game';
 
 @ApiTags('Games')
 @Controller('game')
@@ -85,6 +85,17 @@ export class GameController {
         try {
             await this.gamesService.deleteAllGames();
             response.status(HttpStatus.OK).json('Game deleted successfully');
+        } catch (error) {
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+        }
+    }
+
+    // function that post the new values of the three timers (variables)
+    @Put('/constants')
+    async postConstants(@Body() newConstants: TimeConfig, @Res() response: Response) {
+        try {
+            await this.gamesService.updateConstants(newConstants);
+            response.status(HttpStatus.OK).json('constants updated successfully');
         } catch (error) {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }

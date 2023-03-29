@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord } from '@common/game';
+import { Game, GameInfo, GameRecord, TimeConfig } from '@common/game';
 import { CanvasHolderService } from './canvas-holder.service';
 import { ImageDiffService } from './image-diff.service';
 @Injectable({
@@ -60,5 +60,9 @@ export class GameDatabaseService {
 
     deleteAllGames(): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/`, { observe: 'response', responseType: 'text' });
+    }
+
+    updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {
+        return this.http.put(`${this.baseUrl}/game/constants`, constants, { observe: 'response', responseType: 'text' });
     }
 }

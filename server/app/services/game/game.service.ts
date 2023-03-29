@@ -1,20 +1,26 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
-import { Game, GameInfo } from '@common/game';
+import { Game, GameInfo, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import { Model } from 'mongoose';
 import { join } from 'path';
+import { TimerConstantsModel } from '@app/model/database/timer-constants';
+
 @Injectable()
 @Controller('file')
 export class GameService {
-
     gamesNames: string[];
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
     rootPath = join(process.cwd(), 'assets', 'games');
+    rootPathConstant = join(process.cwd(), 'assets', 'constants');
 
-    constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
+    constructor(
+        @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
+        private readonly logger: Logger,
+        @InjectModel(TimerConstantsModel.name) private readonly timerConstantsModel: Model<TimerConstantsModel>,
+    ) {
         if (!fs.existsSync(this.rootPath)) {
             fs.mkdirSync(this.rootPath);
         }
@@ -128,5 +134,11 @@ export class GameService {
         this.gamesNames.forEach(async (gameName) => {
             await this.deleteGame(gameName);
         });
+    }
+
+    // i want to update the values of the constants in the database with the new one in the body
+    async updateConstants(newConstants: TimeConfig): Promise<void> {
+        this.createFile(this.rootPathConstant, 'infoTime.json', JSON.stringify(newConstants));
+        await this.timerConstantsModel.updateOne({}, newConstants, { upsert: true });
     }
 }

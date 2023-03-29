@@ -19,16 +19,20 @@ export class SocketClientService {
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
-    gameState = new Subject<boolean>();
-    playerFoundDiff = new Subject<string>();
+    error: Set<number>;
+    private gameState = new Subject<boolean>();
+    private playerFoundDiff = new Subject<string>();
     private diffFound = new Subject<Set<number>>();
+    private difference = new Subject<Set<number>>();
+
     // eslint-disable-next-line @typescript-eslint/member-ordering
     gameState$ = this.gameState.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     playerFoundDiff$ = this.playerFoundDiff.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     diffFound$ = this.diffFound.asObservable();
-
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    difference$ = this.difference.asObservable();
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
     get socketId() {
@@ -91,6 +95,14 @@ export class SocketClientService {
         this.socketClient.on('gameEnded', (data: [gameEnded: boolean, player: string]) => {
             this.gameState.next(data[0]);
             this.statusPlayer = data[1];
+        });
+
+        this.socketClient.on('diffFound', (diff: Set<number>) => {
+            const data = new Set<number>(diff);
+            this.difference.next(data);
+        });
+        this.socketClient.on('error', () => {
+            this.difference.next(this.error);
         });
 
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
@@ -161,5 +173,13 @@ export class SocketClientService {
 
     sendDifference(diff: Set<number>, roomName: string) {
         this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
+    }
+
+    sendGameName(gameName: string) {
+        this.socketClient.send('gameName', gameName);
+    }
+
+    sendMousePosition(pos: number) {
+        this.socketClient.send('mousePosition', pos);
     }
 }

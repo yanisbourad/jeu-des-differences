@@ -1,22 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { ShowDiffRecord } from '@app/classes/game-records/show-diff';
 import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-difference';
-import { StartCheatModeRecord } from '@app/classes/game-records/start-cheat-mode';
-import { StopCheatModeRecord } from '@app/classes/game-records/stop-cheat-mode';
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
-import * as constantsTime from '@app/configuration/const-time';
 import { Message } from '@app/interfaces/message';
-import { Vec2 } from '@app/interfaces/vec2';
+import { CheatModeService } from '@app/services/cheat-mode.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
-import { HotkeysService } from '@app/services/hotkeys.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Subscription } from 'rxjs';
 
@@ -30,38 +23,26 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas3', { static: true }) canvas3!: ElementRef<HTMLCanvasElement>;
-
     @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
     // a reference to the chatComponent
 
     @ViewChild('chatComponent', { static: true }) chat!: MessageAreaComponent;
-    blinking: ReturnType<typeof setTimeout>;
     idEventList: number;
-    mousePosition: Vec2;
-    errorPenalty: boolean;
-    unfoundedDifference: Set<number>[];
-    isCheating: boolean = false;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
     notRewinding: boolean = true;
-
-    // TODO: reduce the number of parameters + move some functions to service, the logic shouldn't be here!!
+    differenceSubscription: Subscription = new Subscription();
     // eslint-disable-next-line max-params
     constructor(
-        private readonly drawService: DrawService,
         public gameService: GameService,
         readonly socket: SocketClientService,
-        public dialog: MatDialog,
         public route: ActivatedRoute,
-        readonly hotkeysService: HotkeysService,
         private gameRecordService: GameRecorderService,
-    ) {
-        this.mousePosition = { x: 0, y: 0 };
-        this.errorPenalty = false;
-    }
+        public cheatModeService: CheatModeService,
+    ) {}
 
     get width(): number {
         return constants.DEFAULT_WIDTH;
@@ -85,12 +66,18 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getRouterParams();
         this.gameService.getGame(this.gameService.gameName);
         this.loading();
+        this.socket.sendGameName(this.gameService.gameName);
+        if (this.gameService.gameType !== 'solo') {
+            this.cheatModeService.cheatModeKeyBinding();
+            this.cheatModeService.canvas0 = this.canvasCheat0;
+            this.cheatModeService.canvas1 = this.canvasCheat1;
+        }
     }
 
     loading(): void {
         const timeout = 500;
         setTimeout(() => {
-            this.unfoundedDifference = this.getSetDifference(this.gameService.game.listDifferences);
+            this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, timeout);
     }
 
@@ -101,47 +88,56 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const roomName = this.gameService.gameId + this.gameService.gameName;
             this.socket.sendRoomName(roomName);
-            this.idEventList = this.cheatModeKeyBinding();
         }
         this.subscriptions();
         this.gameRecordService.timeStart = Date.now();
     }
 
     startRewind(): void {
-        this.initForRewind();
+        console.log('startRewind');
+        if (this.notRewinding) this.initForRewind();
+        this.cheatModeService.stopCheating();
         this.gameRecordService.startRewind();
     }
+
     initForRewind(): void {
+        if (this.notRewinding) {
+            this.cheatModeService.removeHotkeysEventListener();
+            this.diffFoundSubscription.unsubscribe();
+            this.playerFoundDiffSubscription.unsubscribe();
+            this.gameStateSubscription.unsubscribe();
+            this.socket.disconnect();
+        }
+        console.log('initForRewind');
         this.notRewinding = false;
         this.chat.isNotRewinding = false;
-        clearInterval(this.blinking);
-        this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-        this.clearCanvas(this.canvas3.nativeElement, this.canvas0.nativeElement);
-        this.isCheating = false;
-        this.diffFoundSubscription.unsubscribe();
-        this.playerFoundDiffSubscription.unsubscribe();
-        this.gameStateSubscription.unsubscribe();
-        this.socket.disconnect();
-        if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
+        this.clearCanvases();
+        this.cheatModeService.resetService();
         this.gameService.initRewind();
+        this.cheatModeService.canvas0 = this.canvasCheat0;
+        this.cheatModeService.canvas1 = this.canvasCheat1;
+        this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
     }
 
     ngOnDestroy(): void {
-        clearInterval(this.blinking);
-        this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-        if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
+        this.cheatModeService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
+        this.differenceSubscription.unsubscribe();
         this.gameService.reinitializeGame();
         this.socket.disconnect();
+        this.cheatModeService.resetService();
+        this.notRewinding = true;
+        this.chat.isNotRewinding = true;
     }
 
     subscriptions(): void {
         this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
             if (newValue) {
-                new ShowDiffRecord(newValue).record(this.gameRecordService);
-                this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
+                new ShowDiffRecord(newValue, { canvas1: this.canvas1, canvas2: this.canvas2 }, false, this.gameService.mousePosition).record(
+                    this.gameRecordService,
+                );
             }
         });
 
@@ -155,10 +151,27 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         });
 
+        this.differenceSubscription = this.socket.difference$.subscribe((newValue) => {
+            const canvases = {
+                canvas1: this.canvas0,
+                canvas2: this.canvas1,
+                canvas0: this.canvasCheat0,
+                canvas3: this.canvasCheat1,
+            };
+            if (newValue) {
+                new ShowDiffRecord(newValue, canvases, true, this.gameService.mousePosition).record(this.gameRecordService);
+                new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
+                this.gameService.handleDifferenceFound();
+                this.socket.sendDifference(newValue, this.socket.getRoomName());
+            } else {
+                new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);
+                new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
+            }
+        });
+
         // this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
         //     if (newValue === this.gameService.opponentName) {
-        //         // this.gameService.handlePlayerDifference();
-        //         console.log('player found diff handled by ShowDiffRecord');
+        //         this.gameService.handlePlayerDifference();
         //     }
         // });
     }
@@ -172,132 +185,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     mouseHitDetect(event: MouseEvent): void {
-        if (event.button === MouseButton.Left && !this.errorPenalty && this.notRewinding) {
-            this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
-            if (diff) {
-                new ShowDiffRecord(diff, this.mousePosition, true).record(this.gameRecordService);
-                new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
-                this.gameService.handleDifferenceFound();
-            } else {
-                new ShowNotADiffRecord(this.mousePosition).record(this.gameRecordService);
-                new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
-            }
-        }
-    }
-
-    // called from the record service ShowDiffRecord
-    showDifferenceFoundByMe(diff: Set<number>, mousePosition: Vec2): void {
-        this.displayWord('Trouvé', mousePosition);
-        this.drawDifference(diff, 'yellow');
-        this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
-        this.gameService.reduceNbrDifferences();
-        this.socket.sendDifference(diff, this.socket.getRoomName());
-        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
-    }
-
-    // called from the record service ShowNotADiffRecord
-    showErrorNotADifference(mousePosition: Vec2): void {
-        this.errorPenalty = true;
-        this.displayWord('Erreur', mousePosition);
-        this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
-    }
-
-    displayWord(word: string, mousePosition: Vec2): void {
-        this.drawService.drawWord(word, this.canvas0.nativeElement, mousePosition);
-        this.drawService.drawWord(word, this.canvas3.nativeElement, mousePosition);
-        if (word === 'Erreur') {
-            this.gameService.playFailureAudio();
-            setTimeout(() => {
-                this.errorPenalty = false;
-            }, constantsTime.BLINKING_TIME);
-        } else {
-            this.gameService.playSuccessAudio();
-            this.gameService.blinkDifference(this.canvas1, this.canvas2);
-        }
-    }
-
-    getSetDifference(differencesStr: string[]): Set<number>[] {
-        return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
-    }
-
-    drawDifference(diff: Set<number>, color: string = 'black', isCheating: boolean = false): void {
-        const tempColor = this.drawService.getColor;
-        this.drawService.setColor = color;
-        if (!isCheating) {
-            this.drawService.drawDiff(diff, this.canvas1.nativeElement);
-            this.drawService.drawDiff(diff, this.canvas2.nativeElement);
-        } else {
-            this.drawService.drawDiff(diff, this.canvasCheat0.nativeElement);
-            this.drawService.drawDiff(diff, this.canvasCheat1.nativeElement);
-        }
-        this.drawService.setColor = tempColor;
-    }
-
-    clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
-        setTimeout(() => {
-            this.drawService.clearDiff(canvasA);
-            this.drawService.clearDiff(canvasB);
-        }, constantsTime.BLINKING_TIME);
-    }
-    clearCanvasCheat(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
-        this.drawService.clearDiff(canvasA);
-        this.drawService.clearDiff(canvasB);
-    }
-
-    displayGiveUp(msg: string, type: string): void {
-        this.dialog.open(MessageDialogComponent, {
-            data: [msg, type],
-            minWidth: '250px',
-            minHeight: '150px',
-            panelClass: 'custom-dialog-container',
-        });
-    }
-
-    giveUp(): void {
-        this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
-    }
-
-    cheatMode(): void {
-        let color = 'black';
-        this.blinking = setInterval(() => {
-            color = color === 'black' ? 'yellow' : 'black';
-            for (const set of this.unfoundedDifference) {
-                this.drawDifference(set, color, true);
-            }
-        }, constantsTime.BLINKING_TIMEOUT);
-    }
-
-    stopCheatMode(): void {
-        clearInterval(this.blinking);
-        this.clearCanvasCheat(this.canvasCheat0.nativeElement, this.canvasCheat1.nativeElement);
-        this.drawService.setColor = 'black';
-    }
-
-    toggleCheating(): void {
-        const chatBox = document.getElementById('chat-box');
-        if (document.activeElement === chatBox) return;
-
-        this.isCheating = !this.isCheating;
-        if (this.isCheating) new StartCheatModeRecord().record(this.gameRecordService);
-        else new StopCheatModeRecord().record(this.gameRecordService);
-    }
-
-    cheatModeKeyBinding(): number {
-        return this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
-    }
-
-    eqSet(set1: Set<number>, set2: Set<number>): boolean {
-        return (
-            set1.size === set2.size &&
-            [...set1].every((x) => {
-                return set2.has(x);
-            })
-        );
+        this.gameService.mouseHitDetect(event);
     }
 
     showMessage(message: Message): void {
         this.chat.pushMessage(message);
+    }
+
+    clearCanvases(): void {
+        DrawService.clearDiff(this.canvas0.nativeElement);
+        DrawService.clearDiff(this.canvas2.nativeElement);
+        DrawService.clearDiff(this.canvas3.nativeElement);
+        DrawService.clearDiff(this.canvasCheat0.nativeElement);
+        DrawService.clearDiff(this.canvas1.nativeElement);
+        DrawService.clearDiff(this.canvasCheat1.nativeElement);
     }
 }

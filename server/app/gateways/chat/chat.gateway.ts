@@ -1,3 +1,4 @@
+import { GameService } from '@app/services/game/game.service';
 import { PlayerService } from '@app/services/player/player-service';
 import { ServerTimeService } from '@app/services/time/server-time.service';
 import { DELAY_BEFORE_EMITTING_TIME } from '@common/const-chat-gateway';
@@ -14,8 +15,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     roomName: string = '';
     // create a queue of Players
     playersQueue: PlayerMulti[] = [];
-
-    constructor(private readonly logger: Logger, private readonly playerService: PlayerService, private readonly serverTime: ServerTimeService) {}
+    unfoundedDifference: Set<number>[] = new Array();
+    constructor(
+        private readonly logger: Logger,
+        private readonly playerService: PlayerService,
+        private readonly serverTime: ServerTimeService,
+        private readonly gameService: GameService,
+    ) {}
 
     @SubscribeMessage(ChatEvents.Connect)
     connect(_: Socket, message: string) {
@@ -105,6 +111,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.to(data[1]).emit('feedbackDifference', data[0]);
     }
 
+    @SubscribeMessage(ChatEvents.MousePosition)
+    async mouseDetect(socket: Socket, position: number) {
+        const diff = this.unfoundedDifference.find((set) => set.has(position));
+        if (diff) {
+            socket.emit('diffFound', Array.from(diff));
+        } else {
+            socket.emit('error');
+        }
+        this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+    }
+
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         // to be private
@@ -115,6 +132,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.SendGiveUp)
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
+    }
+    @SubscribeMessage(ChatEvents.GameName)
+    async getGame(_: Socket, gameName: string) {
+        const game = this.gameService.getGame(gameName);
+        this.unfoundedDifference = this.gameService.getSetDifference(game.listDifferences);
     }
 
     async handleConnection(socket: Socket) {

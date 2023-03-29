@@ -2,15 +2,18 @@ import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Message } from '@app/interfaces/message';
+import { Vec2 } from '@app/interfaces/vec2';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
+import { DrawService } from './draw.service';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 
 @Injectable({
@@ -31,7 +34,10 @@ export class GameService {
     opponentName: string;
     gameId: string;
     gameName: string;
+    diff: Set<number>;
     message: string;
+    mousePosition: Vec2;
+    errorPenalty: boolean;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -41,6 +47,7 @@ export class GameService {
         public dialog: MatDialog,
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
+        private readonly drawService: DrawService,
     ) {
         this.path = {
             differenceNotFound: './assets/img/difference-not-found.png',
@@ -54,6 +61,8 @@ export class GameService {
         };
         this.nDifferencesFound = 0;
         this.renderer = rendererFactory.createRenderer(null, null);
+        this.mousePosition = { x: 0, y: 0 };
+        this.errorPenalty = false;
     }
 
     get width(): number {
@@ -75,6 +84,10 @@ export class GameService {
         this.differencesArray = new Array(this.totalDifferences);
         this.opponentDifferencesArray = new Array(this.totalDifferences);
         this.playersName = [this.playerName, this.opponentName];
+    }
+
+    getSetDifference(differencesStr: string[]): Set<number>[] {
+        return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
     getGame(gameName: string): void {
@@ -325,5 +338,91 @@ export class GameService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         this.gameCardHandlerService.handleDelete(gameName);
         return this.gameDataBase.deleteGame(gameName);
+    }
+
+    mouseHitDetect(event: MouseEvent): void {
+        if (event.button === MouseButton.Left && !this.errorPenalty) {
+            this.mousePosition = { x: event.offsetX, y: event.offsetY };
+            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
+            this.socket.sendMousePosition(distMousePosition);
+        }
+    }
+
+    diffFound(
+        canvas: {
+            canvas0: ElementRef<HTMLCanvasElement>;
+            canvas1: ElementRef<HTMLCanvasElement>;
+            canvas2: ElementRef<HTMLCanvasElement>;
+            canvas3: ElementRef<HTMLCanvasElement>;
+        },
+        diff: Set<number>,
+    ): void {
+        this.displayWord('Trouvé', canvas);
+        this.drawDifference(diff, false, canvas);
+        // to change
+        this.socket.sendDifference(diff, this.socket.getRoomName());
+        this.sendFoundMessage();
+        this.handleDifferenceFound();
+        this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
+    }
+
+    diffNotFound(canvas: {
+        canvas0: ElementRef<HTMLCanvasElement>;
+        canvas1: ElementRef<HTMLCanvasElement>;
+        canvas2: ElementRef<HTMLCanvasElement>;
+        canvas3: ElementRef<HTMLCanvasElement>;
+    }): void {
+        this.errorPenalty = true;
+        this.displayWord('Erreur', canvas);
+        this.sendErrorMessage();
+        this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
+    }
+
+    clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
+        setTimeout(() => {
+            this.drawService.clearDiff(canvasA);
+            this.drawService.clearDiff(canvasB);
+        }, constantsTime.BLINKING_TIME);
+    }
+
+    displayWord(
+        word: string,
+        canvas: {
+            canvas0: ElementRef<HTMLCanvasElement>;
+            canvas1: ElementRef<HTMLCanvasElement>;
+            canvas2: ElementRef<HTMLCanvasElement>;
+            canvas3: ElementRef<HTMLCanvasElement>;
+        },
+    ): void {
+        this.drawService.drawWord(word, canvas.canvas0.nativeElement, this.mousePosition);
+        this.drawService.drawWord(word, canvas.canvas3.nativeElement, this.mousePosition);
+        if (word === 'Erreur') {
+            this.playFailureAudio();
+            setTimeout(() => {
+                this.errorPenalty = false;
+            }, constantsTime.BLINKING_TIME);
+        } else {
+            this.playSuccessAudio();
+            this.blinkDifference(canvas.canvas1, canvas.canvas2);
+        }
+    }
+
+    drawDifference(
+        diff: Set<number>,
+        isCheating: boolean = false,
+        canvas: {
+            canvas0: ElementRef<HTMLCanvasElement>;
+            canvas1: ElementRef<HTMLCanvasElement>;
+            canvas2: ElementRef<HTMLCanvasElement>;
+            canvas3: ElementRef<HTMLCanvasElement>;
+        },
+    ): void {
+        if (!isCheating) {
+            this.drawService.drawDiff(diff, canvas.canvas0.nativeElement);
+            this.drawService.drawDiff(diff, canvas.canvas1.nativeElement);
+        } else {
+            this.drawService.drawDiff(diff, canvas.canvas2.nativeElement);
+            this.drawService.drawDiff(diff, canvas.canvas3.nativeElement);
+        }
     }
 }

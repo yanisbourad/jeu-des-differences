@@ -18,3 +18,20 @@ export const MOCK_CARDS = [
         rankingSolo: [],
     },
 ];
+
+export const MOCK_GAME_RECORDS = [
+    {
+        gameName: 'difference 1',
+        typeGame: 'multi',
+        time: '1:23',
+        playerName: 'joueur 1',
+        dateStart: '2023-01-01',
+    },
+    {
+        gameName: 'difference 1',
+        typeGame: 'multi',
+        time: '1:24',
+        playerName: 'joueur 1',
+        dateStart: '2023-01-01',
+    },
+];

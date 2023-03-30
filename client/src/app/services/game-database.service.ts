@@ -38,6 +38,10 @@ export class GameDatabaseService {
         return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`);
     }
 
+    deleteAllGames(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/`, { observe: 'response', responseType: 'text' });
+    }
+
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
     }
@@ -56,10 +60,6 @@ export class GameDatabaseService {
             error: () => isSaved.next(false),
         });
         return isSaved;
-    }
-
-    deleteAllGames(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/`, { observe: 'response', responseType: 'text' });
     }
 
     updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {

@@ -4,6 +4,7 @@ import { TimePopupComponent } from '@app/components/time-popup/time-popup.compon
 import { Router } from '@angular/router';
 import { GameDatabaseService } from '@app/services/game-database.service';
 // import { GameService } from '@app/services/game.service';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
     selector: 'app-header',
@@ -15,6 +16,7 @@ export class HeaderComponent {
     newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
+    messageDeleteGames: string = 'êtes-vous sur de vouloir supprimer tous les jeux?';
     constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
@@ -28,7 +30,18 @@ export class HeaderComponent {
         return this.newUrl !== '/game';
     }
 
-    resetGame(): void {
-        this.gameDatabaseService.deleteAllGames();
+    resetGames(): void {
+        this.gameDatabaseService.deleteAllGames().subscribe();
+    }
+    launchFeedback(showedMessage: string): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: { message: showedMessage, confirmFunction: () => this.resetGames() },
+                disableClose: true,
+            })
+            .afterClosed()
+            .subscribe(() => {
+                this.router.navigate(['/']);
+            });
     }
 }

@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import * as constants from '@app/configuration/const-time';
 import { TimeConfig } from '@common/game';
 import { GameDatabaseService } from '@app/services/game-database.service';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
     selector: 'app-time-popup',
@@ -16,7 +17,8 @@ export class TimePopupComponent {
     maxInitTime = constants.MAX_INIT_TIME;
     maxPenaltyTime = constants.MAX_PENALTY_TIME;
     maxBonusTime = constants.MAX_BONUS_TIME;
-    constructor(public dialogRef: MatDialogRef<TimePopupComponent>, readonly gameDatabaseService: GameDatabaseService) {
+    message: string = 'êtes-vous sur de vouloir reinitialiser les constantes de jeu?';
+    constructor(public dialogRef: MatDialogRef<TimePopupComponent>, readonly gameDatabaseService: GameDatabaseService, public dialog: MatDialog) {
         this.gameDatabaseService.getConstants().subscribe((res: TimeConfig) => {
             this.timer1 = res.timeInit;
             this.timer2 = res.timePen;
@@ -63,5 +65,17 @@ export class TimePopupComponent {
             timeBonus: constants.BONUS_TIME,
         };
         this.gameDatabaseService.updateConstants(newConstants).subscribe();
+    }
+
+    launchFeedback(showedMessage: string): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: { message: showedMessage, confirmFunction: () => this.resetConstants() },
+                disableClose: true,
+            })
+            .afterClosed()
+            .subscribe(() => {
+                this.onNoClick();
+            });
     }
 }

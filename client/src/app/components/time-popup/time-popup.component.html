@@ -1,13 +1,16 @@
 <div class = "firstBox">
     <p id = "title">Constantes de Jeu</p>
+    <button mat-icon-button id = "title" class="icon-display" matTooltip="Réinitialiser les constantes de jeu" (click) = "launchFeedback(message)">
+        <mat-icon>autorenew</mat-icon>
+    </button>
     <div class = "main">
         <div class = "section" id = "first">
             <p class = "text">1. Temps initial du compte à rebours</p>
             <p class = "time">{{timer1}} s</p>
             <div class = "buttonContainer">
-                <button [disabled]="this.timer1===0" class = "lessTime" (click) = "decrementTime1()"> <p>-</p> </button>
+                <button [disabled]="this.timer1===30" class = "lessTime" (click) = "decrementTime1()"> <p>-</p> </button>
                 <button [disabled]="this.timer1=== maxInitTime" class = "addButton" (click) = "incrementTime1()"> + </button>
-                <p>La valeur doit êre comprise entre 0 et {{maxInitTime}} secondes</p>
+                <p>La valeur doit êre comprise entre 30 et {{maxInitTime}} secondes</p>
             </div>
         </div>
         <div class = "section" id = "second">
@@ -23,9 +26,9 @@
             <p class = "text">3. Temps gagné avec la découverte d’une différence</p>
             <p class = "time2">{{timer3}} s</p>
             <div class = "buttonContainer">
-                <button [disabled]="this.timer3===0" class = "lessTime" id = "buttonTime3" (click) = "decrementTime3()"> <p>-</p> </button>
+                <button [disabled]="this.timer3===1" class = "lessTime" id = "buttonTime3" (click) = "decrementTime3()"> <p>-</p> </button>
                 <button [disabled]="this.timer3=== maxBonusTime" class = "addButton" (click) = "incrementTime3()"> + </button>
-                <p>La valeur doit êre comprise entre 0 et {{maxBonusTime}} secondes</p>
+                <p>La valeur doit êre comprise entre 1 et {{maxBonusTime}} secondes</p>
             </div>
         </div>
         

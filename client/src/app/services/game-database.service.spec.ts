@@ -192,7 +192,7 @@ fdescribe('GameDatabaseService', () => {
             expect(response.body).toEqual('Successfully deleted all games');
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/`);
+        const req = httpMock.expectOne(`${baseUrl}/game/`);
         expect(req.request.method).toBe('DELETE');
 
         req.flush('Successfully deleted all games', { status: 200, statusText: 'OK' });

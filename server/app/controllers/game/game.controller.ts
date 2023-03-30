@@ -80,20 +80,20 @@ export class GameController {
         response.status(HttpStatus.OK).json(res);
     }
 
-    @Delete('/:id')
-    async deleteGame(@Param('id') id: string, @Res() response: Response) {
+    @Delete('/')
+    async deleteAllGames(@Res() response: Response) {
         try {
-            await this.gamesService.deleteGame(id);
-            response.status(HttpStatus.OK).json('Game deleted successfully');
+            await this.gamesService.deleteAllGames();
+            response.status(HttpStatus.OK).json('Games deleted successfully');
         } catch (error) {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
 
-    @Delete('/')
-    async deleteAllGames(@Res() response: Response) {
+    @Delete('/:id')
+    async deleteGame(@Param('id') id: string, @Res() response: Response) {
         try {
-            await this.gamesService.deleteAllGames();
+            await this.gamesService.deleteGame(id);
             response.status(HttpStatus.OK).json('Game deleted successfully');
         } catch (error) {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);

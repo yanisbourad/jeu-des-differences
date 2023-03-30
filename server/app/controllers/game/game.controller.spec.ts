@@ -304,7 +304,7 @@ describe('GameController', () => {
                 return res;
             };
             res.json = (message) => {
-                expect(message).toEqual('Game deleted successfully');
+                expect(message).toEqual('Games deleted successfully');
                 return res;
             };
             res.send = () => res;

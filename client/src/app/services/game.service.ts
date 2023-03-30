@@ -357,9 +357,9 @@ export class GameService {
         },
         diff: Set<number>,
     ): void {
+        this.drawService.setColor = 'black';
         this.displayWord('Trouvé', canvas);
-        this.drawDifference(diff, false, canvas);
-        // to change
+        this.drawDifference(diff, { canvas1: canvas.canvas1, canvas2: canvas.canvas2 });
         this.socket.sendDifference(diff, this.socket.getRoomName());
         this.sendFoundMessage();
         this.handleDifferenceFound();
@@ -383,6 +383,19 @@ export class GameService {
             this.drawService.clearDiff(canvasA);
             this.drawService.clearDiff(canvasB);
         }, constantsTime.BLINKING_TIME);
+    }
+
+    displayGiveUp(msg: string, type: string): void {
+        this.dialog.open(MessageDialogComponent, {
+            data: [msg, type],
+            minWidth: '250px',
+            minHeight: '150px',
+            panelClass: 'custom-dialog-container',
+        });
+    }
+
+    giveUp(): void {
+        this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
 
     displayWord(
@@ -409,20 +422,12 @@ export class GameService {
 
     drawDifference(
         diff: Set<number>,
-        isCheating: boolean = false,
         canvas: {
-            canvas0: ElementRef<HTMLCanvasElement>;
             canvas1: ElementRef<HTMLCanvasElement>;
             canvas2: ElementRef<HTMLCanvasElement>;
-            canvas3: ElementRef<HTMLCanvasElement>;
         },
     ): void {
-        if (!isCheating) {
-            this.drawService.drawDiff(diff, canvas.canvas0.nativeElement);
-            this.drawService.drawDiff(diff, canvas.canvas1.nativeElement);
-        } else {
-            this.drawService.drawDiff(diff, canvas.canvas2.nativeElement);
-            this.drawService.drawDiff(diff, canvas.canvas3.nativeElement);
-        }
+        this.drawService.drawDiff(diff, canvas.canvas1.nativeElement);
+        this.drawService.drawDiff(diff, canvas.canvas2.nativeElement);
     }
 }

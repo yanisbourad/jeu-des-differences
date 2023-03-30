@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="footer">
-        <button mat-raised-button class="giveUp btn" (click)="giveUp()">Abandonner la partie</button>
+        <button mat-raised-button class="giveUp btn" (click)="this.gameService.giveUp()">Abandonner la partie</button>
     </div>
     <div class="message">
         <app-message-area #chatComponent id="chat" [playerName]="this.gameService.playerName"></app-message-area>

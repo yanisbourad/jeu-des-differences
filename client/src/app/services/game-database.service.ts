@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord } from '@common/game';
+import { Game, GameInfo, GameRecord, GamingHistory } from '@common/game';
 import { CanvasHolderService } from './canvas-holder.service';
 import { ImageDiffService } from './image-diff.service';
 @Injectable({
@@ -22,8 +22,8 @@ export class GameDatabaseService {
         return this.http.get<GameInfo[]>(`${this.baseUrl}/game`);
     }
 
-    getAllGameRecords(): Observable<GameRecord[]> {
-        return this.http.get<GameRecord[]>(`${this.baseUrl}/gameRecord`);
+    getAllGamingHistory(): Observable<GameRecord[]> {
+        return this.http.get<GameRecord[]>(`${this.baseUrl}/gamingHistory`);
     }
 
     getGameByName(gameName: string): Observable<GameInfo> {
@@ -32,6 +32,9 @@ export class GameDatabaseService {
 
     createGameRecord(gameRecord: GameRecord): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}/gameRecord/create`, gameRecord, { observe: 'response', responseType: 'text' });
+    }
+    createGamingHistory(gamingHistory: GamingHistory): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseUrl}/gamingHistory/create`, gamingHistory, { observe: 'response', responseType: 'text' });
     }
 
     createGame(game: Game): Observable<HttpResponse<string>> {
@@ -45,8 +48,8 @@ export class GameDatabaseService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
     }
-    deleteGameRecords(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/gameRecord`, { observe: 'response', responseType: 'text' });
+    deleteGamingHistory(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });
     }
 
     saveGame(_gameName: string): EventEmitter<boolean> {

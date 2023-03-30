@@ -22,6 +22,10 @@ export class GameDatabaseService {
         return this.http.get<GameInfo[]>(`${this.baseUrl}/game`);
     }
 
+    getAllGameRecords(): Observable<GameRecord[]> {
+        return this.http.get<GameRecord[]>(`${this.baseUrl}/gameRecord`);
+    }
+
     getGameByName(gameName: string): Observable<GameInfo> {
         return this.http.get<GameInfo>(`${this.baseUrl}/game/${gameName}`);
     }

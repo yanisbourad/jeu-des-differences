@@ -1,4 +1,4 @@
-import { AfterContentChecked, Component, OnInit } from '@angular/core';
+import { AfterContentChecked, Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameRecord } from '@common/game';
@@ -8,17 +8,14 @@ import { GameRecord } from '@common/game';
     templateUrl: './gaming-history.component.html',
     styleUrls: ['./gaming-history.component.scss'],
 })
-export class GamingHistoryComponent implements OnInit, AfterContentChecked {
+export class GamingHistoryComponent implements AfterContentChecked {
     gameRecords: GameRecord[];
     hasGameRecords: boolean;
 
     constructor(private readonly gameDatabaseService: GameDatabaseService, public dialogReff: MatDialogRef<GamingHistoryComponent>) {
         this.hasGameRecords = false;
         this.gameRecords = [];
-    }
-
-    ngOnInit(): void {
-        if (!this.hasGameRecords) this.hasGameRecords = this.getAllGameRecords().length > 0;
+        this.gameRecords = this.getAllGameRecords();
     }
 
     ngAfterContentChecked(): void {
@@ -37,6 +34,7 @@ export class GamingHistoryComponent implements OnInit, AfterContentChecked {
             if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
                 this.gameRecords = [];
             }
+            this.hasGameRecords = false;
         });
     }
 

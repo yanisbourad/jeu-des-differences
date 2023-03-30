@@ -19,6 +19,7 @@ import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-t
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
 import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
+import { GamingHistoryComponent } from './components/gaming-history/gaming-history.component';
 import { GeneralFeedbackComponent } from './components/general-feedback/general-feedback.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
@@ -29,9 +30,9 @@ import { TimePopupComponent } from './components/time-popup/time-popup.component
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
-import { GamePageComponent } from './pages/game-page/game-page.component';
 import { GamePageConfigurationComponent } from './pages/game-page-configuration/game-page-configuration.component';
 import { GamePageSelectionComponent } from './pages/game-page-selection/game-page-selection.component';
+import { GamePageComponent } from './pages/game-page/game-page.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -57,6 +58,7 @@ import { GamePageSelectionComponent } from './pages/game-page-selection/game-pag
         NamePopupComponent,
         TimePopupComponent,
         GameInfoComponent,
+        GamingHistoryComponent,
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,

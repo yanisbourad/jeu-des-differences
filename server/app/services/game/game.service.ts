@@ -122,4 +122,29 @@ export class GameService {
         const name = _name + this.key;
         await this.gameRecordModel.deleteMany({ gameName: name });
     }
+
+    // deleteGameRecords(): void {
+    //     this.gamesNames.forEach((gameName) => {
+    //         this.gameRecordModel.deleteMany({ gameName: gameName + this.key });
+    //         const basRecords: GameRecord[] = [];
+    //         const name = gameName + this.key;
+    //         for (let i = 0; i < 3; i++) {
+    //             basRecords.push({
+    //                 gameName: name,
+    //                 typeGame: 'multi',
+    //                 time: '15:20', // 10min in seconds
+    //                 playerName: 'Sharmila',
+    //                 dateStart: new Date().getTime().toString(),
+    //             });
+    //             basRecords.push({
+    //                 gameName: name,
+    //                 typeGame: 'solo',
+    //                 time: '12:50', // 10min in seconds
+    //                 playerName: 'Ania',
+    //                 dateStart: new Date().getTime().toString(),
+    //             });
+    //         }
+    //         this.gameRecordModel.insertMany(basRecords);
+    //     });
+    // }
 }

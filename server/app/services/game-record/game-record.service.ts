@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { GamingHistory, GamingHistoryDocument } from '@app/model/database/gaming-history';
 import { CreateGameRecordDto } from '@app/model/dto/game-record/create-game-record.dto';
-import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history.dto.ts/create-gaming-history.dto';
+import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 import { GameService } from '@app/services/game/game.service';
 @Injectable()
 export class GameRecordService {

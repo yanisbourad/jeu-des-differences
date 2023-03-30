@@ -16,7 +16,7 @@ export class HeaderComponent {
     newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
-    messageDeleteGames: string = 'êtes-vous sur de vouloir supprimer tous les jeux?';
+    messageDeleteGames: string = "êtes-vous sur de vouloir supprimer tous les jeux? si oui, vous allez être redirigé vers la page d'accueil";
     constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {

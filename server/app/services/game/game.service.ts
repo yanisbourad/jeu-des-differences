@@ -92,14 +92,14 @@ export class GameService {
             basRecords.push({
                 gameName: name,
                 typeGame: 'multi',
-                time: '15:20', // 10min in seconds
+                time: '01:20', // 10min in seconds
                 playerName: 'Sharmila',
                 dateStart: new Date().getTime().toString(),
             });
             basRecords.push({
                 gameName: name,
                 typeGame: 'solo',
-                time: '12:50', // 10min in seconds
+                time: '02:50', // 10min in seconds
                 playerName: 'Ania',
                 dateStart: new Date().getTime().toString(),
             });

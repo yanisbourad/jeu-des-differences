@@ -1,18 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { GameDatabaseService } from '@app/services/game-database.service';
+import { GameRecord } from '@common/game';
 
 @Component({
     selector: 'app-gaming-history',
     templateUrl: './gaming-history.component.html',
     styleUrls: ['./gaming-history.component.scss'],
 })
-export class GamingHistoryComponent implements OnInit {
-    constructor(private readonly gameDatabaseService: GameDatabaseService) {}
+export class GamingHistoryComponent implements OnInit, AfterContentChecked {
+    gameRecords: GameRecord[];
+    hasGameRecords: boolean;
+
+    constructor(private readonly gameDatabaseService: GameDatabaseService, public dialogReff: MatDialogRef<GamingHistoryComponent>) {
+        this.hasGameRecords = false;
+        this.gameRecords = [];
+    }
 
     ngOnInit(): void {
-        this.gameDatabaseService.getAllGames();
+        if (!this.hasGameRecords) this.hasGameRecords = this.getAllGameRecords().length > 0;
     }
-    eraseGamingHistory() {
-        throw new Error('Method not implemented.');
+
+    ngAfterContentChecked(): void {
+        if (!this.hasGameRecords) this.hasGameRecords = this.getAllGameRecords().length > 0;
+    }
+
+    getAllGameRecords(): GameRecord[] {
+        this.gameDatabaseService.getAllGamingHistory().subscribe((res) => {
+            if (res) this.gameRecords = res;
+        });
+        return this.gameRecords;
+    }
+
+    async eraseGamingHistory() {
+        this.gameDatabaseService.deleteGamingHistory().subscribe((res) => {
+            if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
+                this.gameRecords = [];
+            }
+        });
+    }
+
+    close() {
+        this.dialogReff.close();
     }
 }

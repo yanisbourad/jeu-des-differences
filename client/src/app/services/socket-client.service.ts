@@ -75,9 +75,8 @@ export class SocketClientService {
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
             if (data) {
-                // TODO: Validate the getRoomTime(this.roomName) is correct
                 this.messageToAdd.next(
-                    new GameMessageEvent(this.getRoomTime(this.roomName), {
+                    new GameMessageEvent({
                         message: data.message,
                         userName: data.userName,
                         mine: false,

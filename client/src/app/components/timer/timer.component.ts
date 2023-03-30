@@ -33,7 +33,7 @@ export class TimerComponent {
 
     getSecond(): number {
         const time = this.socket.getRoomTime(this.socket.getRoomName());
-        return time ? Number(time % constants.MIN_TO_SEC) : 0;
+        return Math.floor(time ? Number(time % constants.MIN_TO_SEC) : 0);
     }
 
     getMinute(): number {

@@ -63,7 +63,7 @@ export class MessageAreaComponent implements OnInit {
     }
 
     addMessage(message: Message) {
-        new GameMessageEvent(this.socketClient.getRoomTime(this.socketClient.getRoomName()), message).record(this.gameRecorderService);
+        new GameMessageEvent(message).record(this.gameRecorderService);
     }
 
     pushMessage(message: Message) {

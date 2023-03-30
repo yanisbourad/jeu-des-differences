@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
-import { BLINKING_TIME } from '@app/configuration/const-time';
+import { SEC_TO_MILLISEC, UNIT } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { Subject } from 'rxjs';
 import { GameService } from './game.service';
@@ -18,7 +18,7 @@ export class GameRecorderService {
     paused: boolean = false;
     myTimeout: ReturnType<typeof setTimeout> | undefined;
     progress$ = new Subject<number>();
-
+    startingTime: number = 0;
     constructor(private gameService: GameService, private socketClient: SocketClientService) {
         this.socketClient.messageToAdd$.subscribe((message) => {
             this.do(message);
@@ -28,8 +28,17 @@ export class GameRecorderService {
     get currentTime(): number {
         return this.socketClient.getRoomTime(this.socketClient.getRoomName());
     }
+
+    get currentTimeInMilliseconds(): number {
+        return this.currentTime * SEC_TO_MILLISEC;
+    }
+
     get maxTime(): number {
         return this.gameService.gameTime;
+    }
+
+    set timeStart(time: number) {
+        this.startingTime = time;
     }
 
     // this will be used to set the speed of the rewind
@@ -74,7 +83,6 @@ export class GameRecorderService {
         // prepare the game for the rewind
         this.position = 0;
         this.action = this.list[this.position++];
-        // TODO: make this a constant
         this.lunchRewind();
     }
 
@@ -86,7 +94,7 @@ export class GameRecorderService {
             } else {
                 this.endRewind();
             }
-        }, BLINKING_TIME / this.speed);
+        }, UNIT / this.speed);
     }
 
     stopRewind() {
@@ -97,12 +105,15 @@ export class GameRecorderService {
     // will be called every second
     private tick(): void {
         if (this.paused) return;
-        this.socketClient.gameTime = this.currentTime + 1;
 
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.progress$.next(Math.floor(this.currentTime * 100) / this.maxTime);
+        this.socketClient.gameTime = this.currentTime + UNIT / SEC_TO_MILLISEC;
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.progress$.next(Math.floor(this.currentTime) / this.maxTime);
         while (this.action) {
-            if (this.action.gameTime <= this.currentTime) {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            if (this.action.gameTime(this.startingTime) <= this.currentTimeInMilliseconds) {
                 this.redo();
                 this.action = this.list[this.position++];
             } else break;

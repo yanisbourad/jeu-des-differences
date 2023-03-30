@@ -5,8 +5,8 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 export class GameMessageEvent extends GameRecordCommand {
     message: Message;
 
-    constructor(gameTime: number, message: Message) {
-        super(gameTime);
+    constructor(message: Message) {
+        super();
         this.message = message;
     }
     do(component: GamePageComponent): void {

@@ -4,8 +4,8 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 
 export class ShowNotADiffRecord extends GameRecordCommand {
     position: Point;
-    constructor(gameTime: number, position: Point) {
-        super(gameTime);
+    constructor(position: Point) {
+        super();
         this.position = position;
     }
 

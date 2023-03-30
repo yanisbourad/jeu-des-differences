@@ -2,14 +2,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import * as constants from '@app/configuration/const-canvas';
-import * as constantsTime from '@app/configuration/const-time';
 import * as constTest from '@app/configuration/const-test';
+import * as constantsTime from '@app/configuration/const-time';
 import { DrawService } from '@app/services/draw.service';
 import { GameService } from '@app/services/game.service';
 import { HotkeysService } from '@app/services/hotkeys.service';
@@ -221,7 +221,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should call blinkDifference with canvas1 and canvas2', () => {
-        component.displayWord('Test');
+        component.displayWord('Test', { x: 9.5, y: 9.5 });
         expect(gameServiceSpy.blinkDifference).toHaveBeenCalledWith(component.canvas1, component.canvas2);
     });
 
@@ -236,7 +236,7 @@ describe('GamePageComponent', () => {
 
     it('should play failure audio and draw word on both canvases when word is "Erreur"', () => {
         jasmine.clock().install();
-        component.displayWord('Erreur');
+        component.displayWord('Erreur', { x: 9.5, y: 9.5 });
         expect(gameServiceSpy.playFailureAudio).toHaveBeenCalled();
         expect(drawServiceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas0.nativeElement, component.mousePosition);
         expect(drawServiceSpy.drawWord).toHaveBeenCalledWith('Erreur', component.canvas3.nativeElement, component.mousePosition);
@@ -246,7 +246,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should play success audio, draw word on both canvases, call handleDifferenceFound and blinkCanvas when word is not "Erreur"', () => {
-        component.displayWord('Test');
+        component.displayWord('Test', { x: 9.5, y: 9.5 });
         expect(gameServiceSpy.playSuccessAudio).toHaveBeenCalled();
         expect(drawServiceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas0.nativeElement, component.mousePosition);
         expect(drawServiceSpy.drawWord).toHaveBeenCalledWith('Test', component.canvas3.nativeElement, component.mousePosition);
@@ -259,7 +259,7 @@ describe('GamePageComponent', () => {
         component.unfoundedDifference = [];
         component.mouseHitDetect(mouseEvent);
         expect(component.errorPenalty).toBe(true);
-        expect(spy).toHaveBeenCalledWith('Erreur');
+        expect(spy).toHaveBeenCalledWith('Erreur', { x: mouseEvent.offsetX, y: mouseEvent.offsetY });
     });
 
     it('should sets the mouse position to the event offsetX and offsetY when the left mouse button is clicked and there is no error penalty', () => {
@@ -273,7 +273,7 @@ describe('GamePageComponent', () => {
         const spy = spyOn(component, 'displayWord').and.callThrough();
         component.mouseHitDetect(mouseEvent);
         expect(component.errorPenalty).toBe(true);
-        expect(spy).toHaveBeenCalledWith('Erreur');
+        expect(spy).toHaveBeenCalledWith('Erreur', { x: mouseEvent.offsetX, y: mouseEvent.offsetY });
     });
 
     it('should draws the difference, removes the difference, and displays the word "Trouvé" when difference is found', () => {
@@ -283,7 +283,7 @@ describe('GamePageComponent', () => {
         component.mouseHitDetect(mouseEvent);
         expect(component.unfoundedDifference).toEqual([]);
         expect(spyDrawDiff).toHaveBeenCalledWith(new Set([0]));
-        expect(spyDisplayWord).toHaveBeenCalledWith('Trouvé');
+        expect(spyDisplayWord).toHaveBeenCalledWith('Trouvé', { x: mouseEvent.offsetX, y: mouseEvent.offsetY });
     });
 
     it('should toggle isCheating when toggleCheating is called', () => {
@@ -296,7 +296,7 @@ describe('GamePageComponent', () => {
 
     it('should call drawDiff on canvasCheat0 and canvasCheat1', () => {
         const diff = new Set<number>();
-        component.drawDifference(diff, true);
+        component.drawDifference(diff, 'black', true);
         expect(drawServiceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvasCheat0.nativeElement);
         expect(drawServiceSpy.drawDiff).toHaveBeenCalledWith(diff, component.canvasCheat1.nativeElement);
     });
@@ -309,7 +309,7 @@ describe('GamePageComponent', () => {
         jasmine.clock().tick(constantsTime.BLINKING_TIME);
         expect(drawServiceSpy.setColor).toEqual('black');
         for (const set of component.unfoundedDifference) {
-            expect(drawDifferenceSpy).toHaveBeenCalledWith(set, true);
+            expect(drawDifferenceSpy).toHaveBeenCalledWith(set, 'black', true);
         }
         jasmine.clock().uninstall();
     });

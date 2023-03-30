@@ -51,7 +51,7 @@ export class MessageDialogComponent {
                 event: true,
             };
             this.socket.sendMessage(dataToSend);
-            new GameMessageEvent(this.socket.getRoomTime(this.socket.getRoomName()), {
+            new GameMessageEvent({
                 message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
                 userName: this.gameService.playerName,
                 mine: true,

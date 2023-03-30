@@ -11,13 +11,15 @@ export abstract class GameRecordCommand {
     // in milliseconds
     // this will be used to determine the
     // order of the actions
-    constructor(gameTime: number) {
-        this.time = gameTime;
+    constructor() {
+        // get the time the action was performed in seconds
+        this.time = Date.now();
     }
 
-    get gameTime(): number {
-        return this.time || 0;
+    gameTime(startingTime: number): number {
+        return this.time - startingTime || 0;
     }
+
     record(gameRecordService: GameRecorderService): void {
         gameRecordService.do(this);
     }

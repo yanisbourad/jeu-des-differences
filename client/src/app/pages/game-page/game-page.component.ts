@@ -104,6 +104,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.idEventList = this.cheatModeKeyBinding();
         }
         this.subscriptions();
+        this.gameRecordService.timeStart = Date.now();
     }
 
     startRewind(): void {
@@ -139,7 +140,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     subscriptions(): void {
         this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
             if (newValue) {
-                new ShowDiffRecord(this.currentTimer, newValue).record(this.gameRecordService);
+                new ShowDiffRecord(newValue).record(this.gameRecordService);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
             }
         });
@@ -176,12 +177,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
-                new ShowDiffRecord(this.currentTimer, diff, this.mousePosition, true).record(this.gameRecordService);
-                new GameMessageEvent(this.currentTimer, this.gameService.sendFoundMessage()).record(this.gameRecordService);
+                new ShowDiffRecord(diff, this.mousePosition, true).record(this.gameRecordService);
+                new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
                 this.gameService.handleDifferenceFound();
             } else {
-                new ShowNotADiffRecord(this.currentTimer, this.mousePosition).record(this.gameRecordService);
-                new GameMessageEvent(this.currentTimer, this.gameService.sendErrorMessage()).record(this.gameRecordService);
+                new ShowNotADiffRecord(this.mousePosition).record(this.gameRecordService);
+                new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
             }
         }
     }
@@ -279,8 +280,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (document.activeElement === chatBox) return;
 
         this.isCheating = !this.isCheating;
-        if (this.isCheating) new StartCheatModeRecord(this.currentTimer).record(this.gameRecordService);
-        else new StopCheatModeRecord(this.currentTimer).record(this.gameRecordService);
+        if (this.isCheating) new StartCheatModeRecord().record(this.gameRecordService);
+        else new StopCheatModeRecord().record(this.gameRecordService);
     }
 
     cheatModeKeyBinding(): number {

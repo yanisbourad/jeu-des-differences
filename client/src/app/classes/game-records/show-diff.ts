@@ -5,17 +5,17 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 export class ShowDiffRecord extends GameRecordCommand {
     diff: Set<number>;
     position: Point;
-    isMeHowFound: boolean;
+    isMeWhoFound: boolean;
     // eslint-disable-next-line max-params
-    constructor(gameTime: number, diff: Set<number>, position: Point = { x: 0, y: 0 }, isMeHowFound: boolean = false) {
-        super(gameTime);
+    constructor(diff: Set<number>, position: Point = { x: 0, y: 0 }, isMeWhoFound: boolean = false) {
+        super();
         this.diff = diff;
         this.position = position;
-        this.isMeHowFound = isMeHowFound;
+        this.isMeWhoFound = isMeWhoFound;
     }
 
     do(component: GamePageComponent): void {
-        if (this.isMeHowFound) {
+        if (this.isMeWhoFound) {
             component.showDifferenceFoundByMe(this.diff, this.position);
         } else {
             component.drawDifference(this.diff);

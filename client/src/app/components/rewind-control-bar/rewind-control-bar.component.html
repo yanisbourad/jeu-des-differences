@@ -4,8 +4,8 @@
   <select class="form-control" [(ngModel)]="speed" (change)="updateSpeed()">
     <option *ngFor="let speed of speeds" [ngValue]="speed">{{speed}}</option>
   </select>
-  <!-- lets do a process bar -->
+
   <progress #myProgressBar [value]="process" max="100"></progress>
 
-  <button type="button" class="btn btn-primary" (click)="redirect()">Sortir</button>
+  <button type="button" class="btn btn-primary" (click)="redirect()">Sortie</button>
 </div>

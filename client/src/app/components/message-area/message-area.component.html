@@ -22,6 +22,6 @@
         </textarea>
     </div>
     <div class="container">
-        <button mat-raised-button class="send-btn" (click)="sendMessage()" [disabled]= "gameService.gameType === 'solo'" >Envoyer</button>
+        <button mat-raised-button class="send-btn" (click)="sendMessage()" [disabled]= "gameService.gameType === 'solo' || !notRewinding" >Envoyer</button>
     </div>
 </div>

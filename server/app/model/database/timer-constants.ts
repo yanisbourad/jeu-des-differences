@@ -1,3 +1,4 @@
+import { SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber } from 'class-validator';
 
@@ -14,3 +15,5 @@ export class TimerConstantsModel {
     @IsNumber()
     timeBonus: number;
 }
+
+export const timerConstantsShema = SchemaFactory.createForClass(TimerConstantsModel);

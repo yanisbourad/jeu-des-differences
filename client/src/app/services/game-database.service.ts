@@ -65,4 +65,8 @@ export class GameDatabaseService {
     updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {
         return this.http.put(`${this.baseUrl}/game/constants`, constants, { observe: 'response', responseType: 'text' });
     }
+
+    getConstants(): Observable<TimeConfig> {
+        return this.http.get<TimeConfig>(`${this.baseUrl}/game/constants`);
+    }
 }

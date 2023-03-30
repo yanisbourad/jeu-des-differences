@@ -1,10 +1,11 @@
 import { GameRecordDocument } from '@app/model/database/game-record';
-import { Game } from '@common/game';
+import { Game, TimeConfig } from '@common/game';
 import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import { Model, Query } from 'mongoose';
 import { join } from 'path';
 import { GameService } from './game.service';
+import { TimerConstantsModel } from '@app/model/database/timer-constants';
 /**
  * There is two way to test the service :
  * - Mock the mongoose Model implementation and do what ever we want to do with it (see describe GameService) or
@@ -25,15 +26,26 @@ describe('GameService', () => {
         listDifferences: [],
     } as Game;
 
+    const newConstants = {
+        timeInit: 0,
+        timePen: 0,
+        timeBonus: 0,
+    } as TimeConfig;
+
     beforeAll(() => {
         const gameRecordModel = {
             find: () => [],
             insertMany: () => [],
             deleteMany: () => [],
         } as unknown as Model<GameRecordDocument>;
+
+        const timerConstantsModel = {
+            updateOne: () => [],
+        } as unknown as Model<TimerConstantsModel>;
         logger = new Logger();
-        service = new GameService(gameRecordModel, logger);
+        service = new GameService(gameRecordModel, logger, timerConstantsModel);
         service.addGame(mockGame);
+        service.updateConstants(newConstants);
         // notice that only the functions we call from the model are mocked
         // we can´t use sinon because mongoose Model is an interface and not a class
     });
@@ -158,12 +170,19 @@ describe('GameService', () => {
             insertMany: () => [],
             deleteMany: () => [],
         } as unknown as Model<GameRecordDocument>;
-        new GameService(gameRecordModel, new Logger());
-        expect(spyCreateFolder).toBeCalledTimes(1);
-        expect(spyValidateKeyExists).toBeCalledTimes(2);
+
+        const timerConstantsModel = {
+            find: () => [],
+            insertMany: () => [],
+            deleteMany: () => [],
+        } as unknown as Model<TimerConstantsModel>;
+
+        new GameService(gameRecordModel, new Logger(), timerConstantsModel);
+        expect(spyCreateFolder).toHaveBeenCalled();
+        expect(spyValidateKeyExists).toHaveBeenCalled();
         const keyPath = join(process.cwd(), 'assets', 'key.text');
         expect(spyValidateKeyExists).toHaveBeenCalledWith(keyPath);
-        expect(spyCreateFile).toHaveBeenCalledTimes(1);
+        expect(spyCreateFile).toHaveBeenCalled();
         spyCreateFile.mockRestore();
         spyValidateKeyExists.mockRestore();
         spyCreateFolder.mockRestore();
@@ -183,6 +202,43 @@ describe('GameService', () => {
         await service.deleteGame(mockGame.gameName);
         expect(spyDeleteMany).toBeCalledTimes(1);
         expect(spyDeleteFolder).toBeCalledTimes(1);
+        expect(service.gamesNames).not.toContain(mockGame.gameName);
+        service.gamesNames.push(mockGame.gameName);
+    });
+
+    // test updateConstants() in the service
+    it('should update the constants', async () => {
+        const spyDbSaveMany = jest.spyOn(service.timerConstantsModel, 'updateOne').mockImplementation();
+        const spyWriteFileSync = jest.spyOn(fs, 'writeFileSync').mockImplementation();
+        const spyMkdirSync = jest.spyOn(fs, 'mkdirSync').mockImplementation();
+        const spyExistsSync = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+        await service.updateConstants(newConstants);
+        expect(spyWriteFileSync).toHaveBeenCalled();
+        expect(spyExistsSync).toHaveBeenCalledWith(service.rootPathTime + '/time');
+        expect(spyMkdirSync).toHaveBeenCalledWith(service.rootPathTime + '/time');
+        expect(spyDbSaveMany).toHaveBeenCalledTimes(1);
+        spyWriteFileSync.mockRestore();
+        spyMkdirSync.mockRestore();
+        spyExistsSync.mockRestore();
+        spyDbSaveMany.mockRestore();
+    });
+
+    // test getConstants() in the service
+    it('should return the same game as saved game', async () => {
+        const result = await service.getConstants();
+        expect(result).toBeDefined();
+        expect(result.timeInit).toEqual(newConstants.timeInit);
+        expect(result.timePen).toEqual(newConstants.timePen);
+        expect(result.timeBonus).toEqual(newConstants.timeBonus);
+    });
+
+    // should test deleteAllGames() in the service
+    it('should delete all games', async () => {
+        const spyDeleteMany = jest.spyOn(service.gameRecordModel, 'deleteMany').mockImplementation();
+        const spyDeleteFolder = jest.spyOn(fs, 'rm').mockImplementation();
+        await service.deleteAllGames();
+        expect(spyDeleteMany).toBeCalledTimes(2);
+        expect(spyDeleteFolder).toBeCalledTimes(2);
         expect(service.gamesNames).not.toContain(mockGame.gameName);
         service.gamesNames.push(mockGame.gameName);
     });

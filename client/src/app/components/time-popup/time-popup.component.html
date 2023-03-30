@@ -6,7 +6,8 @@
             <p class = "time">{{timer1}} s</p>
             <div class = "buttonContainer">
                 <button [disabled]="this.timer1===0" class = "lessTime" (click) = "decrementTime1()"> <p>-</p> </button>
-                <button class = "addButton" (click) = "incrementTime1()"> + </button>
+                <button [disabled]="this.timer1=== maxInitTime" class = "addButton" (click) = "incrementTime1()"> + </button>
+                <p>La valeur doit êre comprise entre 0 et {{maxInitTime}} secondes</p>
             </div>
         </div>
         <div class = "section" id = "second">
@@ -14,7 +15,8 @@
             <p class = "time2">{{timer2}} s</p>
             <div class = "buttonContainer">
                 <button [disabled]="this.timer2===0" class = "lessTime" (click) = "decrementTime2()"> <p>-</p> </button>
-                <button class = "addButton" (click) = "incrementTime2()"> + </button>
+                <button [disabled]="this.timer2=== maxPenaltyTime" class = "addButton" (click) = "incrementTime2()"> + </button>
+                <p>La valeur doit êre comprise entre 0 et {{maxPenaltyTime}} secondes</p>
             </div>
         </div>
         <div class = "section" id = "third">
@@ -22,14 +24,15 @@
             <p class = "time2">{{timer3}} s</p>
             <div class = "buttonContainer">
                 <button [disabled]="this.timer3===0" class = "lessTime" id = "buttonTime3" (click) = "decrementTime3()"> <p>-</p> </button>
-                <button class = "addButton" (click) = "incrementTime3()"> + </button>
+                <button [disabled]="this.timer3=== maxBonusTime" class = "addButton" (click) = "incrementTime3()"> + </button>
+                <p>La valeur doit êre comprise entre 0 et {{maxBonusTime}} secondes</p>
             </div>
         </div>
         
     </div>
     <div class = "buttonContainer2">
         <button class = "bottomButtons" id = "cancelButton" (click)="onNoClick()">Annuler</button>
-        <button class = "bottomButtons" id = "modifyButton">Modifier</button>
+        <button class = "bottomButtons" id = "modifyButton" (click)="onModify()">Modifier</button>
     </div>
 </div>
 

@@ -14,15 +14,18 @@ export class GameService {
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
     rootPath = join(process.cwd(), 'assets', 'games');
-    rootPathConstant = join(process.cwd(), 'assets', 'constants');
+    rootPathTime = join(process.cwd(), 'assets', 'time');
 
     constructor(
         @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
         private readonly logger: Logger,
-        @InjectModel(TimerConstantsModel.name) private readonly timerConstantsModel: Model<TimerConstantsModel>,
+        @InjectModel(TimerConstantsModel.name) public timerConstantsModel: Model<TimerConstantsModel>,
     ) {
         if (!fs.existsSync(this.rootPath)) {
             fs.mkdirSync(this.rootPath);
+        }
+        if (!fs.existsSync(this.rootPathTime)) {
+            fs.mkdirSync(this.rootPathTime);
         }
         this.gamesNames = fs.readdirSync(this.rootPath);
         this.loadKeyForThisServer();
@@ -136,9 +139,23 @@ export class GameService {
         });
     }
 
-    // i want to update the values of the constants in the database with the new one in the body
     async updateConstants(newConstants: TimeConfig): Promise<void> {
-        this.createFile(this.rootPathConstant, 'infoTime.json', JSON.stringify(newConstants));
+        this.createFileTime('time', 'infoTime.json', JSON.stringify(newConstants));
         await this.timerConstantsModel.updateOne({}, newConstants, { upsert: true });
+    }
+
+    async getConstants(): Promise<TimeConfig> {
+        return JSON.parse(this.getFileTime('time', 'infoTime.json')) as TimeConfig;
+    }
+
+    createFileTime(dirName: string, fileName: string, data: string): void {
+        if (!fs.existsSync(`${this.rootPathTime}/${dirName}`)) {
+            fs.mkdirSync(`${this.rootPathTime}/${dirName}`);
+        }
+        fs.writeFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, data, 'utf8');
+    }
+
+    getFileTime(dirName: string, fileName: string): string {
+        return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
     }
 }

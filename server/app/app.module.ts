@@ -10,7 +10,7 @@ import { GameService } from './services/game/game.service';
 import { PlayerService } from './services/player/player-service';
 import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
 import { ServerTimeService } from './services/time/server-time.service';
-import { TimerConstantsModel } from '@app/model/database/timer-constants';
+import { TimerConstantsModel, timerConstantsShema } from '@app/model/database/timer-constants';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -23,7 +23,7 @@ import { TimerConstantsModel } from '@app/model/database/timer-constants';
         }),
         MongooseModule.forFeature([
             { name: GameRecord.name, schema: gameRecordSchema },
-            { name: TimerConstantsModel.name, schema: TimerConstantsModel },
+            { name: TimerConstantsModel.name, schema: timerConstantsShema },
         ]),
         GameCardHandlerModule,
     ],

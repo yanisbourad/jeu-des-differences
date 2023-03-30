@@ -13,7 +13,7 @@ export class GameRecordService {
         private readonly gameService: GameService,
     ) {}
 
-    async getAllGameRecord(): Promise<unknown> {
+    async getAllGameRecord(): Promise<GameRecord[]> {
         return await this.gameRecordModel.find().exec();
     }
 
@@ -23,6 +23,15 @@ export class GameRecordService {
             await this.gameRecordModel.create(record);
         } catch (error) {
             return Promise.reject(`Failed to insert Game: ${error}`);
+        }
+    }
+
+    async deleteGameRecords(): Promise<void> {
+        try {
+            const response = await this.gameRecordModel.deleteMany({});
+            if (response.deletedCount) this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully`);
+        } catch (error) {
+            return Promise.reject(`Failed to delete Game: ${error}`);
         }
     }
 }

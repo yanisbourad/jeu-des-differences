@@ -4,11 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameRecordController } from './controllers/game-record/game-record.constroller';
 import { GameController } from './controllers/game/game.controller';
+import { GamingHistoryController } from './controllers/gaming-history/gaming-history-controller';
+import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
+import { GamingHistory, gamingHistorySchema } from './model/database/gaming-history';
 import { GameRecordService } from './services/game-record/game-record.service';
 import { GameService } from './services/game/game.service';
 import { PlayerService } from './services/player/player-service';
-import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
 import { ServerTimeService } from './services/time/server-time.service';
 @Module({
     imports: [
@@ -20,10 +22,13 @@ import { ServerTimeService } from './services/time/server-time.service';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: GameRecord.name, schema: gameRecordSchema }]),
+        MongooseModule.forFeature([
+            { name: GameRecord.name, schema: gameRecordSchema },
+            { name: GamingHistory.name, schema: gamingHistorySchema },
+        ]),
         GameCardHandlerModule,
     ],
-    controllers: [GameRecordController, GameController],
+    controllers: [GameRecordController, GameController, GamingHistoryController],
     providers: [ChatGateway, GameService, GameRecordService, Logger, PlayerService, ServerTimeService],
 })
 export class AppModule {}

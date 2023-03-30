@@ -11,5 +11,7 @@
   </ng-template>
   <div mat-dialog-actions >
     <button class={{type}} mat-raised-button mat-dialog-close color="primary" (click)="redirection()">Ok</button>
+    <button *ngIf="type === 'finished'" class={{type}} mat-raised-button mat-dialog-close color="primary" (click)="rewindGame()">Revoire La Partie</button>
+
   </div>
 </div>

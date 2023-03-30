@@ -1,4 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
+import { Message } from '@app/interfaces/message';
+import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
@@ -19,7 +22,13 @@ export class MessageAreaComponent implements OnInit {
     defaultColor: string[];
     position: string[];
     roomName: string = '';
-    constructor(readonly socketClient: SocketClientService, readonly gameService: GameService) {}
+    notRewinding: boolean = true;
+    constructor(readonly socketClient: SocketClientService, readonly gameService: GameService, private gameRecorderService: GameRecorderService) {}
+
+    set isNotRewinding(value: boolean) {
+        this.notRewinding = value;
+    }
+
     ngOnInit() {
         this.playerInitials = this.playerName[1];
         this.defaultColor = ['#69bd84', '#6ca2c7'];
@@ -48,11 +57,16 @@ export class MessageAreaComponent implements OnInit {
             pos: this.position[1],
             event: false,
         });
+        // no idea why this is here
         this.socketClient.messageList.push();
         this.message = '';
     }
 
-    addMessage(message: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }) {
+    addMessage(message: Message) {
+        new GameMessageEvent(this.socketClient.getRoomTime(this.socketClient.getRoomName()), message).record(this.gameRecorderService);
+    }
+
+    pushMessage(message: Message) {
         this.socketClient.messageList.push(message);
     }
 

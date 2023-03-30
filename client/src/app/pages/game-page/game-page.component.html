@@ -30,5 +30,7 @@
     </div>
     <div class="message">
         <app-message-area #chatComponent id="chat" [playerName]="this.gameService.playerName"></app-message-area>
+        <button *ngIf="notRewinding" (click)="startRewind()">Start Rewinding</button>
     </div>
 </div>
+<app-rewind-control-bar *ngIf="!notRewinding" #rewindControlBar></app-rewind-control-bar>

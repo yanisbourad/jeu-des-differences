@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="container">
-        <textarea id ="chat-box" [disabled]= "gameService.gameType === 'solo'" type="text" maxlength="200" cols="40"  
+        <textarea id ="chat-box" [disabled]= "gameService.gameType === 'solo' || !notRewinding" type="text" maxlength="200" cols="40"  
          rows="5"  placeholder="Écrire à {{gameService.opponentName}}… (200 caractères maximum)" [(ngModel)]="message">
         </textarea>
     </div>

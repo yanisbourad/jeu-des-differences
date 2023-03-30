@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
 import { Subject } from 'rxjs';
@@ -9,7 +10,12 @@ import { Subject } from 'rxjs';
 })
 export class SocketClientService {
     roomName: string = '';
+
+    // Mange the message list
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
+    messageToAdd = new Subject<GameMessageEvent>();
+    messageToAdd$ = this.messageToAdd.asObservable();
+
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
@@ -27,6 +33,10 @@ export class SocketClientService {
 
     get socketId() {
         return this.socketClient.socket.id ? this.socketClient.socket.id : '';
+    }
+
+    set gameTime(gameTime: number) {
+        this.elapsedTimes.set(this.roomName, gameTime);
     }
 
     connect() {
@@ -65,14 +75,17 @@ export class SocketClientService {
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
             if (data) {
-                this.messageList.push({
-                    message: data.message,
-                    userName: data.userName,
-                    mine: false,
-                    color: data.color,
-                    pos: data.pos,
-                    event: data.event,
-                });
+                // TODO: Validate the getRoomTime(this.roomName) is correct
+                this.messageToAdd.next(
+                    new GameMessageEvent(this.getRoomTime(this.roomName), {
+                        message: data.message,
+                        userName: data.userName,
+                        mine: false,
+                        color: data.color,
+                        pos: data.pos,
+                        event: data.event,
+                    }),
+                );
             }
         });
 

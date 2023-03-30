@@ -1,18 +1,36 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { GameRecordCommand } from '@app/classes/game-record';
+import { BLINKING_TIME } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { Subject } from 'rxjs';
 import { GameService } from './game.service';
-
+import { SocketClientService } from './socket-client.service';
 @Injectable({
     providedIn: 'root',
 })
 export class GameRecorderService {
     gamePage: GamePageComponent;
     list: GameRecordCommand[] = [];
+    tempList: GameRecordCommand[] = [];
+    position = 0;
     action: GameRecordCommand | undefined;
     speed: number = 1;
-    constructor(private gameService: GameService, private router: Router) {}
+    paused: boolean = false;
+    myTimeout: ReturnType<typeof setTimeout> | undefined;
+    progress$ = new Subject<number>();
+
+    constructor(private gameService: GameService, private socketClient: SocketClientService) {
+        this.socketClient.messageToAdd$.subscribe((message) => {
+            this.do(message);
+        });
+    }
+
+    get currentTime(): number {
+        return this.socketClient.getRoomTime(this.socketClient.getRoomName());
+    }
+    get maxTime(): number {
+        return this.gameService.gameTime;
+    }
 
     // this will be used to set the speed of the rewind
     // the default speed is 1 second per second
@@ -21,6 +39,20 @@ export class GameRecorderService {
     // 2 means 2 seconds per second ...
     set rewindSpeed(speed: number) {
         this.speed = speed;
+        if (this.myTimeout) {
+            clearInterval(this.myTimeout);
+            this.lunchRewind();
+        }
+    }
+
+    set page(gamePage: GamePageComponent) {
+        this.gamePage = gamePage;
+        this.list = [];
+        this.position = 0;
+    }
+
+    togglePause() {
+        this.paused = !this.paused;
     }
 
     do(action: GameRecordCommand) {
@@ -31,52 +63,66 @@ export class GameRecorderService {
     // this will be used to start the rewind
     // will take the controls of the game
     // need to make all the user interactions blocked during the rewind
-    startRewind(gamePage: GamePageComponent) {
+    // will start the rewind from the beginning
+    startRewind(gamePage: GamePageComponent = this.gamePage) {
         this.gamePage = gamePage;
-
+        this.gamePage.initForRewind();
         if (this.list.length === 0) {
             alert('No actions to rewind');
             return;
         }
         // prepare the game for the rewind
-        this.gameService.gameTime = 0;
-        this.action = this.list.pop();
-
+        this.position = 0;
+        this.action = this.list[this.position++];
         // TODO: make this a constant
-        const oneSecond = 1000;
-        const myTimeout = setTimeout(() => {
-            if (this.list.length > 0) {
+        this.lunchRewind();
+    }
+
+    lunchRewind() {
+        clearInterval(this.myTimeout);
+        this.myTimeout = setInterval(() => {
+            if (this.position < this.list.length) {
                 this.tick();
             } else {
-                this.endRewind(myTimeout);
+                this.endRewind();
             }
-        }, oneSecond / this.speed);
+        }, BLINKING_TIME / this.speed);
+    }
+
+    stopRewind() {
+        clearInterval(this.myTimeout);
     }
 
     // this will be used to tick the rewind
     // will be called every second
     private tick(): void {
-        this.gameService.gameTime += 1;
-        if (this.gameService.gameTime === this.action?.gameTime) {
-            this.redo();
-            this.action = this.list.pop();
+        if (this.paused) return;
+        this.socketClient.gameTime = this.currentTime + 1;
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.progress$.next(Math.floor(this.currentTime * 100) / this.maxTime);
+        while (this.action) {
+            if (this.action.gameTime <= this.currentTime) {
+                this.redo();
+                this.action = this.list[this.position++];
+            } else break;
         }
     }
 
     // this will be used to end the rewind
     // will alert the user that the rewind is over
     // will redirect the user to the home page
-    private endRewind(myTimeout: ReturnType<typeof setTimeout>) {
-        clearTimeout(myTimeout);
-        alert('the game has been rewired');
-        this.router.navigate(['/home']);
+    private endRewind() {
+        clearInterval(this.myTimeout);
+        this.paused = true;
+        this.progress$.next(0);
+        this.startRewind();
     }
 
     private redo() {
         if (!this.action) return;
         this.action.do(this.gamePage);
     }
-
     // this will be used to record the actions
     // that the user performs
     // the actions will be stored in a list

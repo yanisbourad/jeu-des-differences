@@ -1,0 +1,26 @@
+.control-bar {
+  //make this div a long rectangle 
+  width: 90%;
+  height: fit-content;
+  // center this div horizontally
+  // make it be placed at the bottom of the screen
+  position: absolute;
+  bottom: 10px;
+  // make the background color black
+  background-color: black;
+  // make the text color white
+  color: white;
+  // make the text centered
+  text-align: center;
+  // make all the elements in this div be placed horizontally
+  // display: flex;
+  // flex-direction: row;
+  // align-items: center;
+  padding: 0 10px;
+  // add some margin a the sides and bottom of the div and center it
+  margin: 0 auto;
+
+  // make the border radius of the corners be 10px
+  border-radius: 10px;
+  // make the border be 1px wide and black
+}

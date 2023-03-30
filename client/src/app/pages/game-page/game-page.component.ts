@@ -1,13 +1,20 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
+import { ShowDiffRecord } from '@app/classes/game-records/show-diff';
+import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-difference';
+import { StartCheatModeRecord } from '@app/classes/game-records/start-cheat-mode';
+import { StopCheatModeRecord } from '@app/classes/game-records/stop-cheat-mode';
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import * as constantsTime from '@app/configuration/const-time';
+import { Message } from '@app/interfaces/message';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from '@app/services/draw.service';
+import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
 import { HotkeysService } from '@app/services/hotkeys.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -39,6 +46,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     diffFoundSubscription: Subscription = new Subscription();
     playerFoundDiffSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
+    notRewinding: boolean = true;
 
     // TODO: reduce the number of parameters + move some functions to service, the logic shouldn't be here!!
     // eslint-disable-next-line max-params
@@ -49,6 +57,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public dialog: MatDialog,
         public route: ActivatedRoute,
         readonly hotkeysService: HotkeysService,
+        private gameRecordService: GameRecorderService,
     ) {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
@@ -66,7 +75,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.gameService.gameTime;
     }
 
+    get currentTimer(): number {
+        return this.socket.getRoomTime(this.socket.roomName);
+    }
+
     ngOnInit(): void {
+        // needed for the rewind
+        this.gameRecordService.page = this;
         this.getRouterParams();
         this.gameService.getGame(this.gameService.gameName);
         this.loading();
@@ -88,14 +103,31 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.socket.sendRoomName(roomName);
             this.idEventList = this.cheatModeKeyBinding();
         }
-        this.drawService.setColor = 'yellow';
         this.subscriptions();
+    }
+
+    startRewind(): void {
+        this.initForRewind();
+        this.gameRecordService.startRewind();
+    }
+    initForRewind(): void {
+        this.notRewinding = false;
+        this.chat.isNotRewinding = false;
+        clearInterval(this.blinking);
+        this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
+        this.clearCanvas(this.canvas3.nativeElement, this.canvas0.nativeElement);
+        this.isCheating = false;
+        this.diffFoundSubscription.unsubscribe();
+        this.playerFoundDiffSubscription.unsubscribe();
+        this.gameStateSubscription.unsubscribe();
+        this.socket.disconnect();
+        if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
+        this.gameService.initRewind();
     }
 
     ngOnDestroy(): void {
         clearInterval(this.blinking);
         this.clearCanvas(this.canvas1.nativeElement, this.canvas2.nativeElement);
-        this.drawService.setColor = 'black';
         if (this.gameService.gameType === 'double') this.hotkeysService.removeHotkeysEventListener(this.idEventList);
         this.diffFoundSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
@@ -107,15 +139,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     subscriptions(): void {
         this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
             if (newValue) {
-                this.drawService.setColor = 'black';
-                this.drawDifference(newValue);
+                new ShowDiffRecord(this.currentTimer, newValue).record(this.gameRecordService);
                 this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, newValue));
-                this.drawService.setColor = 'yellow';
             }
         });
 
         this.gameStateSubscription = this.socket.gameState$.subscribe((newValue) => {
             const opponentName: string = this.gameService.opponentName;
+            this.gameService.gameTime = this.currentTimer;
             const msg: string = 'Vous avez perdu la partie, le vainqueur est : ' + opponentName;
             if (newValue === true && this.socket.statusPlayer !== this.gameService.playerName) {
                 this.gameService.displayGameEnded(msg, 'finished');
@@ -123,11 +154,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         });
 
-        this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
-            if (newValue === this.gameService.opponentName) {
-                this.gameService.handlePlayerDifference();
-            }
-        });
+        // this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
+        //     if (newValue === this.gameService.opponentName) {
+        //         // this.gameService.handlePlayerDifference();
+        //         console.log('player found diff handled by ShowDiffRecord');
+        //     }
+        // });
     }
 
     getRouterParams(): void {
@@ -139,33 +171,35 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     mouseHitDetect(event: MouseEvent): void {
-        if (event.button === MouseButton.Left && !this.errorPenalty) {
+        if (event.button === MouseButton.Left && !this.errorPenalty && this.notRewinding) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
             const diff = this.unfoundedDifference.find((set) => set.has(distMousePosition));
             if (diff) {
-                this.showDifferenceFoundByMe(diff, this.mousePosition);
+                new ShowDiffRecord(this.currentTimer, diff, this.mousePosition, true).record(this.gameRecordService);
+                new GameMessageEvent(this.currentTimer, this.gameService.sendFoundMessage()).record(this.gameRecordService);
+                this.gameService.handleDifferenceFound();
             } else {
-                this.showErrorNotADifference(this.mousePosition);
+                new ShowNotADiffRecord(this.currentTimer, this.mousePosition).record(this.gameRecordService);
+                new GameMessageEvent(this.currentTimer, this.gameService.sendErrorMessage()).record(this.gameRecordService);
             }
         }
     }
 
+    // called from the record service ShowDiffRecord
     showDifferenceFoundByMe(diff: Set<number>, mousePosition: Vec2): void {
-        this.drawService.setColor = 'yellow';
         this.displayWord('Trouvé', mousePosition);
-        this.drawDifference(diff);
+        this.drawDifference(diff, 'yellow');
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => set !== diff);
+        this.gameService.reduceNbrDifferences();
         this.socket.sendDifference(diff, this.socket.getRoomName());
-        this.gameService.sendFoundMessage();
-        this.gameService.handleDifferenceFound();
         this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
     }
 
+    // called from the record service ShowNotADiffRecord
     showErrorNotADifference(mousePosition: Vec2): void {
         this.errorPenalty = true;
         this.displayWord('Erreur', mousePosition);
-        this.gameService.sendErrorMessage();
         this.clearCanvas(this.canvas0.nativeElement, this.canvas3.nativeElement);
     }
 
@@ -187,7 +221,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    drawDifference(diff: Set<number>, isCheating: boolean = false): void {
+    drawDifference(diff: Set<number>, color: string = 'black', isCheating: boolean = false): void {
+        const tempColor = this.drawService.getColor;
+        this.drawService.setColor = color;
         if (!isCheating) {
             this.drawService.drawDiff(diff, this.canvas1.nativeElement);
             this.drawService.drawDiff(diff, this.canvas2.nativeElement);
@@ -195,6 +231,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.drawService.drawDiff(diff, this.canvasCheat0.nativeElement);
             this.drawService.drawDiff(diff, this.canvasCheat1.nativeElement);
         }
+        this.drawService.setColor = tempColor;
     }
 
     clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
@@ -222,10 +259,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     cheatMode(): void {
+        let color = 'black';
         this.blinking = setInterval(() => {
-            this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
+            color = color === 'black' ? 'yellow' : 'black';
             for (const set of this.unfoundedDifference) {
-                this.drawDifference(set, true);
+                this.drawDifference(set, color, true);
             }
         }, constantsTime.BLINKING_TIMEOUT);
     }
@@ -241,8 +279,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (document.activeElement === chatBox) return;
 
         this.isCheating = !this.isCheating;
-        if (this.isCheating) this.cheatMode();
-        else this.stopCheatMode();
+        if (this.isCheating) new StartCheatModeRecord(this.currentTimer).record(this.gameRecordService);
+        else new StopCheatModeRecord(this.currentTimer).record(this.gameRecordService);
     }
 
     cheatModeKeyBinding(): number {
@@ -256,5 +294,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 return set2.has(x);
             })
         );
+    }
+
+    showMessage(message: Message): void {
+        this.chat.pushMessage(message);
     }
 }

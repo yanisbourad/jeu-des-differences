@@ -6,6 +6,7 @@ import * as constants from '@app/configuration/const-canvas';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
+import { Message } from '@app/interfaces/message';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
@@ -83,6 +84,13 @@ export class GameService {
         });
     }
 
+    initRewind(): void {
+        this.socket.gameTime = 0;
+        this.totalDifferences = this.gameInformation.nDifferences;
+        this.differencesArray = new Array(this.totalDifferences);
+        this.opponentDifferencesArray = new Array(this.totalDifferences);
+        this.playersName = [this.playerName, this.opponentName];
+    }
     displayIcons(): void {
         if (this.gameType === 'solo') {
             for (let i = 0; i < this.totalDifferences; i++) {
@@ -127,35 +135,36 @@ export class GameService {
         this.totalDifferences = 0;
         this.differencesArray = [];
         this.opponentDifferencesArray = [];
-        this.playerName = '';
-        this.playersName = [];
-        this.opponentName = '';
+        // this.playerName = '';
+        // this.playersName = [];
+        // this.opponentName = '';
         this.gameId = '';
-        this.gameName = '';
-        this.gameTime = 0;
-        this.gameType = '';
+        // this.gameName = '';
+        // this.gameTime = 0;
+        // this.gameType = '';
         this.nDifferencesFound = 0;
         this.socket.messageList = [];
-        this.game = {
-            gameName: '',
-            difficulty: '',
-            originalImageData: './assets/image_empty.bmp',
-            modifiedImageData: './assets/image_empty.bmp',
-            listDifferences: [],
-        };
-        this.gameInformation = {
-            gameTitle: '',
-            gameMode: '',
-            gameDifficulty: '',
-            nDifferences: 0,
-        };
+        // this.game = {
+        //     gameName: '',
+        //     difficulty: '',
+        //     originalImageData: './assets/image_empty.bmp',
+        //     modifiedImageData: './assets/image_empty.bmp',
+        //     listDifferences: [],
+        // };
+        // this.gameInformation = {
+        //     gameTitle: '',
+        //     gameMode: '',
+        //     gameDifficulty: '',
+        //     nDifferences: 0,
+        // };
     }
 
-    handleDifferenceFound(): void {
+    reduceNbrDifferences(): void {
         this.nDifferencesFound++;
         this.differencesArray.pop();
         this.differencesArray.unshift(this.path.differenceFound);
-
+    }
+    handleDifferenceFound(): void {
         switch (this.gameType) {
             case 'solo':
                 this.handleSoloDifference();
@@ -208,7 +217,7 @@ export class GameService {
         return this.nDifferencesFound === (this.totalDifferences + 1) / 2;
     }
 
-    sendFoundMessage(): void {
+    sendFoundMessage(): Message {
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée';
         if (this.gameType === 'double') {
             this.message = this.message + ' par ' + this.playerName;
@@ -222,17 +231,25 @@ export class GameService {
             event: true,
         };
         this.socket.sendMessage(foundMessage);
-        this.socket.messageList.push({
+        return {
             message: foundMessage.message,
             userName: foundMessage.playerName,
             mine: true,
             color: foundMessage.color,
             pos: foundMessage.pos,
             event: foundMessage.event,
-        });
+        };
+        // new GameMessageEvent(this.gameTime, {
+        //     message: foundMessage.message,
+        //     userName: foundMessage.playerName,
+        //     mine: true,
+        //     color: foundMessage.color,
+        //     pos: foundMessage.pos,
+        //     event: foundMessage.event,
+        // }).record(this.gameRecorderService);
     }
 
-    sendErrorMessage(): void {
+    sendErrorMessage(): Message {
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Erreur';
         if (this.gameType === 'double') {
             this.message = this.message + ' par ' + this.playerName;
@@ -246,14 +263,23 @@ export class GameService {
             event: true,
         };
         this.socket.sendMessage(errorMessage);
-        this.socket.messageList.push({
+
+        return {
             message: errorMessage.message,
             userName: errorMessage.playerName,
             mine: true,
             color: errorMessage.color,
             pos: errorMessage.pos,
             event: errorMessage.event,
-        });
+        };
+        // new GameMessageEvent(this.gameTime, {
+        //     message: errorMessage.message,
+        //     userName: errorMessage.playerName,
+        //     mine: true,
+        //     color: errorMessage.color,
+        //     pos: errorMessage.pos,
+        //     event: errorMessage.event,
+        // }).record(this.gameRecorderService);
     }
 
     endGame(): void {

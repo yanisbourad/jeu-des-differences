@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { AfterContentChecked, Component, Input } from '@angular/core';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import * as constants from '@app/configuration/const-time';
 import { TimeConfig } from '@common/game';
@@ -10,13 +10,14 @@ import { VerificationFeedbackComponent } from '@app/components/verification-feed
     templateUrl: './time-popup.component.html',
     styleUrls: ['./time-popup.component.scss'],
 })
-export class TimePopupComponent {
+export class TimePopupComponent implements AfterContentChecked {
     @Input() timer1: number = constants.INIT_TIME;
     @Input() timer2: number = constants.PENALTY_TIME;
     @Input() timer3: number = constants.BONUS_TIME;
     maxInitTime = constants.MAX_INIT_TIME;
     maxPenaltyTime = constants.MAX_PENALTY_TIME;
     maxBonusTime = constants.MAX_BONUS_TIME;
+    isReset: boolean;
     message: string = 'êtes-vous sur de vouloir reinitialiser les constantes de jeu?';
     constructor(public dialogRef: MatDialogRef<TimePopupComponent>, readonly gameDatabaseService: GameDatabaseService, public dialog: MatDialog) {
         this.gameDatabaseService.getConstants().subscribe((res: TimeConfig) => {
@@ -24,6 +25,16 @@ export class TimePopupComponent {
             this.timer2 = res.timePen;
             this.timer3 = res.timeBonus;
         });
+        this.isReset = false;
+    }
+    ngAfterContentChecked(): void {
+        if (this.isReset) {
+            this.gameDatabaseService.getConstants().subscribe((res: TimeConfig) => {
+                this.timer1 = res.timeInit;
+                this.timer2 = res.timePen;
+                this.timer3 = res.timeBonus;
+            });
+        }
     }
 
     incrementTime1() {
@@ -65,6 +76,7 @@ export class TimePopupComponent {
             timeBonus: constants.BONUS_TIME,
         };
         this.gameDatabaseService.updateConstants(newConstants).subscribe();
+        this.isReset = true;
     }
 
     launchFeedback(showedMessage: string): void {
@@ -75,7 +87,7 @@ export class TimePopupComponent {
             })
             .afterClosed()
             .subscribe(() => {
-                this.onNoClick();
+                this.isReset = false;
             });
     }
 }

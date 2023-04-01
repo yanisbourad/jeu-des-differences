@@ -2,7 +2,7 @@ import { GamingHistory } from '@app/model/database/gaming-history';
 import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 import { GameRecordService } from '@app/services/game-record/game-record.service';
 import { Body, Controller, Delete, Get, HttpStatus, Post, Res } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConflictResponse, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('GamingHistory')
@@ -27,28 +27,28 @@ export class GamingHistoryController {
         }
     }
 
-    @ApiOkResponse({
+    @ApiCreatedResponse({
         description: 'Create gameHistory',
         type: GamingHistory,
     })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
+    @ApiConflictResponse({
+        description: 'Return CONFLICT http status when request fails',
     })
     @Post('/create')
     async createGamingHistory(@Body() gameRecord: CreateGamingHistoryDto, @Res() response: Response) {
         try {
             const res = await this.gamesRecordService.addGamingHistory(gameRecord);
-            response.status(HttpStatus.OK).json(res);
+            response.status(HttpStatus.CREATED).json(res);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.CONFLICT).send(error.message);
         }
     }
 
     @ApiOkResponse({
         description: 'Delete gameHistory',
     })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
+    @ApiNoContentResponse({
+        description: 'Return NO_CONTENT http status when request fails',
     })
     @Delete('/')
     async deleteGame(@Res() response: Response) {
@@ -56,7 +56,7 @@ export class GamingHistoryController {
             await this.gamesRecordService.deleteGameRecords();
             response.status(HttpStatus.OK).json('Game deleted successfully');
         } catch (error) {
-            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+            response.status(HttpStatus.NO_CONTENT).send(error.message);
         }
     }
 }

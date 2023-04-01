@@ -31,12 +31,9 @@ describe('GamingHistoryController', () => {
             dateStart: 'test',
         };
     });
-
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
-
-    // test for allGames()
     it('should return all gaming History', async () => {
         jest.spyOn(gameRecordService, 'getAllGamingHistory').mockImplementation(async () => {
             return Promise.resolve([stubGamingHistory]);
@@ -53,7 +50,6 @@ describe('GamingHistoryController', () => {
         await controller.allGames(res);
         expect(gameRecordService.getAllGamingHistory).toHaveBeenCalled();
     });
-
     it('should return NOT_FOUND http status when request fails', async () => {
         jest.spyOn(gameRecordService, 'getAllGamingHistory').mockRejectedValueOnce(new Error('test error'));
         const res = {} as unknown as Response;
@@ -114,7 +110,6 @@ describe('GamingHistoryController', () => {
         await controller.deleteGame(res);
         expect(gameRecordService.deleteGameRecords).toHaveBeenCalled();
     });
-
     it('Should return NO_CONTENT when nothing is deleted', async () => {
         jest.spyOn(gameRecordService, 'deleteGameRecords').mockImplementation(async () => Promise.reject(new Error('test error')));
         const res = {} as unknown as Response;
@@ -130,6 +125,4 @@ describe('GamingHistoryController', () => {
         await controller.deleteGame(res);
         expect(gameRecordService.deleteGameRecords).toHaveBeenCalled();
     });
-
-
 });

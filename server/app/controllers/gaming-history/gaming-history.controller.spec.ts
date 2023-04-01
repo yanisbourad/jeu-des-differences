@@ -69,6 +69,37 @@ describe('GamingHistoryController', () => {
         await controller.allGames(res);
         expect(gameRecordService.getAllGamingHistory).toHaveBeenCalled();
     });
+    it('should create a gaming history', async () => {
+        jest.spyOn(gameRecordService, 'addGamingHistory').mockImplementation(async () => Promise.resolve());
+        const res = {} as unknown as Response;
+        res.status = () => {
+            return res;
+        };
+        res.json = (message) => {
+            expect(message).toEqual(res);
+            return res;
+        };
+        res.send = () => res;
+        await controller.createGamingHistory(stubGamingHistory, res);
+        expect(gameRecordService.addGamingHistory).toHaveBeenCalled();
+    });
+    it('should not create a gaming history and return 409 status code', async () => {
+        jest.spyOn(gameRecordService, 'addGamingHistory').mockImplementation(() => {
+            throw new Error('test error');
+        });
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toBe(HttpStatus.CONFLICT);
+            return res;
+        };
+        res.json = (message) => {
+            expect(message).toEqual('test error');
+            return res;
+        };
+        res.send = () => res;
+        await controller.createGamingHistory(stubGamingHistory, res);
+        expect(gameRecordService.addGamingHistory).toHaveBeenCalled();
+    });
 
 
 });

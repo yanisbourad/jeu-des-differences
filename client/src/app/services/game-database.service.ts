@@ -51,6 +51,9 @@ export class GameDatabaseService {
     deleteGamingHistory(): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });
     }
+    deleteGameRecords(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gameRecord`, { observe: 'response', responseType: 'text' });
+    }
 
     saveGame(_gameName: string): EventEmitter<boolean> {
         const game: Game = {

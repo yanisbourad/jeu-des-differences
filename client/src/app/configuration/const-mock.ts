@@ -22,16 +22,18 @@ export const MOCK_CARDS = [
 export const MOCK_GAME_RECORDS = [
     {
         gameName: 'difference 1',
-        typeGame: 'multi',
-        time: '1:23',
-        playerName: 'joueur 1',
         dateStart: '2023-01-01',
+        time: '1:23',
+        gameType: 'multi',
+        playerName: 'joueur 1',
+        opponentName: 'joueur 2',
     },
     {
-        gameName: 'difference 1',
-        typeGame: 'multi',
-        time: '1:24',
-        playerName: 'joueur 1',
+        gameName: 'difference EE',
         dateStart: '2023-01-01',
+        time: '1:23',
+        gameType: 'multi',
+        playerName: 'joueur 1',
+        opponentName: 'joueur 2',
     },
 ];

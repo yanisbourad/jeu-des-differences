@@ -11,7 +11,7 @@ export class GamingHistory {
 
     @ApiProperty()
     @Prop({ required: true })
-    typeGame: string;
+    dateStart: string;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -19,11 +19,15 @@ export class GamingHistory {
 
     @ApiProperty()
     @Prop({ required: true })
+    gameType: string;
+
+    @ApiProperty()
+    @Prop({ required: true })
     playerName: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    dateStart: string;
+    opponentName: string;
 }
 
 export const gamingHistorySchema = SchemaFactory.createForClass(GamingHistory);

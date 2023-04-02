@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import * as constantsMock from '@app/configuration/const-mock';
 import { GameDatabaseService } from '@app/services/game-database.service';
-import { GameRecord } from '@common/game';
+import { GamingHistory } from '@common/game';
 import { of } from 'rxjs';
 import { GamingHistoryComponent } from './gaming-history.component';
 
-const mockGameRecords: GameRecord[] = constantsMock.MOCK_GAME_RECORDS;
+const mockGameRecords: GamingHistory[] = constantsMock.MOCK_GAME_RECORDS;
 
 describe('GamingHistoryComponent', () => {
     let component: GamingHistoryComponent;

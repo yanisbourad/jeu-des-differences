@@ -25,10 +25,11 @@ describe('GamingHistoryController', () => {
         controller = module.get<GamingHistoryController>(GamingHistoryController);
         stubGamingHistory = {
             gameName: 'test',
-            typeGame: 'test',
-            time: 'test',
-            playerName: 'test',
             dateStart: 'test',
+            time: 'test',
+            gameType: 'test',
+            playerName: 'test',
+            opponentName: 'test',
         };
     });
     it('should be defined', () => {

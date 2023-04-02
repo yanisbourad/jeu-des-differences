@@ -8,7 +8,7 @@ export class CreateGamingHistoryDto {
 
     @ApiProperty()
     @IsString()
-    typeGame: string;
+    dateStart: string;
 
     @ApiProperty()
     @IsString()
@@ -16,9 +16,13 @@ export class CreateGamingHistoryDto {
 
     @ApiProperty()
     @IsString()
+    gameType: string;
+
+    @ApiProperty()
+    @IsString()
     playerName: string;
 
     @ApiProperty()
     @IsString()
-    dateStart: string;
+    opponentName: string;
 }

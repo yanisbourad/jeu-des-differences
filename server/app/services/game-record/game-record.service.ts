@@ -31,7 +31,10 @@ export class GameRecordService {
     }
     async deleteGameRecords(): Promise<void> {
         try {
-            this.gameService.deleteGameRecords();;
+            const response = await this.gameRecordModel.deleteMany({});
+            this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully`);
+            this.gameService.populateFakeGameRecords();
+            this.logger.log(`Fuction have been called ve been deleted successfully`);
         } catch (error) {
             return Promise.reject(`Failed to delete Game: ${error}`);
         }

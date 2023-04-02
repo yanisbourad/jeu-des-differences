@@ -20,10 +20,6 @@ export class GameRecordService {
     async getAllGameRecord(): Promise<GameRecord[]> {
         return await this.gameRecordModel.find().exec();
     }
-    async getAllGamingHistory(): Promise<GamingHistory[]> {
-        return await this.gamingHistoryModel.find().exec();
-    }
-
     async addGameRecord(record: CreateGameRecordDto): Promise<void> {
         try {
             record.gameName += this.gameService.getKey;
@@ -33,6 +29,16 @@ export class GameRecordService {
             return Promise.reject(`Failed to insert Game: ${error}`);
         }
     }
+    async deleteGameRecords(): Promise<void> {
+        try {
+            this.gameService.deleteGameRecords();;
+        } catch (error) {
+            return Promise.reject(`Failed to delete Game: ${error}`);
+        }
+    }
+    async getAllGamingHistory(): Promise<GamingHistory[]> {
+        return await this.gamingHistoryModel.find().exec();
+    }
     async addGamingHistory(record: CreateGamingHistoryDto): Promise<void> {
         try {
             await this.gamingHistoryModel.create(record);
@@ -40,14 +46,13 @@ export class GameRecordService {
             return Promise.reject(`Failed to insert Game: ${error}`);
         }
     }
-
-    async deleteGameRecords(): Promise<void> {
+    async deleteGamingHistory(): Promise<void> {
         try {
             const response = await this.gamingHistoryModel.deleteMany({});
-            // this.gameService.deleteGameRecords();;
             if (response.deletedCount) this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully`);
         } catch (error) {
-            return Promise.reject(`Failed to delete Game: ${error}`);
+            return Promise.reject(`Failed to delete Gaming History: ${error}`);
         }
     }
+
 }

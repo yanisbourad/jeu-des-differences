@@ -22,8 +22,8 @@ export class GameDatabaseService {
         return this.http.get<GameInfo[]>(`${this.baseUrl}/game`);
     }
 
-    getAllGamingHistory(): Observable<GameRecord[]> {
-        return this.http.get<GameRecord[]>(`${this.baseUrl}/gamingHistory`);
+    getAllGamingHistory(): Observable<GamingHistory[]> {
+        return this.http.get<GamingHistory[]>(`${this.baseUrl}/gamingHistory`);
     }
 
     getGameByName(gameName: string): Observable<GameInfo> {

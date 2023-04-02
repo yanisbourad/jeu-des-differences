@@ -1,17 +1,17 @@
 import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import * as constants from '@app/configuration/const-canvas';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Game, GameInfo } from '@common/game';
 import { of } from 'rxjs';
+import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from './socket-client.service';
-import * as constants from '@app/configuration/const-canvas';
-import { GameCardHandlerService } from './game-card-handler-service.service';
 
 import SpyObj = jasmine.SpyObj;
 
@@ -33,7 +33,7 @@ describe('GameService', () => {
         rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
         renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord', 'deleteGame']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord', 'deleteGame', 'createGamingHistory']);
         gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['handleDelete']);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
             'getRoomTime',
@@ -44,6 +44,7 @@ describe('GameService', () => {
             'sendMessage',
         ]);
         audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
+        gameDataBaseSpy.createGamingHistory.and.callFake(() => of(new HttpResponse({ body: 'OK' })));
     });
 
     beforeEach(() => {

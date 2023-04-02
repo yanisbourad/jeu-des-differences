@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameRecordController } from './controllers/game-record/game-record.constroller';
 import { GameController } from './controllers/game/game.controller';
-import { GamingHistoryController } from './controllers/gaming-history/gaming-history-controller';
+import { GamingHistoryController } from './controllers/gaming-history/gaming-history.controller';
 import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
 import { GamingHistory, gamingHistorySchema } from './model/database/gaming-history';

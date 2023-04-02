@@ -20,7 +20,7 @@ export class GameRecordService {
     async getAllGameRecord(): Promise<GameRecord[]> {
         return await this.gameRecordModel.find().exec();
     }
-    async getAllGamingHistory(): Promise<GameRecord[]> {
+    async getAllGamingHistory(): Promise<GamingHistory[]> {
         return await this.gamingHistoryModel.find().exec();
     }
 
@@ -28,13 +28,13 @@ export class GameRecordService {
         try {
             record.gameName += this.gameService.getKey;
             await this.gameRecordModel.create(record);
+            return Promise.resolve();
         } catch (error) {
             return Promise.reject(`Failed to insert Game: ${error}`);
         }
     }
     async addGamingHistory(record: CreateGamingHistoryDto): Promise<void> {
         try {
-            record.gameName += this.gameService.getKey;
             await this.gamingHistoryModel.create(record);
         } catch (error) {
             return Promise.reject(`Failed to insert Game: ${error}`);

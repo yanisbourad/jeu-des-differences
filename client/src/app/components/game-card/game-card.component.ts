@@ -77,4 +77,10 @@ export class GameCardComponent implements OnInit {
             alert('la suppression du jeu a échoué');
         }
     }
+    async onReinitialise(gameName: string) {
+        try {
+            await this.gameService.deleteOneGameRecords(gameName);
+            // should update the view to reflect initial game records
+        } catch (error) {}
+    }
 }

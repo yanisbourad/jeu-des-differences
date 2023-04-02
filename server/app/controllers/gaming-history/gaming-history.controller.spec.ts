@@ -98,7 +98,7 @@ describe('GamingHistoryController', () => {
         expect(gameRecordService.addGamingHistory).toHaveBeenCalled();
     });
     it('Should delete games and  return OK ', async () => {
-        jest.spyOn(gameRecordService, 'deleteGameRecords').mockResolvedValueOnce();
+        jest.spyOn(gameRecordService, 'deleteGamingHistory').mockResolvedValueOnce();
 
         const res = {} as unknown as Response;
         res.status = () => {
@@ -108,11 +108,11 @@ describe('GamingHistoryController', () => {
             expect(message).toEqual('Game deleted successfully');
             return res;
         };
-        await controller.deleteGame(res);
-        expect(gameRecordService.deleteGameRecords).toHaveBeenCalled();
+        await controller.deleteGamingHistory(res);
+        expect(gameRecordService.deleteGamingHistory).toHaveBeenCalled();
     });
     it('Should return NO_CONTENT when nothing is deleted', async () => {
-        jest.spyOn(gameRecordService, 'deleteGameRecords').mockImplementation(async () => Promise.reject(new Error('test error')));
+        jest.spyOn(gameRecordService, 'deleteGamingHistory').mockImplementation(async () => Promise.reject(new Error('test error')));
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toEqual(HttpStatus.NO_CONTENT);
@@ -123,7 +123,7 @@ describe('GamingHistoryController', () => {
             return res;
         };
         res.send = () => res;
-        await controller.deleteGame(res);
-        expect(gameRecordService.deleteGameRecords).toHaveBeenCalled();
+        await controller.deleteGamingHistory(res);
+        expect(gameRecordService.deleteGamingHistory).toHaveBeenCalled();
     });
 });

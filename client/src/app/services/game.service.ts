@@ -8,7 +8,7 @@ import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { Game, GameRecord } from '@common/game';
+import { Game, GameRecord, GamingHistory } from '@common/game';
 import { Observable } from 'rxjs';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 
@@ -31,6 +31,7 @@ export class GameService {
     gameId: string;
     gameName: string;
     message: string;
+    isWinner: boolean;
     private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
@@ -53,6 +54,7 @@ export class GameService {
         };
         this.nDifferencesFound = 0;
         this.renderer = rendererFactory.createRenderer(null, null);
+        this.isWinner = false;
     }
 
     get width(): number {
@@ -130,6 +132,7 @@ export class GameService {
         this.playerName = '';
         this.playersName = [];
         this.opponentName = '';
+        this.isWinner = false;
         this.gameId = '';
         this.gameName = '';
         this.gameTime = 0;
@@ -182,6 +185,8 @@ export class GameService {
         if (this.totalDifferences % 2 === 0) {
             return this.nDifferencesFound === this.totalDifferences / 2;
         }
+        // if this mean that this is the winner
+        this.isWinner = true;
         return this.nDifferencesFound === (this.totalDifferences + 1) / 2;
     }
 
@@ -250,7 +255,18 @@ export class GameService {
             dateStart: new Date().getTime().toString(),
             time: this.getGameTime(),
         };
+        const gamingHistory: GamingHistory = {
+            gameName: this.gameInformation.gameTitle,
+            dateStart: new Date().toString(),
+            time: this.getGameTime(),
+            gameType: this.gameType === 'double' ? 'multi' : 'solo',
+            playerName: this.playerName,
+            opponentName: this.gameType === 'double' ? this.opponentName : '999999999999999',
+        };
         this.gameDataBase.createGameRecord(gameRecord).subscribe();
+        if (this.gameType === 'solo' || this.isWinner) {
+            this.gameDataBase.createGamingHistory(gamingHistory).subscribe();
+        }
     }
 
     getGameTime(): string {

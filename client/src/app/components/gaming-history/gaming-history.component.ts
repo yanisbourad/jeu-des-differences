@@ -1,38 +1,37 @@
 import { AfterContentChecked, Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { GameDatabaseService } from '@app/services/game-database.service';
-import { GameRecord } from '@common/game';
-
+import { GamingHistory } from '@common/game';
 @Component({
     selector: 'app-gaming-history',
     templateUrl: './gaming-history.component.html',
     styleUrls: ['./gaming-history.component.scss'],
 })
 export class GamingHistoryComponent implements AfterContentChecked {
-    gameRecords: GameRecord[];
+    gamingHistory: GamingHistory[];
     hasGameRecords: boolean;
 
     constructor(private readonly gameDatabaseService: GameDatabaseService, public dialogReff: MatDialogRef<GamingHistoryComponent>) {
         this.hasGameRecords = false;
-        this.gameRecords = [];
-        this.gameRecords = this.getAllGameRecords();
+        this.gamingHistory = [];
+        this.gamingHistory = this.getAllGamingHistory();
     }
 
     ngAfterContentChecked(): void {
-        if (!this.hasGameRecords) this.hasGameRecords = this.getAllGameRecords().length > 0;
+        if (!this.hasGameRecords) this.hasGameRecords = this.getAllGamingHistory().length > 0;
     }
 
-    getAllGameRecords(): GameRecord[] {
+    getAllGamingHistory(): GamingHistory[] {
         this.gameDatabaseService.getAllGamingHistory().subscribe((res) => {
-            if (res) this.gameRecords = res;
+            if (res) this.gamingHistory = res;
         });
-        return this.gameRecords;
+        return this.gamingHistory;
     }
 
     async eraseGamingHistory() {
         this.gameDatabaseService.deleteGamingHistory().subscribe((res) => {
             if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
-                this.gameRecords = [];
+                this.gamingHistory = [];
             }
             this.hasGameRecords = false;
         });

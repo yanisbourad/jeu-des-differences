@@ -11,7 +11,8 @@
         <button mat-icon-button class="icon-display" matTooltip="Supprimer tous les jeux">
             <mat-icon>delete</mat-icon>
         </button>
-        <button mat-icon-button class="icon-display" matTooltip="Réinitialiser les meilleurs temps">
+        <button mat-icon-button class="icon-display" matTooltip="Réinitialiser les meilleurs temps"
+            (click)="eraseGameRecords()">
             <mat-icon>autorenew</mat-icon>
         </button>
         <button mat-icon-button class="icon-display" matTooltip="Consulter l’historique des parties jouées"

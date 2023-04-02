@@ -1,15 +1,18 @@
+<h1>Historique des parties</h1>
 <div class="container">
-    <h1>Historique des parties</h1>
-    <div *ngFor="let record of gamingHistory">
-        <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
-            --- Durée totale: {{record.time}} --- <span *ngIf="record.gameType !== 'solo' ">Entre joueurs:
-                <strong> {{record.playerName}} </strong></span>
-            <span *ngIf="record.gameType === 'solo' "> Joueur :
-                {{record.playerName}}</span>
-            <span *ngIf="record.gameType !== 'solo' ">et
-                <em *ngIf="record.gameType !== 'solo' ">{{record.opponentName}} </em></span>
-        </p>
+    <div class="contents">
+        <div *ngFor="let record of gamingHistory">
+            <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
+                --- Durée totale: {{record.time}} --- <span *ngIf="record.gameType !== 'solo' ">Entre joueurs:
+                    <strong> {{record.playerName}} </strong></span>
+                <span *ngIf="record.gameType === 'solo' "> Joueur :
+                    {{record.playerName}}</span>
+                <span *ngIf="record.gameType !== 'solo' ">et
+                    <em *ngIf="record.gameType !== 'solo' ">{{record.opponentName}} </em></span>
+            </p>
+        </div>
     </div>
+
     <div class="buttonContainer2">
         <button *ngIf='hasGameRecords' class="bottomButtons" id="eraseButton" (click)="eraseGamingHistory()">
             Supprimer l'historique</button>

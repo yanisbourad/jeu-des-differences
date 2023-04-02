@@ -48,6 +48,9 @@ export class GameDatabaseService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
     }
+    deleteOneGameRecords(gameName: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gameRecord/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
     deleteGamingHistory(): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });
     }

@@ -34,9 +34,18 @@ export class GameRecordService {
             const response = await this.gameRecordModel.deleteMany({});
             this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully`);
             this.gameService.populateFakeGameRecords();
-            this.logger.log(`Fuction have been called ve been deleted successfully`);
         } catch (error) {
-            return Promise.reject(`Failed to delete Game: ${error}`);
+            return Promise.reject(`Failed to delete Game records: ${error}`);
+        }
+    }
+    async deleteGameRecordsForOneGame(name: string): Promise<void> {
+        try {
+            const naming = name + this.gameService.getKey;
+            const response = await this.gameRecordModel.deleteMany({ gameName: naming });
+            this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully for ${name}`);
+            this.gameService.populateFakeGameRecordsForOneGame(name);
+        } catch (error) {
+            return Promise.reject(`Failed to delete Game records: ${error}`);
         }
     }
     async getAllGamingHistory(): Promise<GamingHistory[]> {

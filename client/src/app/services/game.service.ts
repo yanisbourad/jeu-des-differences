@@ -293,4 +293,8 @@ export class GameService {
         this.gameCardHandlerService.handleDelete(gameName);
         return this.gameDataBase.deleteGame(gameName);
     }
+
+    deleteOneGameRecords(gameName: string): void {
+        this.gameDataBase.deleteOneGameRecords(gameName).subscribe();
+    }
 }

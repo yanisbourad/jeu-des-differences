@@ -51,9 +51,9 @@ export class GamingHistoryController {
         description: 'Return NO_CONTENT http status when request fails',
     })
     @Delete('/')
-    async deleteGame(@Res() response: Response) {
+    async deleteGamingHistory(@Res() response: Response) {
         try {
-            await this.gamesRecordService.deleteGameRecords();
+            await this.gamesRecordService.deleteGamingHistory();
             response.status(HttpStatus.OK).json('Game deleted successfully');
         } catch (error) {
             response.status(HttpStatus.NO_CONTENT).send(error.message);

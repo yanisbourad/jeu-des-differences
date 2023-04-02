@@ -20,10 +20,10 @@ export interface GameRecord {
 }
 export interface GamingHistory {
     gameName: string;
-    typeGame: string;
-    time: String;
-    playerName: string;
     dateStart: string;
+    time: String;
+    gameType: string;
+    playerName: string;
     opponentName: string;
 }
 

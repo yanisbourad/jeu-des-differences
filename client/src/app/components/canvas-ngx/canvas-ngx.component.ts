@@ -88,7 +88,7 @@ export class CanvasNgxComponent implements AfterViewInit {
         this.canvasDrawNative.addEventListener('mouseup', () => {
             this.mouseUpDetection();
         });
-        this.drawService.clearCanvas(this.canvasImage.nativeElement);
+        DrawService.clearCanvas(this.canvasImage.nativeElement);
     }
 
     loadImage(img: ImageBitmap) {

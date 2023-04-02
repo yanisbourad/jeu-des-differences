@@ -3,6 +3,6 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 
 export class StopCheatModeRecord extends GameRecordCommand {
     do(component: GamePageComponent): void {
-        component.stopCheatMode();
+        component.cheatModeService.stopCheating();
     }
 }

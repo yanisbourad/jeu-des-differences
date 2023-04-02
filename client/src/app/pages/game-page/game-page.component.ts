@@ -94,7 +94,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     startRewind(): void {
-        console.log('startRewind');
         if (this.notRewinding) this.initForRewind();
         this.cheatModeService.stopCheating();
         this.gameRecordService.startRewind();
@@ -108,7 +107,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.gameStateSubscription.unsubscribe();
             this.socket.disconnect();
         }
-        console.log('initForRewind');
         this.notRewinding = false;
         this.chat.isNotRewinding = false;
         this.clearCanvases();
@@ -153,10 +151,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.differenceSubscription = this.socket.difference$.subscribe((newValue) => {
             const canvases = {
-                canvas1: this.canvas0,
-                canvas2: this.canvas1,
-                canvas0: this.canvasCheat0,
-                canvas3: this.canvasCheat1,
+                canvas1: this.canvas1,
+                canvas2: this.canvas2,
+                canvas0: this.canvas0,
+                canvas3: this.canvas3,
             };
             if (newValue) {
                 new ShowDiffRecord(newValue, canvases, true, this.gameService.mousePosition).record(this.gameRecordService);

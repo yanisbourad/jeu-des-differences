@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./rewind-control-bar.component.scss'],
 })
 export class RewindControlBarComponent implements OnDestroy {
-    // TODO: move to config file
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     speeds: number[] = [1, 2, 4];
     speed: number = 1;
@@ -18,11 +17,13 @@ export class RewindControlBarComponent implements OnDestroy {
 
     constructor(public gameRecorderService: GameRecorderService, private router: Router) {
         this.subs = gameRecorderService.progress$.subscribe((process: number) => {
-            this.process = Math.floor(process);
+            this.process = process;
         });
+        this.gameRecorderService.paused = false;
     }
     ngOnDestroy(): void {
         this.subs.unsubscribe();
+        this.gameRecorderService.stopRewind();
     }
 
     updateSpeed(): void {

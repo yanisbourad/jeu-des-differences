@@ -1,7 +1,10 @@
 import { ElementRef, Injectable } from '@angular/core';
-import { DrawService } from './draw.service';
-import { HotkeysService } from './hotkeys.service';
+import { StartCheatModeRecord } from '@app/classes/game-records/start-cheat-mode';
+import { StopCheatModeRecord } from '@app/classes/game-records/stop-cheat-mode';
 import * as constantsTime from '@app/configuration/const-time';
+import { DrawService } from './draw.service';
+import { GameRecorderService } from './game-recorder.service';
+import { HotkeysService } from './hotkeys.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,54 +15,77 @@ export class CheatModeService {
     canvas0: ElementRef<HTMLCanvasElement>;
     canvas1: ElementRef<HTMLCanvasElement>;
     unfoundedDifference: Set<number>[];
+    indexEvent: number | undefined;
+    color: string = 'black';
 
-    constructor(private readonly hotkeysService: HotkeysService, private readonly drawService: DrawService) {}
+    constructor(private readonly hotkeysService: HotkeysService, public gameRecorderService: GameRecorderService) {}
 
-    cheatModeKeyBinding(): number {
-        return this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
+    cheatModeKeyBinding(): void {
+        this.indexEvent = this.hotkeysService.hotkeysEventListener(['t'], true, this.toggleCheating.bind(this));
     }
 
     cheatMode(): void {
         this.blinking = setInterval(() => {
-            this.drawService.setColor = this.drawService.getColor === 'black' ? 'yellow' : 'black';
+            this.color = this.color === 'black' ? 'yellow' : 'black';
             for (const set of this.unfoundedDifference) {
                 this.drawDifference(set);
             }
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
+    removeDifference(diff: Set<number>): void {
+        this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, diff));
+    }
+
     toggleCheating(): void {
-        this.isCheating = !this.isCheating;
         const chatBox = document.getElementById('chat-box');
+        if (document.activeElement === chatBox) return;
+
+        this.isCheating = !this.isCheating;
         if (this.isCheating) {
-            if (document.activeElement !== chatBox) {
-                this.cheatMode();
-            }
+            new StartCheatModeRecord().record(this.gameRecorderService);
+            // this.cheatMode();
         } else {
-            if (document.activeElement !== chatBox) clearInterval(this.blinking);
-            this.clearCanvasCheat(this.canvas0.nativeElement, this.canvas1.nativeElement);
-            this.drawService.setColor = 'black';
+            new StopCheatModeRecord().record(this.gameRecorderService);
+            // this.stopCheating();
         }
     }
 
-    drawDifference(diff: Set<number>): void {
-        this.drawService.drawDiff(diff, this.canvas0.nativeElement);
-        this.drawService.drawDiff(diff, this.canvas1.nativeElement);
+    stopCheating(): void {
+        clearInterval(this.blinking);
+        this.clearCanvasCheat(this.canvas0.nativeElement, this.canvas1.nativeElement);
     }
 
-    removeHotkeysEventListener(idEventList: number): void {
-        this.hotkeysService.removeHotkeysEventListener(idEventList);
+    drawDifference(diff: Set<number>): void {
+        DrawService.drawDiff(diff, this.canvas0.nativeElement, this.color);
+        DrawService.drawDiff(diff, this.canvas1.nativeElement, this.color);
+    }
+
+    removeHotkeysEventListener(): void {
+        // indexEvent is undefined when the user is not in the game
+        // indexEvent is possibly 0 so we can't use !indexEvent
+        if (this.indexEvent === undefined) return;
+        this.hotkeysService.removeHotkeysEventListener(this.indexEvent);
+        this.indexEvent = undefined;
     }
 
     clearCanvasCheat(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
-        this.drawService.clearDiff(canvasA);
-        this.drawService.clearDiff(canvasB);
+        DrawService.clearDiff(canvasA);
+        DrawService.clearDiff(canvasB);
     }
 
     resetService(): void {
         this.isCheating = false;
         clearInterval(this.blinking);
-        this.drawService.setColor = 'black';
         this.unfoundedDifference = new Array();
+    }
+
+    eqSet(set1: Set<number>, set2: Set<number>): boolean {
+        return (
+            set1.size === set2.size &&
+            [...set1].every((x) => {
+                return set2.has(x);
+            })
+        );
     }
 }

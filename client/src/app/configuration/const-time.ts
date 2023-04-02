@@ -11,3 +11,4 @@ export const TIMER_INCREMENT = 5;
 export const BLINKING_TIME = 1000;
 export const BLINKING_TIMEOUT = 125;
 export const BLINKING_COUNT = 8;
+export const UNIT_DELAY_INTERVAL = 100;

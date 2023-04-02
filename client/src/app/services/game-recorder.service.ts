@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
-import { SEC_TO_MILLISEC, UNIT } from '@app/configuration/const-time';
+import { DELAY_BEFORE_EMITTING_TIME, SEC_TO_MILLISEC, UNIT_DELAY_INTERVAL } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { Subject } from 'rxjs';
 import { GameService } from './game.service';
@@ -25,8 +25,11 @@ export class GameRecorderService {
         });
     }
 
+    get isPaused(): boolean {
+        return this.paused;
+    }
     get currentTime(): number {
-        return this.socketClient.getRoomTime(this.socketClient.getRoomName());
+        return this.socketClient.getRoomTime(this.socketClient.getRoomName()) || 0;
     }
 
     get currentTimeInMilliseconds(): number {
@@ -34,16 +37,19 @@ export class GameRecorderService {
     }
 
     get maxTime(): number {
-        return this.gameService.gameTime;
+        return this.gameService.gameTime + DELAY_BEFORE_EMITTING_TIME / SEC_TO_MILLISEC;
+    }
+
+    get timeoutDelay(): number {
+        return UNIT_DELAY_INTERVAL / this.speed;
     }
 
     set timeStart(time: number) {
         this.startingTime = time;
     }
-
     // this will be used to set the speed of the rewind
     // the default speed is 1 second per second
-    // the speed can be set to 2, 3, 4, 5, 6, 7, 8, 9, 10
+    // the speed can be set to 2, 3, 4
     // representing the multiplier of the speed
     // 2 means 2 seconds per second ...
     set rewindSpeed(speed: number) {
@@ -81,6 +87,7 @@ export class GameRecorderService {
             return;
         }
         // prepare the game for the rewind
+        this.socketClient.gameTime = 0;
         this.position = 0;
         this.action = this.list[this.position++];
         this.lunchRewind();
@@ -89,12 +96,14 @@ export class GameRecorderService {
     lunchRewind() {
         clearInterval(this.myTimeout);
         this.myTimeout = setInterval(() => {
-            if (this.position < this.list.length) {
+            if (this.position <= this.list.length) {
                 this.tick();
             } else {
-                this.endRewind();
+                setTimeout(() => {
+                    this.endRewind();
+                }, DELAY_BEFORE_EMITTING_TIME);
             }
-        }, UNIT / this.speed);
+        }, this.timeoutDelay);
     }
 
     stopRewind() {
@@ -106,17 +115,16 @@ export class GameRecorderService {
     private tick(): void {
         if (this.paused) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.socketClient.gameTime = this.currentTime + UNIT / SEC_TO_MILLISEC;
+        // set the view time to the current time
+        this.socketClient.gameTime = this.currentTime + UNIT_DELAY_INTERVAL / SEC_TO_MILLISEC;
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.progress$.next(Math.floor(this.currentTime) / this.maxTime);
-        while (this.action) {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            if (this.action.gameTime(this.startingTime) <= this.currentTimeInMilliseconds) {
-                this.redo();
-                this.action = this.list[this.position++];
-            } else break;
+        // set the progress bar to the current time
+        this.progress$.next(this.currentTime / this.maxTime);
+
+        // while the current action is not null and its time is less than the current time
+        while (this.action && this.action.gameTime(this.startingTime) <= this.currentTimeInMilliseconds) {
+            this.redo();
+            this.action = this.list[this.position++];
         }
     }
 
@@ -125,6 +133,7 @@ export class GameRecorderService {
     // will redirect the user to the home page
     private endRewind() {
         clearInterval(this.myTimeout);
+
         this.paused = true;
         this.progress$.next(0);
         this.startRewind();

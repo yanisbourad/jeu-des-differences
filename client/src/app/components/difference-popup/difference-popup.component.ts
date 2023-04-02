@@ -24,7 +24,6 @@ export class DifferencePopupComponent implements AfterViewInit {
         public dialog: MatDialog,
         public dialogRef: MatDialogRef<DifferencePopupComponent>,
         private readonly imageDifferenceService: ImageDiffService,
-        private readonly drawService: DrawService,
         private changeDetectorRef: ChangeDetectorRef,
     ) {
         this.showValidation = false;
@@ -35,9 +34,9 @@ export class DifferencePopupComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.showDifference = this.imageDifferenceService.listDifferences.length;
         if (this.showDifference !== 0) {
-            this.drawService.clearCanvas(this.canvas.nativeElement);
+            DrawService.clearCanvas(this.canvas.nativeElement);
             const differences = this.imageDifferenceService.listDifferences;
-            this.drawService.drawAllDiff(differences, this.canvas.nativeElement);
+            DrawService.drawAllDiff(differences, this.canvas.nativeElement);
         }
 
         if (this.showDifference > this.lowerLimitDifferenceAllowed && this.showDifference < this.upperLimitDifferenceAllowed) {

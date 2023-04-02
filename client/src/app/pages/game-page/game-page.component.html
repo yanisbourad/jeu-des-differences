@@ -25,7 +25,7 @@
             <canvas #canvas2 style="top: -333.7%;" [attr.width]="width" [attr.height]="height"></canvas>
         </div>
     </div>
-    <div class="footer">
+    <div *ngIf="notRewinding" class="footer">
         <button mat-raised-button class="giveUp btn" (click)="this.gameService.giveUp()">Abandonner la partie</button>
     </div>
     <div class="message">

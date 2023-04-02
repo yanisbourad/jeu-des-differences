@@ -1,11 +1,12 @@
 <div class="control-bar">
-  <button type="button" class="btn btn-primary" (click)="togglePause()">play/pause</button>
+  <button type="button" class="btn btn-primary" (click)="togglePause()">{{gameRecorderService.isPaused ? 'Play': 'Pause'}}</button>
   <button type="button" class="btn btn-primary" (click)="restart()">restart</button>
   <select class="form-control" [(ngModel)]="speed" (change)="updateSpeed()">
     <option *ngFor="let speed of speeds" [ngValue]="speed">{{speed}}</option>
   </select>
-
-  <progress #myProgressBar [value]="process" max="100"></progress>
-
   <button type="button" class="btn btn-primary" (click)="redirect()">Sortie</button>
+
+
+  <progress #myProgressBar [value]="process" min="0" max="1"></progress>
+
 </div>

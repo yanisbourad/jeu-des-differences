@@ -55,53 +55,53 @@ export class DrawService {
         this.lineWidth = width;
     }
 
+    static drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
+        differences.forEach((diff) => {
+            this.drawDiff(diff, canvas);
+        });
+    }
+
+    static drawDiff(diff: Set<number>, canvas: HTMLCanvasElement, color: string = constants.DEFAULT_LINE_COLOR): void {
+        const context = this.getContext(canvas);
+        // color pixels one by one and draw them
+        diff.forEach((index) => {
+            const x = index % constants.DEFAULT_WIDTH;
+            const y = Math.floor(index / constants.DEFAULT_WIDTH);
+            context.fillStyle = color;
+            context.fillRect(x, y, 1, 1);
+        });
+    }
+
+    static clearCanvas(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
+        context.fillRect(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+    }
+
+    static clearDiff(canvas: HTMLCanvasElement) {
+        const context = this.getContext(canvas);
+        // make it transparent
+        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
+        context.clearRect(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+    }
+
+    static getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+        const context = canvas.getContext('2d', CanvasRenderingContext2D) as CanvasRenderingContext2D;
+        return context;
+    }
+
+    static drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
+        const context = this.getContext(canvas);
+        context.font = '25px system-ui';
+        context.fillStyle = 'red';
+        context.fillText(word, position.x, position.y);
+    }
+
     setIsSquare(): void {
         this.rectangleIsSquare = true;
     }
 
     setIsRectangle(): void {
         this.rectangleIsSquare = false;
-    }
-
-    drawAllDiff(differences: Set<number>[], canvas: HTMLCanvasElement) {
-        differences.forEach((diff) => {
-            this.drawDiff(diff, canvas);
-        });
-    }
-
-    drawDiff(diff: Set<number>, canvas: HTMLCanvasElement): void {
-        const context = this.getContext(canvas);
-        // color pixels one by one and draw them
-        diff.forEach((index) => {
-            const x = index % this.width;
-            const y = Math.floor(index / this.width);
-            context.fillStyle = this.color;
-            context.fillRect(x, y, 1, 1);
-        });
-    }
-
-    clearCanvas(canvas: HTMLCanvasElement) {
-        const context = this.getContext(canvas);
-        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
-        context.fillRect(0, 0, this.width, this.height);
-    }
-
-    clearDiff(canvas: HTMLCanvasElement) {
-        const context = this.getContext(canvas);
-        // make it transparent
-        context.fillStyle = constants.DEFAULT_BACKGROUND_COLOR;
-        context.clearRect(0, 0, this.width, this.height);
-    }
-
-    getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-        const context = canvas.getContext('2d', CanvasRenderingContext2D) as CanvasRenderingContext2D;
-        return context;
-    }
-
-    drawWord(word: string, canvas: HTMLCanvasElement, position: Vec2): void {
-        const context = this.getContext(canvas);
-        context.font = '25px system-ui';
-        context.fillStyle = 'red';
-        context.fillText(word, position.x, position.y);
     }
 }

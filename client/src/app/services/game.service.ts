@@ -1,5 +1,5 @@
 import { HttpResponse } from '@angular/common/http';
-import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MouseButton } from '@app/components/play-area/play-area.component';
@@ -13,14 +13,13 @@ import { GameDatabaseService } from '@app/services/game-database.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Game, GameRecord } from '@common/game';
 import { Observable } from 'rxjs';
-import { DrawService } from './draw.service';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    path: ImagePath;
+    path: ImagePath; // can be moved
     game: Game;
     gameInformation: GameInformation;
     totalDifferences: number;
@@ -38,16 +37,13 @@ export class GameService {
     message: string;
     mousePosition: Vec2;
     errorPenalty: boolean;
-    private renderer: Renderer2;
 
     // eslint-disable-next-line max-params
     constructor(
-        rendererFactory: RendererFactory2,
         private readonly gameCardHandlerService: GameCardHandlerService,
         public dialog: MatDialog,
         private gameDataBase: GameDatabaseService,
         private socket: SocketClientService,
-        private readonly drawService: DrawService,
     ) {
         this.path = {
             differenceNotFound: './assets/img/difference-not-found.png',
@@ -60,7 +56,6 @@ export class GameService {
             nDifferences: 0,
         };
         this.nDifferencesFound = 0;
-        this.renderer = rendererFactory.createRenderer(null, null);
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
     }
@@ -98,13 +93,17 @@ export class GameService {
     }
 
     initRewind(): void {
-        this.socket.gameTime = 0;
+        // this.socket.gameTime = 0;
         this.totalDifferences = this.gameInformation.nDifferences;
         this.differencesArray = new Array(this.totalDifferences);
+        this.displayIcons();
         this.opponentDifferencesArray = new Array(this.totalDifferences);
-        this.playersName = [this.playerName, this.opponentName];
+        this.socket.messageList = [];
+        // this.playersName = [this.playerName, this.opponentName];
     }
+
     displayIcons(): void {
+        // can be moved
         if (this.gameType === 'solo') {
             for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.path.differenceNotFound;
@@ -118,23 +117,8 @@ export class GameService {
         }
     }
 
-    async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
-        let isVisible = true;
-        let blinkCount = 0;
-        const intervalId = setInterval(() => {
-            isVisible = !isVisible;
-            if (this.renderer) {
-                this.renderer.setStyle(canvas1.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-                this.renderer.setStyle(canvas2.nativeElement, 'visibility', isVisible ? 'visible' : 'hidden');
-            }
-            blinkCount++;
-            if (blinkCount === constantsTime.BLINKING_COUNT) {
-                clearInterval(intervalId);
-            }
-        }, constantsTime.BLINKING_TIMEOUT);
-    }
-
     displayGameEnded(msg: string, type: string, time?: string) {
+        // can be moved to a service
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type, time],
             disableClose: true,
@@ -197,18 +181,6 @@ export class GameService {
         }
     }
 
-    // if (this.gameType === 'double') {
-    //     this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
-    // }
-
-    // if (this.totalDifferenceReached() && this.gameType === 'solo') {
-    //     this.endGame();
-    // }
-
-    // if (this.multiGameEnd() && this.gameType === 'double') {
-    //     this.endGame();
-    // }
-    // }
     handleSoloDifference(): void {
         if (this.totalDifferenceReached()) {
             this.endGame();
@@ -224,6 +196,7 @@ export class GameService {
     }
 
     multiGameEnd(): boolean {
+        // can be moved
         if (this.totalDifferences % 2 === 0) {
             return this.nDifferencesFound === this.totalDifferences / 2;
         }
@@ -252,14 +225,6 @@ export class GameService {
             pos: foundMessage.pos,
             event: foundMessage.event,
         };
-        // new GameMessageEvent(this.gameTime, {
-        //     message: foundMessage.message,
-        //     userName: foundMessage.playerName,
-        //     mine: true,
-        //     color: foundMessage.color,
-        //     pos: foundMessage.pos,
-        //     event: foundMessage.event,
-        // }).record(this.gameRecorderService);
     }
 
     sendErrorMessage(): Message {
@@ -285,14 +250,6 @@ export class GameService {
             pos: errorMessage.pos,
             event: errorMessage.event,
         };
-        // new GameMessageEvent(this.gameTime, {
-        //     message: errorMessage.message,
-        //     userName: errorMessage.playerName,
-        //     mine: true,
-        //     color: errorMessage.color,
-        //     pos: errorMessage.pos,
-        //     event: errorMessage.event,
-        // }).record(this.gameRecorderService);
     }
 
     endGame(): void {
@@ -305,6 +262,7 @@ export class GameService {
     }
 
     saveGameRecord(): void {
+        // can be moved
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
             typeGame: this.gameType === 'double' ? 'multi' : 'solo',
@@ -316,26 +274,14 @@ export class GameService {
     }
 
     getGameTime(): string {
+        // can be moved
         const minutes = Math.floor(this.gameTime / constantsTime.MIN_TO_SEC);
         const seconds = this.gameTime - minutes * constantsTime.MIN_TO_SEC;
         return `${minutes}:${seconds < constantsTime.UNIT ? '0' : ''}${seconds}`;
     }
 
-    playSuccessAudio(): void {
-        const audio = new Audio();
-        audio.src = './assets/sounds/yay-6120.mp3';
-        audio.load();
-        audio.play();
-    }
-
-    playFailureAudio(): void {
-        const audio = new Audio();
-        audio.src = './assets/sounds/wronganswer-37702.mp3';
-        audio.load();
-        audio.play();
-    }
-
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        // can be moved
         this.gameCardHandlerService.handleDelete(gameName);
         return this.gameDataBase.deleteGame(gameName);
     }
@@ -348,44 +294,15 @@ export class GameService {
         }
     }
 
-    diffFound(
-        canvas: {
-            canvas0: ElementRef<HTMLCanvasElement>;
-            canvas1: ElementRef<HTMLCanvasElement>;
-            canvas2: ElementRef<HTMLCanvasElement>;
-            canvas3: ElementRef<HTMLCanvasElement>;
-        },
-        diff: Set<number>,
-    ): void {
-        this.drawService.setColor = 'black';
-        this.displayWord('Trouvé', canvas);
-        this.drawDifference(diff, { canvas1: canvas.canvas1, canvas2: canvas.canvas2 });
-        this.socket.sendDifference(diff, this.socket.getRoomName());
-        this.sendFoundMessage();
-        this.handleDifferenceFound();
-        this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
-    }
-
-    diffNotFound(canvas: {
-        canvas0: ElementRef<HTMLCanvasElement>;
-        canvas1: ElementRef<HTMLCanvasElement>;
-        canvas2: ElementRef<HTMLCanvasElement>;
-        canvas3: ElementRef<HTMLCanvasElement>;
-    }): void {
+    startPenaltyTimer(): void {
         this.errorPenalty = true;
-        this.displayWord('Erreur', canvas);
-        this.sendErrorMessage();
-        this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
-    }
-
-    clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
         setTimeout(() => {
-            this.drawService.clearDiff(canvasA);
-            this.drawService.clearDiff(canvasB);
+            this.errorPenalty = false;
         }, constantsTime.BLINKING_TIME);
     }
 
     displayGiveUp(msg: string, type: string): void {
+        // can be moved
         this.dialog.open(MessageDialogComponent, {
             data: [msg, type],
             minWidth: '250px',
@@ -395,39 +312,7 @@ export class GameService {
     }
 
     giveUp(): void {
+        // can be moved
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
-    }
-
-    displayWord(
-        word: string,
-        canvas: {
-            canvas0: ElementRef<HTMLCanvasElement>;
-            canvas1: ElementRef<HTMLCanvasElement>;
-            canvas2: ElementRef<HTMLCanvasElement>;
-            canvas3: ElementRef<HTMLCanvasElement>;
-        },
-    ): void {
-        this.drawService.drawWord(word, canvas.canvas0.nativeElement, this.mousePosition);
-        this.drawService.drawWord(word, canvas.canvas3.nativeElement, this.mousePosition);
-        if (word === 'Erreur') {
-            this.playFailureAudio();
-            setTimeout(() => {
-                this.errorPenalty = false;
-            }, constantsTime.BLINKING_TIME);
-        } else {
-            this.playSuccessAudio();
-            this.blinkDifference(canvas.canvas1, canvas.canvas2);
-        }
-    }
-
-    drawDifference(
-        diff: Set<number>,
-        canvas: {
-            canvas1: ElementRef<HTMLCanvasElement>;
-            canvas2: ElementRef<HTMLCanvasElement>;
-        },
-    ): void {
-        this.drawService.drawDiff(diff, canvas.canvas1.nativeElement);
-        this.drawService.drawDiff(diff, canvas.canvas2.nativeElement);
     }
 }

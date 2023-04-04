@@ -38,6 +38,8 @@ export class GameService {
     mousePosition: Vec2;
     errorPenalty: boolean;
     isWinner: boolean;
+    startDate: string;
+    hasAbandonedGame: boolean;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -60,6 +62,8 @@ export class GameService {
         this.mousePosition = { x: 0, y: 0 };
         this.errorPenalty = false;
         this.isWinner = false;
+        this.startDate = '';
+        this.hasAbandonedGame = false;
     }
 
     get width(): number {
@@ -130,6 +134,10 @@ export class GameService {
         });
     }
 
+    setStartDate(date: string): void {
+        this.startDate = date;
+    }
+
     reinitializeGame(): void {
         this.totalDifferences = 0;
         this.differencesArray = [];
@@ -138,6 +146,8 @@ export class GameService {
         // this.playersName = [];
         // this.opponentName = '';
         this.isWinner = false;
+        this.startDate = '';
+        this.hasAbandonedGame = false;
         this.gameId = '';
         // this.gameName = '';
         // this.gameTime = 0;
@@ -200,11 +210,11 @@ export class GameService {
 
     multiGameEnd(): boolean {
         // can be moved
+        this.isWinner = true;
         if (this.totalDifferences % 2 === 0) {
             return this.nDifferencesFound === this.totalDifferences / 2;
         }
         // if this mean that this is the winner
-        this.isWinner = true;
         return this.nDifferencesFound === (this.totalDifferences + 1) / 2;
     }
 
@@ -277,11 +287,12 @@ export class GameService {
         };
         const gamingHistory: GamingHistory = {
             gameName: this.gameInformation.gameTitle,
-            dateStart: new Date().toString(),
+            dateStart: this.startDate,
             time: this.getGameTime(),
             gameType: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
             opponentName: this.gameType === 'double' ? this.opponentName : '999999999999999',
+            hasAbandonedGame: this.hasAbandonedGame,
         };
         this.gameDataBase.createGameRecord(gameRecord).subscribe();
         if (this.gameType === 'solo' || this.isWinner) {
@@ -329,6 +340,9 @@ export class GameService {
 
     giveUp(): void {
         // can be moved
+        this.hasAbandonedGame = true;
+        this.saveGameRecord();
+        this.reinitializeGame();
         this.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
     deleteOneGameRecords(gameName: string): void {

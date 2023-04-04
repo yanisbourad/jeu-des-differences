@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class CreateGamingHistoryDto {
     @ApiProperty()
@@ -25,4 +25,8 @@ export class CreateGamingHistoryDto {
     @ApiProperty()
     @IsString()
     opponentName: string;
+
+    @ApiProperty()
+    @IsBoolean()
+    hasAbandonedGame: boolean;
 }

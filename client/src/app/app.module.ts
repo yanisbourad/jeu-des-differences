@@ -15,6 +15,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BannerComponent } from './components/banner/banner.component';
 import { CanvasNgxComponent } from './components/canvas-ngx/canvas-ngx.component';
 import { CardDisplayerComponent } from './components/card-displayer/card-displayer.component';
+import { DifferencePopupComponent } from './components/difference-popup/difference-popup.component';
 import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-tool-bar.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
@@ -30,11 +31,11 @@ import { RewindControlBarComponent } from './components/rewind-control-bar/rewin
 import { TimePopupComponent } from './components/time-popup/time-popup.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ValidateCreateBtnComponent } from './components/validate-create-btn/validate-create-btn.component';
+import { VerificationFeedbackComponent } from './components/verification-feedback/verification-feedback.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GamePageConfigurationComponent } from './pages/game-page-configuration/game-page-configuration.component';
 import { GamePageSelectionComponent } from './pages/game-page-selection/game-page-selection.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
-import { VerificationFeedbackComponent } from './components/verification-feedback/verification-feedback.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -61,6 +62,7 @@ import { VerificationFeedbackComponent } from './components/verification-feedbac
         TimePopupComponent,
         GameInfoComponent,
         GamingHistoryComponent,
+        DifferencePopupComponent,
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,

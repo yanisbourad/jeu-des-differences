@@ -80,6 +80,9 @@ describe('SocketClientService', () => {
         service.elapsedTimes = new Map([['apple', 3]]);
         expect(service.getRoomTime('apple')).toEqual(3);
     });
+    //     (service.socket as unknown) = undefined;
+    //     expect(service.socketId).toEqual('');
+    // });
 
     it('should not connect to the socket if the socket is connected', () => {
         socketClient.isSocketAlive.and.returnValue(true);

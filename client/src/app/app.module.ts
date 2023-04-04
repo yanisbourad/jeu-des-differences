@@ -33,6 +33,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
 import { GamePageConfigurationComponent } from './pages/game-page-configuration/game-page-configuration.component';
 import { GamePageSelectionComponent } from './pages/game-page-selection/game-page-selection.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
+import { VerificationFeedbackComponent } from './components/verification-feedback/verification-feedback.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -65,6 +66,7 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
         GamePageConfigurationComponent,
         GamePageSelectionComponent,
         RewindControlBarComponent,
+        VerificationFeedbackComponent,
     ],
     imports: [
         AppMaterialModule,

@@ -1,10 +1,12 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
-import { Game, GameInfo } from '@common/game';
+import { Game, GameInfo, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import { Model } from 'mongoose';
 import { join } from 'path';
+import { TimerConstantsModel } from '@app/model/database/timer-constants';
+
 @Injectable()
 @Controller('file')
 export class GameService {
@@ -12,10 +14,18 @@ export class GameService {
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
     rootPath = join(process.cwd(), 'assets', 'games');
+    rootPathTime = join(process.cwd(), 'assets', 'time');
 
-    constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
+    constructor(
+        @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
+        private readonly logger: Logger,
+        @InjectModel(TimerConstantsModel.name) public timerConstantsModel: Model<TimerConstantsModel>,
+    ) {
         if (!fs.existsSync(this.rootPath)) {
             fs.mkdirSync(this.rootPath);
+        }
+        if (!fs.existsSync(this.rootPathTime)) {
+            fs.mkdirSync(this.rootPathTime);
         }
         this.gamesNames = fs.readdirSync(this.rootPath);
         this.loadKeyForThisServer();
@@ -76,14 +86,14 @@ export class GameService {
             basRecords.push({
                 gameName: name,
                 typeGame: 'multi',
-                time: '15:20', // 10min in seconds
+                time: '01:20', // 10min in seconds
                 playerName: 'Sharmila',
                 dateStart: new Date().getTime().toString(),
             });
             basRecords.push({
                 gameName: name,
                 typeGame: 'solo',
-                time: '12:50', // 10min in seconds
+                time: '02:50', // 10min in seconds
                 playerName: 'Ania',
                 dateStart: new Date().getTime().toString(),
             });
@@ -115,5 +125,31 @@ export class GameService {
         this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
         const name = _name + this.key;
         await this.gameRecordModel.deleteMany({ gameName: name });
+    }
+
+    async deleteAllGames(): Promise<void> {
+        this.gamesNames.forEach(async (gameName) => {
+            await this.deleteGame(gameName);
+        });
+    }
+
+    async updateConstants(newConstants: TimeConfig): Promise<void> {
+        this.createFileTime('time', 'infoTime.json', JSON.stringify(newConstants));
+        await this.timerConstantsModel.updateOne({}, newConstants, { upsert: true });
+    }
+
+    async getConstants(): Promise<TimeConfig> {
+        return JSON.parse(this.getFileTime('time', 'infoTime.json')) as TimeConfig;
+    }
+
+    createFileTime(dirName: string, fileName: string, data: string): void {
+        if (!fs.existsSync(`${this.rootPathTime}/${dirName}`)) {
+            fs.mkdirSync(`${this.rootPathTime}/${dirName}`);
+        }
+        fs.writeFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, data, 'utf8');
+    }
+
+    getFileTime(dirName: string, fileName: string): string {
+        return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
     }
 }

@@ -1,8 +1,8 @@
 import { GameService } from '@app/services/game/game.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { Game } from './../../../../common/game';
+import { Game, TimeConfig } from './../../../../common/game';
 
 @ApiTags('Games')
 @Controller('game')
@@ -32,6 +32,16 @@ export class GameController {
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
+    @Get('/constants')
+    async getConstants(@Res() response: Response) {
+        try {
+            const constants = await this.gamesService.getConstants();
+            response.status(HttpStatus.OK).json(constants);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+
     @Get('/:id')
     async gameId(@Param('id') id: string, @Res() response: Response) {
         try {
@@ -70,11 +80,32 @@ export class GameController {
         response.status(HttpStatus.OK).json(res);
     }
 
+    @Delete('/')
+    async deleteAllGames(@Res() response: Response) {
+        try {
+            await this.gamesService.deleteAllGames();
+            response.status(HttpStatus.OK).json('Games deleted successfully');
+        } catch (error) {
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+        }
+    }
+
     @Delete('/:id')
     async deleteGame(@Param('id') id: string, @Res() response: Response) {
         try {
             await this.gamesService.deleteGame(id);
             response.status(HttpStatus.OK).json('Game deleted successfully');
+        } catch (error) {
+            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+        }
+    }
+
+    // function that post the new values of the three timers (variables)
+    @Put('/constants')
+    async updateConstants(@Body() newConstants: TimeConfig, @Res() response: Response) {
+        try {
+            await this.gamesService.updateConstants(newConstants);
+            response.status(HttpStatus.OK).json('constants updated successfully');
         } catch (error) {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }

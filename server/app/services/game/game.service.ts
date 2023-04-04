@@ -1,11 +1,11 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
+import { TimerConstantsModel } from '@app/model/database/timer-constants';
 import { Game, GameInfo, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import { Model } from 'mongoose';
 import { join } from 'path';
-import { TimerConstantsModel } from '@app/model/database/timer-constants';
 
 @Injectable()
 @Controller('file')
@@ -74,13 +74,7 @@ export class GameService {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    async addGame(game: Game): Promise<void> {
-        if (this.gamesNames.includes(game.gameName)) {
-            throw Error(`Failed to insert Game: ${game.gameName} already exists`);
-        }
-        this.createFile(game.gameName, 'info.json', JSON.stringify(game));
-        this.gamesNames.push(game.gameName);
-        const name = game.gameName + this.key;
+    getFakeGameRecords(name: string): GameRecord[] {
         const basRecords: GameRecord[] = [];
         for (let i = 0; i < 3; i++) {
             basRecords.push({
@@ -98,20 +92,27 @@ export class GameService {
                 dateStart: new Date().getTime().toString(),
             });
         }
+        return basRecords;
+    }
+    async addGame(game: Game): Promise<void> {
+        if (this.gamesNames.includes(game.gameName)) {
+            throw Error(`Failed to insert Game: ${game.gameName} already exists`);
+        }
+        this.createFile(game.gameName, 'info.json', JSON.stringify(game));
+        this.gamesNames.push(game.gameName);
+        const name = game.gameName + this.key;
+        const basRecords: GameRecord[] = this.getFakeGameRecords(name);
         this.gameRecordModel.insertMany(basRecords);
     }
-
     createFile(dirName: string, fileName: string, data: string): void {
         if (!fs.existsSync(`${this.rootPath}/${dirName}`)) {
             fs.mkdirSync(`${this.rootPath}/${dirName}`);
         }
         fs.writeFileSync(`${this.rootPath}/${dirName}/${fileName}`, data, 'utf8');
     }
-
     getFile(dirName: string, fileName: string): string {
         return fs.readFileSync(`${this.rootPath}/${dirName}/${fileName}`, 'utf8');
     }
-
     deleteDirectory(dirName: string): void {
         fs.rm(`${this.rootPath}/${dirName}`, { recursive: true }, (err) => {
             if (err) {
@@ -151,5 +152,17 @@ export class GameService {
 
     getFileTime(dirName: string, fileName: string): string {
         return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
+    }
+    populateFakeGameRecordsForOneGame(_name: string): void {
+        const name = _name + this.key;
+        const basRecords: GameRecord[] = this.getFakeGameRecords(name);
+        this.gameRecordModel.insertMany(basRecords);
+    }
+    populateFakeGameRecords(): void {
+        this.gamesNames.forEach((gameName) => {
+            const name = gameName + this.key;
+            const basRecords: GameRecord[] = this.getFakeGameRecords(name);
+            this.gameRecordModel.insertMany(basRecords);
+        });
     }
 }

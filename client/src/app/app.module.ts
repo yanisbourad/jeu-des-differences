@@ -19,6 +19,7 @@ import { DrawingToolBarComponent } from './components/drawing-tool-bar/drawing-t
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameInfoComponent } from './components/game-info/game-info.component';
 import { GameNameSaveComponent } from './components/game-name-save/game-name-save.component';
+import { GamingHistoryComponent } from './components/gaming-history/gaming-history.component';
 import { GeneralFeedbackComponent } from './components/general-feedback/general-feedback.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MessageAreaComponent } from './components/message-area/message-area.component';
@@ -59,6 +60,7 @@ import { VerificationFeedbackComponent } from './components/verification-feedbac
         NamePopupComponent,
         TimePopupComponent,
         GameInfoComponent,
+        GamingHistoryComponent,
         GameNameSaveComponent,
         MessageDialogComponent,
         PlayerWaitPopupComponent,

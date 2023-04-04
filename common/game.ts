@@ -18,6 +18,14 @@ export interface GameRecord {
     playerName: string;
     dateStart: string;
 }
+export interface GamingHistory {
+    gameName: string;
+    dateStart: string;
+    time: String;
+    gameType: string;
+    playerName: string;
+    opponentName: string;
+}
 
 export interface TimeConfig {
     timeInit: number;

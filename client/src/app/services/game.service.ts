@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpResponse } from '@angular/common/http';
 import { ElementRef, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,6 +18,8 @@ import { GameCardHandlerService } from './game-card-handler-service.service';
 })
 export class GameService {
     path: ImagePath;
+    rankingSoloCopy: GameRecord[];
+    rankingMultiCopy: GameRecord[];
     game: Game;
     gameInformation: GameInformation;
     totalDifferences: number;
@@ -232,12 +235,136 @@ export class GameService {
             event: errorMessage.event,
         });
     }
+    sendWinnerMessage(position: number): void {
+        if (position === 1) {
+            this.message =
+                new Date().toLocaleTimeString() +
+                ' - ' +
+                this.playerName +
+                ' obtient la première position dans les meilleurs temps du jeu ' +
+                this.gameName +
+                ' en ' +
+                this.gameType;
+        }
+        if (position === 2) {
+            this.message =
+                new Date().toLocaleTimeString() +
+                ' - ' +
+                this.playerName +
+                ' obtient la deuxième position dans les meilleurs temps du jeu ' +
+                this.gameName +
+                ' en ' +
+                this.gameType;
+        }
+        if (position === 3) {
+            this.message =
+                new Date().toLocaleTimeString() +
+                ' - ' +
+                this.playerName +
+                ' obtient la troisième dans les meilleurs temps du jeu ' +
+                this.gameName +
+                ' en ' +
+                this.gameType;
+        }
+        const winnerMessage = {
+            message: this.message,
+            playerName: 'meilleur temps',
+            color: '#FF0000',
+            pos: '50%',
+            gameId: this.socket.getRoomName(),
+            event: true,
+        };
+        this.socket.sendMessage(winnerMessage);
+        this.socket.messageList.push({
+            message: winnerMessage.message,
+            userName: winnerMessage.playerName,
+            mine: true,
+            color: winnerMessage.color,
+            pos: winnerMessage.pos,
+            event: winnerMessage.event,
+        });
+    }
+    globalMessageMulti() {
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[0].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingMultiCopy[0].time.slice(0, 2), 10)) {
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingMultiCopy[0].time.slice(2), 10)) {
+                    this.sendWinnerMessage(1);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(1);
+                return;
+            }
+        }
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[1].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingMultiCopy[1].time.slice(0, 2), 10)) {
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingMultiCopy[1].time.slice(2), 10)) {
+                    this.sendWinnerMessage(2);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(2);
+                return;
+            }
+        }
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[2].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingMultiCopy[2].time.slice(0, 2), 10)) {
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingMultiCopy[2].time.slice(2), 10)) {
+                    this.sendWinnerMessage(3);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(3);
+                return;
+            }
+        }
+    }
+    globalMessageSolo() {
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[0].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingSoloCopy[0].time.slice(0, 2), 10)) {
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingSoloCopy[0].time.slice(2), 10)) {
+                    this.sendWinnerMessage(1);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(1);
+                return;
+            }
+        }
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[1].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingSoloCopy[1].time.slice(0, 2), 10)){
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingSoloCopy[1].time.slice(2), 10)) {
+                    this.sendWinnerMessage(2);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(2);
+                return;
+            }
+        }
+        if (parseInt(this.getGameTime().slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[2].time.slice(0, 2), 10)) {
+            if (parseInt(this.getGameTime().slice(0, 2), 10) === parseInt(this.rankingSoloCopy[2].time.slice(0, 2), 10)) {
+                if (parseInt(this.getGameTime().slice(2), 10) <= parseInt(this.rankingSoloCopy[2].time.slice(2), 10)) {
+                    this.sendWinnerMessage(3);
+                    return;
+                }
+            } else {
+                this.sendWinnerMessage(3);
+                return;
+            }
+        }
+    }
 
     endGame(): void {
         this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.socket.gameEnded(this.socket.getRoomName());
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
         this.saveGameRecord();
+        if (this.gameType === 'solo') {
+            this.globalMessageSolo();
+        } else {
+            this.globalMessageMulti();
+        }
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.getGameTime());
         this.reinitializeGame();
     }

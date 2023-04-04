@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
     providedIn: 'root',
 })
-// to contain various helpfull functions
+// to contain various helpful functions
 export class GameHelperService {
     constructor() {}
 }

@@ -5,6 +5,7 @@ import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
+import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 
 @Component({
     selector: 'app-message-dialog',
@@ -12,23 +13,16 @@ import { SocketClientService } from '@app/services/socket-client.service';
     styleUrls: ['./message-dialog.component.scss'],
 })
 export class MessageDialogComponent {
-    message: string;
-    type: string;
-    formatTime: string;
     winner: string = this.gameService.playerName;
     // eslint-disable-next-line max-params
     constructor(
-        @Inject(MAT_DIALOG_DATA) data: string,
+        @Inject(MAT_DIALOG_DATA) public data: { message: string; type: string; formatTime: string; playerName: string },
         private router: Router,
         readonly socket: SocketClientService,
         private readonly gameService: GameService,
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
-    ) {
-        this.message = data[0];
-        this.type = data[1];
-        this.formatTime = data[2];
-    }
+    ) {}
 
     rewindGame() {
         this.socket.leaveRoom();
@@ -36,8 +30,21 @@ export class MessageDialogComponent {
         this.gameRecorderService.startRewind();
     }
 
+    launchSolo(): void {
+        this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+    }
+
+    launchCooperatif(): void {
+        this.dialog.open(PlayerWaitPopupComponent, {
+            data: { name: this.data.playerName, gameType: 'tempsLimite' },
+            disableClose: true,
+            height: '600px',
+            width: '600px',
+        });
+    }
+
     redirection(): void {
-        if (this.type === 'giveUp') {
+        if (this.data.type === 'giveUp') {
             this.socket.sendGiveUp({
                 playerName: this.gameService.playerName,
                 roomName: this.socket.getRoomName(),

@@ -43,7 +43,6 @@ export class ShowDiffRecord extends GameRecordCommand {
     }
 
     drawDifference(
-        // can be moved
         diff: Set<number>,
         canvas: {
             canvas1: ElementRef<HTMLCanvasElement>;

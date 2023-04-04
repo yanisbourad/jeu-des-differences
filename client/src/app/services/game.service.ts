@@ -33,10 +33,12 @@ export class GameService {
     opponentName: string;
     gameId: string;
     gameName: string;
+    mode: string;
     diff: Set<number>;
     message: string;
     mousePosition: Vec2;
     errorPenalty: boolean;
+    dateStart: string;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -64,10 +66,6 @@ export class GameService {
         return constants.DEFAULT_WIDTH;
     }
 
-    get height(): number {
-        return constants.DEFAULT_HEIGHT;
-    }
-
     defineVariables(): void {
         this.gameInformation = {
             gameTitle: this.game.gameName,
@@ -86,10 +84,17 @@ export class GameService {
     }
 
     getGame(gameName: string): void {
-        this.gameDataBase.getGameByName(gameName).subscribe((res: Game) => {
-            this.game = res;
+        if (this.mode === 'tempsLimite') {
+            this.socket.startSoloTimeLimit(this.playerName, 120);
+        } else {
+            this.socket.getGameFromServer(gameName);
+        }
+        setTimeout(() => {
+            this.game = this.socket.getGame();
             this.defineVariables();
-        });
+            this.socket.sendGameName(this.gameName);
+            this.displayIcons();
+        }, 500);
     }
 
     initRewind(): void {
@@ -120,7 +125,7 @@ export class GameService {
     displayGameEnded(msg: string, type: string, time?: string) {
         // can be moved to a service
         this.dialog.open(MessageDialogComponent, {
-            data: [msg, type, time],
+            data: { message: msg, type, formatTime: time },
             disableClose: true,
             minWidth: '250px',
             minHeight: '250px',
@@ -262,12 +267,11 @@ export class GameService {
     }
 
     saveGameRecord(): void {
-        // can be moved
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
             typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
-            dateStart: new Date().getTime().toString(),
+            dateStart: this.dateStart,
             time: this.getGameTime(),
         };
         this.gameDataBase.createGameRecord(gameRecord).subscribe();
@@ -281,7 +285,6 @@ export class GameService {
     }
 
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
-        // can be moved
         this.gameCardHandlerService.handleDelete(gameName);
         return this.gameDataBase.deleteGame(gameName);
     }
@@ -304,7 +307,7 @@ export class GameService {
     displayGiveUp(msg: string, type: string): void {
         // can be moved
         this.dialog.open(MessageDialogComponent, {
-            data: [msg, type],
+            data: { message: msg, type },
             minWidth: '250px',
             minHeight: '150px',
             panelClass: 'custom-dialog-container',

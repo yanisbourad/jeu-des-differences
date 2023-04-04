@@ -26,7 +26,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
     // a reference to the chatComponent
-
     @ViewChild('chatComponent', { static: true }) chat!: MessageAreaComponent;
     idEventList: number;
     // list of all the subscriptions to be unsubscribed on destruction
@@ -38,7 +37,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     // eslint-disable-next-line max-params
     constructor(
         public gameService: GameService,
-        readonly socket: SocketClientService,
+        public socket: SocketClientService,
         public route: ActivatedRoute,
         private gameRecordService: GameRecorderService,
         public cheatModeService: CheatModeService,
@@ -62,11 +61,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
+        this.socket.connect();
         this.gameRecordService.page = this;
         this.getRouterParams();
         this.gameService.getGame(this.gameService.gameName);
+        this.gameService.dateStart = new Date().toLocaleDateString();
         this.loading();
-        this.socket.sendGameName(this.gameService.gameName);
         if (this.gameService.gameType !== 'solo') {
             this.cheatModeService.cheatModeKeyBinding();
             this.cheatModeService.canvas0 = this.canvasCheat0;
@@ -82,12 +82,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        this.socket.connect();
-        if (this.gameService.gameType === 'solo') {
-            this.socket.joinRoomSolo(this.gameService.playerName);
-        } else {
-            const roomName = this.gameService.gameId + this.gameService.gameName;
-            this.socket.sendRoomName(roomName);
+        const roomName = this.gameService.gameId + this.gameService.gameName;
+        switch (this.gameService.gameType) {
+            case 'solo':
+                this.socket.joinRoomSolo(this.gameService.playerName);
+                break;
+            case 'double':
+                this.socket.sendRoomName(roomName);
+                break;
+            default:
+                break;
         }
         this.subscriptions();
         this.gameRecordService.timeStart = Date.now();
@@ -180,6 +184,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
         this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
+        this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
     }
 
     mouseHitDetect(event: MouseEvent): void {

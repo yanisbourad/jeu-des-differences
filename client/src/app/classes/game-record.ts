@@ -48,10 +48,8 @@ export abstract class GameRecordCommand {
     }
 
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {
-        // can be moved
         let isVisible = true;
         let blinkCount = 0;
-
         const intervalId = setInterval(() => {
             isVisible = !isVisible;
             canvas1.nativeElement.style.visibility = isVisible ? 'visible' : 'hidden';
@@ -78,11 +76,11 @@ export abstract class GameRecordCommand {
     }
 
     clearCanvas(canvasA: HTMLCanvasElement, canvasB: HTMLCanvasElement): void {
-        // can be moved
         setTimeout(() => {
             DrawService.clearDiff(canvasA);
             DrawService.clearDiff(canvasB);
         }, BLINKING_TIME);
     }
+
     abstract do(component: GamePageComponent): void;
 }

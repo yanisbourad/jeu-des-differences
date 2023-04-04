@@ -1,10 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-// eslint-disable-next-line no-restricted-imports
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-// eslint-disable-next-line no-restricted-imports
 import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 
 export interface DialogData {
     name: string;
@@ -22,7 +21,7 @@ export class NamePopupComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<NamePopupComponent>,
         public dialog: MatDialog,
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName?: string; gameType?: string; isTimeLimit?: boolean },
         private route: Router,
     ) {
         this.name = '';
@@ -60,6 +59,22 @@ export class NamePopupComponent implements OnInit {
         });
         dialog.afterClosed().subscribe((result) => {
             this.name = result;
+        });
+    }
+
+    launchGameTypeSelection(): void {
+        if (this.validatePlayerName(this.data.name) === false) {
+            const message = 'Veuillez entrer un nom valide (2-10 caractères alphanumeriques).';
+            this.launchFeedback(message);
+            return;
+        }
+        const msg = 'Veuillez sélectionner un mode de jeu';
+        this.dialog.open(MessageDialogComponent, {
+            data: { message: msg, type: 'timeLimit', playerName: this.data.name },
+            disableClose: true,
+            minWidth: '250px',
+            minHeight: '110px',
+            panelClass: 'custom-dialog-container',
         });
     }
 

@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
 import { SocketClient } from '@app/utils/socket-client';
+import { Game } from '@common/game';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -15,7 +16,7 @@ export class SocketClientService {
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     messageToAdd = new Subject<GameMessageEvent>();
     messageToAdd$ = this.messageToAdd.asObservable();
-
+    game: Game;
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
@@ -54,6 +55,10 @@ export class SocketClientService {
         return this.elapsedTimes.get(roomName) as number;
     }
 
+    getGame(): Game {
+        return this.game;
+    }
+
     getRoomName(): string {
         return this.roomName;
     }
@@ -69,6 +74,10 @@ export class SocketClientService {
 
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
+        });
+
+        this.socketClient.on('getGame', (game: Game) => {
+            this.game = game;
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -138,6 +147,10 @@ export class SocketClientService {
         this.socketClient.send('joinRoomSolo', playerName);
     }
 
+    startSoloTimeLimit(playerName: string, countDown: number) {
+        this.socketClient.send('startSoloTimeLimit', { playerName, countDown });
+    }
+
     sendRoomName(roomName: string) {
         this.socketClient.send('sendRoomName', roomName);
     }
@@ -177,6 +190,10 @@ export class SocketClientService {
 
     sendGameName(gameName: string) {
         this.socketClient.send('gameName', gameName);
+    }
+
+    getGameFromServer(gameName: string): void {
+        this.socketClient.send('requestToGetGame', gameName);
     }
 
     sendMousePosition(pos: number) {

@@ -11,6 +11,7 @@ export class GameService {
     gamesNames: string[];
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
+    games: Game[] = new Array();
     rootPath = join(process.cwd(), 'assets', 'games');
 
     constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
@@ -58,6 +59,17 @@ export class GameService {
             throw Error(`Failed to get Game: ${_gameName} does not exist`);
         }
         return JSON.parse(this.getFile(_gameName, 'info.json')) as Game;
+    }
+
+    // get all games
+    getGames(): Game[] {
+        if (this.gamesNames.length === 0) {
+            throw Error('Failed to get Games, list is empty');
+        }
+        for (const gameName of this.gamesNames) {
+            this.games.push(this.getGame(gameName));
+        }
+        return this.games;
     }
 
     getSetDifference(differencesStr: string[]): Set<number>[] {
@@ -109,6 +121,7 @@ export class GameService {
             }
         });
     }
+
     async deleteGame(_name: string): Promise<void> {
         if (!this.gamesNames.includes(_name)) throw Error('Does not exist');
         this.deleteDirectory(_name);

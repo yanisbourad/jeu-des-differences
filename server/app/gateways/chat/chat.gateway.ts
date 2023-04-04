@@ -137,10 +137,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (diff) {
             if (this.isTimeLimit) {
                 console.log('timeLimit');
-                this.deleteGameFromArray();
+                this.deleteGameFromArray(); // to implement game switching
                 // this.chooseRandomGame();
-                this.serverTime.incrementTime(this.roomName);
-            }; // doesn't work
+                this.serverTime.incrementTime(); // work!
+            } // doesn't work
             socket.emit('diffFound', Array.from(diff));
         } else {
             socket.emit('error');

@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 @Service()
 export class ServerTimeService {
     elapsedTime: number = 0;
-    countDown: number; // to change
+    countDown: number;
     tamponTime: number;
     hintPenalty: number = 5; // to change
     timeIncrement: number = 5; // to change
@@ -25,10 +25,10 @@ export class ServerTimeService {
     // start countDown
     startCountDown(id: string): void {
         let count = 0;
-        const time = this.countDown;
+        this.tamponTime = this.countDown;
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {
             count++;
-            this.countDown = time - count;
+            this.countDown = this.tamponTime - count;
             this.elapsedTimes.set(id, this.countDown);
         });
     }
@@ -40,24 +40,20 @@ export class ServerTimeService {
     }
 
     // increment time should not exceed 2 minutes
-    incrementTime(id: string): void {
-        const time = this.countDown;
-        this.countDown = time + this.timeIncrement;
-        if (this.countDown <= MAX_COUNTDOWN) {
-            this.elapsedTimes.set(id, time + this.timeIncrement);
-        } else {
-            this.countDown = MAX_COUNTDOWN;
-            this.elapsedTimes.set(id, MAX_COUNTDOWN);
+    incrementTime(): void {
+        if (this.tamponTime + this.timeIncrement > MAX_COUNTDOWN) {
+            this.tamponTime = MAX_COUNTDOWN;
         }
+        this.tamponTime += this.timeIncrement;
     }
 
     // decrement time should not be below 0, if equal zero, stop chronometer
     decrementTime(id: string): void {
-        const time = this.elapsedTimes.get(id);
-        if (time - this.hintPenalty > 0) {
-            this.elapsedTimes.set(id, time - this.hintPenalty);
-        } else {
+        if (this.tamponTime - this.hintPenalty < 0) {
+            this.tamponTime = 0;
             this.stopChronometer(id);
+        } else {
+            this.tamponTime -= this.hintPenalty;
         }
     }
 

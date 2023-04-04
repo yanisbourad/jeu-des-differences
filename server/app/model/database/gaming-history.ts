@@ -28,6 +28,10 @@ export class GamingHistory {
     @ApiProperty()
     @Prop({ required: true })
     opponentName: string;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    hasAbandonedGame: boolean;
 }
 
 export const gamingHistorySchema = SchemaFactory.createForClass(GamingHistory);

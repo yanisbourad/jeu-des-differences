@@ -64,7 +64,8 @@ export class GameService {
     // get all games
     getGames(): Game[] {
         if (this.gamesNames.length === 0) {
-            throw Error('Failed to get Games, list is empty');
+            return;
+            // throw Error('Failed to get Games, list is empty');
         }
         for (const gameName of this.gamesNames) {
             this.games.push(this.getGame(gameName));

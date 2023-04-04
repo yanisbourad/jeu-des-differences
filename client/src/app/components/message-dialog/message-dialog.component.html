@@ -2,7 +2,7 @@
   <h1 mat-dialog-title > {{data.message}}</h1>
   <div mat-dialog-content *ngIf="data.type === 'finished' && data.formatTime; else elseBlock">
     <h1 class="align-text">  Vous avez fini la partie en : {{data.formatTime}} minutes.</h1>
-    <h1 class="align-text">Le vainqueur est {{winner}}</h1>
+    <h1 class="align-text" *ngIf="gameService.mode !== 'tempsLimite'">Le vainqueur est {{winner}}</h1>
   </div>
   <ng-template #elseBlock>
     <div mat-dialog-content *ngIf="data.type !== 'timeLimit'">

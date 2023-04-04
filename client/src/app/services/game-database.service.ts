@@ -11,6 +11,7 @@ import { ImageDiffService } from './image-diff.service';
 })
 export class GameDatabaseService {
     twoHundredOkResponse: number;
+    isEmpty: boolean = false;
 
     private readonly baseUrl: string = environment.serverUrl;
 
@@ -56,5 +57,12 @@ export class GameDatabaseService {
             error: () => isSaved.next(false),
         });
         return isSaved;
+    }
+    async isDataBaseEmpty(): Promise<void> {
+        this.getAllGames().subscribe((res: GameInfo[]) => {
+            if (res.length === 0) {
+                this.isEmpty = true;
+            }
+        });
     }
 }

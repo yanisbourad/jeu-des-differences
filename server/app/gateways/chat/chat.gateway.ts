@@ -9,7 +9,6 @@ import { Server, Socket } from 'socket.io';
 import { INDEX_NOT_FOUND } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 import { Game } from '@common/game';
-import { timeStamp } from 'console';
 @WebSocketGateway({ namespace: '/api', cors: true, transport: ['websocket'] })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -136,12 +135,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async mouseDetect(socket: Socket, position: number) {
         const diff = this.unfoundedDifference.find((set) => set.has(position));
         if (diff) {
-            socket.emit('diffFound', Array.from(diff));
             if (this.isTimeLimit) {
+                console.log('timeLimit');
                 this.deleteGameFromArray();
-                this.chooseRandomGame();
+                // this.chooseRandomGame();
                 this.serverTime.incrementTime(this.roomName);
             }; // doesn't work
+            socket.emit('diffFound', Array.from(diff));
         } else {
             socket.emit('error');
         }

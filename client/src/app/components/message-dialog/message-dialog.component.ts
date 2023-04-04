@@ -6,6 +6,8 @@ import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import { GameDatabaseService } from '@app/services/game-database.service';
 
 @Component({
     selector: 'app-message-dialog',
@@ -19,10 +21,13 @@ export class MessageDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: { message: string; type: string; formatTime: string; playerName: string },
         private router: Router,
         readonly socket: SocketClientService,
-        private readonly gameService: GameService,
+        readonly gameService: GameService,
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
-    ) {}
+        private gameDataBaseService: GameDatabaseService,
+    ) {
+        this.gameDataBaseService.isDataBaseEmpty();
+    }
 
     rewindGame() {
         this.socket.leaveRoom();
@@ -31,7 +36,18 @@ export class MessageDialogComponent {
     }
 
     launchSolo(): void {
-        this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+        if (this.gameDataBaseService.isEmpty) {
+            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
+        } else {
+            this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+        }
+    }
+
+    launchFeedback(showedMessage: string): void {
+        this.dialog.open(GeneralFeedbackComponent, {
+            data: { message: showedMessage },
+            disableClose: true,
+        });
     }
 
     launchCooperatif(): void {

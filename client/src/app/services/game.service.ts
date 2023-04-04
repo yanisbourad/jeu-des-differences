@@ -85,7 +85,7 @@ export class GameService {
 
     getGame(gameName: string): void {
         if (this.mode === 'tempsLimite') {
-            this.socket.startSoloTimeLimit(this.playerName, 120);
+            this.socket.startSoloTimeLimit(this.playerName, 30);
         } else {
             this.socket.getGameFromServer(gameName);
         }

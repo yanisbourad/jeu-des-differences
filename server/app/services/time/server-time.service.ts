@@ -41,10 +41,13 @@ export class ServerTimeService {
 
     // increment time should not exceed 2 minutes
     incrementTime(id: string): void {
-        const time = this.elapsedTimes.get(id);
-        console.log(time + this.timeIncrement);
-        if (time + this.timeIncrement <= MAX_COUNTDOWN) {
+        const time = this.countDown;
+        this.countDown = time + this.timeIncrement;
+        if (this.countDown <= MAX_COUNTDOWN) {
             this.elapsedTimes.set(id, time + this.timeIncrement);
+        } else {
+            this.countDown = MAX_COUNTDOWN;
+            this.elapsedTimes.set(id, MAX_COUNTDOWN);
         }
     }
 

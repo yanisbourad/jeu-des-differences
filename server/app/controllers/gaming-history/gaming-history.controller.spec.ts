@@ -30,6 +30,7 @@ describe('GamingHistoryController', () => {
             gameType: 'test',
             playerName: 'test',
             opponentName: 'test',
+            hasAbandonedGame: false,
         };
     });
     it('should be defined', () => {

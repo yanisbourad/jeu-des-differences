@@ -3,12 +3,20 @@
     <div class="contents">
         <div *ngFor="let record of gamingHistory">
             <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
-                --- Durée totale: {{record.time}} --- <span *ngIf="record.gameType !== 'solo' ">Entre joueurs:
+                --- Durée totale: <span *ngIf="!record.hasAbandonedGame">{{record.time}}</span>
+                <span *ngIf="record.hasAbandonedGame">00:00</span>---
+                <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame">Entre joueurs:
                     <strong> {{record.playerName}} </strong></span>
-                <span *ngIf="record.gameType === 'solo' "> Joueur :
+                <span *ngIf="record.gameType === 'solo' && !record.hasAbandonedGame"> Joueur :
                     {{record.playerName}}</span>
-                <span *ngIf="record.gameType !== 'solo' ">et
-                    <em *ngIf="record.gameType !== 'solo' ">{{record.opponentName}} </em></span>
+                <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame"> et {{record.opponentName}}</span>
+
+                <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> Entre joueurs :
+                    <s>{{record.playerName}}</s></span>
+                <span *ngIf="record.gameType === 'solo' && record.hasAbandonedGame"> Joueur :
+                    <s> {{record.playerName}} </s></span>
+                <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> et
+                    <strong>{{record.opponentName}}</strong> </span>
             </p>
         </div>
     </div>

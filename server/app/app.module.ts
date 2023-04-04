@@ -8,11 +8,11 @@ import { GamingHistoryController } from './controllers/gaming-history/gaming-his
 import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
 import { GamingHistory, gamingHistorySchema } from './model/database/gaming-history';
+import { TimerConstantsModel, timerConstantsShema } from './model/database/timer-constants';
 import { GameRecordService } from './services/game-record/game-record.service';
 import { GameService } from './services/game/game.service';
 import { PlayerService } from './services/player/player-service';
 import { ServerTimeService } from './services/time/server-time.service';
-import { TimerConstantsModel, timerConstantsShema } from '@app/model/database/timer-constants';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -26,6 +26,7 @@ import { TimerConstantsModel, timerConstantsShema } from '@app/model/database/ti
         MongooseModule.forFeature([
             { name: GameRecord.name, schema: gameRecordSchema },
             { name: GamingHistory.name, schema: gamingHistorySchema },
+            { name: TimerConstantsModel.name, schema: timerConstantsShema },
         ]),
         GameCardHandlerModule,
     ],

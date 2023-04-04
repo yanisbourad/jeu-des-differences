@@ -50,6 +50,7 @@ export class DifferencePopupComponent implements AfterViewInit {
     }
 
     openName() {
+        this.showDifference = this.imageDifferenceService.listDifferences.length;
         if (this.showValidation) {
             const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
                 disableClose: true,

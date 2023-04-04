@@ -25,6 +25,7 @@ export interface GamingHistory {
     gameType: string;
     playerName: string;
     opponentName: string;
+    hasAbandonedGame: boolean;
 }
 
 export interface TimeConfig {

@@ -12,3 +12,4 @@ export const BLINKING_TIME = 1000;
 export const BLINKING_TIMEOUT = 125;
 export const BLINKING_COUNT = 8;
 export const UNIT_DELAY_INTERVAL = 100;
+export const LOADING_TIMEOUT = 500;

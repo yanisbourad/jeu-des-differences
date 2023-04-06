@@ -64,14 +64,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.socket.connect();
         this.gameRecordService.page = this;
         this.getRouterParams();
-        this.gameService.getGame(this.gameService.gameName);
+        if (this.gameService.mode === 'tempsLimite') {
+            this.socket.startSoloTimeLimit(this.gameService.playerName, 30);
+            this.gameService.getTimeLimitGame();
+        } else {
+            this.gameService.getClassicGame(this.gameService.gameName);
+        }
         this.gameService.dateStart = new Date().toLocaleDateString();
         this.loading();
-        if (this.gameService.gameType !== 'solo') {
-            this.cheatModeService.cheatModeKeyBinding();
-            this.cheatModeService.canvas0 = this.canvasCheat0;
-            this.cheatModeService.canvas1 = this.canvasCheat1;
-        }
+        this.cheatModeService.cheatModeKeyBinding();
+        this.cheatModeService.canvas0 = this.canvasCheat0;
+        this.cheatModeService.canvas1 = this.canvasCheat1;
     }
 
     loading(): void {
@@ -166,6 +169,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
                 this.gameService.handleDifferenceFound();
                 this.socket.sendDifference(newValue, this.socket.getRoomName());
+                if (this.gameService.mode === 'tempsLimite') {
+                    // this.gameService.game = this.socket.getRandomGame();
+                    console.log('found');
+                    // this.gameService.defineVariables();
+                }
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);
                 new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);

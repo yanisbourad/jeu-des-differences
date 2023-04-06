@@ -11,7 +11,7 @@ export class GameService {
     gamesNames: string[];
     // key to encrypt the game name in the database to avoid other servers to access the game records
     key: string;
-    games: Game[] = new Array();
+    games: Map<string, Game> = new Map<string, Game>();
     rootPath = join(process.cwd(), 'assets', 'games');
 
     constructor(@InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>, private readonly logger: Logger) {
@@ -62,13 +62,13 @@ export class GameService {
     }
 
     // get all games
-    getGames(): Game[] {
+    getGames(): Map<string, Game> {
         if (this.gamesNames.length === 0) {
             return;
             // throw Error('Failed to get Games, list is empty');
         }
         for (const gameName of this.gamesNames) {
-            this.games.push(this.getGame(gameName));
+            this.games.set(gameName, this.getGame(gameName));
         }
         return this.games;
     }

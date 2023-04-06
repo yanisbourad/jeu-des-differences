@@ -67,7 +67,7 @@ export class GameService {
     }
 
     defineVariables(): void {
-        console.log(this.game);
+        // console.log(this.game);
         this.gameInformation = {
             gameTitle: this.game.gameName,
             gameMode: this.gameType,
@@ -84,16 +84,20 @@ export class GameService {
         return differencesStr.map((a: string) => new Set(a.split(',').map((b: string) => Number(b))));
     }
 
-    getGame(gameName: string): void {
+    getTimeLimitGame(): void {
+        setTimeout(() => {
+            this.game = this.socket.getRandomGame();
+            this.defineVariables();
+            this.displayIcons();
+        }, 500)
+    }
+
+    getClassicGame(gameName: string): void {
         this.gameDataBase.getGameByName(gameName).subscribe((res) => {
             this.game = res;
+            this.defineVariables();
+            this.displayIcons();
         });
-        if (this.mode === 'tempsLimite') {
-            this.socket.startSoloTimeLimit(this.playerName, 30);
-            this.game = this.socket.getRandomGame();
-        }
-        this.defineVariables();
-        this.displayIcons();
     }
 
     initRewind(): void {

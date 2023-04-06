@@ -19,9 +19,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     isTimeLimit: boolean = false;
     isMulti: boolean = false;
     // create a queue of Players
+    gameNames: string[];
     playersQueue: PlayerMulti[] = [];
     unfoundedDifference: Map<string, Set<number>[]> = new Map<string, Set<number>[]>();
-    games: Game[] = new Array();
+    games: Map<string, Game> = new Map<string, Game>();
     game: Game;
     constructor(
         private readonly logger: Logger,
@@ -61,8 +62,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async startSoloTimeLimit(socket: Socket, infos: { playerName: string; countDown: number }) {
         this.logger.debug('temps limite');
         this.roomName = socket.id;
+        this.gameNames = [...this.gameService.gamesNames];
         this.games = this.gameService.getGames();
-        this.game = this.games[Math.floor(Math.random() * this.games.length)];
+        this.logger.debug(this.games.size);
+        this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         this.playerName = infos.playerName;
         this.isTimeLimit = true;
@@ -72,7 +75,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.serverTime.countDown = infos.countDown;
             this.serverTime.startCountDown(this.roomName);
         }
-        this.server.emit('getRandomGame', this.game);
+        this.server.to(this.roomName).emit('getRandomGame', this.game);
         // add room maybe
     }
 
@@ -154,12 +157,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         const diff = this.unfoundedDifference.get(this.roomName).find((set) => set.has(data[0]));
         if (diff) {
-            if (this.isTimeLimit) {
-                this.deleteGameFromArray(); // to implement game switching
-                this.isTimeLimit = false;
-                this.logger.debug(this.serverTime.countDown);
+            if (this.isTimeLimit && this.games.size !== 0) {
                 this.serverTime.incrementTime(); // work!
-            } // doesn't work
+                this.goToNextGame(); // to implement game switching
+                // this.isTimeLimit = false;
+            } else {
+                this.isTimeLimit = false;
+                this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+            }
             socket.emit('diffFound', Array.from(diff));
         } else {
             socket.emit('error');
@@ -211,8 +216,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     emitTime(): void {
         // to be private
         setInterval(() => {
-            // this.serverTime.stopCountDown(this.roomName);
-            // if (this.serverTime.countDown === 0) this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+            if (this.serverTime.countDown === 0) {
+                this.serverTime.stopCountDown(this.roomName);
+                this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+            }
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
         }, DELAY_BEFORE_EMITTING_TIME);
     }
@@ -234,18 +241,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
     }
 
-    loadRandomGame(): void {
-        this.games = this.gameService.getGames();
-        this.chooseRandomGame();
+    // loadRandomGame(): void {
+    //     this.games = this.gameService.getGames();
+    //     this.chooseRandomGame();
+    // }
+
+    chooseRandomName(): string {
+        return this.gameNames[Math.floor(Math.random() * this.gameService.games.size)];
     }
 
-    chooseRandomGame(): void {
-        this.game = this.games[Math.floor(Math.random() * this.games.length)];
-        this.server.emit('getRandomGame', this.game);
-    }
-
-    deleteGameFromArray(): void {
-        this.games = this.games.filter((game) => game !== this.game);
-        console.log('arrayLength', this.games.length);
+    goToNextGame(): void {
+        this.logger.debug(['init', this.games.size]);
+        this.games.delete(this.game.gameName);
+        this.gameNames.filter((name) => name !== this.game.gameName);
+        this.game = this.games.get(this.chooseRandomName());
+        this.logger.debug(['after', this.games.size]);
+        this.logger.debug(this.game.gameName);
+        this.server.to(this.roomName).emit('getRandomGame', this.game);
     }
 }

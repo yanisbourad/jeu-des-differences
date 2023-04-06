@@ -204,7 +204,6 @@ export class SocketClientService {
     }
 
     sendMousePosition(pos: number, roomName: string) {
-        console.log(pos);
         this.socketClient.send('mousePosition', [pos, roomName]);
     }
 }

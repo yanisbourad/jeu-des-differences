@@ -66,12 +66,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameRecordService.page = this;
         this.getRouterParams();
         if (this.gameService.mode === 'tempsLimite') {
-            this.socket.startSoloTimeLimit(this.gameService.playerName, 30);
+            this.socket.startSoloTimeLimit(this.gameService.playerName);
             this.gameService.getTimeLimitGame();
         } else {
             this.gameService.getClassicGame(this.gameService.gameName);
         }
-        this.gameService.dateStart = new Date().toLocaleDateString();
         this.loading();
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;

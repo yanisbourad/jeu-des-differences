@@ -60,20 +60,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.StartSoloTimeLimit)
-    async startSoloTimeLimit(socket: Socket, infos: { playerName: string; countDown: number }) {
-        this.logger.debug(['temps limite', infos.playerName, infos.countDown]);
+    async startSoloTimeLimit(socket: Socket, playerName: string) {
         this.roomName = socket.id;
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
-        this.logger.debug(this.games.size);
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
-        this.playerName = infos.playerName;
+        this.playerName = playerName;
         socket.join(this.roomName);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
         if (!this.serverTime.timers[this.roomName]) {
-            this.serverTime.countDown = infos.countDown;
-            this.logger.debug('start countDown');
             this.serverTime.startCountDown(this.roomName);
         }
         this.server.to(this.roomName).emit('getRandomGame', this.game);

@@ -152,31 +152,12 @@ export class GameService {
         this.totalDifferences = 0;
         this.differencesArray = [];
         this.opponentDifferencesArray = [];
-        // this.playerName = '';
-        // this.playersName = [];
-        // this.opponentName = '';
         this.isWinner = false;
         this.startDate = '';
         this.hasAbandonedGame = false;
         this.gameId = '';
-        // this.gameName = '';
-        // this.gameTime = 0;
-        // this.gameType = '';
         this.nDifferencesFound = 0;
         this.socket.messageList = [];
-        // this.game = {
-        //     gameName: '',
-        //     difficulty: '',
-        //     originalImageData: './assets/image_empty.bmp',
-        //     modifiedImageData: './assets/image_empty.bmp',
-        //     listDifferences: [],
-        // };
-        // this.gameInformation = {
-        //     gameTitle: '',
-        //     gameMode: '',
-        //     gameDifficulty: '',
-        //     nDifferences: 0,
-        // };
     }
 
     reduceNbrDifferences(): void {

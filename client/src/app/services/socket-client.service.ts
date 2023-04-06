@@ -154,8 +154,8 @@ export class SocketClientService {
         this.socketClient.send('joinRoomSolo', { playerName, gameName });
     }
 
-    startSoloTimeLimit(playerName: string, countDown: number) {
-        this.socketClient.send('startSoloTimeLimit', { playerName, countDown });
+    startSoloTimeLimit(playerName: string) {
+        this.socketClient.send('startSoloTimeLimit', playerName);
     }
 
     sendRoomName(roomName: string) {

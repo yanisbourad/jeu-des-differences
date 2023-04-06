@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DELAY_BEFORE_EMITTING_TIME, MAX_COUNTDOWN } from '@common/const-chat-gateway';
 import { interval, Subscription } from 'rxjs';
 import { Service } from 'typedi';
+import { GameService } from '@app/services/game/game.service';
+import {TimeConfig } from '@common/game';
 
 @Injectable()
 @Service()
@@ -9,10 +11,17 @@ export class ServerTimeService {
     elapsedTime: number = 0;
     countDown: number;
     tamponTime: number;
-    hintPenalty: number = 5; // to change
-    timeIncrement: number = 5; // to change
+    timeConstants: TimeConfig;
     timers: { [key: string]: Subscription } = {};
     elapsedTimes: Map<string, number> = new Map<string, number>();
+
+    constructor(private gameService: GameService) {
+        this.getTimeConstants();
+    }
+
+    async getTimeConstants(): Promise<void> {
+        this.timeConstants = await this.gameService.getConstants()
+    }
 
     startChronometer(id: string): void {
         let count = 0;
@@ -25,6 +34,7 @@ export class ServerTimeService {
     // start countDown
     startCountDown(id: string): void {
         let count = 0;
+        this.countDown = this.timeConstants.timeInit;
         this.tamponTime = this.countDown;
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {
             count++;
@@ -42,19 +52,19 @@ export class ServerTimeService {
 
     // increment time should not exceed 2 minutes
     incrementTime(): void {
-        if (this.tamponTime + this.timeIncrement > MAX_COUNTDOWN) {
+        if (this.tamponTime + this.timeConstants.timeBonus > MAX_COUNTDOWN) {
             this.tamponTime = MAX_COUNTDOWN;
         }
-        this.tamponTime += this.timeIncrement;
+        this.tamponTime += this.timeConstants.timeBonus;
     }
 
     // decrement time should not be below 0, if equal zero, stop chronometer
     decrementTime(id: string): void {
-        if (this.tamponTime - this.hintPenalty < 0) {
+        if (this.tamponTime - this.timeConstants.timePen < 0) {
             this.tamponTime = 0;
             this.stopChronometer(id);
         } else {
-            this.tamponTime -= this.hintPenalty;
+            this.tamponTime -= this.timeConstants.timePen;
         }
     }
 

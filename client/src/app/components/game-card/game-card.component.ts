@@ -41,6 +41,8 @@ export class GameCardComponent implements OnInit {
 
     ngOnInit(): void {
         this.url = this.router.url;
+        this.gameService.rankingSoloCopy = this.card.rankingSolo;
+        this.gameService.rankingMultiCopy = this.card.rankingMulti;
     }
 
     launchDialog(): void {
@@ -76,5 +78,11 @@ export class GameCardComponent implements OnInit {
         } catch (error) {
             alert('la suppression du jeu a échoué');
         }
+    }
+    async onReinitialise(gameName: string) {
+        try {
+            await this.gameService.deleteOneGameRecords(gameName);
+            // should update the view to reflect initial game records
+        } catch (error) {}
     }
 }

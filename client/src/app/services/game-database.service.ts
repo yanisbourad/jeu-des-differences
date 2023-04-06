@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord } from '@common/game';
+import { Game, GameInfo, GameRecord, TimeConfig, GamingHistory } from '@common/game';
 import { CanvasHolderService } from './canvas-holder.service';
 import { ImageDiffService } from './image-diff.service';
 @Injectable({
@@ -23,12 +23,19 @@ export class GameDatabaseService {
         return this.http.get<GameInfo[]>(`${this.baseUrl}/game`);
     }
 
+    getAllGamingHistory(): Observable<GamingHistory[]> {
+        return this.http.get<GamingHistory[]>(`${this.baseUrl}/gamingHistory`);
+    }
+
     getGameByName(gameName: string): Observable<GameInfo> {
         return this.http.get<GameInfo>(`${this.baseUrl}/game/${gameName}`);
     }
 
     createGameRecord(gameRecord: GameRecord): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}/gameRecord/create`, gameRecord, { observe: 'response', responseType: 'text' });
+    }
+    createGamingHistory(gamingHistory: GamingHistory): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseUrl}/gamingHistory/create`, gamingHistory, { observe: 'response', responseType: 'text' });
     }
 
     createGame(game: Game): Observable<HttpResponse<string>> {
@@ -39,8 +46,21 @@ export class GameDatabaseService {
         return this.http.get<boolean>(`${this.baseUrl}/game/validate/${gameName}`);
     }
 
+    deleteAllGames(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/game/`, { observe: 'response', responseType: 'text' });
+    }
+
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
+    deleteOneGameRecords(gameName: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gameRecord/${gameName}`, { observe: 'response', responseType: 'text' });
+    }
+    deleteGamingHistory(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });
+    }
+    deleteGameRecords(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}/gameRecord`, { observe: 'response', responseType: 'text' });
     }
 
     saveGame(_gameName: string): EventEmitter<boolean> {
@@ -64,5 +84,13 @@ export class GameDatabaseService {
                 this.isEmpty = true;
             }
         });
+    }
+
+    updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {
+        return this.http.put(`${this.baseUrl}/game/constants`, constants, { observe: 'response', responseType: 'text' });
+    }
+
+    getConstants(): Observable<TimeConfig> {
+        return this.http.get<TimeConfig>(`${this.baseUrl}/game/constants`);
     }
 }

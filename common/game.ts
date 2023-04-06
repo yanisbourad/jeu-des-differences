@@ -18,6 +18,15 @@ export interface GameRecord {
     playerName: string;
     dateStart: string;
 }
+export interface GamingHistory {
+    gameName: string;
+    dateStart: string;
+    time: String;
+    gameType: string;
+    playerName: string;
+    opponentName: string;
+    hasAbandonedGame: boolean;
+}
 
 export interface TimeConfig {
     timeInit: number;

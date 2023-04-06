@@ -62,6 +62,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         // needed for the rewind
         this.socket.connect();
+        this.gameService.setStartDate(new Date().toString());
         this.gameRecordService.page = this;
         this.getRouterParams();
         if (this.gameService.mode === 'tempsLimite') {

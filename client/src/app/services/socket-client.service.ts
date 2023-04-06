@@ -25,6 +25,7 @@ export class SocketClientService {
     private playerFoundDiff = new Subject<string>();
     private diffFound = new Subject<Set<number>>();
     private difference = new Subject<Set<number>>();
+    private timeLimitStatus = new Subject<boolean>();
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
     gameState$ = this.gameState.asObservable();
@@ -34,6 +35,8 @@ export class SocketClientService {
     diffFound$ = this.diffFound.asObservable();
     // eslint-disable-next-line @typescript-eslint/member-ordering
     difference$ = this.difference.asObservable();
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    timeLimitStatus$ = this.timeLimitStatus.asObservable();
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
     get socketId() {
@@ -118,6 +121,10 @@ export class SocketClientService {
 
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
             this.playerFoundDiff.next(data.playerName);
+        });
+
+        this.socketClient.on('timeLimitStatus', (finished: boolean) => {
+            this.timeLimitStatus.next(finished);
         });
 
         this.socketClient.on('feedbackDifference', (diff: Set<number>) => {

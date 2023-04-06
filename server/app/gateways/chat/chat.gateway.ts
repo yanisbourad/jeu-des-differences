@@ -212,7 +212,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         setInterval(() => {
             if (this.serverTime.countDown === 0) {
                 this.serverTime.removeTimer(this.roomName);
-                this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+                this.server.to(this.roomName).emit('timeLimitStatus', false);
             }
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
         }, DELAY_BEFORE_EMITTING_TIME);
@@ -246,7 +246,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.server.to(this.roomName).emit('getRandomGame', this.game);
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         } else {
-            this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+            this.server.to(this.roomName).emit('timeLimitStatus', true);
         }
     }
 }

@@ -30,7 +30,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     idEventList: number;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundSubscription: Subscription = new Subscription();
-    playerFoundDiffSubscription: Subscription = new Subscription();
+    timeLimitStatusSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
     notRewinding: boolean = true;
     differenceSubscription: Subscription = new Subscription();
@@ -111,7 +111,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.notRewinding) {
             this.cheatModeService.removeHotkeysEventListener();
             this.diffFoundSubscription.unsubscribe();
-            this.playerFoundDiffSubscription.unsubscribe();
+            this.timeLimitStatusSubscription.unsubscribe();
             this.gameStateSubscription.unsubscribe();
             this.socket.disconnect();
         }
@@ -128,7 +128,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy(): void {
         this.cheatModeService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
-        this.playerFoundDiffSubscription.unsubscribe();
+        this.timeLimitStatusSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.differenceSubscription.unsubscribe();
         this.gameService.reinitializeGame();
@@ -171,6 +171,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.socket.sendDifference(newValue, this.socket.getRoomName());
                 if (this.gameService.mode === 'tempsLimite') {
                     this.gameService.game = this.socket.getGame();
+                    this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
                 }
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);
@@ -178,11 +179,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         });
 
-        // this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
-        //     if (newValue === this.gameService.opponentName) {
-        //         this.gameService.handlePlayerDifference();
-        //     }
-        // });
+        this.timeLimitStatusSubscription = this.socket.timeLimitStatus$.subscribe((newValue) => {
+            if (newValue) {
+                this.gameService.displayGameEnded('Félicitaion, vous avez gagné la partie ', 'finished');
+            } else {
+                this.gameService.displayGameEnded('Vous avez perdu la partie ', 'finished');
+            }
+            this.socket.disconnect();
+        });
     }
 
     getRouterParams(): void {

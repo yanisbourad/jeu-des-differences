@@ -203,7 +203,7 @@ export class SocketClientService {
         this.socketClient.send('requestToGetGame');
     }
 
-    sendMousePosition(pos: number, roomName: string) {
-        this.socketClient.send('mousePosition', [pos, roomName]);
+    sendMousePosition(pos: number, roomName: string, mode: string) {
+        this.socketClient.send('mousePosition', [pos, roomName, mode]);
     }
 }

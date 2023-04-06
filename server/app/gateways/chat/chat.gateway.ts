@@ -39,6 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.JoinRoomSolo)
     async joinRoomSolo(socket: Socket, data: { playerName: string; gameName: string }) {
+        this.logger.debug('solo');
         const game = this.gameService.getGame(data.gameName);
         this.unfoundedDifference.set(socket.id, this.gameService.getSetDifference(game.listDifferences));
         const startTime = new Date();
@@ -60,19 +61,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StartSoloTimeLimit)
     async startSoloTimeLimit(socket: Socket, infos: { playerName: string; countDown: number }) {
-        this.logger.debug('temps limite');
+        this.logger.debug(['temps limite', infos.playerName, infos.countDown]);
         this.roomName = socket.id;
-        this.gameNames = [...this.gameService.gamesNames];
+        this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
         this.logger.debug(this.games.size);
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         this.playerName = infos.playerName;
-        this.isTimeLimit = true;
         socket.join(this.roomName);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
         if (!this.serverTime.timers[this.roomName]) {
             this.serverTime.countDown = infos.countDown;
+            this.logger.debug('start countDown');
             this.serverTime.startCountDown(this.roomName);
         }
         this.server.to(this.roomName).emit('getRandomGame', this.game);
@@ -89,6 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.join(this.roomName);
         this.logger.debug(this.unfoundedDifference.size);
         if (!this.serverTime.timers[this.roomName]) {
+            this.logger.debug('start');
             this.serverTime.startChronometer(this.roomName);
         }
     }
@@ -149,7 +151,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.MousePosition)
-    async mouseDetect(socket: Socket, data: [position: number, roomName: string]) {
+    async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
         if (!this.isMulti) {
             this.roomName = socket.id;
         } else {
@@ -157,13 +159,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         const diff = this.unfoundedDifference.get(this.roomName).find((set) => set.has(data[0]));
         if (diff) {
-            if (this.isTimeLimit && this.games.size !== 0) {
+            if (data[2]) {
+                this.logger.debug('here');
                 this.serverTime.incrementTime(); // work!
                 this.goToNextGame(); // to implement game switching
-                // this.isTimeLimit = false;
-            } else {
-                this.isTimeLimit = false;
-                this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
             }
             socket.emit('diffFound', Array.from(diff));
         } else {
@@ -190,12 +189,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
 
-    // @SubscribeMessage(ChatEvents.CurrentGameName)
-    // async getRandomGame(socket: Socket) {
-    //     this.defineDifferences(this.roomName, this.game.listDifferences);
-    //     socket.emit('getRandomGame', this.game);
-    // }
-
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id: ${socket.id} `);
     }
@@ -203,6 +196,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
         await this.playerService.removeRoom(this.roomName);
+        // this.serverTime.removeTimer(socket.id);
         socket.leave(this.roomName);
     }
 
@@ -217,7 +211,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // to be private
         setInterval(() => {
             if (this.serverTime.countDown === 0) {
-                this.serverTime.stopCountDown(this.roomName);
+                this.serverTime.removeTimer(this.roomName);
                 this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
             }
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
@@ -241,22 +235,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
     }
 
-    // loadRandomGame(): void {
-    //     this.games = this.gameService.getGames();
-    //     this.chooseRandomGame();
-    // }
-
     chooseRandomName(): string {
-        return this.gameNames[Math.floor(Math.random() * this.gameService.games.size)];
+        return this.gameNames[Math.floor(Math.random() * this.gameNames.length)];
     }
 
     goToNextGame(): void {
-        this.logger.debug(['init', this.games.size]);
-        this.games.delete(this.game.gameName);
-        this.gameNames.filter((name) => name !== this.game.gameName);
-        this.game = this.games.get(this.chooseRandomName());
-        this.logger.debug(['after', this.games.size]);
-        this.logger.debug(this.game.gameName);
-        this.server.to(this.roomName).emit('getRandomGame', this.game);
+        if (this.gameNames.length !== 1) {
+            this.gameNames = this.gameNames.filter((name) => name !== this.game.gameName);
+            this.game = this.games.get(this.chooseRandomName());
+            this.server.to(this.roomName).emit('getRandomGame', this.game);
+        } else {
+            this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
+        }
     }
 }

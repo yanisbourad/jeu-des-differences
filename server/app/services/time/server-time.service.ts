@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 @Service()
 export class ServerTimeService {
     elapsedTime: number = 0;
-    countDown: number = 30;
+    countDown: number;
     tamponTime: number;
     hintPenalty: number = 5; // to change
     timeIncrement: number = 5; // to change
@@ -29,6 +29,7 @@ export class ServerTimeService {
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {
             count++;
             this.countDown = this.tamponTime - count;
+            this.stopCountDown(id);
             this.elapsedTimes.set(id, this.countDown);
         });
     }
@@ -85,5 +86,6 @@ export class ServerTimeService {
     removeTimer(id: string): void {
         this.timers[id].unsubscribe();
         this.elapsedTimes.delete(id);
+        this.countDown = 30;
     }
 }

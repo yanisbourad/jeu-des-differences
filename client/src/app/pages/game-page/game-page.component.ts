@@ -88,7 +88,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         const roomName = this.gameService.gameId + this.gameService.gameName;
         switch (this.gameService.gameType) {
             case 'solo':
-                this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
+                if (this.gameService.mode !== 'tempsLimite') this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
                 break;
             case 'double':
                 this.socket.sendGameName(this.gameService.gameName);

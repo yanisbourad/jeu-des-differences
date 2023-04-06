@@ -297,7 +297,7 @@ export class GameService {
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            this.socket.sendMousePosition(distMousePosition, roomName);
+            this.socket.sendMousePosition(distMousePosition, roomName, this.mode);
         }
     }
 

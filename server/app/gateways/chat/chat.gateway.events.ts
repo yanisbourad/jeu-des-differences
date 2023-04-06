@@ -12,8 +12,8 @@ export enum ChatEvents {
     FindDifference = 'findDifference',
     FeedbackDifference = 'feedbackDifference',
     SendGiveUp = 'sendGiveUp',
-    // GameName = 'gameName',
-    RequestToGetGame = 'requestToGetGame',
+    GameName = 'gameName',
+    CurrentGameName = 'currentGameName',
     MousePosition = 'mousePosition',
     StartSoloTimeLimit = 'startSoloTimeLimit',
 }

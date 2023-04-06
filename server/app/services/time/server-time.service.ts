@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 @Service()
 export class ServerTimeService {
     elapsedTime: number = 0;
-    countDown: number;
+    countDown: number = 30;
     tamponTime: number;
     hintPenalty: number = 5; // to change
     timeIncrement: number = 5; // to change

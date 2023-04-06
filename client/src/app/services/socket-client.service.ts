@@ -17,6 +17,7 @@ export class SocketClientService {
     messageToAdd = new Subject<GameMessageEvent>();
     messageToAdd$ = this.messageToAdd.asObservable();
     game: Game;
+    randomGame: Game;
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
@@ -59,6 +60,10 @@ export class SocketClientService {
         return this.game;
     }
 
+    getRandomGame(): Game {
+        return this.randomGame;
+    }
+
     getRoomName(): string {
         return this.roomName;
     }
@@ -74,10 +79,12 @@ export class SocketClientService {
 
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
+            console.log(this.elapsedTimes);
         });
 
-        this.socketClient.on('getGame', (game: Game) => {
-            this.game = game;
+        this.socketClient.on('getRandomGame', (game: Game) => {
+            this.randomGame = game;
+            console.log(this.randomGame);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -143,8 +150,8 @@ export class SocketClientService {
         this.socketClient.disconnect();
     }
 
-    joinRoomSolo(playerName: string) {
-        this.socketClient.send('joinRoomSolo', playerName);
+    joinRoomSolo(playerName: string, gameName: string) {
+        this.socketClient.send('joinRoomSolo', { playerName, gameName });
     }
 
     startSoloTimeLimit(playerName: string, countDown: number) {
@@ -189,14 +196,15 @@ export class SocketClientService {
     }
 
     sendGameName(gameName: string) {
-        this.socketClient.send('gameName', gameName);
+        this.socketClient.send('currentGameName', gameName);
     }
 
-    getGameFromServer(gameName: string): void {
-        this.socketClient.send('requestToGetGame', gameName);
+    getGameFromServer(): void {
+        this.socketClient.send('requestToGetGame');
     }
 
-    sendMousePosition(pos: number) {
-        this.socketClient.send('mousePosition', pos);
+    sendMousePosition(pos: number, roomName: string) {
+        console.log(pos);
+        this.socketClient.send('mousePosition', [pos, roomName]);
     }
 }

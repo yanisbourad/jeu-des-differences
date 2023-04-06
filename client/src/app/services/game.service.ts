@@ -67,6 +67,7 @@ export class GameService {
     }
 
     defineVariables(): void {
+        console.log(this.game);
         this.gameInformation = {
             gameTitle: this.game.gameName,
             gameMode: this.gameType,
@@ -84,17 +85,15 @@ export class GameService {
     }
 
     getGame(gameName: string): void {
+        this.gameDataBase.getGameByName(gameName).subscribe((res) => {
+            this.game = res;
+        });
         if (this.mode === 'tempsLimite') {
             this.socket.startSoloTimeLimit(this.playerName, 30);
-        } else {
-            this.socket.getGameFromServer(gameName);
+            this.game = this.socket.getRandomGame();
         }
-        setTimeout(() => {
-            this.game = this.socket.getGame();
-            this.defineVariables();
-            this.socket.sendGameName(this.gameName);
-            this.displayIcons();
-        }, 500);
+        this.defineVariables();
+        this.displayIcons();
     }
 
     initRewind(): void {
@@ -290,10 +289,11 @@ export class GameService {
     }
 
     mouseHitDetect(event: MouseEvent): void {
+        const roomName = this.gameId + this.gameName;
         if (event.button === MouseButton.Left && !this.errorPenalty) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };
             const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            this.socket.sendMousePosition(distMousePosition);
+            this.socket.sendMousePosition(distMousePosition, roomName);
         }
     }
 

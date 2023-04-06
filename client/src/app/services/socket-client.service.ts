@@ -17,7 +17,6 @@ export class SocketClientService {
     messageToAdd = new Subject<GameMessageEvent>();
     messageToAdd$ = this.messageToAdd.asObservable();
     game: Game;
-    randomGame: Game;
     elapsedTimes: Map<string, number> = new Map<string, number>();
     playerGaveUp: string;
     statusPlayer: string;
@@ -60,10 +59,6 @@ export class SocketClientService {
         return this.game;
     }
 
-    getRandomGame(): Game {
-        return this.randomGame;
-    }
-
     getRoomName(): string {
         return this.roomName;
     }
@@ -83,8 +78,8 @@ export class SocketClientService {
         });
 
         this.socketClient.on('getRandomGame', (game: Game) => {
-            this.randomGame = game;
-            console.log(this.randomGame);
+            this.game = game;
+            console.log(this.game);
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {

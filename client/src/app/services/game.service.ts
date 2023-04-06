@@ -94,7 +94,7 @@ export class GameService {
 
     getTimeLimitGame(): void {
         setTimeout(() => {
-            this.game = this.socket.getRandomGame();
+            this.game = this.socket.getGame();
             this.defineVariables();
             this.displayIcons();
         }, 500)

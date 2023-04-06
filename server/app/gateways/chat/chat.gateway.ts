@@ -244,6 +244,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.gameNames = this.gameNames.filter((name) => name !== this.game.gameName);
             this.game = this.games.get(this.chooseRandomName());
             this.server.to(this.roomName).emit('getRandomGame', this.game);
+            this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         } else {
             this.server.to(this.roomName).emit('gameEnded', [true, this.playerName]);
         }

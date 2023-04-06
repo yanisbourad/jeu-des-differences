@@ -170,9 +170,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gameService.handleDifferenceFound();
                 this.socket.sendDifference(newValue, this.socket.getRoomName());
                 if (this.gameService.mode === 'tempsLimite') {
-                    // this.gameService.game = this.socket.getRandomGame();
-                    console.log('found');
-                    // this.gameService.defineVariables();
+                    this.gameService.game = this.socket.getGame();
                 }
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);

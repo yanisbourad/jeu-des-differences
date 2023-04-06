@@ -98,7 +98,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string, boolean]) {
-        socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
+        if (data[1] === 'meilleur temps') {
+            socket.broadcast.emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
+        } else {
+            socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
+        }
     }
 
     @SubscribeMessage(ChatEvents.FindDifference)

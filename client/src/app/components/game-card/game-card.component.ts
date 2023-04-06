@@ -41,6 +41,8 @@ export class GameCardComponent implements OnInit {
 
     ngOnInit(): void {
         this.url = this.router.url;
+        this.gameService.rankingSoloCopy = this.card.rankingSolo;
+        this.gameService.rankingMultiCopy = this.card.rankingMulti;
     }
 
     launchDialog(): void {

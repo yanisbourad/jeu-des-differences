@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
@@ -10,33 +11,29 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class SocketClientService {
-    roomName: string = '';
-
-    // Mange the message list
-    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
-    messageToAdd = new Subject<GameMessageEvent>();
-    messageToAdd$ = this.messageToAdd.asObservable();
     game: Game;
-    elapsedTimes: Map<string, number> = new Map<string, number>();
+    roomName: string;
     playerGaveUp: string;
     statusPlayer: string;
     error: Set<number>;
+    nbrDifference: number;
+    elapsedTimes: Map<string, number> = new Map<string, number>();
+    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
+    // DEFINE SUBJECTS
     private gameState = new Subject<boolean>();
     private playerFoundDiff = new Subject<string>();
     private diffFound = new Subject<Set<number>>();
     private difference = new Subject<Set<number>>();
     private timeLimitStatus = new Subject<boolean>();
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering
+    private messageToAdd = new Subject<GameMessageEvent>();
+    // DEFINE OBSERVABLES
     gameState$ = this.gameState.asObservable();
-    // eslint-disable-next-line @typescript-eslint/member-ordering
     playerFoundDiff$ = this.playerFoundDiff.asObservable();
-    // eslint-disable-next-line @typescript-eslint/member-ordering
     diffFound$ = this.diffFound.asObservable();
-    // eslint-disable-next-line @typescript-eslint/member-ordering
     difference$ = this.difference.asObservable();
-    // eslint-disable-next-line @typescript-eslint/member-ordering
     timeLimitStatus$ = this.timeLimitStatus.asObservable();
+    messageToAdd$ = this.messageToAdd.asObservable();
+
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
     get socketId() {
@@ -77,12 +74,11 @@ export class SocketClientService {
 
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
-            console.log(this.elapsedTimes);
         });
 
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
-            console.log(this.game);
+            // this.nbrDifference = values[1];
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {

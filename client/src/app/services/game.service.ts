@@ -138,8 +138,8 @@ export class GameService {
         this.dialog.open(MessageDialogComponent, {
             data: { message: msg, type, formatTime: time },
             disableClose: true,
-            minWidth: '250px',
-            minHeight: '250px',
+            minWidth: 'fit-content',
+            minHeight: 'fit-content',
             panelClass: 'custom-dialog-container',
         });
     }
@@ -446,8 +446,8 @@ export class GameService {
         // can be moved
         this.dialog.open(MessageDialogComponent, {
             data: { message: msg, type },
-            minWidth: '250px',
-            minHeight: '150px',
+            minWidth: 'fit-content',
+            minHeight: 'fit-content',
             panelClass: 'custom-dialog-container',
         });
     }

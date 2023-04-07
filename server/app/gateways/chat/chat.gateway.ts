@@ -16,7 +16,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     roomName: string = '';
     playerName: string = '';
     gameName: string = '';
-    isTimeLimit: boolean = false;
     isMulti: boolean = false;
     // create a queue of Players
     gameNames: string[];
@@ -37,6 +36,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('connection au socket');
     }
 
+    /**
+    * START SECTION FOR JOINING THE  GAME
+    */
     @SubscribeMessage(ChatEvents.JoinRoomSolo)
     async joinRoomSolo(socket: Socket, data: { playerName: string; gameName: string }) {
         this.logger.debug('solo');
@@ -109,21 +111,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.gameName = player.gameName;
         }
     }
+    /**
+    * END SECTION FOR JOINING THE  GAME
+    */
 
-    @SubscribeMessage(ChatEvents.LeaveRoom)
-    async leaveRoom(socket: Socket) {
-        // await this.playerService.removeRoom(this.roomName);
-        socket.to(this.roomName).socketsLeave(this.roomName);
-        socket.disconnect();
-    }
-
-    @SubscribeMessage(ChatEvents.StopTimer)
-    async stopTimer(socket: Socket, data: [string, string]) {
-        socket.to(data[0]).emit('gameEnded', [true, data[1]]);
-        // this.serverTime.stopChronometer(data[0]);
-        this.serverTime.removeTimer(data[0]);
-    }
-
+    /**
+    *  SECTION FOR SENDING MESSAGES
+    */
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string, boolean]) {
         if (data[1] === 'meilleur temps') {
@@ -132,7 +126,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
         }
     }
-
+    /**
+    *  START SECTION FOR THE DIFFERENCE DETECTION
+    */
     @SubscribeMessage(ChatEvents.FindDifference)
     async findDifference(socket: Socket, information: { playerName: string; roomName: string }) {
         socket.to(information.roomName).emit('findDifference-return', { playerName: information.playerName });
@@ -169,7 +165,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             );
         }
     }
+    /**
+    *  END SECTION FOR THE DIFFERENCE DETECTION
+    */
 
+    /**
+    *  START SECTION FOR END GAME
+    */
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         this.serverTime.removeTimer(roomName);
@@ -181,15 +183,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
 
-    async handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id: ${socket.id} `);
+    @SubscribeMessage(ChatEvents.LeaveRoom)
+    async leaveRoom(socket: Socket) {
+        // await this.playerService.removeRoom(this.roomName);
+        socket.to(this.roomName).socketsLeave(this.roomName);
+        socket.disconnect();
+    }
+
+    @SubscribeMessage(ChatEvents.StopTimer)
+    async stopTimer(socket: Socket, data: [string, string]) {
+        socket.to(data[0]).emit('gameEnded', [true, data[1]]);
+        // this.serverTime.stopChronometer(data[0]);
+        this.serverTime.removeTimer(data[0]);
     }
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
         socket.leave(this.roomName);
     }
+    /**
+    *  END SECTION FOR END GAME
+    */
+    
+    async handleConnection(socket: Socket) {
+        this.logger.log(`Connexion par l'utilisateur avec id: ${socket.id} `);
+    }
 
+    /**
+    *  SECTION FOR USEFUL FUNCTIONS FOR THE GAME LOGIC
+    */
     afterInit() {
         this.emitTime();
     }
@@ -197,6 +219,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     defineDifferences(roomName: string, diffList: string[]): void {
         this.unfoundedDifference.set(roomName, this.gameService.getSetDifference(diffList));
     }
+
     private emitTime(): void {
         setInterval(() => {
             if (this.serverTime.countDown === 0) {

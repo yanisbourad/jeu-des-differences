@@ -26,7 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     game: Game;
     constructor(
         private readonly logger: Logger,
-        private readonly playerService: PlayerService,
+        // private readonly playerService: PlayerService,
         private readonly serverTime: ServerTimeService,
         private readonly gameService: GameService,
     ) {}
@@ -42,25 +42,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.debug('solo');
         const game = this.gameService.getGame(data.gameName);
         this.unfoundedDifference.set(socket.id, this.gameService.getSetDifference(game.listDifferences));
-        const startTime = new Date();
-        const player: PlayerEntity = {
-            playerName: data.playerName,
-            socketId: socket.id,
-        };
-        if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
-            socket.emit(ChatEvents.Hello, `${socket.id}`);
-            await this.playerService.addRoomSolo(socket.id, player, startTime);
-            if (!this.serverTime.timers[player.socketId]) {
-                this.serverTime.startChronometer(player.socketId);
-            }
-            socket.join(player.socketId);
-        } else {
-            this.logger.log('room already exists');
+        // const startTime = new Date();
+        // const player: PlayerEntity = {
+        //     playerName: data.playerName,
+        //     socketId: socket.id,
+        // };
+        // if ((await this.playerService.getRoomIndex(socket.id)) === INDEX_NOT_FOUND) {
+        socket.emit(ChatEvents.Hello, `${socket.id}`);
+            // await this.playerService.addRoomSolo(socket.id, player, startTime);
+        if (!this.serverTime.timers[socket.id]) {
+            this.serverTime.startChronometer(socket.id);
         }
+        socket.join(socket.id);
+        // } else {
+        //     this.logger.log('room already exists');
+        // }
     }
 
     @SubscribeMessage(ChatEvents.StartSoloTimeLimit)
     async startSoloTimeLimit(socket: Socket, playerName: string) {
+        this.logger.debug('temps Limite');
         this.roomName = socket.id;
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
@@ -93,7 +94,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StartMultiGame)
     async startMultiGame(socket: Socket, player: { gameId: string; creatorName: string; gameName: string; opponentName: string }) {
-        this.logger.debug('multi');
+        // this.logger.debug('multi');
         this.playersQueue.push({
             socketId: socket.id,
             id: player.gameId,
@@ -101,25 +102,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             gameName: player.gameName,
             opponentName: player.opponentName,
         });
-        this.isMulti = true;
-        this.gameName = player.gameName;
+        
         const myPlayers: PlayerMulti[] = this.playersMatch();
         if (myPlayers.length === 2) {
-            const player1: PlayerEntity = {
-                playerName: myPlayers[0].creatorName,
-                socketId: myPlayers[0].socketId,
-            };
-            const player2: PlayerEntity = {
-                playerName: myPlayers[1].creatorName,
-                socketId: myPlayers[1].socketId,
-            };
-            this.playerService.addRoomMulti(myPlayers[0].id, [player1, player2], new Date());
+            this.isMulti = true;
+            this.gameName = player.gameName;
         }
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
-        await this.playerService.removeRoom(this.roomName);
+        // await this.playerService.removeRoom(this.roomName);
         socket.to(this.roomName).socketsLeave(this.roomName);
         socket.disconnect();
     }
@@ -127,7 +120,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, data: [string, string]) {
         socket.to(data[0]).emit('gameEnded', [true, data[1]]);
-        this.serverTime.stopChronometer(data[0]);
+        // this.serverTime.stopChronometer(data[0]);
         this.serverTime.removeTimer(data[0]);
     }
 
@@ -161,8 +154,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (diff) {
             if (data[2]) {
                 this.logger.debug('here');
-                this.serverTime.incrementTime(); // work!
-                this.goToNextGame(); // to implement game switching
+                this.serverTime.incrementTime();
+                this.goToNextGame(); 
             }
             socket.emit('diffFound', Array.from(diff));
         } else {
@@ -179,9 +172,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
-        // to be private
         this.serverTime.removeTimer(roomName);
-        this.playerService.removeRoom(roomName);
+        // this.playerService.removeRoom(roomName);
         socket.to(roomName).socketsLeave(roomName);
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
@@ -195,8 +187,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        await this.playerService.removeRoom(this.roomName);
-        // this.serverTime.removeTimer(socket.id);
         socket.leave(this.roomName);
     }
 
@@ -207,8 +197,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     defineDifferences(roomName: string, diffList: string[]): void {
         this.unfoundedDifference.set(roomName, this.gameService.getSetDifference(diffList));
     }
-    emitTime(): void {
-        // to be private
+    private emitTime(): void {
         setInterval(() => {
             if (this.serverTime.countDown === 0) {
                 this.serverTime.removeTimer(this.roomName);
@@ -218,7 +207,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }, DELAY_BEFORE_EMITTING_TIME);
     }
 
-    playersMatch(): PlayerMulti[] {
+    private playersMatch(): PlayerMulti[] {
         const playerMap = new Map<string, PlayerMulti>();
         for (const player of this.playersQueue) {
             if (playerMap.has(player.id)) {
@@ -231,15 +220,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return [];
     }
 
-    removePlayerFromQueue(player: PlayerMulti): void {
+    private removePlayerFromQueue(player: PlayerMulti): void {
         this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
     }
 
-    chooseRandomName(): string {
+    private chooseRandomName(): string {
         return this.gameNames[Math.floor(Math.random() * this.gameNames.length)];
     }
 
-    goToNextGame(): void {
+    private goToNextGame(): void {
         if (this.gameNames.length !== 1) {
             this.gameNames = this.gameNames.filter((name) => name !== this.game.gameName);
             this.game = this.games.get(this.chooseRandomName());

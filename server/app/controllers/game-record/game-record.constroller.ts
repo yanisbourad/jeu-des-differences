@@ -27,7 +27,6 @@ export class GameRecordController {
         }
     }
 
-
     @ApiOkResponse({
         description: 'Create gameRecord',
         type: GameRecord,

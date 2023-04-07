@@ -46,7 +46,7 @@ export class ServerTimeService {
     // stop the timer when countDown reach zero
     stopCountDown(id: string): void {
         if (this.countDown === 0) {
-            this.stopChronometer(id);
+            this.removeTimer(id);
         }
     }
 
@@ -68,7 +68,7 @@ export class ServerTimeService {
         }
     }
 
-    stopChronometer(id: string): number {
+    stopChronometer(id: string): number { // maybe remove later
         this.timers[id].unsubscribe();
         const time = this.elapsedTimes.get(id);
         this.resetTimer(id);
@@ -79,12 +79,12 @@ export class ServerTimeService {
         return this.elapsedTimes.get(id);
     }
 
-    resetTimer(id: string): void {
+    resetTimer(id: string): void { // maybe to remove later
         this.elapsedTimes.set(id, 0);
         this.elapsedTime = 0;
     }
 
-    resetAllTimers(): void {
+    resetAllTimers(): void { // maybe to remove later
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
         // unsubscribe to every timers
@@ -96,6 +96,6 @@ export class ServerTimeService {
     removeTimer(id: string): void {
         this.timers[id].unsubscribe();
         this.elapsedTimes.delete(id);
-        this.countDown = 30;
+        this.countDown = this.timeConstants.timeInit;
     }
 }

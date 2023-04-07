@@ -17,6 +17,7 @@ export class SocketClientService {
     statusPlayer: string;
     error: Set<number>;
     nbrDifference: number;
+    diffLeft: number;
     elapsedTimes: Map<string, number> = new Map<string, number>();
     messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     // DEFINE SUBJECTS
@@ -76,9 +77,16 @@ export class SocketClientService {
             this.elapsedTimes = new Map(values);
         });
 
+        this.socketClient.on('nbrDifference', (nbrDifference: number) => {
+            this.nbrDifference = nbrDifference;
+        });
+
+        this.socketClient.on('nbrDiffLeft', (diffLeft: number) => {
+            this.diffLeft = diffLeft;
+        });
+
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
-            // this.nbrDifference = values[1];
         });
 
         this.socketClient.on('sendRoomName', (values: [string, string]) => {
@@ -148,22 +156,6 @@ export class SocketClientService {
         this.socketClient.disconnect();
     }
 
-    joinRoomSolo(playerName: string, gameName: string) {
-        this.socketClient.send('joinRoomSolo', { playerName, gameName });
-    }
-
-    startSoloTimeLimit(playerName: string) {
-        this.socketClient.send('startSoloTimeLimit', playerName);
-    }
-
-    sendRoomName(roomName: string) {
-        this.socketClient.send('sendRoomName', roomName);
-    }
-
-    startMultiGame(player: { gameId: string; creatorName: string; gameName: string; opponentName: string }): void {
-        this.socketClient.send('startMultiGame', player);
-    }
-
     gameEnded(roomName: string): void {
         this.socketClient.send('gameEnded', roomName);
     }
@@ -172,9 +164,28 @@ export class SocketClientService {
         this.socketClient.send('stopTimer', [roomName, playerName]);
     }
 
+    sendGiveUp(information: { playerName: string; roomName: string }) {
+        this.socketClient.send('sendGiveUp', information);
+    }
+
     leaveRoom() {
         this.disconnect();
         this.socketClient.send('leaveRoom');
+    }
+    joinRoomSolo(playerName: string, gameName: string) {
+        this.socketClient.send('joinRoomSolo', { playerName, gameName });
+    }
+
+    startTimeLimit(playerName: string) {
+        this.socketClient.send('startTimeLimit', playerName);
+    }
+
+    sendRoomName(roomName: string, mode: string) {
+        this.socketClient.send('sendRoomName', [roomName, mode]);
+    }
+
+    startMultiGame(player: { gameId: string; creatorName: string; gameName: string; opponentName: string }): void {
+        this.socketClient.send('startMultiGame', player);
     }
 
     findDifference(information: { playerName: string; roomName: string }) {
@@ -185,20 +196,12 @@ export class SocketClientService {
         this.socketClient.send('message', [data.message, data.playerName, data.color, data.pos, data.gameId, data.event]);
     }
 
-    sendGiveUp(information: { playerName: string; roomName: string }) {
-        this.socketClient.send('sendGiveUp', information);
-    }
-
     sendDifference(diff: Set<number>, roomName: string) {
         this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
 
     sendGameName(gameName: string) {
         this.socketClient.send('currentGameName', gameName);
-    }
-
-    getGameFromServer(): void {
-        this.socketClient.send('requestToGetGame');
     }
 
     sendMousePosition(pos: number, roomName: string, mode: string) {

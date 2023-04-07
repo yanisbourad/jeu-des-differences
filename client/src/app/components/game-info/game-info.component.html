@@ -6,15 +6,15 @@
         <ng-template #multiBlock>
             <p class="sub-title game-infos">Multijoueur</p>
         </ng-template>
-        <div *ngIf="gameService.gameType === 'solo'; else elseBlock">
+        <div *ngIf="gameService.gameType === 'solo'">
             <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
             <div>
                 <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
                     src={{differences}} alt="Differences trouvées" />
             </div>
         </div>
-        <ng-template #elseBlock>
-            <!-- <div *ngFor="let player of gameService.playersName"> -->
+        
+        <div *ngIf="gameService.gameType === 'double' && !gameService.mode">
             <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
             <div>
                 <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
@@ -25,8 +25,14 @@
                 <img *ngFor="let differences of gameService.opponentDifferencesArray" class="differences-trouvees-img"
                     src={{differences}} alt="Differences trouvées" />
             </div>
-            <!-- </div> -->
-        </ng-template>
+        </div>
+        <div *ngIf="gameService.gameType === 'double' && gameService.mode">
+            <p class="sub-title">Différences trouvées par - {{gameService.playerName}} - {{gameService.opponentName}}</p>
+            <div>
+                <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
+                    src={{differences}} alt="Differences trouvées" />
+            </div>
+        </div>
     </div>
     <div class="middle">
         <div class="difficulty">

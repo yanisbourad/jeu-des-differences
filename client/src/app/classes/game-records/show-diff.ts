@@ -43,6 +43,7 @@ export class ShowDiffRecord extends GameRecordCommand {
             this.clearCanvas(this.canvas.canvas1.nativeElement, this.canvas.canvas2.nativeElement);
             component.gameService.defineVariables();
             component.gameService.displayIcons();
+            component.gameService.iconsUpdateForTimeLimit();
         }
         component.cheatModeService.removeDifference(this.diff);
     }

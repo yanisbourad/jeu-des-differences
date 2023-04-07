@@ -8,6 +8,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { GameDatabaseService } from '@app/services/game-database.service';
+import * as constantsTime from '@app/configuration/const-time';
 
 @Component({
     selector: 'app-message-dialog',
@@ -39,7 +40,11 @@ export class MessageDialogComponent {
         if (this.gameDataBaseService.isEmpty) {
             this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
         } else {
-            this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+            this.socket.connect();
+            this.socket.startTimeLimit(this.gameService.playerName);
+            setTimeout(() => {
+                this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+            }, constantsTime.LOADING);
         }
     }
 
@@ -50,13 +55,19 @@ export class MessageDialogComponent {
         });
     }
 
-    launchCooperatif(): void {
-        this.dialog.open(PlayerWaitPopupComponent, {
-            data: { name: this.data.playerName, gameType: 'tempsLimite' },
-            disableClose: true,
-            height: '600px',
-            width: '600px',
-        });
+    launchCooperation(): void {
+        if (this.gameDataBaseService.isEmpty) {
+            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
+        } else {
+            // this.socket.connect();
+            // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
+            this.dialog.open(PlayerWaitPopupComponent, {
+                data: { name: this.data.playerName, gameType: 'tempsLimite' },
+                disableClose: true,
+                height: '600px',
+                width: '600px',
+            });
+        }
     }
 
     redirection(): void {

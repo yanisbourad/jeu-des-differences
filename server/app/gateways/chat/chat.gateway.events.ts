@@ -15,5 +15,5 @@ export enum ChatEvents {
     GameName = 'gameName',
     CurrentGameName = 'currentGameName',
     MousePosition = 'mousePosition',
-    StartSoloTimeLimit = 'startSoloTimeLimit',
+    StartTimeLimit = 'startTimeLimit',
 }

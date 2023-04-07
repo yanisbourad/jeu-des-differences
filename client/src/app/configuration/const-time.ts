@@ -13,6 +13,7 @@ export const BLINKING_TIME = 1000;
 export const BLINKING_TIMEOUT = 125;
 export const BLINKING_COUNT = 8;
 export const LOADING_TIMEOUT = 500;
+export const LOADING = 300;
 export const INIT_TIME = 30;
 export const PENALTY_TIME = 5;
 export const BONUS_TIME = 5;

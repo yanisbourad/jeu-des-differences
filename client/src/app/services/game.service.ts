@@ -83,6 +83,7 @@ export class GameService {
             nDifferences: this.game.listDifferences.length,
         };
         this.totalDifferences = this.gameInformation.nDifferences;
+        if (this.mode) this.totalDifferences = this.socket.nbrDifference;
         this.differencesArray = new Array(this.totalDifferences);
         this.opponentDifferencesArray = new Array(this.totalDifferences);
         this.playersName = [this.playerName, this.opponentName];
@@ -97,7 +98,7 @@ export class GameService {
             this.game = this.socket.getGame();
             this.defineVariables();
             this.displayIcons();
-        }, 500)
+        }, constantsTime.LOADING_TIMEOUT);
     }
 
     getClassicGame(gameName: string): void {
@@ -119,17 +120,24 @@ export class GameService {
     }
 
     displayIcons(): void {
-        // can be moved
         if (this.gameType === 'solo') {
             for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.path.differenceNotFound;
             }
         }
-        if (this.gameType === 'double') {
+        if (this.gameType === 'double' && !this.mode) {
             for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.path.differenceNotFound;
                 this.opponentDifferencesArray[i] = this.path.differenceNotFound;
             }
+        }
+    }
+
+    iconsUpdateForTimeLimit(): void {
+        const diffFound = this.socket.nbrDifference - this.socket.diffLeft;
+        for (let i = 0; i < diffFound; i++) {
+            this.differencesArray.pop();
+            this.differencesArray.unshift(this.path.differenceFound);
         }
     }
 
@@ -165,6 +173,7 @@ export class GameService {
         this.differencesArray.pop();
         this.differencesArray.unshift(this.path.differenceFound);
     }
+
     handleDifferenceFound(): void {
         switch (this.gameType) {
             case 'solo':
@@ -200,12 +209,9 @@ export class GameService {
     }
 
     multiGameEnd(): boolean {
-        // can be moved
         this.isWinner = true;
-        if (this.totalDifferences % 2 === 0) {
-            return this.nDifferencesFound === this.totalDifferences / 2;
-        }
-        // if this mean that this is the winner
+        if (this.totalDifferences % 2 === 0) return this.nDifferencesFound === this.totalDifferences / 2;
+        // winning multiplayer game with an odd total number of difference
         return this.nDifferencesFound === (this.totalDifferences + 1) / 2;
     }
 

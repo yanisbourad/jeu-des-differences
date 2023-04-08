@@ -264,6 +264,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         } else {
             this.server.to(this.roomName).emit('timeLimitStatus', true);
+            this.serverTime.removeTimer(this.roomName);
         }
     }
 }

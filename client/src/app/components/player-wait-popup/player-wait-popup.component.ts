@@ -31,6 +31,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             name: '',
             opponentName: '',
             gameName: '',
+            gameType: '',
         };
         this.isReady = false;
         this.isUpdated = false;
@@ -45,6 +46,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.game.name = this.data.name;
         this.game.gameName = this.data.gameName;
         this.game.opponentName = "Attente d'un adversaire";
+        this.game.gameType = this.data.gameType === 'double' ? 'Double' : 'limit';
         this.data.name = ' ';
         this.gameCardHandlerService.join(this.game);
         this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);

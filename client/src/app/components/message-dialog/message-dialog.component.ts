@@ -1,14 +1,14 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
+import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import * as constantsTime from '@app/configuration/const-time';
+import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
-import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import * as constantsTime from '@app/configuration/const-time';
 
 @Component({
     selector: 'app-message-dialog',
@@ -19,7 +19,7 @@ export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
     // eslint-disable-next-line max-params
     constructor(
-        @Inject(MAT_DIALOG_DATA) public data: { message: string; type: string; formatTime: string; playerName: string },
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; message: string; gameType: string; formatTime: string; type: string },
         private router: Router,
         readonly socket: SocketClientService,
         readonly gameService: GameService,
@@ -43,7 +43,7 @@ export class MessageDialogComponent {
             this.socket.connect();
             this.socket.startTimeLimit(this.gameService.playerName);
             setTimeout(() => {
-                this.router.navigate(['/game', { player: this.data.playerName, gameType: 'solo', mode: 'tempsLimite' }]);
+                this.router.navigate(['/game', { player: this.data.name, gameType: 'solo', mode: 'tempsLimite' }]);
             }, constantsTime.LOADING);
         }
     }
@@ -61,8 +61,9 @@ export class MessageDialogComponent {
         } else {
             // this.socket.connect();
             // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
+            // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
             this.dialog.open(PlayerWaitPopupComponent, {
-                data: { name: this.data.playerName, gameType: 'tempsLimite' },
+                data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
                 disableClose: true,
                 height: '600px',
                 width: '600px',

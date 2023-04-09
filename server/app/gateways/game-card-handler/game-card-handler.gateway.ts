@@ -27,16 +27,31 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             id: gamer.id,
             name: payload.name,
             gameName: payload.gameName,
+            gameType: payload.gameType,
         };
-        this.logger.log(`New request from ${player.name} to play ${player.gameName} in 1vs1 mode`);
+        this.logger.log(`New request from ${player.name} to play ${player.gameName} in ${player.gameType} mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
-        if (!this.gameCardHandlerService.isGameAvailable(player.gameName)) {
+        if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
             this.server.to(gamer.id).emit('gameUnavailable', 'game deleted by admin');
             return;
         }
 
         gamer.join(player.id);
+
+        // handle limited time mode
+        if (player.gameType === 'limit') {
+            this.logger.log('limit game');
+            const players = this.gameCardHandlerService.manageJoinLimitMode(player)
+            if (players.length === 1) {
+                this.server.to(players[0].id).emit('feedbackOnStart', 'Attente d\'un adversaire');
+            } else if (players.length === 2) {
+                this.server.to(players[0].id).emit('feedbackOnStart', players[1].name);
+                this.server.to(players[1].id).emit('feedbackOnStart', players[0].name);
+            }
+            return;
+        }
+
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
         switch (stackedPlayerNumber) {
             // when this is the creator

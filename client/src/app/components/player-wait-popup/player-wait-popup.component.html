@@ -10,14 +10,16 @@
         </div>
         <div class="player">
             <div class="opponent">
-                <img  class="avatar" [src]="'./assets/img/user2.png'" alt="avatar">
+                <img class="avatar" [src]="'./assets/img/user2.png'" alt="avatar">
             </div>
             <div class="playerName">{{game.opponentName}}</div>
         </div>
     </div>
     <div class="btn-box">
-        <button  mat-raised-button class="btn close" (click)="leaveGame()">Annuler</button>
-        <button  mat-raised-button *ngIf="isReady" class="btn accept" (click)="startGame()">{{acceptState}}</button>
-        <button  mat-raised-button *ngIf="isReady" class="btn refuse" (click)="rejectOpponent()">Refuser</button>
+        <button mat-raised-button class="btn close" (click)="leaveGame()">Annuler</button>
+        <button mat-raised-button *ngIf="isReady && game.gameType !== 'limit' " class="btn accept"
+            (click)="startGame()">{{acceptState}}</button>
+        <button mat-raised-button *ngIf="isReady && game.gameType !== 'limit' " class="btn refuse"
+            (click)="rejectOpponent()">Refuser</button>
     </div>
 </div>

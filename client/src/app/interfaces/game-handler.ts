@@ -2,6 +2,7 @@ export interface Game {
     name: string;
     opponentName: string;
     gameName: string;
+    gameType: string;
 }
 export class GamersInfo {
     gameId: number;

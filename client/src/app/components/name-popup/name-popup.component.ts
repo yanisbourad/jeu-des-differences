@@ -2,8 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 
 export interface DialogData {
     name: string;
@@ -70,7 +70,7 @@ export class NamePopupComponent implements OnInit {
         }
         const msg = 'Veuillez sélectionner un mode de jeu';
         this.dialog.open(MessageDialogComponent, {
-            data: { message: msg, type: 'timeLimit', playerName: this.data.name },
+            data: { name: this.data.name, gameName: this.data.gameName, message: msg, type: 'timeLimit' },
             disableClose: true,
             minWidth: '250px',
             minHeight: '110px',

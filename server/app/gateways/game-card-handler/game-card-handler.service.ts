@@ -87,6 +87,10 @@ export class GameCardHandlerService {
             return player;
         }
     }
+    // manage time limited game
+    manageJoinLimitMode(player: Player): Player[] {
+        throw new Error('Method not implemented.');
+    }
 
     removePlayerInJoiningQueue(gameName: string, playerId: string) {
         if (this.gamesQueue.get(gameName)) {

@@ -219,9 +219,9 @@ export class GameService {
         this.saveGameRecord();
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.gameHelper.getGameTime(this.gameTime));
         if (this.gameType === 'solo') {
-            this.gameHelper.globalMessageSolo(this.gameTime);
+            this.gameHelper.globalMessage(this.gameTime, this.rankingSoloCopy);
         } else {
-            this.gameHelper.globalMessageMulti(this.gameTime);
+            this.gameHelper.globalMessage(this.gameTime, this.rankingMultiCopy);
         }
         this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();

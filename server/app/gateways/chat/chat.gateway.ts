@@ -24,6 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     unfoundedDifference: Map<string, Set<number>[]> = new Map<string, Set<number>[]>();
     games: Map<string, Game> = new Map<string, Game>();
     game: Game;
+    isTimeLimit: boolean;
     constructor(
         private readonly logger: Logger,
         private readonly playerService: PlayerService,
@@ -68,6 +69,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         this.isPlaying.set(this.roomName, true);
+        this.isTimeLimit = true;
         this.playerName = playerName;
         socket.join(this.roomName);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
@@ -109,16 +111,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (myPlayers.length === 2) {
             this.isMulti = true;
             this.gameName = player.gameName;
-            const player1: PlayerEntity = {
-                playerName: myPlayers[0].creatorName,
-                socketId: myPlayers[0].socketId,
-            };
-            const player2: PlayerEntity = {
-                playerName: myPlayers[1].creatorName,
-                socketId: myPlayers[1].socketId,
-            };
-            await this.playerService.addRoomMulti(this.roomName, [player1, player2], new Date());
-            console.log(this.playerService.rooms)
+            // const player1: PlayerEntity = {
+            //     playerName: myPlayers[0].creatorName,
+            //     socketId: myPlayers[0].socketId,
+            // };
+            // const player2: PlayerEntity = {
+            //     playerName: myPlayers[1].creatorName,
+            //     socketId: myPlayers[1].socketId,
+            // };
+            // await this.playerService.addRoomMulti(this.roomName, [player1, player2], new Date());
+            // console.log(this.playerService.rooms)
         }
     }
 
@@ -172,6 +174,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         this.serverTime.stopChronometer(roomName);
+        this.isTimeLimit = false;
         await this.playerService.removeRoom(roomName);
         this.isPlaying.set(roomName, false);
         socket.to(roomName).socketsLeave(roomName);
@@ -180,7 +183,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
         // this.isPlaying = false;
         this.isPlaying.set(socket.id, false);
-        await this.playerService.removePlayer(information.roomName, information.playerName);
+        // await this.playerService.removePlayer(information.roomName, information.playerName);
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
 
@@ -195,15 +198,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, data: [string, string]) {
         socket.to(data[0]).emit('gameEnded', [true, data[1]]);
+        this.isMulti = false;
         this.serverTime.stopChronometer(data[0]);
         this.serverTime.removeTimer(data[0]);
     }
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        if(this.isMulti && this.isPlaying.get(this.roomName)) {
+        if(this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit) { // need something else for time limit
             socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName }); 
-            await this.playerService.removePlayer(this.roomName, this.playerName);
+            // await this.playerService.removePlayer(this.roomName, this.playerName);
+        }
+        if (this.isMulti && this.isPlaying.get(this.roomName) && this.isTimeLimit){
+            // send message to transform the view to solo Time Limit
         }
         socket.leave(this.roomName);
         // await this.playerService.removeRoom(this.roomName);

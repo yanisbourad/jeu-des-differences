@@ -59,9 +59,7 @@ export class MessageDialogComponent {
         if (this.gameDataBaseService.isEmpty) {
             this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
         } else {
-            // this.socket.connect();
-            // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
-            // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
+            this.socket.connect();
             this.dialog.open(PlayerWaitPopupComponent, {
                 data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
                 disableClose: true,

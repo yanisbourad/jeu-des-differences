@@ -20,6 +20,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     isCancelled: boolean;
     isTriggered: boolean;
     isGameAvailable: boolean;
+    limitedTimeGame: string;
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
@@ -41,6 +42,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.isCancelled = false;
         this.isTriggered = false;
         this.isGameAvailable = true;
+        this.limitedTimeGame = '';
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
@@ -92,6 +94,13 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.sendFeedback("Désolé, le jeu n'est plus disponible, il a été supprimé");
             this.resetState();
             this.gameCardHandlerService.resetGameVariables();
+        }
+        this.limitedTimeGame = this.gameCardHandlerService.getLimitedTimeGameName();
+        if (this.limitedTimeGame) {
+            console.log('limitedTimeGame', this.limitedTimeGame);
+            this.dialogReff.close();
+            this.gameCardHandlerService.resetGameVariables();
+            this.gameCardHandlerService.setNewUpdate(false);
         }
     }
 

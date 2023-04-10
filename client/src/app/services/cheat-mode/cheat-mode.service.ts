@@ -26,7 +26,7 @@ export class CheatModeService {
 
     cheatMode(): void {
         this.blinking = setInterval(() => {
-            this.color = this.color === 'black' ? 'yellow' : 'black';
+            this.color = this.color === 'black' ? 'white' : 'black';
             for (const set of this.unfoundedDifference) {
                 this.drawDifference(set);
             }

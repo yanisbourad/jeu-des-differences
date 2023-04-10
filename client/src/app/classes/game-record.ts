@@ -6,8 +6,8 @@ import { ElementRef } from '@angular/core';
 import { BLINKING_COUNT, BLINKING_TIME, BLINKING_TIMEOUT } from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { DrawService } from '@app/services/draw.service';
-import { GameRecorderService } from '@app/services/game-recorder.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
 export abstract class GameRecordCommand {
     time: number;
 

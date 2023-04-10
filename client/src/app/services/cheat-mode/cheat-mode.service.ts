@@ -2,9 +2,9 @@ import { ElementRef, Injectable } from '@angular/core';
 import { StartCheatModeRecord } from '@app/classes/game-records/start-cheat-mode';
 import { StopCheatModeRecord } from '@app/classes/game-records/stop-cheat-mode';
 import * as constantsTime from '@app/configuration/const-time';
-import { DrawService } from './draw.service';
-import { GameRecorderService } from './game-recorder.service';
-import { HotkeysService } from './hotkeys.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 
 @Injectable({
     providedIn: 'root',

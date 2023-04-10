@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { PlayerWaitPopupComponent } from './player-wait-popup.component';
 
 describe('PlayerWaitPopupComponent', () => {

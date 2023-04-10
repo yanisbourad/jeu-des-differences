@@ -3,9 +3,9 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord, TimeConfig, GamingHistory } from '@common/game';
-import { CanvasHolderService } from './canvas-holder.service';
-import { ImageDiffService } from './image-diff.service';
+import { Game, GameInfo, GameRecord, GamingHistory, TimeConfig } from '@common/game';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 @Injectable({
     providedIn: 'root',
 })

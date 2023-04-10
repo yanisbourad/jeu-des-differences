@@ -4,7 +4,7 @@ import * as keys from '@app/configuration/const-hotkeys';
 import * as styler from '@app/configuration/const-styler-type';
 import { Point } from '@app/interfaces/point';
 import { Vec2 } from '@app/interfaces/vec2';
-import { HotkeysService } from './hotkeys.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 @Injectable({
     providedIn: 'root',
 })

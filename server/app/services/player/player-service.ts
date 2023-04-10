@@ -23,6 +23,13 @@ export class PlayerService {
         this.rooms.splice(rIndex, 1);
     }
 
+    // remove player
+    async removePlayer(roomName: string, playerName: string): Promise<void> {
+        const rIndex = await this.getRoomIndex(roomName);   
+        const pIndex = this.rooms[rIndex].players.findIndex((player) => player.playerName === playerName);
+        this.rooms[rIndex].players.splice(pIndex, 1);
+    }
+
     async getRooms(): Promise<Room[]> {
         return this.rooms;
     }

@@ -1,9 +1,9 @@
 import { AfterContentChecked, Component, Input } from '@angular/core';
-import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import * as constants from '@app/configuration/const-time';
-import { TimeConfig } from '@common/game';
-import { GameDatabaseService } from '@app/services/game-database.service';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
+import * as constants from '@app/configuration/const-time';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { TimeConfig } from '@common/game';
 
 @Component({
     selector: 'app-time-popup',

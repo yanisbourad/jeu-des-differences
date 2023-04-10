@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 
 @Component({
     selector: 'app-game-name-save',

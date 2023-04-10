@@ -7,12 +7,12 @@ import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { Message } from '@app/interfaces/message';
 import { Vec2 } from '@app/interfaces/vec2';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { Game, GameRecord, GamingHistory } from '@common/game';
 import { Observable } from 'rxjs';
-import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameHelperService } from './game-helper.service';
+import { GameCardHandlerService } from './game-card-handler-service.service';
 
 @Injectable({
     providedIn: 'root',

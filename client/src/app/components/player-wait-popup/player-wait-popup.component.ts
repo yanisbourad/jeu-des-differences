@@ -2,7 +2,7 @@ import { AfterContentChecked, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { Game } from '@app/interfaces/game-handler';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 
 @Component({
     selector: 'app-player-wait-popup',

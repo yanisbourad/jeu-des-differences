@@ -5,10 +5,10 @@ import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import * as constantsTime from '@app/configuration/const-time';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 
 @Component({
     selector: 'app-message-dialog',

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
-import { GameDatabaseService } from '@app/services/game-database.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 // import { GameService } from '@app/services/game.service';
 import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 

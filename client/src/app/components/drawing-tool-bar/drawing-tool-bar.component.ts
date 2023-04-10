@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
 import * as stylers from '@app/configuration/const-styler-type';
-import { CommandService } from '@app/services/command.service';
-import { DrawService } from '@app/services/draw.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { CommandService } from '@app/services/command/command.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 @Component({
     selector: 'app-drawing-tool-bar',
     templateUrl: './drawing-tool-bar.component.html',

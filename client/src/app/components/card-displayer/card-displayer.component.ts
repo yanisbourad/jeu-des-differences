@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import * as constants from '@app/configuration/const-game';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameDatabaseService } from '@app/services/game-database.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GameInfo } from '@common/game';
 
 @Component({

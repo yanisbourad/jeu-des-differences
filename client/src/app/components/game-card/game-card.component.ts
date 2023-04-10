@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameService } from '@app/services/game.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameService } from '@app/services/game/game.service';
 import { GameInfo } from '@common/game';
 import { firstValueFrom } from 'rxjs';
 

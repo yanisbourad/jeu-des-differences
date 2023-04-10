@@ -1,6 +1,6 @@
 import { AfterContentChecked, Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { GameDatabaseService } from '@app/services/game-database.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GamingHistory } from '@common/game';
 @Component({
     selector: 'app-gaming-history',

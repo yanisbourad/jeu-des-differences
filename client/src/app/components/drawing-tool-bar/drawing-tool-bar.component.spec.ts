@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CommandService } from '@app/services/command.service';
-import { DrawService } from '@app/services/draw.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { CommandService } from '@app/services/command/command.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { DrawingToolBarComponent } from './drawing-tool-bar.component';
 import SpyObj = jasmine.SpyObj;
 

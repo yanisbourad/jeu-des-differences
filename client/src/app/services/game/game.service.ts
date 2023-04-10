@@ -217,12 +217,12 @@ export class GameService {
         this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
         this.saveGameRecord();
+        this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.gameHelper.getGameTime(this.gameTime));
         if (this.gameType === 'solo') {
             this.gameHelper.globalMessageSolo(this.gameTime);
         } else {
             this.gameHelper.globalMessageMulti(this.gameTime);
         }
-        this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.gameHelper.getGameTime(this.gameTime));
         this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();
     }

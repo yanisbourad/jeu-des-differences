@@ -20,6 +20,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     // create a queue of Players
     gameNames: string[];
     playersQueue: PlayerMulti[] = [];
+    isPlaying: Map<string, boolean> = new Map<string, boolean>();
     unfoundedDifference: Map<string, Set<number>[]> = new Map<string, Set<number>[]>();
     games: Map<string, Game> = new Map<string, Game>();
     game: Game;
@@ -41,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.debug('solo');
         const game = this.gameService.getGame(data.gameName);
         this.unfoundedDifference.set(socket.id, this.gameService.getSetDifference(game.listDifferences));
+        this.isPlaying.set(socket.id, true);
         // const startTime = new Date();
         // const player: PlayerEntity = {
         //     playerName: data.playerName,
@@ -65,6 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.games = this.gameService.getGames();
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
+        this.isPlaying.set(this.roomName, true);
         this.playerName = playerName;
         socket.join(this.roomName);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
@@ -81,6 +84,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const game = this.gameService.getGame(this.gameName);
         this.roomName = data[0];
         if (!data[1]) this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(game.listDifferences));
+        this.isPlaying.set(this.roomName, true);
         socket.emit('sendRoomName', ['multi', this.roomName]);
         socket.join(this.roomName);
         this.logger.debug(this.unfoundedDifference.size);
@@ -169,11 +173,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async gameEnded(socket: Socket, roomName: string) {
         this.serverTime.stopChronometer(roomName);
         await this.playerService.removeRoom(roomName);
+        this.isPlaying.set(roomName, false);
         socket.to(roomName).socketsLeave(roomName);
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
         // this.isPlaying = false;
+        this.isPlaying.set(socket.id, false);
         await this.playerService.removePlayer(information.roomName, information.playerName);
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
@@ -182,6 +188,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async leaveRoom(socket: Socket) {
         await this.playerService.removeRoom(this.roomName);
         socket.to(this.roomName).socketsLeave(this.roomName);
+        this.isPlaying.delete(socket.id);
         socket.disconnect();
     }
 
@@ -194,8 +201,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        const room = await this.playerService.getRoom(this.roomName);
-        if(this.isMulti && room.players.length === 2) {
+        if(this.isMulti && this.isPlaying.get(this.roomName)) {
             socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName }); 
             await this.playerService.removePlayer(this.roomName, this.playerName);
         }

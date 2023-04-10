@@ -5,6 +5,7 @@ import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import * as constantsTime from '@app/configuration/const-time';
+import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game-database.service';
 import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
@@ -26,6 +27,7 @@ export class MessageDialogComponent {
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
         private gameDataBaseService: GameDatabaseService,
+        private gameCardHandlerService: GameCardHandlerService,
     ) {
         this.gameDataBaseService.isDataBaseEmpty();
     }
@@ -68,6 +70,8 @@ export class MessageDialogComponent {
                 height: '600px',
                 width: '600px',
             });
+            this.gameCardHandlerService.connect();
+            this.gameCardHandlerService.joinLimitedTime();
         }
     }
 

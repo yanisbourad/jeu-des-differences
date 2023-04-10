@@ -81,8 +81,6 @@ export class GameService {
         this.gameHelper.gameName = this.gameName;
         this.gameHelper.gameType = this.gameType;
         this.gameHelper.playerName = this.playerName;
-        this.gameHelper.rankingSoloCopy = this.rankingSoloCopy;
-        this.gameHelper.rankingMultiCopy = this.rankingMultiCopy;
     }
 
     getSetDifference(differencesStr: string[]): Set<number>[] {

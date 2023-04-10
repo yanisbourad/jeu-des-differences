@@ -13,8 +13,6 @@ import { Message } from '@app/interfaces/message';
 // to contain various helpful functions
 export class GameHelperService {
     path: ImagePath;
-    rankingSoloCopy: GameRecord[];
-    rankingMultiCopy: GameRecord[];
     playerName: string;
     gameName: string;
     gameType: string;

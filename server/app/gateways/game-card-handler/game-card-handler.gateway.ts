@@ -42,12 +42,20 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         // handle limited time mode
         if (player.gameType === 'limit') {
             this.logger.log('limit game');
+            this.logger.debug(player);
+            this.logger.debug(this.gameCardHandlerService.timeLimitedGamesQueue);
             const players = this.gameCardHandlerService.manageJoinLimitMode(player)
             if (players.length === 1) {
-                this.server.to(players[0].id).emit('feedbackOnStart', 'Attente d\'un adversaire');
-            } else if (players.length === 2) {
-                this.server.to(players[0].id).emit('feedbackOnStart', players[1].name);
-                this.server.to(players[1].id).emit('feedbackOnStart', players[0].name);
+                this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+            } else {
+                const gameInfo = {
+                    gameId: this.countGame++,
+                    gameName: "limitedTime99999",
+                    creatorName: players[CREATOR_INDEX].name,
+                    opponentName: players[OPPONENT_INDEX].name,
+                };
+                this.server.to(players[0].id).emit('feedbackOnStart', gameInfo);
+                this.server.to(players[1].id).emit('feedbackOnStart', gameInfo);
             }
             return;
         }

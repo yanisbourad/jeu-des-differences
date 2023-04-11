@@ -1,7 +1,7 @@
 <h1>Historique des parties</h1>
 <div class="container">
     <div class="contents">
-        <div *ngFor="let record of gamingHistory">
+        <div *ngFor="let record of gamingHistory.reverse()">
             <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
                 --- Durée totale: <span *ngIf="!record.hasAbandonedGame">{{record.time}}</span>
                 <span *ngIf="record.hasAbandonedGame">00:00</span>---

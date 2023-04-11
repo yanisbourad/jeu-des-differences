@@ -2,8 +2,8 @@ import { ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CommandSpecific } from '@app/classes/command-specific';
 import * as keys from '@app/configuration/const-hotkeys';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { CommandService } from './command.service';
-import { HotkeysService } from './hotkeys.service';
 
 class CommandSpecificStub extends CommandSpecific {
     // eslint-disable-next-line no-unused-vars

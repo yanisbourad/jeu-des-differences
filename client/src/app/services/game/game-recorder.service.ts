@@ -3,8 +3,8 @@ import { GameRecordCommand } from '@app/classes/game-record';
 import { DELAY_BEFORE_EMITTING_TIME, SEC_TO_MILLISEC, UNIT_DELAY_INTERVAL } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { Subject } from 'rxjs';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { GameService } from './game.service';
-import { SocketClientService } from './socket-client.service';
 @Injectable({
     providedIn: 'root',
 })

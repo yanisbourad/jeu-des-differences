@@ -20,12 +20,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     // create a queue of Players
     gameNames: string[];
     playersQueue: PlayerMulti[] = [];
+    isPlaying: Map<string, boolean> = new Map<string, boolean>();
     unfoundedDifference: Map<string, Set<number>[]> = new Map<string, Set<number>[]>();
     games: Map<string, Game> = new Map<string, Game>();
     game: Game;
+    isTimeLimit: boolean;
     constructor(
         private readonly logger: Logger,
-        // private readonly playerService: PlayerService,
+        private readonly playerService: PlayerService,
         private readonly serverTime: ServerTimeService,
         private readonly gameService: GameService,
     ) {}
@@ -36,14 +38,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('connection au socket');
     }
 
-    /**
-    * START SECTION FOR JOINING THE  GAME
-    */
     @SubscribeMessage(ChatEvents.JoinRoomSolo)
     async joinRoomSolo(socket: Socket, data: { playerName: string; gameName: string }) {
         this.logger.debug('solo');
         const game = this.gameService.getGame(data.gameName);
         this.unfoundedDifference.set(socket.id, this.gameService.getSetDifference(game.listDifferences));
+        this.isPlaying.set(socket.id, true);
         // const startTime = new Date();
         // const player: PlayerEntity = {
         //     playerName: data.playerName,
@@ -63,13 +63,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StartTimeLimit)
     async startTimeLimit(socket: Socket, playerName: string) {
-        this.logger.debug('temps Limite');
         this.roomName = socket.id;
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
-        this.logger.debug(this.unfoundedDifference.size);
+        this.isPlaying.set(this.roomName, true);
+        this.isTimeLimit = true;
         this.playerName = playerName;
         socket.join(this.roomName);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
@@ -78,8 +78,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         this.server.to(this.roomName).emit('getRandomGame', this.game);
         this.server.to(this.roomName).emit('nbrDifference', this.games.size);
-        this.logger.debug(this.roomName);
-        // add room maybe
     }
 
     @SubscribeMessage(ChatEvents.SendRoomName)
@@ -88,6 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const game = this.gameService.getGame(this.gameName);
         this.roomName = data[0];
         if (!data[1]) this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(game.listDifferences));
+        this.isPlaying.set(this.roomName, true);
         socket.emit('sendRoomName', ['multi', this.roomName]);
         socket.join(this.roomName);
         this.logger.debug(this.unfoundedDifference.size);
@@ -99,7 +98,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StartMultiGame)
     async startMultiGame(socket: Socket, player: { gameId: string; creatorName: string; gameName: string; opponentName: string }) {
-        // this.logger.debug('multi');
+        this.roomName = player.gameId + player.gameName;
         this.playersQueue.push({
             socketId: socket.id,
             id: player.gameId,
@@ -112,15 +111,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (myPlayers.length === 2) {
             this.isMulti = true;
             this.gameName = player.gameName;
+            // const player1: PlayerEntity = {
+            //     playerName: myPlayers[0].creatorName,
+            //     socketId: myPlayers[0].socketId,
+            // };
+            // const player2: PlayerEntity = {
+            //     playerName: myPlayers[1].creatorName,
+            //     socketId: myPlayers[1].socketId,
+            // };
+            // await this.playerService.addRoomMulti(this.roomName, [player1, player2], new Date());
+            // console.log(this.playerService.rooms)
         }
     }
-    /**
-    * END SECTION FOR JOINING THE  GAME
-    */
 
-    /**
-    *  SECTION FOR SENDING MESSAGES
-    */
     @SubscribeMessage(ChatEvents.Message)
     async message(socket: Socket, data: [string, string, string, string, string, boolean]) {
         if (data[1] === 'meilleur temps') {
@@ -129,11 +132,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             socket.to(data[4]).emit('message-return', { message: data[0], userName: data[1], color: data[2], pos: data[3], event: data[5] });
         }
     }
-    /**
-    *  START SECTION FOR THE DIFFERENCE DETECTION
-    */
+ 
     @SubscribeMessage(ChatEvents.FindDifference)
     async findDifference(socket: Socket, information: { playerName: string; roomName: string }) {
+        this.playerName = information.playerName;
         socket.to(information.roomName).emit('findDifference-return', { playerName: information.playerName });
     }
 
@@ -168,53 +170,56 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             );
         }
     }
-    /**
-    *  END SECTION FOR THE DIFFERENCE DETECTION
-    */
-
-    /**
-    *  START SECTION FOR END GAME
-    */
+    
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
         this.serverTime.stopChronometer(roomName);
-        // this.playerService.removeRoom(roomName);
+        this.isTimeLimit = false;
+        await this.playerService.removeRoom(roomName);
+        this.isPlaying.set(roomName, false);
         socket.to(roomName).socketsLeave(roomName);
     }
     @SubscribeMessage(ChatEvents.SendGiveUp)
     async sendGiveUp(socket: Socket, information: { playerName: string; roomName: string }) {
+        // this.isPlaying = false;
+        this.isPlaying.set(socket.id, false);
+        // await this.playerService.removePlayer(information.roomName, information.playerName);
         socket.to(information.roomName).emit('giveup-return', { playerName: information.playerName });
     }
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
-        // await this.playerService.removeRoom(this.roomName);
+        await this.playerService.removeRoom(this.roomName);
         socket.to(this.roomName).socketsLeave(this.roomName);
+        this.isPlaying.delete(socket.id);
         socket.disconnect();
     }
 
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, data: [string, string]) {
         socket.to(data[0]).emit('gameEnded', [true, data[1]]);
+        this.isMulti = false;
         this.serverTime.stopChronometer(data[0]);
         this.serverTime.removeTimer(data[0]);
     }
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
+        if(this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit) { // need something else for time limit
+            socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName }); 
+            // await this.playerService.removePlayer(this.roomName, this.playerName);
+        }
+        if (this.isMulti && this.isPlaying.get(this.roomName) && this.isTimeLimit){
+            // send message to transform the view to solo Time Limit
+        }
         socket.leave(this.roomName);
+        // await this.playerService.removeRoom(this.roomName);
     }
-    /**
-    *  END SECTION FOR END GAME
-    */
     
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id: ${socket.id} `);
     }
 
-    /**
-    *  SECTION FOR USEFUL FUNCTIONS FOR THE GAME LOGIC
-    */
     afterInit() {
         this.emitTime();
     }

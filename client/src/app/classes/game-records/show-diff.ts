@@ -2,7 +2,7 @@ import { ElementRef } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { DrawService } from '@app/services/draw.service';
+import { DrawService } from '@app/services/draw/draw.service';
 
 interface Canvases {
     canvas1: ElementRef<HTMLCanvasElement>;

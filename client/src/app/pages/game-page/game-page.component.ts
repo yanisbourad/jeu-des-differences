@@ -6,11 +6,11 @@ import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-differe
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import { Message } from '@app/interfaces/message';
-import { CheatModeService } from '@app/services/cheat-mode.service';
-import { DrawService } from '@app/services/draw.service';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { Subscription } from 'rxjs';
 
 @Component({

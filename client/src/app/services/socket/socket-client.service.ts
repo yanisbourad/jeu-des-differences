@@ -34,6 +34,7 @@ export class SocketClientService {
     difference$ = this.difference.asObservable();
     timeLimitStatus$ = this.timeLimitStatus.asObservable();
     messageToAdd$ = this.messageToAdd.asObservable();
+    isPlaying: boolean; // to determine if the other player in time limit is still in the game
 
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
@@ -119,6 +120,11 @@ export class SocketClientService {
             const data = new Set<number>(diff);
             this.difference.next(data);
         });
+
+        this.socketClient.on('statusPartner', (status: boolean) => {
+            this.isPlaying = status;
+        });
+
         this.socketClient.on('error', () => {
             this.difference.next(this.error);
         });

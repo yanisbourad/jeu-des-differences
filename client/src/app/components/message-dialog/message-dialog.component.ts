@@ -5,11 +5,11 @@ import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import * as constantsTime from '@app/configuration/const-time';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 
 @Component({
     selector: 'app-message-dialog',
@@ -64,7 +64,9 @@ export class MessageDialogComponent {
             // this.socket.connect();
             // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
             // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
+            this.socket.connect();
             const dialog = this.dialog.open(PlayerWaitPopupComponent, {
+                // this.dialog.open(PlayerWaitPopupComponent, {
                 data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
                 disableClose: true,
                 height: '600px',

@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import * as constants from '@app/configuration/const-time';
-import { TimePopupComponent } from './time-popup.component';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { TimeConfig } from '@common/game';
-import { GameDatabaseService } from '@app/services/game-database.service';
 import { of } from 'rxjs';
+import { TimePopupComponent } from './time-popup.component';
 
 const mockConstants: TimeConfig = {
     timeInit: constants.INIT_TIME,

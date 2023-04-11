@@ -7,12 +7,12 @@ import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { Message } from '@app/interfaces/message';
 import { Vec2 } from '@app/interfaces/vec2';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { Game, GameRecord, GamingHistory } from '@common/game';
 import { Observable } from 'rxjs';
-import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameHelperService } from './game-helper.service';
+import { GameCardHandlerService } from './game-card-handler-service.service';
 
 @Injectable({
     providedIn: 'root',
@@ -81,8 +81,6 @@ export class GameService {
         this.gameHelper.gameName = this.gameName;
         this.gameHelper.gameType = this.gameType;
         this.gameHelper.playerName = this.playerName;
-        this.gameHelper.rankingSoloCopy = this.rankingSoloCopy;
-        this.gameHelper.rankingMultiCopy = this.rankingMultiCopy;
     }
 
     getSetDifference(differencesStr: string[]): Set<number>[] {
@@ -217,12 +215,12 @@ export class GameService {
         this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
         this.saveGameRecord();
-        if (this.gameType === 'solo') {
-            this.gameHelper.globalMessageSolo(this.gameTime);
-        } else {
-            this.gameHelper.globalMessageMulti(this.gameTime);
-        }
         this.displayGameEnded('Félicitation, vous avez terminée la partie', 'finished', this.gameHelper.getGameTime(this.gameTime));
+        if (this.gameType === 'solo') {
+            this.gameHelper.globalMessage(this.gameTime, this.rankingSoloCopy);
+        } else {
+            this.gameHelper.globalMessage(this.gameTime, this.rankingMultiCopy);
+        }
         this.socket.gameEnded(this.socket.getRoomName());
         this.reinitializeGame();
     }

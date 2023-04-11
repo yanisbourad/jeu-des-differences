@@ -1,10 +1,10 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ERASER, PEN, RECTANGLE } from '@app/configuration/const-styler-type';
 import { BitmapService } from '@app/services/bitmap.service';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { CommandService } from '@app/services/command.service';
-import { DrawService } from '@app/services/draw.service';
-import { HotkeysService } from '@app/services/hotkeys.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { CommandService } from '@app/services/command/command.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { CanvasNgxComponent } from './canvas-ngx.component';
 describe('CanvasNgxComponent', () => {
     let component: CanvasNgxComponent;

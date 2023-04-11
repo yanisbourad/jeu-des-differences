@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameRecorderService } from '@app/services/game-recorder.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { Subscription } from 'rxjs';
 
 @Component({

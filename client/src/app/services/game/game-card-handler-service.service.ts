@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
-import { SocketClientService } from './socket-client.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
 @Injectable({

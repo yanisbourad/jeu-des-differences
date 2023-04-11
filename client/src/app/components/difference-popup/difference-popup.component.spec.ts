@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
 import * as constants from '@app/configuration/const-test';
-import { DrawService } from '@app/services/draw.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { DifferencePopupComponent } from './difference-popup.component';
 
 describe('DifferencePopupComponent', () => {

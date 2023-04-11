@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameRecord } from '@common/game';
-import { SocketClientService } from './socket-client.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,8 +13,6 @@ import { Message } from '@app/interfaces/message';
 // to contain various helpful functions
 export class GameHelperService {
     path: ImagePath;
-    rankingSoloCopy: GameRecord[];
-    rankingMultiCopy: GameRecord[];
     playerName: string;
     gameName: string;
     gameType: string;
@@ -135,74 +133,22 @@ export class GameHelperService {
         });
     }
 
-    globalMessageMulti(gameTime: number) {
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[0].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingMultiCopy[0].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingMultiCopy[0].time.slice(2), 10)) {
-                    this.sendWinnerMessage(1);
+    globalMessage(gameTime: number, rankingCopy: GameRecord[]) {
+        const gameTimeMinute = parseInt(this.getGameTime(gameTime).slice(0, 2), 10);
+        const gameTimeSec = parseInt(this.getGameTime(gameTime).slice(2), 10);
+        for (let i = 0; i < rankingCopy.length; i++) {
+            const rankingMinute = parseInt(rankingCopy[i].time.slice(0, 2), 10);
+            const rankingSec = parseInt(rankingCopy[i].time.slice(2), 10);
+            if (gameTimeMinute <= rankingMinute) {
+                if (gameTimeMinute === rankingMinute) {
+                    if (gameTimeSec <= rankingSec) {
+                        this.sendWinnerMessage(i + 1);
+                        return;
+                    }
+                } else {
+                    this.sendWinnerMessage(i + 1);
                     return;
                 }
-            } else {
-                this.sendWinnerMessage(1);
-                return;
-            }
-        }
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[1].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingMultiCopy[1].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingMultiCopy[1].time.slice(2), 10)) {
-                    this.sendWinnerMessage(2);
-                    return;
-                }
-            } else {
-                this.sendWinnerMessage(2);
-                return;
-            }
-        }
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingMultiCopy[2].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingMultiCopy[2].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingMultiCopy[2].time.slice(2), 10)) {
-                    this.sendWinnerMessage(3);
-                    return;
-                }
-            } else {
-                this.sendWinnerMessage(3);
-                return;
-            }
-        }
-    }
-
-    globalMessageSolo(gameTime: number) {
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[0].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingSoloCopy[0].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingSoloCopy[0].time.slice(2), 10)) {
-                    this.sendWinnerMessage(1);
-                    return;
-                }
-            } else {
-                this.sendWinnerMessage(1);
-                return;
-            }
-        }
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[1].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingSoloCopy[1].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingSoloCopy[1].time.slice(2), 10)) {
-                    this.sendWinnerMessage(2);
-                    return;
-                }
-            } else {
-                this.sendWinnerMessage(2);
-                return;
-            }
-        }
-        if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) <= parseInt(this.rankingSoloCopy[2].time.slice(0, 2), 10)) {
-            if (parseInt(this.getGameTime(gameTime).slice(0, 2), 10) === parseInt(this.rankingSoloCopy[2].time.slice(0, 2), 10)) {
-                if (parseInt(this.getGameTime(gameTime).slice(2), 10) <= parseInt(this.rankingSoloCopy[2].time.slice(2), 10)) {
-                    this.sendWinnerMessage(3);
-                    return;
-                }
-            } else {
-                this.sendWinnerMessage(3);
-                return;
             }
         }
     }

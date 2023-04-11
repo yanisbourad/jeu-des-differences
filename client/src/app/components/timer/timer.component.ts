@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import * as constants from '@app/configuration/const-time';
 import { Time } from '@app/interfaces/time';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',

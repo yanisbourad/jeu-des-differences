@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
-import { SocketClientService } from './socket-client.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 
 import SpyObj = jasmine.SpyObj;
 

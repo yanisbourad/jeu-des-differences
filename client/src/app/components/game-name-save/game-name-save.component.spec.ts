@@ -4,8 +4,8 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-import { GameDatabaseService } from '@app/services/game-database.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { GameNameSaveComponent } from './game-name-save.component';
 import SpyObj = jasmine.SpyObj;
 

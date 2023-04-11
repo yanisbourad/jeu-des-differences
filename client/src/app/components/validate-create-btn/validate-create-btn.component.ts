@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 
 @Component({
     selector: 'app-validate-create-btn',

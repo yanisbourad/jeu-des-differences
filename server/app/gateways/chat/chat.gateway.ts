@@ -205,7 +205,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        if(this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit) { // need something else for time limit
+        if(this.isMulti && this.isPlaying.get(this.roomName) ) { // need something else for time limit
             socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName }); 
             // await this.playerService.removePlayer(this.roomName, this.playerName);
         }

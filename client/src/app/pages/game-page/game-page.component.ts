@@ -61,6 +61,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
+        this.gameService.handleDisconnect();
         if (!this.gameService.mode) this.socket.connect();
         this.gameService.setStartDate(new Date().toString());
         this.gameRecordService.page = this;
@@ -185,6 +186,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }
             this.socket.disconnect();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (this.gameService.gameType === 'double') {
+                localStorage.setItem('reload', 'true');
+            }
         });
     }
 

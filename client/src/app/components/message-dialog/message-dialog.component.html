@@ -6,7 +6,7 @@
   </div>
   <div mat-dialog-actions *ngIf="data.type !== 'timeLimit'" >
     <button class={{data.type}} mat-raised-button mat-dialog-close color="primary" (click)="redirection()">Ok</button>
-    <button *ngIf="data.type === 'finished'" class={{data.type}} mat-raised-button mat-dialog-close color="primary" (click)="rewindGame()">Revoire La Partie</button>
+    <button *ngIf="data.type === 'finished' && !gameService.hasAbandonedGame" class={{data.type}} mat-raised-button mat-dialog-close color="primary" (click)="rewindGame()">Revoire La Partie</button>
   </div>
 
   <div mat-dialog-actions *ngIf="data.type === 'timeLimit'">

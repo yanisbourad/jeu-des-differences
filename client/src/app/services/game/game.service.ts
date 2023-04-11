@@ -191,6 +191,14 @@ export class GameService {
         return this.nDifferencesFound === this.totalDifferences;
     }
 
+    handleDisconnect(): void {
+        if (localStorage.getItem('reload') === 'true') {
+            this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
+            this.hasAbandonedGame = true;
+            localStorage.setItem('reload', 'false');
+        }
+    }
+
     handlePlayerDifference() {
         this.opponentDifferencesArray.pop();
         this.opponentDifferencesArray.unshift(this.gameHelper.path.differenceFound);

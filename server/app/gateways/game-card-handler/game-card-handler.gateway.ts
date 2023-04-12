@@ -41,24 +41,39 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
         // handle limited time mode
         if (player.gameType === 'limit') {
-            this.logger.log('limit game');
-            this.logger.debug(player);
-            this.logger.debug(this.gameCardHandlerService.timeLimitedGamesQueue);
             const players = this.gameCardHandlerService.manageJoinLimitMode(player)
             if (players.length === 1) {
                 this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
-            } else {
+            } else if (players.length === 2) {
                 const gameInfo = {
                     gameId: this.countGame++,
                     gameName: "limitedTime99999",
                     creatorName: players[CREATOR_INDEX].name,
                     opponentName: players[OPPONENT_INDEX].name,
+                    mode: "tempsLimite"
                 };
                 this.server.to(players[0].id).emit('feedbackOnStart', gameInfo);
                 this.server.to(players[1].id).emit('feedbackOnStart', gameInfo);
+            } else {
+                while (players.length % 2 === 0) {
+                    const gameInfo = {
+                        gameId: this.countGame++,
+                        gameName: "limitedTime99999",
+                        creatorName: players[CREATOR_INDEX].name,
+                        opponentName: players[OPPONENT_INDEX].name,
+                        mode: "tempsLimite"
+                    };
+                    this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
+                    this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
+                }
+                if (players.length === 1) {
+                    this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                }
             }
             return;
         }
+
+        this.logger.debug(player.gameType);
 
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
         switch (stackedPlayerNumber) {

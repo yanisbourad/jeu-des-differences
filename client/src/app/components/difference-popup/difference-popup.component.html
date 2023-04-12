@@ -6,6 +6,7 @@
     </div>
     <div class="btn-block">
         <button class="btn cancel" (click)="closeOnAbort()">Annuler</button>
-        <button *ngIf="showDifference > 2" class="btn validate" (click)="openName()">Valider</button>
+        <button *ngIf="showDifference > 2 && showDifference < 10" class="btn validate"
+            (click)="openName()">Valider</button>
     </div>
 </div>

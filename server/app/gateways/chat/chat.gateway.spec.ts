@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { PlayerService } from '@app/services/player/player-service';
 import { ServerTimeService } from '@app/services/time/server-time.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -15,7 +14,6 @@ describe('ChatGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
-    let playerService: SinonStubbedInstance<PlayerService>;
     let timeService: SinonStubbedInstance<ServerTimeService>;
     const testPlayer1 = {
         socketId: 'player1_socket_id',
@@ -43,20 +41,14 @@ describe('ChatGateway', () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
-        playerService = createStubInstance<PlayerService>(PlayerService);
         timeService = createStubInstance<ServerTimeService>(ServerTimeService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ChatGateway,
-                PlayerService,
                 ServerTimeService,
                 {
                     provide: Logger,
                     useValue: logger,
-                },
-                {
-                    provide: PlayerService,
-                    useValue: playerService,
                 },
                 {
                     provide: ServerTimeService,

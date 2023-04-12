@@ -4,11 +4,10 @@
     display: flex;
     flex-direction: column;
     margin: 0;
-    padding-top: 100px;
     align-items: center;
     justify-content: center;
-    background-color: white;
-    color: rgb(2, 0, 0);
+    background: white;
+    color: white;
 }
 h1 {
     width: 1050px;
@@ -37,6 +36,7 @@ h1 {
 .buttonContainer2 {
     display: flex;
     position: fixed;
+    bottom: 20%;
     background-color: white;
     margin-top: 10px;
     justify-content: center;
@@ -59,3 +59,21 @@ h1 {
 p {
     color: black;
 }
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: #423d4a;
+}
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+    height : 50px;
+  }
+   
+  /* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(153, 109, 185, 0.952); 
+    border-radius: 10px;
+    height : 50px;
+  }

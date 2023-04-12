@@ -11,7 +11,7 @@
             <div *ngFor="let message of socketClient.messageList">
                 <p *ngIf="message.event === false" class="user-message" [style.background-color]="message.color"
                 [style.margin-left]="message.pos"
-                >{{message.userName}}- {{message.message}}</p>
+                >{{message.playerName}}- {{message.message}}</p>
                 <p *ngIf="message.event === true" class="event-message">{{message.message}}</p>
             </div>
         </div>

@@ -17,6 +17,7 @@ export class GameHelperService {
     gameName: string;
     gameType: string;
     message: string;
+    subMessage: { playerName: string; color: string; pos: string; gameId: string; event: boolean };
     constructor(private socket: SocketClientService, private dialog: MatDialog) {
         this.path = {
             differenceNotFound: './assets/img/difference-not-found.png',
@@ -51,68 +52,23 @@ export class GameHelperService {
 
     sendFoundMessage(): Message {
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée';
-        if (this.gameType === 'double') {
-            this.message = this.message + ' par ' + this.playerName;
-        }
-        const foundMessage = {
-            message: this.message,
-            playerName: this.playerName,
-            color: '#00FF00',
-            pos: '50%',
-            gameId: this.socket.getRoomName(),
-            event: true,
-        };
+        if (this.gameType === 'double') this.message = this.message + ' par ' + this.playerName;
+        const foundMessage = { message: this.message, ...this.subMessage };
         this.socket.sendMessage(foundMessage);
-        return {
-            message: foundMessage.message,
-            userName: foundMessage.playerName,
-            mine: true,
-            color: foundMessage.color,
-            pos: foundMessage.pos,
-            event: foundMessage.event,
-        };
+        return { ...foundMessage, mine: true };
     }
 
     sendErrorMessage(): Message {
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Erreur';
-        if (this.gameType === 'double') {
-            this.message = this.message + ' par ' + this.playerName;
-        }
-        const errorMessage = {
-            message: this.message,
-            playerName: this.playerName,
-            color: '#FF0000',
-            pos: '50%',
-            gameId: this.socket.getRoomName(),
-            event: true,
-        };
+        if (this.gameType === 'double') this.message = this.message + ' par ' + this.playerName;
+        const errorMessage = { message: this.message, ...this.subMessage };
         this.socket.sendMessage(errorMessage);
-
-        return {
-            message: errorMessage.message,
-            userName: errorMessage.playerName,
-            mine: true,
-            color: errorMessage.color,
-            pos: errorMessage.pos,
-            event: errorMessage.event,
-        };
+        return { ...errorMessage, mine: true };
     }
 
     sendWinnerMessage(position: number): void {
-        let msg = '';
-        switch (position) {
-            case 1:
-                msg = ' obtient la première position dans les meilleurs temps du jeu ';
-                break;
-            case 2:
-                msg = ' obtient la deuxième position dans les meilleurs temps du jeu ';
-                break;
-            case 3:
-                msg = ' obtient la troisième dans les meilleurs temps du jeu ';
-                break;
-            default:
-                break;
-        }
+        const positions = ['', 'première', 'deuxième', 'troisième'];
+        const msg = ` obtient la ${positions[position]} position dans les meilleurs temps du jeu`;
         this.message = new Date().toLocaleTimeString() + ' - ' + this.playerName + msg + this.gameName + ' en ' + this.gameType;
         const winnerMessage = {
             message: this.message,
@@ -123,14 +79,7 @@ export class GameHelperService {
             event: true,
         };
         this.socket.sendMessage(winnerMessage);
-        this.socket.messageList.push({
-            message: winnerMessage.message,
-            userName: winnerMessage.playerName,
-            mine: true,
-            color: winnerMessage.color,
-            pos: winnerMessage.pos,
-            event: winnerMessage.event,
-        });
+        this.socket.messageList.push({ ...winnerMessage, mine: true });
     }
 
     globalMessage(gameTime: number, rankingCopy: GameRecord[]) {

@@ -32,8 +32,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     diffFoundSubscription: Subscription = new Subscription();
     timeLimitStatusSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
-    notRewinding: boolean = true;
     differenceSubscription: Subscription = new Subscription();
+    teammateStatusSubscription: Subscription = new Subscription();
+    notRewinding: boolean = true;
     // eslint-disable-next-line max-params
     constructor(
         public gameService: GameService,
@@ -61,11 +62,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
-        this.gameService.handleDisconnect();
         if (!this.gameService.mode) this.socket.connect();
         this.gameService.setStartDate(new Date().toString());
         this.gameRecordService.page = this;
         this.getRouterParams();
+        this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
         } else {
@@ -88,7 +89,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         const roomName = this.gameService.gameId + this.gameService.gameName;
         switch (this.gameService.gameType) {
             case 'solo':
-                if (this.gameService.mode !== 'tempsLimite') this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
+                if (!this.gameService.mode) this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
                 break;
             case 'double':
                 this.socket.sendGameName(this.gameService.gameName);
@@ -113,6 +114,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.diffFoundSubscription.unsubscribe();
             this.timeLimitStatusSubscription.unsubscribe();
             this.gameStateSubscription.unsubscribe();
+            this.differenceSubscription.unsubscribe();
+            this.teammateStatusSubscription.unsubscribe();
             this.socket.disconnect();
         }
         this.notRewinding = false;
@@ -131,6 +134,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.timeLimitStatusSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.differenceSubscription.unsubscribe();
+        this.teammateStatusSubscription.unsubscribe();
         this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.cheatModeService.resetService();
@@ -139,14 +143,34 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     subscriptions(): void {
-        this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
-            if (newValue) {
-                new ShowDiffRecord(newValue, { canvas1: this.canvas1, canvas2: this.canvas2 }, false, this.gameService.mousePosition).record(
-                    this.gameRecordService,
-                );
+        this.subscribeToGameStatus();
+        this.subscribeToTimeLimit();
+        this.subscribeToDifference();
+        window.addEventListener('beforeunload', () => {
+            if (this.gameService.gameType === 'double') {
+                localStorage.setItem('reload', 'true'); // still not working properly
             }
         });
+    }
 
+    subscribeToTimeLimit(): void {
+        this.timeLimitStatusSubscription = this.socket.timeLimitStatus$.subscribe((newValue) => {
+            if (newValue) {
+                this.gameService.displayGameEnded('Félicitaion, vous avez gagné la partie ', 'finished');
+            } else {
+                this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
+            }
+            this.socket.disconnect();
+        });
+
+        this.teammateStatusSubscription = this.socket.teammateStatus$.subscribe((newValue) => {
+            if (newValue) {
+                this.gameService.gameType = 'solo';
+            }
+        });
+    }
+
+    subscribeToGameStatus(): void {
         this.gameStateSubscription = this.socket.gameState$.subscribe((newValue) => {
             const opponentName: string = this.gameService.opponentName;
             this.gameService.gameTime = this.currentTimer;
@@ -154,6 +178,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (newValue === true && this.socket.statusPlayer !== this.gameService.playerName) {
                 this.gameService.displayGameEnded(msg, 'finished');
                 this.socket.disconnect();
+            }
+        });
+    }
+
+    subscribeToDifference(): void {
+        this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
+            if (newValue) {
+                new ShowDiffRecord(newValue, { canvas1: this.canvas1, canvas2: this.canvas2 }, false, this.gameService.mousePosition).record(
+                    this.gameRecordService,
+                );
             }
         });
 
@@ -176,21 +210,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);
                 new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
-            }
-        });
-
-        this.timeLimitStatusSubscription = this.socket.timeLimitStatus$.subscribe((newValue) => {
-            if (newValue) {
-                this.gameService.displayGameEnded('Félicitaion, vous avez gagné la partie ', 'finished');
-            } else {
-                this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
-            }
-            this.socket.disconnect();
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (this.gameService.gameType === 'double') {
-                localStorage.setItem('reload', 'true');
             }
         });
     }

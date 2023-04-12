@@ -51,7 +51,7 @@ export class MessageAreaComponent implements OnInit {
         this.socketClient.sendMessage(dataToSend);
         this.addMessage({
             message: this.message,
-            userName: this.playerName,
+            playerName: this.playerName,
             mine: true,
             color: this.defaultColor[1],
             pos: this.position[1],

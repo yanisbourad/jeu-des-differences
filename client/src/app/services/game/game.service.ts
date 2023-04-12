@@ -81,6 +81,13 @@ export class GameService {
         this.gameHelper.gameName = this.gameName;
         this.gameHelper.gameType = this.gameType;
         this.gameHelper.playerName = this.playerName;
+        this.gameHelper.subMessage = {
+            playerName: this.playerName,
+            color: '#00FF00',
+            pos: '50%',
+            gameId: this.socket.getRoomName(),
+            event: true,
+        };
     }
 
     getSetDifference(differencesStr: string[]): Set<number>[] {
@@ -176,7 +183,10 @@ export class GameService {
 
     handleMultiDifference(): void {
         this.socket.findDifference({ playerName: this.playerName, roomName: this.socket.getRoomName() });
-        if (this.multiGameEnd() && this.gameType === 'double') {
+        if (this.multiGameEnd() && !this.mode) {
+            this.endGame();
+        }
+        if (this.socket.nbrDifference === this.socket.diffLeft && this.mode) { // not sure yet
             this.endGame();
         }
     }
@@ -192,7 +202,7 @@ export class GameService {
     }
 
     handleDisconnect(): void {
-        if (localStorage.getItem('reload') === 'true') {
+        if (localStorage.getItem('reload') === 'true' && this.gameType === 'double') {
             this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
             this.hasAbandonedGame = true;
             localStorage.setItem('reload', 'false');
@@ -242,11 +252,7 @@ export class GameService {
             time: this.gameHelper.getGameTime(this.gameTime),
         };
         const gamingHistory: GamingHistory = {
-            gameName: this.gameInformation.gameTitle,
-            dateStart: this.startDate,
-            time: this.gameHelper.getGameTime(this.gameTime),
-            gameType: this.gameType === 'double' ? 'multi' : 'solo',
-            playerName: this.playerName,
+            ...gameRecord,
             opponentName: this.gameType === 'double' ? this.opponentName : '999999999999999',
             hasAbandonedGame: this.hasAbandonedGame,
         };

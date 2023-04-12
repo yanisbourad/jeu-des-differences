@@ -19,13 +19,14 @@ export class SocketClientService {
     nbrDifference: number;
     diffLeft: number;
     elapsedTimes: Map<string, number> = new Map<string, number>();
-    messageList: { message: string; userName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
+    messageList: { message: string; playerName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
     // DEFINE SUBJECTS
     private gameState = new Subject<boolean>();
     private playerFoundDiff = new Subject<string>();
     private diffFound = new Subject<Set<number>>();
     private difference = new Subject<Set<number>>();
     private timeLimitStatus = new Subject<boolean>();
+    private teammateStatus = new Subject<boolean>();
     private messageToAdd = new Subject<GameMessageEvent>();
     // DEFINE OBSERVABLES
     gameState$ = this.gameState.asObservable();
@@ -34,7 +35,7 @@ export class SocketClientService {
     difference$ = this.difference.asObservable();
     timeLimitStatus$ = this.timeLimitStatus.asObservable();
     messageToAdd$ = this.messageToAdd.asObservable();
-    isPlaying: boolean; // to determine if the other player in time limit is still in the game
+    teammateStatus$ = this.teammateStatus.asObservable();
 
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
@@ -66,34 +67,16 @@ export class SocketClientService {
     }
 
     configureBaseSocketFeatures() {
-        this.socketClient.on('connect', () => {
-            return;
-        });
+        this.connectionHandling();
+        this.differenceHandling();
+        this.timeLimitHandling();
+        this.timeAndMessageHandling();
+        this.endGameHandling();
+    }
 
-        this.socketClient.on('hello', (socketId: string) => {
-            this.roomName = socketId;
-        });
-
+    timeAndMessageHandling(): void {
         this.socketClient.on('serverTime', (values: Map<string, number>) => {
             this.elapsedTimes = new Map(values);
-        });
-
-        this.socketClient.on('nbrDifference', (nbrDifference: number) => {
-            this.nbrDifference = nbrDifference;
-        });
-
-        this.socketClient.on('nbrDiffLeft', (diffLeft: number) => {
-            this.diffLeft = diffLeft;
-        });
-
-        this.socketClient.on('getRandomGame', (game: Game) => {
-            this.game = game;
-        });
-
-        this.socketClient.on('sendRoomName', (values: [string, string]) => {
-            if (values[0] === 'multi') {
-                this.roomName = values[1];
-            }
         });
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
@@ -101,7 +84,7 @@ export class SocketClientService {
                 this.messageToAdd.next(
                     new GameMessageEvent({
                         message: data.message,
-                        userName: data.userName,
+                        playerName: data.userName,
                         mine: false,
                         color: data.color,
                         pos: data.pos,
@@ -110,10 +93,31 @@ export class SocketClientService {
                 );
             }
         });
+    }
 
-        this.socketClient.on('gameEnded', (data: [gameEnded: boolean, player: string]) => {
-            this.gameState.next(data[0]);
-            this.statusPlayer = data[1];
+    connectionHandling(): void {
+        this.socketClient.on('connect', () => {
+            return;
+        });
+
+        this.socketClient.on('hello', (socketId: string) => {
+            this.roomName = socketId;
+        });
+
+        this.socketClient.on('sendRoomName', (values: [string, string]) => {
+            if (values[0] === 'multi') {
+                this.roomName = values[1];
+            }
+        });
+    }
+
+    differenceHandling(): void {
+        this.socketClient.on('nbrDifference', (nbrDifference: number) => {
+            this.nbrDifference = nbrDifference;
+        });
+
+        this.socketClient.on('nbrDiffLeft', (diffLeft: number) => {
+            this.diffLeft = diffLeft;
         });
 
         this.socketClient.on('diffFound', (diff: Set<number>) => {
@@ -121,27 +125,21 @@ export class SocketClientService {
             this.difference.next(data);
         });
 
-        this.socketClient.on('statusPartner', (status: boolean) => {
-            this.isPlaying = status;
+        this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
+            this.playerFoundDiff.next(data.playerName);
         });
 
         this.socketClient.on('error', () => {
             this.difference.next(this.error);
         });
 
-        this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
-            this.playerFoundDiff.next(data.playerName);
-        });
-
-        this.socketClient.on('timeLimitStatus', (finished: boolean) => {
-            this.timeLimitStatus.next(finished);
-        });
-
         this.socketClient.on('feedbackDifference', (diff: Set<number>) => {
             const data = new Set<number>(diff);
             this.diffFound.next(data);
         });
+    }
 
+    endGameHandling(): void {
         this.socketClient.on('giveup-return', (data: { playerName: string }) => {
             this.playerGaveUp = data.playerName;
             this.stopTimer(this.getRoomName(), data.playerName);
@@ -154,6 +152,25 @@ export class SocketClientService {
             dialog.afterClosed().subscribe(() => {
                 this.disconnect();
             });
+        });
+
+        this.socketClient.on('gameEnded', (data: [gameEnded: boolean, player: string]) => {
+            this.gameState.next(data[0]);
+            this.statusPlayer = data[1];
+        });
+    }
+
+    timeLimitHandling(): void {
+        this.socketClient.on('teammateDisconnected', (status: boolean) => {
+            this.teammateStatus.next(status);
+        });
+
+        this.socketClient.on('timeLimitStatus', (finished: boolean) => {
+            this.timeLimitStatus.next(finished);
+        });
+
+        this.socketClient.on('getRandomGame', (game: Game) => {
+            this.game = game;
         });
     }
 

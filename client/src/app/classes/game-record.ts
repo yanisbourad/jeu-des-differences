@@ -27,6 +27,7 @@ export abstract class GameRecordCommand {
     record(gameRecordService: GameRecorderService): void {
         gameRecordService.do(this);
     }
+
     displayWord(
         word: string,
         canvas: {

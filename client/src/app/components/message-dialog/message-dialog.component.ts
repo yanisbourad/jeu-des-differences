@@ -85,12 +85,8 @@ export class MessageDialogComponent {
             };
             this.socket.sendMessage(dataToSend);
             new GameMessageEvent({
-                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
-                userName: this.gameService.playerName,
+                ...dataToSend,
                 mine: true,
-                color: '#FF0000',
-                pos: '50%',
-                event: true,
             }).record(this.gameRecorderService);
         }
         this.socket.leaveRoom();

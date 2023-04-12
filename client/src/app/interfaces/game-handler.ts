@@ -9,4 +9,5 @@ export class GamersInfo {
     creatorName: string;
     opponentName: string;
     gameName: string;
+    mode: string;
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
-import { SocketClientService } from '@app/services/socket/socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
 @Injectable({
@@ -68,6 +68,7 @@ export class GameCardHandlerService {
     }
 
     connect() {
+        console.log('connect');
         this.socketClient.connect();
         this.socket = this.socketClient.socket;
     }
@@ -110,13 +111,13 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
-            console.log(gameIdentifier);
-            if (gameIdentifier.gameName !== 'limitedTime99999') {
-                this.socketClientService.startMultiGame(gameIdentifier);
-                this.isReadyToPlay = true;
-            } else {
+            if (gameIdentifier.gameName === 'limitedTime99999') {
+                this.socketClientService.startTimeLimit(gameIdentifier.creatorName);
                 this.gameName = gameIdentifier.gameName;
+            } else {
+                this.socketClientService.startMultiGame(gameIdentifier);
             }
+            this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
             // this.resetGameVariables();
         });
@@ -149,12 +150,6 @@ export class GameCardHandlerService {
 
     join(game: Game) {
         this.socket.emit('joinGame', game);
-        this.isLeaving = false;
-        this.isReadyToPlay = false;
-        this.listenToFeedBack();
-    }
-    joinLimitedTime() {
-        this.socket.emit('joinGame', 'limitedTime');
         this.isLeaving = false;
         this.isReadyToPlay = false;
         this.listenToFeedBack();
@@ -206,6 +201,7 @@ export class GameCardHandlerService {
                 gameName: gamersIdentifier.gameName,
                 gameType: 'double',
                 gameId: gamersIdentifier.gameId,
+                mode: gamersIdentifier.mode,
             },
         ]);
     }

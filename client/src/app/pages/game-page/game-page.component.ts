@@ -66,7 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
         this.getRouterParams();
-        this.gameService.handleDisconnect(); // doesn't work properly
+        // this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
         } else {
@@ -146,11 +146,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.subscribeToGameStatus();
         this.subscribeToTimeLimit();
         this.subscribeToDifference();
-        window.addEventListener('beforeunload', () => {
-            if (this.gameService.gameType === 'double') {
-                localStorage.setItem('reload', 'true'); // still not working properly
-            }
-        });
+        // window.addEventListener('beforeunload', () => {
+        //     if (this.gameService.gameType === 'double') {
+        //         localStorage.setItem('reload', 'true'); // still not working properly
+        //     }
+        // });
     }
 
     subscribeToTimeLimit(): void {

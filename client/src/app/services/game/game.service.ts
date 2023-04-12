@@ -201,13 +201,13 @@ export class GameService {
         return this.nDifferencesFound === this.totalDifferences;
     }
 
-    handleDisconnect(): void {
-        if (localStorage.getItem('reload') === 'true' && this.gameType === 'double') {
-            this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
-            this.hasAbandonedGame = true;
-            localStorage.setItem('reload', 'false');
-        }
-    }
+    // handleDisconnect(): void {
+    //     if (localStorage.getItem('reload') === 'true' && this.gameType === 'double') {
+    //         this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
+    //         this.hasAbandonedGame = true;
+    //         localStorage.setItem('reload', 'false');
+    //     }
+    // }
 
     handlePlayerDifference() {
         this.opponentDifferencesArray.pop();
@@ -252,7 +252,11 @@ export class GameService {
             time: this.gameHelper.getGameTime(this.gameTime),
         };
         const gamingHistory: GamingHistory = {
-            ...gameRecord,
+            gameName: this.gameInformation.gameTitle,
+            gameType: this.gameType === 'double' ? 'multi' : 'solo',
+            playerName: this.playerName,
+            dateStart: this.startDate,
+            time: this.gameHelper.getGameTime(this.gameTime),
             opponentName: this.gameType === 'double' ? this.opponentName : '999999999999999',
             hasAbandonedGame: this.hasAbandonedGame,
         };

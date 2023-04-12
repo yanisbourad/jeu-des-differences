@@ -22,7 +22,7 @@ export interface GamingHistory {
     gameName: string;
     dateStart: string;
     time: String;
-    typeGame: string;
+    gameType: string;
     playerName: string;
     opponentName: string;
     hasAbandonedGame: boolean;

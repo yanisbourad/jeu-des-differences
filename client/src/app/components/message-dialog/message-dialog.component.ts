@@ -5,6 +5,7 @@ import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import * as constantsTime from '@app/configuration/const-time';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameService } from '@app/services/game/game.service';
@@ -26,6 +27,7 @@ export class MessageDialogComponent {
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
         private gameDataBaseService: GameDatabaseService,
+        private gameCardHandlerService: GameCardHandlerService,
     ) {
         this.gameDataBaseService.isDataBaseEmpty();
     }
@@ -59,12 +61,23 @@ export class MessageDialogComponent {
         if (this.gameDataBaseService.isEmpty) {
             this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
         } else {
+            // this.socket.connect();
+            // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
+            // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
             this.socket.connect();
-            this.dialog.open(PlayerWaitPopupComponent, {
+            const dialog = this.dialog.open(PlayerWaitPopupComponent, {
+                // this.dialog.open(PlayerWaitPopupComponent, {
                 data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
                 disableClose: true,
                 height: '600px',
                 width: '600px',
+            });
+            this.gameCardHandlerService.connect();
+            this.gameCardHandlerService.joinLimitedTime();
+            dialog.afterClosed().subscribe((res) => {
+                if (res) {
+                    return res;
+                }
             });
         }
     }

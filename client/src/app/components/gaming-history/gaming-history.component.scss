@@ -1,32 +1,46 @@
-.container {
+#boxer {
     height: 774px;
     width: 1107px;
     display: flex;
     flex-direction: column;
+    position: relative;
     margin: 0;
     align-items: center;
     justify-content: center;
-    background: white;
-    color: white;
+    background-color: white;
+    color: rgb(2, 0, 0);
 }
-h1 {
-    width: 1050px;
-    height: 50px;
+
+.container > h1 {
+    width: 45%;
+    top:18%;
     position: fixed;
     background-color: gray;
     text-align: center;
     padding-top: 10px;
     font-weight: bold;
 }
+
+.container {
+    display: flex;
+    height: 720px;
+    width: 1107px;
+    flex-direction: column;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    // overflow-y: scroll;
+}
 #eraseButton {
     background-color: transparent;
-    color: black;
+    color: rgb(0, 0, 0);
     border: 3px solid red;
     border-radius: 30px;
 }
 #closeButton {
     background-color: transparent;
-    color: black;
+    color: rgb(0, 0, 0);
     border: 3px solid green;
     border-radius: 30px;
 }
@@ -36,44 +50,28 @@ h1 {
 .buttonContainer2 {
     display: flex;
     position: fixed;
-    bottom: 20%;
-    background-color: white;
-    margin-top: 10px;
     justify-content: center;
-    margin-top: 430px;
-    width: 1000px;
+    bottom: 15%;
+    left: 10%;
+    width: 80%;
+    padding-top: 20px;
+    padding-bottom: 10px;
     gap: 20px;
 }
 .buttonContainer {
     align-content: center;
     padding-left: 17%;
 }
+
+p {
+    color: black;
+}
+
 .bottomButtons {
     display: inline-block;
     font-weight: 500;
     font-size: 24px;
     line-height: 29px;
     padding: 10px 30px;
-}
-
-p {
     color: black;
 }
-/* width */
-::-webkit-scrollbar {
-    width: 10px;
-    background-color: #423d4a;
-}
-/* Track */
-::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey; 
-    border-radius: 10px;
-    height : 50px;
-  }
-   
-  /* Handle */
-::-webkit-scrollbar-thumb {
-    background: rgba(153, 109, 185, 0.952); 
-    border-radius: 10px;
-    height : 50px;
-  }

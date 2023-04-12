@@ -20,6 +20,8 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
+    @ViewChild('originalImage', { static: true }) originalImage!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('modifiedImage', { static: true }) modifiedImage!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
@@ -86,9 +88,20 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     loading(): void {
         const timeout = 500;
         setTimeout(() => {
+            this.loadImages();
+
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
             this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, timeout);
+    }
+
+    loadImages(): void {
+        DrawService.getImageDateFromDataUrl(this.gameService.game.originalImageData).subscribe((originalImageData) => {
+            DrawService.drawImage(originalImageData, this.originalImage.nativeElement);
+        });
+        DrawService.getImageDateFromDataUrl(this.gameService.game.modifiedImageData).subscribe((modifiedImageData) => {
+            DrawService.drawImage(modifiedImageData, this.modifiedImage.nativeElement);
+        });
     }
 
     ngAfterViewInit(): void {

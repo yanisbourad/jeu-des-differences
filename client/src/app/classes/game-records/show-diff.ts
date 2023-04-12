@@ -3,7 +3,6 @@ import { GameRecordCommand } from '@app/classes/game-record';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { DrawService } from '@app/services/draw/draw.service';
-
 interface Canvases {
     canvas1: ElementRef<HTMLCanvasElement>;
     canvas2: ElementRef<HTMLCanvasElement>;
@@ -38,7 +37,10 @@ export class ShowDiffRecord extends GameRecordCommand {
         } else {
             component.gameService.handlePlayerDifference();
         }
-        this.drawDifference(this.diff, this.canvas);
+        const originalImage: string = component.gameService.game.originalImageData;
+        DrawService.getImageDateFromDataUrl(originalImage).subscribe((imageData) => {
+            this.drawDifference(this.diff, this.canvas, imageData);
+        });
         if (component.gameService.mode) {
             this.clearCanvas(this.canvas.canvas1.nativeElement, this.canvas.canvas2.nativeElement);
             component.gameService.defineVariables();
@@ -55,8 +57,9 @@ export class ShowDiffRecord extends GameRecordCommand {
             canvas1: ElementRef<HTMLCanvasElement>;
             canvas2: ElementRef<HTMLCanvasElement>;
         },
+        originalImage: ImageData,
     ): void {
-        DrawService.drawDiff(diff, canvas.canvas1.nativeElement);
-        DrawService.drawDiff(diff, canvas.canvas2.nativeElement);
+        DrawService.drawDiff(diff, canvas.canvas1.nativeElement, 'black', originalImage);
+        DrawService.drawDiff(diff, canvas.canvas2.nativeElement, 'black', originalImage);
     }
 }

@@ -1,19 +1,16 @@
 #boxer {
-    height: 774px;
-    width: 1107px;
     display: flex;
-    flex-direction: column;
-    position: relative;
-    margin: 0;
-    align-items: center;
     justify-content: center;
-    background-color: white;
-    color: rgb(2, 0, 0);
+    margin-top: 200px;
 }
 
-.container > h1 {
-    width: 45%;
-    top:18%;
+#boxer > h1 {
+    display: block;
+    width: 40%;
+    height: 50px;
+    top: 8%;
+    bottom: 85%;
+    left: 30%;
     position: fixed;
     background-color: gray;
     text-align: center;
@@ -27,6 +24,7 @@
     width: 1107px;
     flex-direction: column;
     margin: 0;
+    padding-top: 15px;
     align-items: center;
     justify-content: center;
     background-color: white;
@@ -34,13 +32,13 @@
 }
 #eraseButton {
     background-color: transparent;
-    color: rgb(0, 0, 0);
+    color: rgb(250, 248, 248);
     border: 3px solid red;
     border-radius: 30px;
 }
 #closeButton {
     background-color: transparent;
-    color: rgb(0, 0, 0);
+    color: rgb(253, 251, 251);
     border: 3px solid green;
     border-radius: 30px;
 }
@@ -51,7 +49,7 @@
     display: flex;
     position: fixed;
     justify-content: center;
-    bottom: 15%;
+    bottom: 5%;
     left: 10%;
     width: 80%;
     padding-top: 20px;
@@ -62,16 +60,14 @@
     align-content: center;
     padding-left: 17%;
 }
-
-p {
-    color: black;
-}
-
 .bottomButtons {
     display: inline-block;
     font-weight: 500;
     font-size: 24px;
     line-height: 29px;
     padding: 10px 30px;
+}
+
+p {
     color: black;
 }

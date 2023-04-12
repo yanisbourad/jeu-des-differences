@@ -3,9 +3,9 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord, GamingHistory, TimeConfig } from '@common/game';
 import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { Game, GameInfo, GameRecord, GamingHistory, Rankings, TimeConfig } from '@common/game';
 @Injectable({
     providedIn: 'root',
 })
@@ -53,8 +53,8 @@ export class GameDatabaseService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
     }
-    deleteOneGameRecords(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/gameRecord/${gameName}`, { observe: 'response', responseType: 'text' });
+    deleteOneGameRecords(gameName: string): Observable<Rankings> {
+        return this.http.delete<Rankings>(`${this.baseUrl}/gameRecord/${gameName}`);
     }
     deleteGamingHistory(): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });

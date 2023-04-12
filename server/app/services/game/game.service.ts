@@ -1,12 +1,12 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { TimerConstantsModel } from '@app/model/database/timer-constants';
-import { Game, GameInfo, TimeConfig } from '@common/game';
-
+import { Game, GameInfo, Rankings, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import { Model } from 'mongoose';
 import { join } from 'path';
+import { listNames, rangeTime } from './moke-names.const';
 
 @Injectable()
 @Controller('file')
@@ -90,23 +90,33 @@ export class GameService {
 
     getFakeGameRecords(name: string): GameRecord[] {
         const basRecords: GameRecord[] = [];
+
         for (let i = 0; i < 3; i++) {
+            let recordInfo = this.generateFakeRecordInfo()
             basRecords.push({
                 gameName: name,
                 typeGame: 'multi',
-                time: '12:20', // 10min in seconds
-                playerName: 'Sharmila',
+                time: recordInfo.time, // 10min in seconds
+                playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
             });
+            recordInfo = this.generateFakeRecordInfo()
             basRecords.push({
                 gameName: name,
                 typeGame: 'solo',
-                time: '12:50', // 10min in seconds
-                playerName: 'Ania',
+                time: recordInfo.time, // 10min in seconds
+                playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
             });
         }
         return basRecords;
+    }
+
+    generateFakeRecordInfo(): { name: string, time: string } {
+        const minutes = Math.floor(Math.random() * (rangeTime.minutesMax - rangeTime.minutesMin + 1) + rangeTime.minutesMin)
+        const seconds = Math.floor(Math.random() * (rangeTime.secondesMax - rangeTime.secondesMin + 1) + rangeTime.secondesMin)
+        const playerName = listNames[Math.floor(Math.random() * listNames.length)]
+        return { name: playerName, time: `${minutes}:${seconds}` }
     }
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {
@@ -168,10 +178,14 @@ export class GameService {
     getFileTime(dirName: string, fileName: string): string {
         return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
     }
-    populateFakeGameRecordsForOneGame(_name: string): void {
+    populateFakeGameRecordsForOneGame(_name: string): Rankings {
         const name = _name + this.key;
         const basRecords: GameRecord[] = this.getFakeGameRecords(name);
         this.gameRecordModel.insertMany(basRecords);
+        return {
+            rankingMulti: basRecords.filter((record: GameRecord) => record.typeGame === 'multi').sort((a: GameRecord, b: GameRecord) => a.time.localeCompare(b.time)),
+            rankingSolo: basRecords.filter((record: GameRecord) => record.typeGame === 'solo').sort((a: GameRecord, b: GameRecord) => a.time.localeCompare(b.time)),
+        } as Rankings
     }
     populateFakeGameRecords(): void {
         this.gamesNames.forEach((gameName) => {

@@ -3,6 +3,11 @@ export interface GameInfo extends Game {
     rankingSolo: GameRecord[];
 }
 
+export interface Rankings {
+    rankingMulti: GameRecord[];
+    rankingSolo: GameRecord[];
+}
+
 export interface Game {
     gameName: string;
     difficulty: string;

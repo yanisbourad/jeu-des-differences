@@ -182,14 +182,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.MousePosition)
     async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
-        this.logger.debug('mouse', data)
         if (!this.isMulti) {
             this.roomName = socket.id;
         } else {
             this.roomName = data[1];
         }
         const diff = this.unfoundedDifference.get(this.roomName).find((set) => set.has(data[0]));
-        this.logger.debug('diff', this.unfoundedDifference.get(this.roomName)[0].forEach((set) => console.log(set)))
         if (diff) {
             if (data[2]) {
                 this.goToNextGame();

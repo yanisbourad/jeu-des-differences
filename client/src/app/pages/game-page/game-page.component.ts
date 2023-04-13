@@ -5,12 +5,13 @@ import { ShowDiffRecord } from '@app/classes/game-records/show-diff';
 import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-difference';
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
+import { TIMEOUT } from '@app/configuration/const-time';
 import { Message } from '@app/interfaces/message';
-import { HintsService } from '@app/services/hints/hints.service';
 import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
 import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameService } from '@app/services/game/game.service';
+import { HintsService } from '@app/services/hints/hints.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { Game } from '@common/game';
 import { Subscription } from 'rxjs';
@@ -39,6 +40,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     differenceSubscription: Subscription = new Subscription();
     teammateStatusSubscription: Subscription = new Subscription();
     notRewinding: boolean = true;
+
     // eslint-disable-next-line max-params
     constructor(
         public gameService: GameService,
@@ -70,9 +72,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
-        this.socket.imageLoaded$.subscribe((game: Game) => {
-            this.loadImages(game);
-        });
+
         if (!this.gameService.mode) this.socket.connect();
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
@@ -80,8 +80,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
+            this.loadImages(this.socket.game);
+            this.socket.imageLoaded$.subscribe((game: Game) => {
+                setTimeout(() => {
+                    this.loadImages(game);
+                }, TIMEOUT);
+            });
         } else {
             this.gameService.getClassicGame(this.gameService.gameName);
+            setTimeout(() => {
+                this.loadImages();
+            }, TIMEOUT);
         }
         this.loading();
         this.cheatModeService.cheatModeKeyBinding();
@@ -93,12 +102,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     loading(): void {
-        const timeout = 200;
         setTimeout(() => {
-            this.loadImages();
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
             this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
-        }, timeout);
+        }, TIMEOUT);
     }
 
     loadImages(game: Game = this.gameService.game): void {

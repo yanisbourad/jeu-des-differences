@@ -73,7 +73,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         // needed for the rewind
         this.getRouterParams();
-        // if (this.gameService.mode !== 'tempsLimite') 
+        // if (this.gameService.mode !== 'tempsLimite')
         this.gameService.setStartDate(new Date().toLocaleString());
         if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double'){
             this.socket.connect();
@@ -91,11 +91,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             this.socket.connect();
             this.gameService.getClassicGame(this.gameService.gameName);
-            setTimeout(() => {
-                this.loadImages();
-            }, TIMEOUT);
+            this.loading();
         }
-        this.loading();
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
@@ -106,13 +103,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     loading(): void {
         setTimeout(() => {
+            this.loadImages();
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
             this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, TIMEOUT);
     }
 
     loadImages(game: Game = this.gameService.game): void {
-        if (game.originalImageData === undefined || game.modifiedImageData === undefined) return;
+        if (!game) return;
         DrawService.getImageDateFromDataUrl(game.originalImageData).subscribe((originalImageData) => {
             DrawService.drawImage(originalImageData, this.originalImage.nativeElement);
         });

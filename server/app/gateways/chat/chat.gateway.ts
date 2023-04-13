@@ -83,7 +83,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             opponentName: player.opponentName,
         });
         const myPlayers: PlayerMulti[] = this.playersMatch();
-        console.log('start multi limit', player.gameId+player.gameName)
+        console.log('start multi limit', player.gameId + player.gameName)
         if (myPlayers.length === 2) {
             console.log(myPlayers[0].id, myPlayers[1].id)
             this.isMulti = true;
@@ -129,7 +129,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             // console.log('the game', this.game)
             // this.server.to(this.roomName).emit('getRandomGame', this.game);
             // this.server.to(this.roomName).emit('nbrDifference', this.games.size);
-            this.logger.debug('here')
+            this.logger.debug('here', this.game.gameName)
             if (!this.serverTime.timers[this.roomName]) {
                 this.serverTime.startCountDown(this.roomName);
             }

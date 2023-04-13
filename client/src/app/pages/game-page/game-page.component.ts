@@ -66,7 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
         this.getRouterParams();
-        // this.gameService.handleDisconnect(); // doesn't work properly
+        this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
         } else {
@@ -160,6 +160,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }
+            this.socket.gameEnded(this.socket.getRoomName());
+            this.gameService.reinitializeGame();
             this.socket.disconnect();
         });
 

@@ -31,7 +31,6 @@ export class ServerTimeService {
         });
     }
 
-    // start countDown
     startCountDown(id: string): void {
         let count = 0;
         this.countDown = this.timeConstants.timeInit;
@@ -43,14 +42,13 @@ export class ServerTimeService {
             this.elapsedTimes.set(id, this.countDown);
         });
     }
-    // stop the timer when countDown reach zero
+
     stopCountDown(id: string): void {
         if (this.countDown === 0) {
             this.stopChronometer(id);
         }
     }
 
-    // increment time should not exceed 2 minutes
     incrementTime(): void {
         if (this.tamponTime + this.timeConstants.timeBonus > MAX_COUNTDOWN) {
             this.tamponTime = MAX_COUNTDOWN;
@@ -58,7 +56,6 @@ export class ServerTimeService {
         this.tamponTime += this.timeConstants.timeBonus;
     }
 
-    // decrement time should not be below 0, if equal zero, stop chronometer
     decrementTime(id: string): void {
         if (this.tamponTime - this.timeConstants.timePen < 0) {
             this.tamponTime = 0;

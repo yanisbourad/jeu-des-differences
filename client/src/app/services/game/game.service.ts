@@ -186,13 +186,10 @@ export class GameService {
         if (this.multiGameEnd() && !this.mode) {
             this.endGame();
         }
-        if (this.socket.nbrDifference === this.socket.diffLeft && this.mode) { // not sure yet
-            this.endGame();
-        }
     }
 
     handleSoloDifference(): void {
-        if (this.totalDifferenceReached()) {
+        if (this.totalDifferenceReached() && !this.mode) {
             this.endGame();
         }
     }
@@ -201,13 +198,12 @@ export class GameService {
         return this.nDifferencesFound === this.totalDifferences;
     }
 
-    // handleDisconnect(): void {
-    //     if (localStorage.getItem('reload') === 'true' && this.gameType === 'double') {
-    //         this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
-    //         this.hasAbandonedGame = true;
-    //         localStorage.setItem('reload', 'false');
-    //     }
-    // }
+    handleDisconnect(): void {
+        if (!this.socket.getRoomName() && this.gameType === 'double') {
+            this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
+            this.hasAbandonedGame = true;
+        }
+    }
 
     handlePlayerDifference() {
         this.opponentDifferencesArray.pop();

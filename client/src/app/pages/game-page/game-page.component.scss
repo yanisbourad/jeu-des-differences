@@ -74,15 +74,16 @@ canvas {
 .superposeImageCanvas {
     width: 640px;
     height: 480px;
-    img {
+    .image {
         position: relative;
-        top: 0;
-        left: 0;
+        border: none;
+        top: 29px;
+        left: -32px
     }
     canvas {
         position: relative ;
         border: none;
-        top: -108% ;
+        top: -107.6% ;
         left: -5% ;
     }    
 }

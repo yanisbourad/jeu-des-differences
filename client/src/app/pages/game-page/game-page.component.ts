@@ -6,11 +6,13 @@ import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-differe
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import { Message } from '@app/interfaces/message';
+import { HintsService } from '@app/services/hints/hints.service';
 import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
 import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameService } from '@app/services/game/game.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { Game } from '@common/game';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -19,6 +21,8 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
+    @ViewChild('originalImage', { static: true }) originalImage!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('modifiedImage', { static: true }) modifiedImage!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas1', { static: true }) canvas1!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas2', { static: true }) canvas2!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvas0', { static: true }) canvas0!: ElementRef<HTMLCanvasElement>;
@@ -42,8 +46,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public route: ActivatedRoute,
         private gameRecordService: GameRecorderService,
         public cheatModeService: CheatModeService,
+        public hintsService: HintsService,
     ) {}
 
+    get getCanvasImageModifier(): HTMLCanvasElement {
+        return this.modifiedImage.nativeElement;
+    }
     get width(): number {
         return constants.DEFAULT_WIDTH;
     }
@@ -62,6 +70,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
+        this.socket.imageLoaded$.subscribe((game: Game) => {
+            this.loadImages(game);
+        });
         if (!this.gameService.mode) this.socket.connect();
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
@@ -76,13 +87,28 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
+        this.hintsService.hintsKeyBinding();
+        this.hintsService.canvas0 = this.canvasCheat0;
+        this.hintsService.canvas1 = this.canvasCheat1;
     }
 
     loading(): void {
-        const timeout = 500;
+        const timeout = 200;
         setTimeout(() => {
+            this.loadImages();
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+            this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, timeout);
+    }
+
+    loadImages(game: Game = this.gameService.game): void {
+        if (game.originalImageData === undefined || game.modifiedImageData === undefined) return;
+        DrawService.getImageDateFromDataUrl(game.originalImageData).subscribe((originalImageData) => {
+            DrawService.drawImage(originalImageData, this.originalImage.nativeElement);
+        });
+        DrawService.getImageDateFromDataUrl(game.modifiedImageData).subscribe((modifiedImageData) => {
+            DrawService.drawImage(modifiedImageData, this.modifiedImage.nativeElement);
+        });
     }
 
     ngAfterViewInit(): void {
@@ -105,12 +131,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     startRewind(): void {
         if (this.notRewinding) this.initForRewind();
         this.cheatModeService.stopCheating();
+        this.hintsService.stopHints();
         this.gameRecordService.startRewind();
     }
 
     initForRewind(): void {
         if (this.notRewinding) {
             this.cheatModeService.removeHotkeysEventListener();
+            this.hintsService.removeHotkeysEventListener();
             this.diffFoundSubscription.unsubscribe();
             this.timeLimitStatusSubscription.unsubscribe();
             this.gameStateSubscription.unsubscribe();
@@ -122,14 +150,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chat.isNotRewinding = false;
         this.clearCanvases();
         this.cheatModeService.resetService();
+        this.hintsService.resetService();
         this.gameService.initRewind();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
+        this.hintsService.canvas0 = this.canvasCheat0;
+        this.hintsService.canvas1 = this.canvasCheat1;
         this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+        this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
     }
 
     ngOnDestroy(): void {
         this.cheatModeService.removeHotkeysEventListener();
+        this.hintsService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
         this.timeLimitStatusSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
@@ -138,6 +171,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.cheatModeService.resetService();
+        this.hintsService.resetService();
         this.notRewinding = true;
         this.chat.isNotRewinding = true;
     }
@@ -242,5 +276,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         DrawService.clearDiff(this.canvasCheat0.nativeElement);
         DrawService.clearDiff(this.canvas1.nativeElement);
         DrawService.clearDiff(this.canvasCheat1.nativeElement);
+        this.loadImages();
     }
 }

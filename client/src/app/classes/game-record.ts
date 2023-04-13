@@ -46,6 +46,7 @@ export abstract class GameRecordCommand {
             this.playSuccessAudio();
             this.blinkDifference(canvas.canvas1, canvas.canvas2);
         }
+        this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
     }
 
     async blinkDifference(canvas1: ElementRef<HTMLCanvasElement>, canvas2: ElementRef<HTMLCanvasElement>): Promise<void> {

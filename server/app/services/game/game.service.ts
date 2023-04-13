@@ -50,10 +50,9 @@ export class GameService {
     async getAllGames(): Promise<GameInfo[]> {
         const it = this.gamesNames.map(async (gameName) => {
             const game = this.getGame(gameName);
-            const name = gameName + this.key;
             if (game) {
-                const recordsSolo = await this.gameRecordModel.find({ gameName: name, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
-                const recordsMulti = await this.gameRecordModel.find({ gameName: name, typeGame: 'multi' }).sort({ time: 1 }).limit(3).exec();
+                const recordsSolo = await this.gameRecordModel.find({ gameName: gameName, keyServer: this.getKey, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
+                const recordsMulti = await this.gameRecordModel.find({ gameName: gameName, keyServer: this.getKey, typeGame: 'multi' }).sort({ time: 1 }).limit(3).exec();
                 return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
             }
         });
@@ -96,17 +95,19 @@ export class GameService {
             basRecords.push({
                 gameName: name,
                 typeGame: 'multi',
-                time: recordInfo.time, // 10min in seconds
+                time: recordInfo.time,
                 playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
+                keyServer: this.getKey
             });
             recordInfo = this.generateFakeRecordInfo()
             basRecords.push({
                 gameName: name,
                 typeGame: 'solo',
-                time: recordInfo.time, // 10min in seconds
+                time: recordInfo.time,
                 playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
+                keyServer: this.getKey
             });
         }
         return basRecords;
@@ -115,8 +116,10 @@ export class GameService {
     generateFakeRecordInfo(): { name: string, time: string } {
         const minutes = Math.floor(Math.random() * (rangeTime.minutesMax - rangeTime.minutesMin + 1) + rangeTime.minutesMin)
         const seconds = Math.floor(Math.random() * (rangeTime.secondesMax - rangeTime.secondesMin + 1) + rangeTime.secondesMin)
-        const playerName = listNames[Math.floor(Math.random() * listNames.length)]
-        return { name: playerName, time: `${minutes}:${seconds}` }
+        const name = listNames[Math.floor(Math.random() * listNames.length)]
+        // add 0 if seconds < 10 to have a good format
+        const time = seconds < 10 ? `${minutes}:0${seconds}` : `${minutes}:${seconds}`
+        return { name, time }
     }
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {
@@ -124,8 +127,7 @@ export class GameService {
         }
         this.createFile(game.gameName, 'info.json', JSON.stringify(game));
         this.gamesNames.push(game.gameName);
-        const name = game.gameName + this.key;
-        const basRecords: GameRecord[] = this.getFakeGameRecords(name);
+        const basRecords: GameRecord[] = this.getFakeGameRecords(game.gameName);
         this.gameRecordModel.insertMany(basRecords);
     }
     createFile(dirName: string, fileName: string, data: string): void {
@@ -149,8 +151,7 @@ export class GameService {
         if (!this.gamesNames.includes(_name)) throw Error('Does not exist');
         this.deleteDirectory(_name);
         this.gamesNames = this.gamesNames.filter((gameName) => gameName !== _name);
-        const name = _name + this.key;
-        await this.gameRecordModel.deleteMany({ gameName: name });
+        await this.gameRecordModel.deleteMany({ gameName: _name, keyServer: this.getKey });
     }
 
     async deleteAllGames(): Promise<void> {
@@ -189,8 +190,7 @@ export class GameService {
     }
     populateFakeGameRecords(): void {
         this.gamesNames.forEach((gameName) => {
-            const name = gameName + this.key;
-            const basRecords: GameRecord[] = this.getFakeGameRecords(name);
+            const basRecords: GameRecord[] = this.getFakeGameRecords(gameName);
             this.gameRecordModel.insertMany(basRecords);
         });
     }

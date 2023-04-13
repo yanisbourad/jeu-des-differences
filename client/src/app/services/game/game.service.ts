@@ -247,6 +247,7 @@ export class GameService {
             playerName: this.playerName,
             dateStart: this.startDate,
             time: this.gameHelper.getGameTime(this.gameTime),
+            keyServer: '',
         };
         const gamingHistory: GamingHistory = {
             gameName: this.gameInformation.gameTitle,

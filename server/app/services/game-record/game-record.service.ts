@@ -23,7 +23,7 @@ export class GameRecordService {
     }
     async addGameRecord(record: CreateGameRecordDto): Promise<void> {
         try {
-            record.gameName += this.gameService.getKey;
+            record.keyServer = this.gameService.getKey;
             await this.gameRecordModel.create(record);
             return Promise.resolve();
         } catch (error) {
@@ -32,7 +32,7 @@ export class GameRecordService {
     }
     async deleteGameRecords(): Promise<void> {
         try {
-            const response = await this.gameRecordModel.deleteMany({});
+            const response = await this.gameRecordModel.deleteMany({ keyServer: this.gameService.getKey });
             this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully`);
             this.gameService.populateFakeGameRecords();
         } catch (error) {
@@ -41,8 +41,7 @@ export class GameRecordService {
     }
     async deleteGameRecordsForOneGame(name: string): Promise<Rankings> {
         try {
-            const naming = name + this.gameService.getKey;
-            const response = await this.gameRecordModel.deleteMany({ gameName: naming });
+            const response = await this.gameRecordModel.deleteMany({ gameName: name, keyServer: this.gameService.getKey });
             this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully for ${name}`);
             const newRecords: Rankings = this.gameService.populateFakeGameRecordsForOneGame(name);
             return Promise.resolve(newRecords);

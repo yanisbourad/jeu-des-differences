@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import * as constants from '@app/configuration/const-canvas';
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from '@app/configuration/const-canvas';
 import * as keys from '@app/configuration/const-hotkeys';
 import * as styler from '@app/configuration/const-styler-type';
 import { Point } from '@app/interfaces/point';
@@ -61,15 +62,57 @@ export class DrawService {
         });
     }
 
-    static drawDiff(diff: Set<number>, canvas: HTMLCanvasElement, color: string = constants.DEFAULT_LINE_COLOR): void {
+    static getImageDateFromDataUrl(dataUrl: string): EventEmitter<ImageData> {
+        const obs: EventEmitter<ImageData> = new EventEmitter<ImageData>();
+        const image = new Image();
+        image.src = dataUrl;
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = DEFAULT_WIDTH;
+            canvas.height = DEFAULT_HEIGHT;
+            const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+            context.drawImage(image, 0, 0);
+            canvas.remove();
+            obs.next(context.getImageData(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        };
+        return obs;
+    }
+    // eslint-disable-next-line max-params
+    static drawDiff(
+        diff: Set<number>,
+        canvas: HTMLCanvasElement,
+        color: string = constants.DEFAULT_LINE_COLOR,
+        originalImage: ImageData | undefined = undefined,
+    ): void {
         const context = this.getContext(canvas);
-        // color pixels one by one and draw them
-        diff.forEach((index) => {
-            const x = index % constants.DEFAULT_WIDTH;
-            const y = Math.floor(index / constants.DEFAULT_WIDTH);
-            context.fillStyle = color;
-            context.fillRect(x, y, 1, 1);
-        });
+
+        if (originalImage) {
+            diff.forEach((index) => {
+                const x = index % constants.DEFAULT_WIDTH;
+                const y = Math.floor(index / constants.DEFAULT_WIDTH);
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                const pixelIndex = (y * constants.DEFAULT_WIDTH + x) * 4;
+                const red = originalImage.data[pixelIndex];
+                const green = originalImage.data[pixelIndex + 1];
+                const blue = originalImage.data[pixelIndex + 2];
+                const alpha = originalImage.data[pixelIndex + 3];
+                context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+                context.fillRect(x, y, 1, 1);
+            });
+        } else {
+            // color pixels one by one and draw them
+            diff.forEach((index) => {
+                const x = index % constants.DEFAULT_WIDTH;
+                const y = Math.floor(index / constants.DEFAULT_WIDTH);
+                context.fillStyle = color;
+                context.fillRect(x, y, 1, 1);
+            });
+        }
+    }
+
+    static drawImage(image: ImageData, canvas: HTMLCanvasElement): void {
+        const context = DrawService.getContext(canvas);
+        context.putImageData(image, 0, 0);
     }
 
     static clearCanvas(canvas: HTMLCanvasElement) {

@@ -22,6 +22,7 @@ export interface GameRecord {
     time: String;
     playerName: string;
     dateStart: string;
+    keyServer: string;
 }
 export interface GamingHistory {
     gameName: string;

@@ -47,6 +47,7 @@ export class GameHelperService {
             minWidth: 'fit-content',
             minHeight: 'fit-content',
             panelClass: 'custom-dialog-container',
+            // disableClose: true, // rajouter un bouton annulé pour fermer le popup
         });
     }
 
@@ -55,6 +56,7 @@ export class GameHelperService {
         if (this.gameType === 'double') this.message = this.message + ' par ' + this.playerName;
         const foundMessage = { message: this.message, ...this.subMessage };
         this.socket.sendMessage(foundMessage);
+        console.log(this.socket.socketId);
         return { ...foundMessage, mine: true };
     }
 
@@ -63,6 +65,7 @@ export class GameHelperService {
         if (this.gameType === 'double') this.message = this.message + ' par ' + this.playerName;
         const errorMessage = { message: this.message, ...this.subMessage };
         this.socket.sendMessage(errorMessage);
+        console.log(this.socket.socketId);
         return { ...errorMessage, mine: true };
     }
 

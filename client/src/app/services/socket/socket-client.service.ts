@@ -125,6 +125,7 @@ export class SocketClientService {
         this.socketClient.on('diffFound', (diff: Set<number>) => {
             const data = new Set<number>(diff);
             this.difference.next(data);
+            console.log(data);
         });
 
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
@@ -169,11 +170,13 @@ export class SocketClientService {
 
         this.socketClient.on('timeLimitStatus', (finished: boolean) => {
             this.timeLimitStatus.next(finished);
+            this.disconnect();
         });
 
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
             this.imageLoaded.next(game);
+            console.log(this.game);
         });
     }
 

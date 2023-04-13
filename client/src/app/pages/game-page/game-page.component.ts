@@ -71,11 +71,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
-
-        if (!this.gameService.mode) this.socket.connect();
+        this.getRouterParams();
+        // if (this.gameService.mode !== 'tempsLimite') 
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
-        this.getRouterParams();
         // this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
@@ -84,6 +83,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.loadImages(game);
             });
         } else {
+            this.socket.connect();
             this.gameService.getClassicGame(this.gameService.gameName);
             const timeout = 200;
 

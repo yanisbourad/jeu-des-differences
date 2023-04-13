@@ -289,7 +289,6 @@ export class GameService {
     giveUp(): void {
         this.hasAbandonedGame = true;
         this.saveGameRecord();
-        this.reinitializeGame();
         this.gameHelper.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
 

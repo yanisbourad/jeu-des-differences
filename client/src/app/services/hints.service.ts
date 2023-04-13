@@ -119,6 +119,58 @@ export class HintsService {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;
         this.canvas1.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
+
+        // const ctx = this.canvas0.nativeElement.getContext('2d');
+
+        // Draw the white background
+        // ctx!.fillStyle = 'white';
+        // ctx!.fillRect(0, 0, constantsCanvas.DEFAULT_WIDTH, constantsCanvas.DEFAULT_HEIGHT);
+
+        // // Draw the iris (a blue circle)
+        // ctx!.fillStyle = 'blue';
+        // ctx!.beginPath();
+        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 5, 0, 2 * Math.PI);
+        // ctx!.fill();
+
+        // // Draw the pupil (a black circle)
+        // ctx!.fillStyle = 'black';
+        // ctx!.beginPath();
+        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 10, 0, 2 * Math.PI);
+        // ctx!.fill();
+
+        // // Draw the highlight (a white circle)
+        // ctx!.fillStyle = 'white';
+        // ctx!.beginPath();
+        // ctx!.arc(
+        //     constantsCanvas.DEFAULT_WIDTH / 2 + constantsCanvas.DEFAULT_WIDTH / 20,
+        //     constantsCanvas.DEFAULT_HEIGHT / 2 - constantsCanvas.DEFAULT_WIDTH / 10,
+        //     constantsCanvas.DEFAULT_WIDTH / 25,
+        //     0,
+        //     2 * Math.PI,
+        // );
+        // ctx!.fill();
+
+        // // Draw the upper eyelid (a curved line)
+        // ctx!.beginPath();
+        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, constantsCanvas.DEFAULT_HEIGHT / 3);
+        // ctx!.quadraticCurveTo(
+        //     constantsCanvas.DEFAULT_WIDTH / 2,
+        //     constantsCanvas.DEFAULT_HEIGHT / 4,
+        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
+        //     constantsCanvas.DEFAULT_HEIGHT / 3,
+        // );
+        // ctx!.stroke();
+
+        // // Draw the lower eyelid (a curved line)
+        // ctx!.beginPath();
+        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, (constantsCanvas.DEFAULT_HEIGHT * 2) / 3);
+        // ctx!.quadraticCurveTo(
+        //     constantsCanvas.DEFAULT_WIDTH / 2,
+        //     (constantsCanvas.DEFAULT_HEIGHT * 3) / 4,
+        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
+        //     (constantsCanvas.DEFAULT_HEIGHT * 2) / 3,
+        // );
+        // ctx!.stroke();
     }
 
     findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isAllQuadrant: boolean): void {
@@ -206,7 +258,6 @@ export class HintsService {
     toggleCheating(): void {
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
-
         this.isCheating = !this.isCheating;
         if (this.isCheating) {
             new StartHintsRecord().record(this.gameRecorderService);

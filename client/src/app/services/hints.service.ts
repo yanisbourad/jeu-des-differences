@@ -128,7 +128,7 @@ export class HintsService {
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
         let blinkCount = 0;
         const quadrants = this.generatePossibleQuadrant(quadrant, isInnerQuadrant, isAllQuadrant);
-        this.color = 'rgba(255, 255, 0, 0.45)';
+        this.color = 'rgba(248, 65, 31, 0.5)';
         for (const currentQuadrant of quadrants) {
             switch (currentQuadrant) {
                 case constantsQuadrant.QUADRANT_UP_LEFT: {
@@ -151,7 +151,7 @@ export class HintsService {
         }
         this.blinking = setInterval(() => {
             blinkCount++;
-            if (blinkCount === constantsTime.BLINKING_COUNT * 3) this.stopHints();
+            if (blinkCount === constantsTime.BLINKING_COUNT * 2) this.stopHints();
         }, constantsTime.BLINKING_TIMEOUT);
     }
 

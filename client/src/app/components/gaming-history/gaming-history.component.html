@@ -1,6 +1,6 @@
 <div id="boxer">
+    <h1>Historique des parties</h1>
     <div class="container">
-        <h1>Historique des parties</h1>
         <div class="contents">
             <div *ngFor="let record of gamingHistory.reverse()">
                 <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
@@ -21,10 +21,11 @@
                 </p>
             </div>
         </div>
-        </div>
-        <div class="buttonContainer2">
-            <button  *ngIf='hasGameRecords' class="bottomButtons" id="eraseButton" (click)="eraseGamingHistory()">
-                Supprimer l'historique</button>
-            <button class="bottomButtons" id="closeButton" (click)="close()">Fermer</button>
+
+    </div>
+    <div class="buttonContainer2">
+        <button *ngIf='hasGameRecords' class="bottomButtons" id="eraseButton" (click)="eraseGamingHistory()">
+            Supprimer l'historique</button>
+        <button class="bottomButtons" id="closeButton" (click)="close()">Fermer</button>
     </div>
 </div>

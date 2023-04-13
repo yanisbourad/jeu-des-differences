@@ -46,8 +46,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
-        this.game.gameName = this.data.gameName;
-        this.game.opponentName = "Attente d'un adversaire";
+        this.game.gameName = this.data.gameType === 'double' ? this.data.gameName : 'noGame';
+        this.game.opponentName = this.data.gameType === 'double' ? "Attente d'un adversaire" : 'none';
         this.game.gameType = this.data.gameType === 'double' ? 'Double' : 'limit';
         this.data.name = ' ';
         this.gameCardHandlerService.join(this.game);

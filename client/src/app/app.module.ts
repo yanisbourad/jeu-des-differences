@@ -88,3 +88,4 @@ import { GamePageComponent } from './pages/game-page/game-page.component';
     bootstrap: [AppComponent],
 })
 export class AppModule {}
+

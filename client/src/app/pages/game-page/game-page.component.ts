@@ -6,7 +6,7 @@ import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-differe
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import { Message } from '@app/interfaces/message';
-import { HintsService } from '@app/services/hints.service';
+import { HintsService } from '@app/services/hints/hints.service';
 import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
 import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';

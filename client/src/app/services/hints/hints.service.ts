@@ -2,11 +2,11 @@ import { ElementRef, Injectable } from '@angular/core';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
 import { StopHintsRecord } from '@app/classes/game-records/stop-hints';
 import * as constantsTime from '@app/configuration/const-time';
-import { DrawService } from './draw.service';
-import { GameRecorderService } from './game-recorder.service';
-import { HotkeysService } from './hotkeys.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import * as constantsCanvas from '@app/configuration/const-canvas';
-import { ImageDiffService } from './image-diff.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
 
@@ -122,7 +122,7 @@ export class HintsService {
 
         // const ctx = this.canvas0.nativeElement.getContext('2d');
 
-        // Draw the white background
+        // // Draw the white background
         // ctx!.fillStyle = 'white';
         // ctx!.fillRect(0, 0, constantsCanvas.DEFAULT_WIDTH, constantsCanvas.DEFAULT_HEIGHT);
 

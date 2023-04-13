@@ -67,13 +67,15 @@ export class GameService {
     }
 
     defineVariables(): void {
-        this.gameInformation = {
-            gameTitle: this.game.gameName,
-            gameMode: this.gameType,
-            gameDifficulty: this.game.difficulty,
-            nDifferences: this.game.listDifferences.length,
-        };
-        this.totalDifferences = this.gameInformation.nDifferences;
+        if (this.game) {
+            this.gameInformation = {
+                gameTitle: this.game.gameName,
+                gameMode: this.gameType,
+                gameDifficulty: this.game.difficulty,
+                nDifferences: this.game.listDifferences.length,
+            };
+            this.totalDifferences = this.gameInformation.nDifferences;
+        }
         if (this.mode) this.totalDifferences = this.socket.nbrDifference;
         this.differencesArray = new Array(this.totalDifferences);
         this.opponentDifferencesArray = new Array(this.totalDifferences);
@@ -97,7 +99,6 @@ export class GameService {
     getTimeLimitGame(): void {
         setTimeout(() => {
             this.game = this.socket.getGame();
-            console.log('getting time limit game', this.game);
             this.defineVariables();
             this.displayIcons();
         }, constantsTime.LOADING_TIMEOUT);

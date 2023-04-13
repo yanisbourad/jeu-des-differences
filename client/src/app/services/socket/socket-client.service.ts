@@ -176,7 +176,6 @@ export class SocketClientService {
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
             this.imageLoaded.next(game);
-            console.log(this.game);
         });
     }
 

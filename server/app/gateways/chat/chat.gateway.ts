@@ -83,7 +83,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             opponentName: player.opponentName,
         });
         const myPlayers: PlayerMulti[] = this.playersMatch();
-        console.log('start multi limit', player.gameId+player.gameName)
+        console.log('start multi limit', player.gameId + player.gameName)
         if (myPlayers.length === 2) {
             console.log(myPlayers[0].id, myPlayers[1].id)
             this.isMulti = true;
@@ -116,7 +116,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.roomName = data[0];
         console.log(data)
         socket.join(this.roomName);
-        console.log('sendRoomName',this.roomName)
+        console.log('sendRoomName', this.roomName)
         if (data[1]) {
             console.log(this.game.gameName)
             // console.log(this.game)
@@ -125,13 +125,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             // this.games = this.gameService.getGames();
             // this.game = this.games.get(this.chooseRandomName());
 
-            socket.emit('getRandomGame', this.game);
+            socket.to(this.roomName).emit('getRandomGame', this.game);
             socket.to(this.roomName).emit('nbrDifference', this.games.size);
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
             // console.log('the game', this.game)
             // this.server.to(this.roomName).emit('getRandomGame', this.game);
             // this.server.to(this.roomName).emit('nbrDifference', this.games.size);
-            this.logger.debug('here')
+            this.logger.debug('here', this.game.gameName)
             if (!this.serverTime.timers[this.roomName]) {
                 this.serverTime.startCountDown(this.roomName);
             }

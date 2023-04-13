@@ -68,14 +68,12 @@ export class GameCardHandlerService {
     }
 
     connect() {
-        console.log('connect');
         this.socketClient.connect();
         this.socket = this.socketClient.socket;
     }
 
     updateGameStatus(gameNames: string[]) {
         this.connect();
-        // this.socket.emit('findAllGamesStatus', gameNames);
         this.socketClient.send('findAllGamesStatus', gameNames);
         this.listenToFeedBack();
     }
@@ -119,7 +117,6 @@ export class GameCardHandlerService {
             }
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
-            // this.resetGameVariables();
         });
 
         this.socket.on('feedBackOnLeave', () => {
@@ -144,7 +141,6 @@ export class GameCardHandlerService {
 
         this.socket.on('disconnect', () => {
             this.isLeaving = true;
-            // this.resetGameVariables();
         });
     }
 

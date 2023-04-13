@@ -88,8 +88,6 @@ export class GameHelperService {
         for (let i = 0; i < rankingCopy.length; i++) {
             const rankingMinute = parseInt(rankingCopy[i].time.slice(0, 2), 10);
             const rankingSec = parseInt(rankingCopy[i].time.slice(2), 10);
-            console.log(rankingMinute);
-            console.log(rankingSec);
             if (gameTimeMinute <= rankingMinute) {
                 if (gameTimeMinute === rankingMinute) {
                     if (gameTimeSec <= rankingSec) {

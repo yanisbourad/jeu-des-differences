@@ -115,8 +115,10 @@ export class GameService {
     generateFakeRecordInfo(): { name: string, time: string } {
         const minutes = Math.floor(Math.random() * (rangeTime.minutesMax - rangeTime.minutesMin + 1) + rangeTime.minutesMin)
         const seconds = Math.floor(Math.random() * (rangeTime.secondesMax - rangeTime.secondesMin + 1) + rangeTime.secondesMin)
-        const playerName = listNames[Math.floor(Math.random() * listNames.length)]
-        return { name: playerName, time: `${minutes}:${seconds}` }
+        const name = listNames[Math.floor(Math.random() * listNames.length)]
+        // add 0 if seconds < 10 to have a good format
+        const time = seconds < 10 ? `${minutes}:0${seconds}` : `${minutes}:${seconds}`
+        return { name, time }
     }
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {

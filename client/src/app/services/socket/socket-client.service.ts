@@ -211,6 +211,10 @@ export class SocketClientService {
         this.socketClient.send('startMultiGame', player);
     }
 
+    startMultiTimeLimit(player: { gameId: string; creatorName: string; gameName: string; opponentName: string; mode: string }): void {
+        this.socketClient.send('startMultiTimeLimit', player);
+    }
+
     findDifference(information: { playerName: string; roomName: string }) {
         this.socketClient.send('findDifference', information);
     }
@@ -223,9 +227,9 @@ export class SocketClientService {
         this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
 
-    sendGameName(gameName: string) {
-        this.socketClient.send('currentGameName', gameName);
-    }
+    // sendGameName(gameName: string) {
+    //     this.socketClient.send('currentGameName', gameName);
+    // }
 
     sendMousePosition(pos: number, roomName: string, mode: string) {
         this.socketClient.send('mousePosition', [pos, roomName, mode]);

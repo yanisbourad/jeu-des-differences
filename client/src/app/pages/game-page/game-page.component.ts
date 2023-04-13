@@ -66,7 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
         this.getRouterParams();
-        this.gameService.handleDisconnect(); // doesn't work properly
+        // this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
         } else {
@@ -92,7 +92,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 if (!this.gameService.mode) this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
                 break;
             case 'double':
-                this.socket.sendGameName(this.gameService.gameName);
+                // this.socket.sendGameName(this.gameService.gameName);
                 this.socket.sendRoomName(roomName, this.gameService.mode);
                 break;
             default:
@@ -160,6 +160,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }
+            this.socket.stopTimer(this.socket.getRoomName(), this.gameService.playerName);
             this.socket.gameEnded(this.socket.getRoomName());
             this.gameService.reinitializeGame();
             this.socket.disconnect();
@@ -223,6 +224,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
         this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
+        if (this.gameService.mode === 'undefined') this.gameService.mode = '';
     }
 
     mouseHitDetect(event: MouseEvent): void {

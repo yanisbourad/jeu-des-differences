@@ -112,7 +112,7 @@ export class GameCardHandlerService {
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
             if (gameIdentifier.gameName === 'limitedTime99999') {
-                this.socketClientService.startTimeLimit(gameIdentifier.creatorName);
+                this.socketClientService.startMultiTimeLimit(gameIdentifier);
                 this.gameName = gameIdentifier.gameName;
             } else {
                 this.socketClientService.startMultiGame(gameIdentifier);

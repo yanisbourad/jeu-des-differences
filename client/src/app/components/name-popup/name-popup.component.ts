@@ -92,6 +92,11 @@ export class NamePopupComponent implements OnInit {
     }
 
     redirect(): void {
+        if (this.validatePlayerName(this.data.name) === false) {
+            const message = 'Veuillez entrer un nom valide (2-10 caractères alphanumeriques).';
+            this.launchFeedback(message);
+            return;
+        }
         if (this.data.gameType === 'solo') this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName, gameType: 'solo' }]);
         if (this.data.gameType === 'double') this.launchDialog();
     }

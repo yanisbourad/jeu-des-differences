@@ -161,6 +161,7 @@ export class GameService {
         this.gameId = '';
         this.nDifferencesFound = 0;
         this.socket.messageList = [];
+        this.mode = '';
     }
 
     reduceNbrDifferences(): void {

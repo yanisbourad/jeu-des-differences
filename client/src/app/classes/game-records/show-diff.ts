@@ -32,14 +32,12 @@ export class ShowDiffRecord extends GameRecordCommand {
         if (this.isMeWhoFound) {
             component.gameService.reduceNbrDifferences();
             this.displayWord('Trouvé', this.canvas as AllCanvas, this.position);
-            const canvas = this.canvas as AllCanvas;
-            this.clearCanvas(canvas.canvas0.nativeElement, canvas.canvas3.nativeElement);
         } else {
             component.gameService.handlePlayerDifference();
         }
         const originalImage: string = component.gameService.game.originalImageData;
         DrawService.getImageDateFromDataUrl(originalImage).subscribe((imageData) => {
-            this.drawDifference(this.diff, this.canvas, imageData);
+            this.drawDifference(this.diff, this.canvas, imageData, component.getCanvasImageModifier);
         });
         if (component.gameService.mode) {
             this.clearCanvas(this.canvas.canvas1.nativeElement, this.canvas.canvas2.nativeElement);
@@ -58,8 +56,11 @@ export class ShowDiffRecord extends GameRecordCommand {
             canvas2: ElementRef<HTMLCanvasElement>;
         },
         originalImage: ImageData,
+        canvasImageModifier: HTMLCanvasElement,
     ): void {
-        DrawService.drawDiff(diff, canvas.canvas1.nativeElement, 'black', originalImage);
-        DrawService.drawDiff(diff, canvas.canvas2.nativeElement, 'black', originalImage);
+        DrawService.drawDiff(diff, canvas.canvas1.nativeElement);
+        DrawService.drawDiff(diff, canvas.canvas2.nativeElement);
+        DrawService.drawDiff(diff, canvasImageModifier, 'black', originalImage);
+        this.clearCanvas(canvas.canvas1.nativeElement, canvas.canvas2.nativeElement);
     }
 }

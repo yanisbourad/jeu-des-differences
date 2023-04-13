@@ -24,6 +24,10 @@ export class GameRecord {
     @ApiProperty()
     @Prop({ required: true })
     dateStart: string;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    keyServer: string;
 }
 
 export const gameRecordSchema = SchemaFactory.createForClass(GameRecord);

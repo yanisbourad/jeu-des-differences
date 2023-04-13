@@ -21,4 +21,8 @@ export class CreateGameRecordDto {
     @ApiProperty()
     @IsString()
     dateStart: string;
+
+    @ApiProperty()
+    @IsString()
+    keyServer: string;
 }

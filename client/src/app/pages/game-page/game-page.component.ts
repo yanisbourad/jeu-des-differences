@@ -12,6 +12,7 @@ import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameService } from '@app/services/game/game.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { Game } from '@common/game';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -48,6 +49,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public hintsService: HintsService,
     ) {}
 
+    get getCanvasImageModifier(): HTMLCanvasElement {
+        return this.modifiedImage.nativeElement;
+    }
     get width(): number {
         return constants.DEFAULT_WIDTH;
     }
@@ -66,6 +70,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
+        this.socket.imageLoaded$.subscribe((game: Game) => {
+            this.loadImages(game);
+        });
         if (!this.gameService.mode) this.socket.connect();
         this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
@@ -86,20 +93,20 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     loading(): void {
-        const timeout = 500;
+        const timeout = 200;
         setTimeout(() => {
             this.loadImages();
-
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
             this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, timeout);
     }
 
-    loadImages(): void {
-        DrawService.getImageDateFromDataUrl(this.gameService.game.originalImageData).subscribe((originalImageData) => {
+    loadImages(game: Game = this.gameService.game): void {
+        if (game.originalImageData === undefined || game.modifiedImageData === undefined) return;
+        DrawService.getImageDateFromDataUrl(game.originalImageData).subscribe((originalImageData) => {
             DrawService.drawImage(originalImageData, this.originalImage.nativeElement);
         });
-        DrawService.getImageDateFromDataUrl(this.gameService.game.modifiedImageData).subscribe((modifiedImageData) => {
+        DrawService.getImageDateFromDataUrl(game.modifiedImageData).subscribe((modifiedImageData) => {
             DrawService.drawImage(modifiedImageData, this.modifiedImage.nativeElement);
         });
     }
@@ -269,5 +276,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         DrawService.clearDiff(this.canvasCheat0.nativeElement);
         DrawService.clearDiff(this.canvas1.nativeElement);
         DrawService.clearDiff(this.canvasCheat1.nativeElement);
+        this.loadImages();
     }
 }

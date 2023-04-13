@@ -28,6 +28,7 @@ export class SocketClientService {
     private timeLimitStatus = new Subject<boolean>();
     private teammateStatus = new Subject<boolean>();
     private messageToAdd = new Subject<GameMessageEvent>();
+    private imageLoaded = new Subject<Game>();
     // DEFINE OBSERVABLES
     gameState$ = this.gameState.asObservable();
     playerFoundDiff$ = this.playerFoundDiff.asObservable();
@@ -36,6 +37,7 @@ export class SocketClientService {
     timeLimitStatus$ = this.timeLimitStatus.asObservable();
     messageToAdd$ = this.messageToAdd.asObservable();
     teammateStatus$ = this.teammateStatus.asObservable();
+    imageLoaded$ = this.imageLoaded.asObservable();
 
     constructor(private readonly socketClient: SocketClient, public dialog: MatDialog) {}
 
@@ -171,6 +173,7 @@ export class SocketClientService {
 
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
+            this.imageLoaded.next(game);
         });
     }
 

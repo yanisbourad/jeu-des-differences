@@ -175,13 +175,100 @@ export class HintsService {
         }
     }
 
+    generateAllPossibleInnerQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean): number[] {
+        let possibleQuadrant: Set<number> = new Set<number>();
+        let coordinates: Point;
+        const quadrantWidthLowerBound = isInnerQuadrant ? quadrant.x : 0;
+        const quadrantWidthUpperBound = isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
+        const quadrantHeightLowerBound = isInnerQuadrant ? quadrant.y : 0;
+        const quadrantHeightUpperBound = isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
+
+        for (const set of this.unfoundedDifference) {
+            coordinates = this.imageDiffService.getPositionFromAbsolute(set.entries().next().value[1]);
+            if (coordinates.x <= quadrantWidthUpperBound && coordinates.x >= quadrantWidthLowerBound) {
+                if (coordinates.y <= quadrantHeightUpperBound && coordinates.y >= quadrantHeightLowerBound) {
+                    possibleQuadrant = this.createPossibleQuadrantArray(coordinates, quadrant, possibleQuadrant);
+                }
+            }
+        }
+        return [...possibleQuadrant];
+    }
+
+    findAllQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean): void {
+        const quadrantUpLeft = { ...quadrant };
+        const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h };
+        const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
+        const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
+        let blinkCount = 0;
+        const allPossibleQuadrant = this.generateAllPossibleInnerQuadrant(quadrant, isInnerQuadrant);
+        this.color = 'rgba(255, 0, 0, 0.55)';
+        for (const currentQuadrant of allPossibleQuadrant) {
+            switch (currentQuadrant) {
+                case constantsQuadrant.QUADRANT_UP_LEFT: {
+                    this.displayQuadrant(quadrantUpLeft);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                    this.displayQuadrant(quadrantUpRight);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                    this.displayQuadrant(quadrantDownLeft);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                    this.displayQuadrant(quadrantDownRight);
+                    break;
+                }
+            }
+        }
+        this.blinking = setInterval(() => {
+            blinkCount++;
+            if (blinkCount === constantsTime.BLINKING_COUNT * 3) this.stopHints();
+        }, constantsTime.BLINKING_TIMEOUT);
+    }
+    findAllInnerQuadrant(): void {
+        const allPossibleQuadrant = this.generateAllPossibleInnerQuadrant(this.outerQuadrant, false);
+        console.log(allPossibleQuadrant);
+        for (const currentQuadrant of allPossibleQuadrant) {
+            switch (currentQuadrant) {
+                case constantsQuadrant.QUADRANT_UP_LEFT: {
+                    this.findAllQuadrant(this.innerQuadrant1, true);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                    this.findAllQuadrant(this.innerQuadrant2, true);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                    this.findAllQuadrant(this.innerQuadrant3, true);
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                    this.findAllQuadrant(this.innerQuadrant4, true);
+                    break;
+                }
+            }
+        }
+    }
+
     showHints(): void {
-        if (this.count === 3) {
-            this.findQuadrant(this.outerQuadrant, false);
-            this.count--;
-        } else if (this.count === 2) {
-            this.findInnerQuadrant();
-            this.count--;
+        switch (this.count) {
+            case 3: {
+                this.findQuadrant(this.outerQuadrant, false);
+                this.count--;
+                break;
+            }
+            case 2: {
+                this.findInnerQuadrant();
+                this.count--;
+                break;
+            }
+            case 1: {
+                this.findAllInnerQuadrant();
+                this.count--;
+                break;
+            }
         }
     }
 

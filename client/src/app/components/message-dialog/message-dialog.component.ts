@@ -65,17 +65,17 @@ export class MessageDialogComponent {
             // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
             // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
             this.gameCardHandlerService.connect();
-            const dialog = this.dialog.open(PlayerWaitPopupComponent, {
+            this.dialog.open(PlayerWaitPopupComponent, {
                 data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
                 disableClose: true,
                 height: '600px',
                 width: '600px',
             });
-            dialog.afterClosed().subscribe((res) => {
-                if (res) {
-                    return res;
-                }
-            });
+            // dialog.afterClosed().subscribe((res) => {
+            // if (res) {
+            //     return res;
+            //     }
+            // });
         }
     }
 

@@ -160,10 +160,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }
-            this.socket.stopTimer(this.socket.getRoomName(), this.gameService.playerName);
+            // this.socket.stopTimer(this.socket.getRoomName(), this.gameService.playerName);
             this.socket.gameEnded(this.socket.getRoomName());
+            // this.socket.disconnect();
             this.gameService.reinitializeGame();
-            this.socket.disconnect();
         });
 
         this.teammateStatusSubscription = this.socket.teammateStatus$.subscribe((newValue) => {

@@ -97,6 +97,7 @@ export class GameService {
     getTimeLimitGame(): void {
         setTimeout(() => {
             this.game = this.socket.getGame();
+            console.log('getting time limit game', this.game);
             this.defineVariables();
             this.displayIcons();
         }, constantsTime.LOADING_TIMEOUT);

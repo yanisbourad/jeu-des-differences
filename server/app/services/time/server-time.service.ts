@@ -90,6 +90,7 @@ export class ServerTimeService {
     }
 
     removeTimer(id: string): void {
+        this.getTimeConstants();
         this.timers[id].unsubscribe();
         this.elapsedTimes.delete(id);
         this.countDown = this.timeConstants.timeInit;

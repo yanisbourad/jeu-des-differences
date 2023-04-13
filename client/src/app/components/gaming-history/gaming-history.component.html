@@ -1,28 +1,30 @@
-<h1>Historique des parties</h1>
-<div class="container">
-    <div class="contents">
-        <div *ngFor="let record of gamingHistory">
-            <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
-                --- Durée totale: <span *ngIf="!record.hasAbandonedGame">{{record.time}}</span>
-                <span *ngIf="record.hasAbandonedGame">00:00</span>---
-                <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame">Entre joueurs:
-                    <strong> {{record.playerName}} </strong></span>
-                <span *ngIf="record.gameType === 'solo' && !record.hasAbandonedGame"> Joueur :
-                    {{record.playerName}}</span>
-                <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame"> et {{record.opponentName}}</span>
-
-                <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> Entre joueurs :
-                    <s>{{record.playerName}}</s></span>
-                <span *ngIf="record.gameType === 'solo' && record.hasAbandonedGame"> Joueur :
-                    <s> {{record.playerName}} </s></span>
-                <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> et
-                    <strong>{{record.opponentName}}</strong> </span>
-            </p>
+<div id="boxer">
+    <h1>Historique des parties</h1>
+    <div class="container">
+        <div class="contents">
+            <div *ngFor="let record of gamingHistory.reverse()">
+                <p>{{record.dateStart}} --- Jeu : {{record.gameName}} en mode {{record.gameType}}
+                    --- Durée totale: <span *ngIf="!record.hasAbandonedGame">{{record.time}}</span>
+                    <span *ngIf="record.hasAbandonedGame">00:00</span>---
+                    <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame">Entre joueurs:
+                        <strong> {{record.playerName}} </strong></span>
+                    <span *ngIf="record.gameType === 'solo' && !record.hasAbandonedGame"> Joueur :
+                        {{record.playerName}}</span>
+                    <span *ngIf="record.gameType !== 'solo' && !record.hasAbandonedGame"> et
+                        {{record.opponentName}}</span>
+                    <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> Entre joueurs :
+                        <s>{{record.playerName}}</s></span>
+                    <span *ngIf="record.gameType === 'solo' && record.hasAbandonedGame"> Joueur :
+                        <s> {{record.playerName}} </s></span>
+                    <span *ngIf="record.gameType !== 'solo' && record.hasAbandonedGame"> et
+                        <strong>{{record.opponentName}}</strong> </span>
+                </p>
+            </div>
         </div>
-    </div>
 
+    </div>
     <div class="buttonContainer2">
-        <button *ngIf='hasGameRecords' class="bottomButtons" id="eraseButton" (click)="eraseGamingHistory()">
+        <button *ngIf='hasGameRecords' class="bottomButtons" id="eraseButton" (click)="launchFeedback()">
             Supprimer l'historique</button>
         <button class="bottomButtons" id="closeButton" (click)="close()">Fermer</button>
     </div>

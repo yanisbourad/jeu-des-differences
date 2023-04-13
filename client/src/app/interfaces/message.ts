@@ -1,6 +1,6 @@
 export interface Message {
     message: string;
-    userName: string;
+    playerName: string;
     mine: boolean;
     color: string;
     pos: string;

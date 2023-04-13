@@ -11,7 +11,6 @@ import { GamingHistory, gamingHistorySchema } from './model/database/gaming-hist
 import { TimerConstantsModel, timerConstantsShema } from './model/database/timer-constants';
 import { GameRecordService } from './services/game-record/game-record.service';
 import { GameService } from './services/game/game.service';
-import { PlayerService } from './services/player/player-service';
 import { ServerTimeService } from './services/time/server-time.service';
 @Module({
     imports: [
@@ -31,6 +30,6 @@ import { ServerTimeService } from './services/time/server-time.service';
         GameCardHandlerModule,
     ],
     controllers: [GameRecordController, GameController, GamingHistoryController],
-    providers: [ChatGateway, GameService, GameRecordService, Logger, PlayerService, ServerTimeService],
+    providers: [ChatGateway, GameService, GameRecordService, Logger, ServerTimeService],
 })
 export class AppModule {}

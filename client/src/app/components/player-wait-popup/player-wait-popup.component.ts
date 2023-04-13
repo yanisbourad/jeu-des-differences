@@ -2,7 +2,7 @@ import { AfterContentChecked, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { Game } from '@app/interfaces/game-handler';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 
 @Component({
     selector: 'app-player-wait-popup',
@@ -20,6 +20,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     isCancelled: boolean;
     isTriggered: boolean;
     isGameAvailable: boolean;
+    limitedTimeGame: string;
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,
@@ -31,6 +32,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             name: '',
             opponentName: '',
             gameName: '',
+            gameType: '',
         };
         this.isReady = false;
         this.isUpdated = false;
@@ -40,11 +42,13 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         this.isCancelled = false;
         this.isTriggered = false;
         this.isGameAvailable = true;
+        this.limitedTimeGame = '';
     }
     ngOnInit(): void {
         this.game.name = this.data.name;
-        this.game.gameName = this.data.gameName;
-        this.game.opponentName = "Attente d'un adversaire";
+        this.game.gameName = this.data.gameType === 'double' ? this.data.gameName : 'noGame';
+        this.game.opponentName = this.data.gameType === 'double' ? "Attente d'un adversaire" : 'none';
+        this.game.gameType = this.data.gameType === 'double' ? 'Double' : 'limit';
         this.data.name = ' ';
         this.gameCardHandlerService.join(this.game);
         this.gameCardHandlerService.toggleCreateJoin(this.game.gameName);
@@ -90,6 +94,13 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.sendFeedback("Désolé, le jeu n'est plus disponible, il a été supprimé");
             this.resetState();
             this.gameCardHandlerService.resetGameVariables();
+        }
+        this.limitedTimeGame = this.gameCardHandlerService.getLimitedTimeGameName();
+        if (this.limitedTimeGame) {
+            console.log('limitedTimeGame', this.limitedTimeGame);
+            this.dialogReff.close();
+            this.gameCardHandlerService.resetGameVariables();
+            this.gameCardHandlerService.setNewUpdate(false);
         }
     }
 

@@ -1,18 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import * as constants from '@app/configuration/const-game';
-import { GameService } from '@app/services/game.service';
+import { Component } from '@angular/core';
+import { GameService } from '@app/services/game/game.service';
 @Component({
     selector: 'app-game-info',
     templateUrl: './game-info.component.html',
     styleUrls: ['./game-info.component.scss'],
 })
-export class GameInfoComponent implements OnInit {
+export class GameInfoComponent {
     gameType: string;
     constructor(public gameService: GameService) {}
-
-    ngOnInit(): void {
-        setTimeout(() => {
-            this.gameService.displayIcons();
-        }, constants.WAITING_TIME);
-    }
 }

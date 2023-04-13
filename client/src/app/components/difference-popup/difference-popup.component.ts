@@ -1,8 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GameNameSaveComponent } from '@app/components/game-name-save/game-name-save.component';
-import { DrawService } from '@app/services/draw.service';
-import { ImageDiffService } from '@app/services/image-diff.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 
 @Component({
     selector: 'app-difference-popup',
@@ -44,7 +44,7 @@ export class DifferencePopupComponent implements AfterViewInit {
             this.showValidation = true;
         } else {
             this.showValidation = false;
-            this.showMessage = '(valide entre 3 et 9)';
+            this.showMessage = '(quantite valide -- entre 3 et 9)';
         }
         this.changeDetectorRef.detectChanges();
     }

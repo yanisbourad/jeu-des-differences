@@ -6,12 +6,12 @@ import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-differe
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
 import { Message } from '@app/interfaces/message';
-import { CheatModeService } from '@app/services/cheat-mode.service';
-import { DrawService } from '@app/services/draw.service';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
 import { HintsService } from '@app/services/hints.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -27,19 +27,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('canvasCheat0', { static: true }) canvasCheat0!: ElementRef<HTMLCanvasElement>;
     @ViewChild('canvasCheat1', { static: true }) canvasCheat1!: ElementRef<HTMLCanvasElement>;
     // a reference to the chatComponent
-
     @ViewChild('chatComponent', { static: true }) chat!: MessageAreaComponent;
     idEventList: number;
     // list of all the subscriptions to be unsubscribed on destruction
     diffFoundSubscription: Subscription = new Subscription();
-    playerFoundDiffSubscription: Subscription = new Subscription();
+    timeLimitStatusSubscription: Subscription = new Subscription();
     gameStateSubscription: Subscription = new Subscription();
-    notRewinding: boolean = true;
     differenceSubscription: Subscription = new Subscription();
+    teammateStatusSubscription: Subscription = new Subscription();
+    notRewinding: boolean = true;
     // eslint-disable-next-line max-params
     constructor(
         public gameService: GameService,
-        readonly socket: SocketClientService,
+        public socket: SocketClientService,
         public route: ActivatedRoute,
         private gameRecordService: GameRecorderService,
         public cheatModeService: CheatModeService,
@@ -64,21 +64,23 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         // needed for the rewind
-        this.gameService.setStartDate(new Date().toString());
+        if (!this.gameService.mode) this.socket.connect();
+        this.gameService.setStartDate(new Date().toLocaleString());
         this.gameRecordService.page = this;
         this.getRouterParams();
-        this.gameService.getGame(this.gameService.gameName);
+        // this.gameService.handleDisconnect(); // doesn't work properly
+        if (this.gameService.mode === 'tempsLimite') {
+            this.gameService.getTimeLimitGame();
+        } else {
+            this.gameService.getClassicGame(this.gameService.gameName);
+        }
         this.loading();
-        this.socket.sendGameName(this.gameService.gameName);
-        // if (this.gameService.gameType !== 'solo') {
-        // }
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
         this.hintsService.hintsKeyBinding();
         this.hintsService.canvas0 = this.canvasCheat0;
         this.hintsService.canvas1 = this.canvasCheat1;
-
     }
 
     loading(): void {
@@ -90,12 +92,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        this.socket.connect();
-        if (this.gameService.gameType === 'solo') {
-            this.socket.joinRoomSolo(this.gameService.playerName);
-        } else {
-            const roomName = this.gameService.gameId + this.gameService.gameName;
-            this.socket.sendRoomName(roomName);
+        const roomName = this.gameService.gameId + this.gameService.gameName;
+        switch (this.gameService.gameType) {
+            case 'solo':
+                if (!this.gameService.mode) this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
+                break;
+            case 'double':
+                // this.socket.sendGameName(this.gameService.gameName);
+                this.socket.sendRoomName(roomName, this.gameService.mode);
+                break;
+            default:
+                break;
         }
         this.subscriptions();
         this.gameRecordService.timeStart = Date.now();
@@ -113,8 +120,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.cheatModeService.removeHotkeysEventListener();
             this.hintsService.removeHotkeysEventListener();
             this.diffFoundSubscription.unsubscribe();
-            this.playerFoundDiffSubscription.unsubscribe();
+            this.timeLimitStatusSubscription.unsubscribe();
             this.gameStateSubscription.unsubscribe();
+            this.differenceSubscription.unsubscribe();
+            this.teammateStatusSubscription.unsubscribe();
             this.socket.disconnect();
         }
         this.notRewinding = false;
@@ -135,9 +144,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.removeHotkeysEventListener();
         this.hintsService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
-        this.playerFoundDiffSubscription.unsubscribe();
+        this.timeLimitStatusSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
         this.differenceSubscription.unsubscribe();
+        this.teammateStatusSubscription.unsubscribe();
         this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.cheatModeService.resetService();
@@ -147,14 +157,37 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     subscriptions(): void {
-        this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
+        this.subscribeToGameStatus();
+        this.subscribeToTimeLimit();
+        this.subscribeToDifference();
+        // window.addEventListener('beforeunload', () => {
+        //     if (this.gameService.gameType === 'double') {
+        //         localStorage.setItem('reload', 'true'); // still not working properly
+        //     }
+        // });
+    }
+
+    subscribeToTimeLimit(): void {
+        this.timeLimitStatusSubscription = this.socket.timeLimitStatus$.subscribe((newValue) => {
             if (newValue) {
-                new ShowDiffRecord(newValue, { canvas1: this.canvas1, canvas2: this.canvas2 }, false, this.gameService.mousePosition).record(
-                    this.gameRecordService,
-                );
+                this.gameService.displayGameEnded('Félicitaion, vous avez gagné la partie ', 'finished');
+            } else {
+                this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }
+            this.socket.stopTimer(this.socket.getRoomName(), this.gameService.playerName);
+            this.socket.gameEnded(this.socket.getRoomName());
+            this.gameService.reinitializeGame();
+            this.socket.disconnect();
         });
 
+        this.teammateStatusSubscription = this.socket.teammateStatus$.subscribe((newValue) => {
+            if (newValue) {
+                this.gameService.gameType = 'solo';
+            }
+        });
+    }
+
+    subscribeToGameStatus(): void {
         this.gameStateSubscription = this.socket.gameState$.subscribe((newValue) => {
             const opponentName: string = this.gameService.opponentName;
             this.gameService.gameTime = this.currentTimer;
@@ -162,6 +195,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             if (newValue === true && this.socket.statusPlayer !== this.gameService.playerName) {
                 this.gameService.displayGameEnded(msg, 'finished');
                 this.socket.disconnect();
+            }
+        });
+    }
+
+    subscribeToDifference(): void {
+        this.diffFoundSubscription = this.socket.diffFound$.subscribe((newValue) => {
+            if (newValue) {
+                new ShowDiffRecord(newValue, { canvas1: this.canvas1, canvas2: this.canvas2 }, false, this.gameService.mousePosition).record(
+                    this.gameRecordService,
+                );
             }
         });
 
@@ -177,6 +220,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
                 this.gameService.handleDifferenceFound();
                 this.socket.sendDifference(newValue, this.socket.getRoomName());
+                if (this.gameService.mode === 'tempsLimite') {
+                    this.gameService.game = this.socket.getGame();
+                    this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+                }
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);
                 new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
@@ -190,6 +237,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
         this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
+        this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
+        if (this.gameService.mode === 'undefined') this.gameService.mode = '';
     }
 
     mouseHitDetect(event: MouseEvent): void {

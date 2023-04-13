@@ -3,14 +3,15 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-import { Game, GameInfo, GameRecord, TimeConfig, GamingHistory } from '@common/game';
-import { CanvasHolderService } from './canvas-holder.service';
-import { ImageDiffService } from './image-diff.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { Game, GameInfo, GameRecord, GamingHistory, Rankings, TimeConfig } from '@common/game';
 @Injectable({
     providedIn: 'root',
 })
 export class GameDatabaseService {
     twoHundredOkResponse: number;
+    isEmpty: boolean = false;
 
     private readonly baseUrl: string = environment.serverUrl;
 
@@ -52,8 +53,8 @@ export class GameDatabaseService {
     deleteGame(gameName: string): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/game/${gameName}`, { observe: 'response', responseType: 'text' });
     }
-    deleteOneGameRecords(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/gameRecord/${gameName}`, { observe: 'response', responseType: 'text' });
+    deleteOneGameRecords(gameName: string): Observable<Rankings> {
+        return this.http.delete<Rankings>(`${this.baseUrl}/gameRecord/${gameName}`);
     }
     deleteGamingHistory(): Observable<HttpResponse<string>> {
         return this.http.delete(`${this.baseUrl}/gamingHistory`, { observe: 'response', responseType: 'text' });
@@ -76,6 +77,13 @@ export class GameDatabaseService {
             error: () => isSaved.next(false),
         });
         return isSaved;
+    }
+    async isDataBaseEmpty(): Promise<void> {
+        this.getAllGames().subscribe((res: GameInfo[]) => {
+            if (res.length === 0) {
+                this.isEmpty = true;
+            }
+        });
     }
 
     updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {

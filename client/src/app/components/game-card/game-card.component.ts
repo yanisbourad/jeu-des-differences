@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameService } from '@app/services/game.service';
-import { GameInfo } from '@common/game';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameService } from '@app/services/game/game.service';
+import { GameInfo, Rankings } from '@common/game';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -80,9 +80,10 @@ export class GameCardComponent implements OnInit {
         }
     }
     async onReinitialise(gameName: string) {
-        try {
-            await this.gameService.deleteOneGameRecords(gameName);
-            // should update the view to reflect initial game records
-        } catch (error) {}
+        this.gameService.deleteOneGameRecords(gameName).subscribe((newRankings: Rankings) => {
+            this.card.rankingMulti = newRankings.rankingMulti;
+            this.card.rankingSolo = newRankings.rankingSolo;
+        });
+        // should update the view to reflect initial game records
     }
 }

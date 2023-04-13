@@ -4,9 +4,9 @@ import { DrawDuplicateDrawing } from '@app/classes/commands/draw-duplicate-drawi
 import { DrawExchange } from '@app/classes/commands/draw-exchange-drawing';
 import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
 import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
-import { BitmapService } from '@app/services/bitmap.service';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { CommandService } from '@app/services/command.service';
+import { BitmapService } from '@app/services/bitmap/bitmap.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { CommandService } from '@app/services/command/command.service';
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',

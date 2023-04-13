@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
-import { BitmapService } from './bitmap.service';
+import { BitmapService } from '@app/services/bitmap/bitmap.service';
 
 describe('CanvasHolderServiceService', () => {
     let service: BitmapService;

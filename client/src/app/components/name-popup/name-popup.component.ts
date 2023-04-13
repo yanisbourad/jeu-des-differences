@@ -1,9 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-// eslint-disable-next-line no-restricted-imports
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
-// eslint-disable-next-line no-restricted-imports
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 
 export interface DialogData {
@@ -22,7 +21,7 @@ export class NamePopupComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<NamePopupComponent>,
         public dialog: MatDialog,
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; gameType: string },
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName?: string; gameType?: string; isTimeLimit?: boolean },
         private route: Router,
     ) {
         this.name = '';
@@ -63,6 +62,22 @@ export class NamePopupComponent implements OnInit {
         });
     }
 
+    launchGameTypeSelection(): void {
+        if (this.validatePlayerName(this.data.name) === false) {
+            const message = 'Veuillez entrer un nom valide (2-10 caractères alphanumeriques).';
+            this.launchFeedback(message);
+            return;
+        }
+        const msg = 'Veuillez sélectionner un mode de jeu';
+        this.dialog.open(MessageDialogComponent, {
+            data: { name: this.data.name, gameName: this.data.gameName, message: msg, type: 'timeLimit' },
+            disableClose: true,
+            minWidth: '250px',
+            minHeight: '110px',
+            panelClass: 'custom-dialog-container',
+        });
+    }
+
     validatePlayerName(name: string): boolean {
         const len = name.trim() === '';
         if (
@@ -77,6 +92,11 @@ export class NamePopupComponent implements OnInit {
     }
 
     redirect(): void {
+        if (this.validatePlayerName(this.data.name) === false) {
+            const message = 'Veuillez entrer un nom valide (2-10 caractères alphanumeriques).';
+            this.launchFeedback(message);
+            return;
+        }
         if (this.data.gameType === 'solo') this.route.navigate(['/game', { player: this.data.name, gameName: this.data.gameName, gameType: 'solo' }]);
         if (this.data.gameType === 'double') this.launchDialog();
     }

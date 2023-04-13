@@ -1,10 +1,15 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import * as constantsTime from '@app/configuration/const-time';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 
 @Component({
     selector: 'app-message-dialog',
@@ -12,22 +17,19 @@ import { SocketClientService } from '@app/services/socket-client.service';
     styleUrls: ['./message-dialog.component.scss'],
 })
 export class MessageDialogComponent {
-    message: string;
-    type: string;
-    formatTime: string;
     winner: string = this.gameService.playerName;
     // eslint-disable-next-line max-params
     constructor(
-        @Inject(MAT_DIALOG_DATA) data: string,
+        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; message: string; gameType: string; formatTime: string; type: string },
         private router: Router,
         readonly socket: SocketClientService,
-        private readonly gameService: GameService,
+        readonly gameService: GameService,
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
+        private gameDataBaseService: GameDatabaseService,
+        private gameCardHandlerService: GameCardHandlerService,
     ) {
-        this.message = data[0];
-        this.type = data[1];
-        this.formatTime = data[2];
+        this.gameDataBaseService.isDataBaseEmpty();
     }
 
     rewindGame() {
@@ -36,8 +38,49 @@ export class MessageDialogComponent {
         this.gameRecorderService.startRewind();
     }
 
+    launchSolo(): void {
+        if (this.gameDataBaseService.isEmpty) {
+            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
+        } else {
+            this.socket.connect();
+            this.socket.startTimeLimit(this.gameService.playerName);
+            setTimeout(() => {
+                this.router.navigate(['/game', { player: this.data.name, gameType: 'solo', mode: 'tempsLimite' }]);
+            }, constantsTime.LOADING);
+        }
+    }
+
+    launchFeedback(showedMessage: string): void {
+        this.dialog.open(GeneralFeedbackComponent, {
+            data: { message: showedMessage },
+            disableClose: true,
+        });
+    }
+
+    launchCooperation(): void {
+        if (this.gameDataBaseService.isEmpty) {
+            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
+        } else {
+            // this.socket.connect();
+            // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
+            // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
+            this.gameCardHandlerService.connect();
+            const dialog = this.dialog.open(PlayerWaitPopupComponent, {
+                data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
+                disableClose: true,
+                height: '600px',
+                width: '600px',
+            });
+            dialog.afterClosed().subscribe((res) => {
+                if (res) {
+                    return res;
+                }
+            });
+        }
+    }
+
     redirection(): void {
-        if (this.type === 'giveUp') {
+        if (this.data.type === 'giveUp') {
             this.socket.sendGiveUp({
                 playerName: this.gameService.playerName,
                 roomName: this.socket.getRoomName(),
@@ -52,12 +95,8 @@ export class MessageDialogComponent {
             };
             this.socket.sendMessage(dataToSend);
             new GameMessageEvent({
-                message: new Date().toLocaleTimeString() + ' - ' + this.gameService.playerName + ' a abandonné la partie.',
-                userName: this.gameService.playerName,
+                ...dataToSend,
                 mine: true,
-                color: '#FF0000',
-                pos: '50%',
-                event: true,
             }).record(this.gameRecorderService);
         }
         this.socket.leaveRoom();

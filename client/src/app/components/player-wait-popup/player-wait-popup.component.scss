@@ -19,6 +19,13 @@
     padding: 0 20px;
 }
 
+.avatar {
+    height: 90%;
+    margin-bottom: 0px;
+    margin-top: 2px;
+    min-width: 90%;
+}
+
 .player {
     display: flex;
     flex-direction: column;
@@ -32,12 +39,16 @@
 .creator {
     height: 250px;
     width: 100%;
-    background-color: rgb(13, 93, 93);
+    border: 2px solid rgb(208, 40, 255);
+    border-radius: 10px;
+    background-color: rgb(198, 163, 190);
 }
 .opponent {
     height: 250px;
     width: 100%;
-    background-color: rgb(187, 57, 118);
+    border: 2px solid rgb(58, 195, 254);
+    border-radius: 10px;
+    background-color: rgb(162, 189, 203);
 }
 
 .btn-box {
@@ -52,10 +63,45 @@
     cursor: pointer;
 }
 
-.btn {
-    background-color: rgb(129, 236, 236);
-    color: rgba(0, 0, 0, 0.952);
+.close {
+    background: rgb(230, 100, 100);
+    color: white;
     border-radius: 15px;
     margin: 10px;
     cursor: pointer;
+}
+
+.accept {
+    background: rgb(91, 133, 65);
+    color: white;
+    border-radius: 15px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.refuse {
+    background-color: rgba(239, 49, 24, 0.688);
+    color: white;
+    border-radius: 15px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.sub-title{
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-size: 25px;
+    margin-left: 10px;
+    font-weight: 500;
+    width: fit-content;
+    white-space: nowrap;
+}
+.playerName{
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-size: 20px;
+    margin: 15px 0 0 10px;
+    font-weight: 500;
+    width: fit-content;
+    white-space: nowrap;
 }

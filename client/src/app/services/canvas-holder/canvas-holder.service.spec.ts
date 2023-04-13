@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
-import { CanvasHolderService } from './canvas-holder.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
 
 describe('CanvasHolderService', () => {
     let service: CanvasHolderService;

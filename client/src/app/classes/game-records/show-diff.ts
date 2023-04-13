@@ -2,7 +2,7 @@ import { ElementRef } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { DrawService } from '@app/services/draw.service';
+import { DrawService } from '@app/services/draw/draw.service';
 
 interface Canvases {
     canvas1: ElementRef<HTMLCanvasElement>;
@@ -39,12 +39,17 @@ export class ShowDiffRecord extends GameRecordCommand {
             component.gameService.handlePlayerDifference();
         }
         this.drawDifference(this.diff, this.canvas);
+        if (component.gameService.mode) {
+            this.clearCanvas(this.canvas.canvas1.nativeElement, this.canvas.canvas2.nativeElement);
+            component.gameService.defineVariables();
+            component.gameService.displayIcons();
+            component.gameService.iconsUpdateForTimeLimit();
+        }
         component.cheatModeService.removeDifference(this.diff);
         component.hintsService.removeDifference(this.diff);
     }
 
     drawDifference(
-        // can be moved
         diff: Set<number>,
         canvas: {
             canvas1: ElementRef<HTMLCanvasElement>;

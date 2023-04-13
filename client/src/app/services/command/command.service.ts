@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CommandSpecific } from '@app/classes/command-specific';
 import * as keys from '@app/configuration/const-hotkeys';
-import { HotkeysService } from './hotkeys.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 @Injectable({
     providedIn: 'root',
 })

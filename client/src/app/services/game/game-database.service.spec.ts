@@ -2,13 +2,13 @@ import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import * as constantes from '@app/configuration/const-test';
+import * as constants from '@app/configuration/const-time';
 import { Game, GameInfo, GameRecord, TimeConfig } from '@common/game';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { CanvasHolderService } from './canvas-holder.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { GameDatabaseService } from './game-database.service';
-import { ImageDiffService } from './image-diff.service';
-import * as constants from '@app/configuration/const-time';
 
 fdescribe('GameDatabaseService', () => {
     let service: GameDatabaseService;

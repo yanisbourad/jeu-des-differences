@@ -1,9 +1,9 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { Message } from '@app/interfaces/message';
-import { GameRecorderService } from '@app/services/game-recorder.service';
-import { GameService } from '@app/services/game.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
 @Component({
     selector: 'app-message-area',
@@ -51,7 +51,7 @@ export class MessageAreaComponent implements OnInit {
         this.socketClient.sendMessage(dataToSend);
         this.addMessage({
             message: this.message,
-            userName: this.playerName,
+            playerName: this.playerName,
             mine: true,
             color: this.defaultColor[1],
             pos: this.position[1],

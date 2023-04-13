@@ -27,16 +27,54 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             id: gamer.id,
             name: payload.name,
             gameName: payload.gameName,
+            gameType: payload.gameType,
         };
-        this.logger.log(`New request from ${player.name} to play ${player.gameName} in 1vs1 mode`);
+        this.logger.log(`New request from ${player.name} to play ${player.gameName} in ${player.gameType} mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
-        if (!this.gameCardHandlerService.isGameAvailable(player.gameName)) {
+        if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
             this.server.to(gamer.id).emit('gameUnavailable', 'game deleted by admin');
             return;
         }
 
         gamer.join(player.id);
+
+        // handle limited time mode
+        if (player.gameType === 'limit') {
+            const players = this.gameCardHandlerService.manageJoinLimitMode(player)
+            if (players.length === 1) {
+                this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+            } else if (players.length === 2) {
+                const gameInfo = {
+                    gameId: this.countGame++,
+                    gameName: "limitedTime99999",
+                    creatorName: players[CREATOR_INDEX].name,
+                    opponentName: players[OPPONENT_INDEX].name,
+                    mode: "tempsLimite"
+                };
+                this.server.to(players[0].id).emit('feedbackOnStart', gameInfo);
+                this.server.to(players[1].id).emit('feedbackOnStart', gameInfo);
+            } else {
+                while (players.length % 2 === 0) {
+                    const gameInfo = {
+                        gameId: this.countGame++,
+                        gameName: "limitedTime99999",
+                        creatorName: players[CREATOR_INDEX].name,
+                        opponentName: players[OPPONENT_INDEX].name,
+                        mode: "tempsLimite"
+                    };
+                    this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
+                    this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
+                }
+                if (players.length === 1) {
+                    this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                }
+            }
+            return;
+        }
+
+        this.logger.debug(player.gameType);
+
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
         switch (stackedPlayerNumber) {
             // when this is the creator

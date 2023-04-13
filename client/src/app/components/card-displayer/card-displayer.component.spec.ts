@@ -5,8 +5,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { By } from '@angular/platform-browser';
 import * as constantsMock from '@app/configuration/const-mock';
 
-import { GameCardHandlerService } from '@app/services/game-card-handler-service.service';
-import { GameDatabaseService } from '@app/services/game-database.service';
+import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GameInfo } from '@common/game';
 import { of } from 'rxjs';
 import { CardDisplayerComponent } from './card-displayer.component';

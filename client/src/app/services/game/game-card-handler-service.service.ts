@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game, GamersInfo } from '@app/interfaces/game-handler';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
-import { SocketClientService } from './socket-client.service';
 // eslint-disable-next-line no-restricted-imports
 
 @Injectable({
@@ -20,6 +20,7 @@ export class GameCardHandlerService {
     isRejected: boolean;
     isCreatorLeft: boolean;
     isGameAvailable: boolean;
+    gameName: string;
     games: Map<string, number>;
     constructor(private router: Router, private socketClientService: SocketClientService, private socketClient: SocketClient) {
         this.isCreator = false;
@@ -32,6 +33,7 @@ export class GameCardHandlerService {
         this.isRejected = false;
         this.isCreatorLeft = false;
         this.isGameAvailable = true;
+        this.gameName = '';
     }
 
     getGameState(): string {
@@ -61,6 +63,10 @@ export class GameCardHandlerService {
         return this.isGameAvailable;
     }
 
+    getLimitedTimeGameName(): string {
+        return this.gameName;
+    }
+
     connect() {
         this.socketClient.connect();
         this.socket = this.socketClient.socket;
@@ -68,7 +74,6 @@ export class GameCardHandlerService {
 
     updateGameStatus(gameNames: string[]) {
         this.connect();
-        // this.socket.emit('findAllGamesStatus', gameNames);
         this.socketClient.send('findAllGamesStatus', gameNames);
         this.listenToFeedBack();
     }
@@ -104,10 +109,14 @@ export class GameCardHandlerService {
 
         this.socket.on('feedbackOnStart', (gameIdentifier) => {
             // call method to redirect to game from service with gameIdentifier
-            this.socketClientService.startMultiGame(gameIdentifier);
+            if (gameIdentifier.gameName === 'limitedTime99999') {
+                this.socketClientService.startMultiTimeLimit(gameIdentifier);
+                this.gameName = gameIdentifier.gameName;
+            } else {
+                this.socketClientService.startMultiGame(gameIdentifier);
+            }
             this.isReadyToPlay = true;
             this.redirect(gameIdentifier);
-            // this.resetGameVariables();
         });
 
         this.socket.on('feedBackOnLeave', () => {
@@ -132,7 +141,6 @@ export class GameCardHandlerService {
 
         this.socket.on('disconnect', () => {
             this.isLeaving = true;
-            // this.resetGameVariables();
         });
     }
 
@@ -150,6 +158,7 @@ export class GameCardHandlerService {
         this.isRejected = false;
         this.isLeaving = false;
         this.isGameAvailable = true;
+        this.gameName = '';
     }
 
     handleDelete(gameName: string) {
@@ -188,6 +197,7 @@ export class GameCardHandlerService {
                 gameName: gamersIdentifier.gameName,
                 gameType: 'double',
                 gameId: gamersIdentifier.gameId,
+                mode: gamersIdentifier.mode,
             },
         ]);
     }

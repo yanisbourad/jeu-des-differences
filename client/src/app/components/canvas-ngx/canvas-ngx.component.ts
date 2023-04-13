@@ -9,10 +9,10 @@ import * as constants from '@app/configuration/const-canvas';
 import * as stylers from '@app/configuration/const-styler-type';
 import { Drawing } from '@app/interfaces/drawing';
 import { Point } from '@app/interfaces/point';
-import { BitmapService } from '@app/services/bitmap.service';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { CommandService } from '@app/services/command.service';
-import { DrawService } from '@app/services/draw.service';
+import { BitmapService } from '@app/services/bitmap/bitmap.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { CommandService } from '@app/services/command/command.service';
+import { DrawService } from '@app/services/draw/draw.service';
 @Component({
     selector: 'app-canvas-ngx',
     templateUrl: './canvas-ngx.component.html',

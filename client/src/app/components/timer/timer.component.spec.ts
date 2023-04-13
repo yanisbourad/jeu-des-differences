@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { TimerComponent } from './timer.component';
 import spyObj = jasmine.SpyObj;
 

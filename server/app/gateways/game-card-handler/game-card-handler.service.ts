@@ -3,8 +3,8 @@ import { CREATOR_INDEX, EMPTY, MAX_CAPACITY, MINUS_ONE, OVER_CROWDED, PLAYER_PAI
 import { Player } from './entities/player.entity';
 @Injectable()
 export class GameCardHandlerService {
-    // string: gameName, string[]: [nameCreator, nameOpponent]
     gamesQueue: Map<string, string[]>;
+    timeLimitedGamesQueue: string[];
     players: Map<string, Player>;
     joiningPlayersQueue: Map<string, string[]>;
 
@@ -12,6 +12,7 @@ export class GameCardHandlerService {
         this.gamesQueue = new Map();
         this.players = new Map();
         this.joiningPlayersQueue = new Map();
+        this.timeLimitedGamesQueue = [];
     }
 
     // manage queue for each game and return the number of player waiting
@@ -85,6 +86,29 @@ export class GameCardHandlerService {
         if (player) {
             this.players.delete(playerId);
             return player;
+        }
+    }
+    // manage time limited game
+    manageJoinLimitMode(player: Player): Player[] {
+        this.players.set(player.id, player);
+        this.timeLimitedGamesQueue.push(player.id);
+        if (this.timeLimitedGamesQueue.length === 1) {
+            return [player];
+        } else if (this.timeLimitedGamesQueue.length === 2) {
+            const opponentId = this.timeLimitedGamesQueue.shift();
+            const opponent = this.players.get(opponentId);
+            this.players.delete(opponentId);
+            this.players.delete(player.id);
+            this.timeLimitedGamesQueue = [];
+            return [player, opponent];
+        } else {
+            const players = [];
+            this.timeLimitedGamesQueue.forEach((playerId) => {
+                players.push(this.players.get(playerId));
+                this.players.delete(playerId);
+            });
+            this.timeLimitedGamesQueue = [];
+            return players;
         }
     }
 

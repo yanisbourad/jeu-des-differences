@@ -4,8 +4,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CanvasNgxComponent } from '@app/components/canvas-ngx/canvas-ngx.component';
 import { DifferencePopupComponent } from '@app/components/difference-popup/difference-popup.component';
 import { BitmapService } from '@app/services/bitmap.service';
-import { CanvasHolderService } from '@app/services/canvas-holder.service';
-import { CommandService } from '@app/services/command.service';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { CommandService } from '@app/services/command/command.service';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 

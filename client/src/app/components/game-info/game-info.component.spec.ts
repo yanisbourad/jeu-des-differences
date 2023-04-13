@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { GameInformation } from '@app/interfaces/game-information';
 import * as constants from '@app/configuration/const-game';
-import { GameService } from '@app/services/game.service';
+import { GameInformation } from '@app/interfaces/game-information';
+import { GameService } from '@app/services/game/game.service';
 import { GameInfoComponent } from './game-info.component';
 import SpyObj = jasmine.SpyObj;
 

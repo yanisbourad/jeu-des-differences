@@ -76,6 +76,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
+        console.log(this.socket.socketId);
     }
 
     loading(): void {
@@ -129,6 +130,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        console.log(this.socket.socketId);
         this.cheatModeService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
         this.timeLimitStatusSubscription.unsubscribe();

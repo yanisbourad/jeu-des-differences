@@ -2,10 +2,8 @@ import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
-import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
-// import { GameService } from '@app/services/game.service';
 import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
@@ -19,6 +17,8 @@ export class HeaderComponent {
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
     messageDeleteGames: string = "êtes-vous sur de vouloir supprimer tous les jeux? si oui, vous allez être redirigé vers la page d'accueil";
+    messageDeleteRecords: string =
+        "êtes-vous sur de vouloir reinitialiser tous les meilleurs temps? si oui, vous allez être redirigé vers la page d'accueil";
     constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
@@ -36,19 +36,11 @@ export class HeaderComponent {
         });
         dialogRef.afterClosed();
     }
-    sendFeedback(showedMessage: string): void {
-        const dialog = this.dialog.open(GeneralFeedbackComponent, {
-            data: { message: showedMessage },
-            disableClose: true,
-        });
-        dialog.afterClosed();
-    }
 
     async eraseGameRecords() {
         this.gameDatabaseService.deleteGameRecords().subscribe((res) => {
             if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
                 this.router.navigate(['/home']);
-                this.sendFeedback('Tous les meilleurs temps ont été reinitialisés avec succes');
             }
         });
     }
@@ -60,7 +52,7 @@ export class HeaderComponent {
     resetGames(): void {
         this.gameDatabaseService.deleteAllGames().subscribe();
     }
-    launchFeedback(showedMessage: string): void {
+    launchFeedbackResetGames(showedMessage: string): void {
         this.dialog
             .open(VerificationFeedbackComponent, {
                 data: { message: showedMessage, confirmFunction: () => this.resetGames() },
@@ -68,7 +60,18 @@ export class HeaderComponent {
             })
             .afterClosed()
             .subscribe(() => {
-                this.router.navigate(['/']);
+                location.reload();
+            });
+    }
+    launchFeedbackResetRecords(showedMessage: string): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: { message: showedMessage, confirmFunction: async () => this.eraseGameRecords() },
+                disableClose: true,
+            })
+            .afterClosed()
+            .subscribe(() => {
+                location.reload();
             });
     }
 }

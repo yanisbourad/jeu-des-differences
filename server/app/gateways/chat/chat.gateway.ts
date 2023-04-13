@@ -197,7 +197,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.MousePosition)
     async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
-        this.logger.debug('mouse', data)
         if (!this.isMulti) {
             this.roomName = socket.id;
         } else {

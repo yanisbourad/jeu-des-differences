@@ -29,6 +29,8 @@ export class GameCardComponent implements OnInit {
         private readonly gameCardHandlerService: GameCardHandlerService,
     ) {}
     openDialog(): void {
+        this.gameService.rankingSoloCopy = this.card.rankingSolo;
+        this.gameService.rankingMultiCopy = this.card.rankingMulti;
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
             disableClose: true,
@@ -41,8 +43,6 @@ export class GameCardComponent implements OnInit {
 
     ngOnInit(): void {
         this.url = this.router.url;
-        this.gameService.rankingSoloCopy = this.card.rankingSolo;
-        this.gameService.rankingMultiCopy = this.card.rankingMulti;
     }
 
     launchDialog(): void {

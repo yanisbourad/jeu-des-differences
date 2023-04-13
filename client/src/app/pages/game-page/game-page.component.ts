@@ -5,6 +5,7 @@ import { ShowDiffRecord } from '@app/classes/game-records/show-diff';
 import { ShowNotADiffRecord } from '@app/classes/game-records/show-not-a-difference';
 import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
 import * as constants from '@app/configuration/const-canvas';
+import { TIMEOUT } from '@app/configuration/const-time';
 import { Message } from '@app/interfaces/message';
 import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
 import { DrawService } from '@app/services/draw/draw.service';
@@ -80,16 +81,16 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.gameService.getTimeLimitGame();
             this.loadImages(this.socket.game);
             this.socket.imageLoaded$.subscribe((game: Game) => {
-                this.loadImages(game);
+                setTimeout(() => {
+                    this.loadImages(game);
+                }, TIMEOUT);
             });
         } else {
             this.socket.connect();
             this.gameService.getClassicGame(this.gameService.gameName);
-            const timeout = 200;
-
             setTimeout(() => {
                 this.loadImages();
-            }, timeout);
+            }, TIMEOUT);
         }
         this.loading();
         this.cheatModeService.cheatModeKeyBinding();
@@ -101,11 +102,10 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     loading(): void {
-        const timeout = 200;
         setTimeout(() => {
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
             this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
-        }, timeout);
+        }, TIMEOUT);
     }
 
     loadImages(game: Game = this.gameService.game): void {

@@ -20,3 +20,4 @@ export const BONUS_TIME = 5;
 export const MAX_INIT_TIME = 60;
 export const MAX_PENALTY_TIME = 10;
 export const MAX_BONUS_TIME = 10;
+export const TIMEOUT = 200;

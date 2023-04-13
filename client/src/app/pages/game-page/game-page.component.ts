@@ -75,6 +75,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getRouterParams();
         // if (this.gameService.mode !== 'tempsLimite') 
         this.gameService.setStartDate(new Date().toLocaleString());
+        if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double'){
+            this.socket.connect();
+        }
         this.gameRecordService.page = this;
         // this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {

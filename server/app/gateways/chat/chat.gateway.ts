@@ -88,12 +88,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             console.log(myPlayers[0].id, myPlayers[1].id)
             this.isMulti = true;
             this.gameName = player.gameName;
-            this.logger.debug(this.roomName);
             this.isPlaying.set(this.roomName, true);
             this.gameNames = this.gameService.gamesNames;
             this.games = this.gameService.getGames();
-            this.game = this.games.get(this.chooseRandomName());
-            console.log(this.game.gameName)
+            
             // socket.emit('sendRoomName', ['multi', this.roomName]);
 
             // console.log(this.game);
@@ -106,26 +104,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             // this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
             // socket.join(this.roomName);
         }
-        // this.playerName = player.creatorName;
     }
 
 
 
     @SubscribeMessage(ChatEvents.SendRoomName)
-    async sendRoomName(socket: Socket, data: [roomName: string, mode: string]) {
-        this.roomName = data[0];
+    async sendRoomName(socket: Socket, data: {roomName: string, mode: string}) {
+        this.roomName = data.roomName;
         console.log(data)
-        socket.join(this.roomName);
         console.log('sendRoomName',this.roomName)
-        if (data[1]) {
+        socket.join(this.roomName);
+            
+        if (data.mode) {
             console.log(this.game.gameName)
             // console.log(this.game)
             // this.game = this.games.get(this.chooseRandomName());
             // this.gameNames = this.gameService.gamesNames;
             // this.games = this.gameService.getGames();
             // this.game = this.games.get(this.chooseRandomName());
-
-            socket.emit('getRandomGame', this.game);
+            this.game = this.games.get(this.chooseRandomName());
+            socket.to(this.roomName).emit('getRandomGame', this.game);
             socket.to(this.roomName).emit('nbrDifference', this.games.size);
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
             // console.log('the game', this.game)
@@ -145,6 +143,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         this.isPlaying.set(this.roomName, true);
         socket.emit('sendRoomName', ['multi', this.roomName]);
+        socket.join(this.roomName);
         // const game = this.gameService.getGame(this.gameName);
         // this.roomName = data[0];
         // if (!data[1]) this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(game.listDifferences));
@@ -286,7 +285,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.serverTime.removeTimer(this.roomName);
                 this.logger.debug('went here1')
             }
-            console.log(this.serverTime.elapsedTimes.get(this.roomName))
             this.server.emit(ChatEvents.ServerTime, Array.from(this.serverTime.elapsedTimes));
         }, DELAY_BEFORE_EMITTING_TIME);
     }

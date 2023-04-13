@@ -176,7 +176,6 @@ export class SocketClientService {
         this.socketClient.on('getRandomGame', (game: Game) => {
             this.game = game;
             this.imageLoaded.next(game);
-            console.log(this.game);
         });
     }
 
@@ -210,7 +209,7 @@ export class SocketClientService {
     }
 
     sendRoomName(roomName: string, mode: string) {
-        this.socketClient.send('sendRoomName', [roomName, mode]);
+        this.socketClient.send('sendRoomName', { roomName, mode });
     }
 
     startMultiGame(player: { gameId: string; creatorName: string; gameName: string; opponentName: string }): void {

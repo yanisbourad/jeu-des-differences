@@ -1,5 +1,6 @@
 import { AfterContentChecked, Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GamingHistory } from '@common/game';
 @Component({
@@ -11,7 +12,11 @@ export class GamingHistoryComponent implements AfterContentChecked {
     gamingHistory: GamingHistory[];
     hasGameRecords: boolean;
 
-    constructor(private readonly gameDatabaseService: GameDatabaseService, public dialogReff: MatDialogRef<GamingHistoryComponent>) {
+    constructor(
+        private readonly gameDatabaseService: GameDatabaseService,
+        public dialogReff: MatDialogRef<GamingHistoryComponent>,
+        public dialog: MatDialog,
+    ) {
         this.hasGameRecords = false;
         this.gamingHistory = [];
         this.gamingHistory = this.getAllGamingHistory();
@@ -26,6 +31,21 @@ export class GamingHistoryComponent implements AfterContentChecked {
             if (res) this.gamingHistory = res;
         });
         return this.gamingHistory;
+    }
+
+    launchFeedback(): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: {
+                    message: "Voulez vous vraiment supprimer l'historique des parties?",
+                    confirmFunction: () => {
+                        this.eraseGamingHistory();
+                    },
+                },
+                disableClose: true,
+            })
+            .afterClosed()
+            .subscribe();
     }
 
     async eraseGamingHistory() {

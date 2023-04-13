@@ -32,7 +32,7 @@ export class HotkeysService {
         const { isKeyDown, callback } = this.listCallbacks[id];
         const typeEvent = isKeyDown ? hotkeys.KEYDOWN : hotkeys.KEYUP;
         document.removeEventListener(typeEvent, callback);
-        this.listCallbacks = this.listCallbacks.splice(id, 1);
+        // this.listCallbacks = this.listCallbacks.splice(id, 1);
     }
 
     handleNormalKeys(keys: string[], event: KeyboardEvent): boolean {

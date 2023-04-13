@@ -46,6 +46,7 @@ export class ShowDiffRecord extends GameRecordCommand {
             component.gameService.iconsUpdateForTimeLimit();
         }
         component.cheatModeService.removeDifference(this.diff);
+        component.hintsService.removeDifference(this.diff);
     }
 
     drawDifference(

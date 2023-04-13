@@ -216,7 +216,6 @@ export class SocketClientService {
 
     startMultiTimeLimit(player: { gameId: string; creatorName: string; gameName: string; opponentName: string; mode: string }): void {
         this.socketClient.send('startMultiTimeLimit', player);
-        console.log('here');
     }
 
     findDifference(information: { playerName: string; roomName: string }) {

@@ -10,6 +10,7 @@ import { CheatModeService } from '@app/services/cheat-mode.service';
 import { DrawService } from '@app/services/draw.service';
 import { GameRecorderService } from '@app/services/game-recorder.service';
 import { GameService } from '@app/services/game.service';
+import { HintsService } from '@app/services/hints.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Subscription } from 'rxjs';
 
@@ -42,6 +43,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public route: ActivatedRoute,
         private gameRecordService: GameRecorderService,
         public cheatModeService: CheatModeService,
+        public hintsService: HintsService,
     ) {}
 
     get width(): number {
@@ -73,12 +75,17 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
+        this.hintsService.hintsKeyBinding();
+        this.hintsService.canvas0 = this.canvasCheat0;
+        this.hintsService.canvas1 = this.canvasCheat1;
+
     }
 
     loading(): void {
         const timeout = 500;
         setTimeout(() => {
             this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+            this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
         }, timeout);
     }
 
@@ -97,12 +104,14 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     startRewind(): void {
         if (this.notRewinding) this.initForRewind();
         this.cheatModeService.stopCheating();
+        this.hintsService.stopHints();
         this.gameRecordService.startRewind();
     }
 
     initForRewind(): void {
         if (this.notRewinding) {
             this.cheatModeService.removeHotkeysEventListener();
+            this.hintsService.removeHotkeysEventListener();
             this.diffFoundSubscription.unsubscribe();
             this.playerFoundDiffSubscription.unsubscribe();
             this.gameStateSubscription.unsubscribe();
@@ -112,14 +121,19 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chat.isNotRewinding = false;
         this.clearCanvases();
         this.cheatModeService.resetService();
+        this.hintsService.resetService();
         this.gameService.initRewind();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
+        this.hintsService.canvas0 = this.canvasCheat0;
+        this.hintsService.canvas1 = this.canvasCheat1;
         this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+        this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
     }
 
     ngOnDestroy(): void {
         this.cheatModeService.removeHotkeysEventListener();
+        this.hintsService.removeHotkeysEventListener();
         this.diffFoundSubscription.unsubscribe();
         this.playerFoundDiffSubscription.unsubscribe();
         this.gameStateSubscription.unsubscribe();
@@ -127,6 +141,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.reinitializeGame();
         this.socket.disconnect();
         this.cheatModeService.resetService();
+        this.hintsService.resetService();
         this.notRewinding = true;
         this.chat.isNotRewinding = true;
     }
@@ -167,12 +182,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
             }
         });
-
-        // this.playerFoundDiffSubscription = this.socket.playerFoundDiff$.subscribe((newValue) => {
-        //     if (newValue === this.gameService.opponentName) {
-        //         this.gameService.handlePlayerDifference();
-        //     }
-        // });
     }
 
     getRouterParams(): void {

@@ -123,16 +123,19 @@ export class GameService {
     }
 
     displayIcons(): void {
-        if (this.gameType === 'solo') {
-            for (let i = 0; i < this.totalDifferences; i++) {
-                this.differencesArray[i] = this.gameHelper.path.differenceNotFound;
-            }
-        }
+        if (this.gameType === 'solo') this.setIcons();
+        if (this.gameType === 'double' && this.mode) this.setIcons();
         if (this.gameType === 'double' && !this.mode) {
             for (let i = 0; i < this.totalDifferences; i++) {
                 this.differencesArray[i] = this.gameHelper.path.differenceNotFound;
                 this.opponentDifferencesArray[i] = this.gameHelper.path.differenceNotFound;
             }
+        }
+    }
+
+    setIcons(): void {
+        for (let i = 0; i < this.totalDifferences; i++) {
+            this.differencesArray[i] = this.gameHelper.path.differenceNotFound;
         }
     }
 

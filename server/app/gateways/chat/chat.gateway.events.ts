@@ -13,7 +13,6 @@ export enum ChatEvents {
     FeedbackDifference = 'feedbackDifference',
     SendGiveUp = 'sendGiveUp',
     GameName = 'gameName',
-    // CurrentGameName = 'currentGameName',
     MousePosition = 'mousePosition',
     StartTimeLimit = 'startTimeLimit',
     StartMultiTimeLimit = "startMultiTimeLimit"

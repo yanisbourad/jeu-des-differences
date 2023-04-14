@@ -74,11 +74,9 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         // needed for the rewind
         this.getRouterParams();
         this.gameService.setStartDate(new Date().toLocaleString());
-        if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double') {
-            this.socket.connect();
-        }
+        if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double') this.socket.connect();
         this.gameRecordService.page = this;
-        this.gameService.handleDisconnect(); // doesn't work properly
+        this.gameService.handleDisconnect();
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
             this.loadImages(this.socket.game);
@@ -230,12 +228,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         });
 
         this.differenceSubscription = this.socket.difference$.subscribe((newValue) => {
-            const canvases = {
-                canvas1: this.canvas1,
-                canvas2: this.canvas2,
-                canvas0: this.canvas0,
-                canvas3: this.canvas3,
-            };
+            const canvases = { canvas1: this.canvas1, canvas2: this.canvas2, canvas0: this.canvas0, canvas3: this.canvas3 };
             if (newValue) {
                 new ShowDiffRecord(newValue, canvases, true, this.gameService.mousePosition).record(this.gameRecordService);
                 new GameMessageEvent(this.gameService.sendFoundMessage()).record(this.gameRecordService);
@@ -250,16 +243,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 new GameMessageEvent(this.gameService.sendErrorMessage()).record(this.gameRecordService);
             }
         });
-    }
-
-    getRouterParams(): void {
-        this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
-        this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
-        this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
-        this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
-        this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
-        this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
-        if (this.gameService.mode === 'undefined') this.gameService.mode = '';
     }
 
     mouseHitDetect(event: MouseEvent): void {
@@ -278,5 +261,15 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         DrawService.clearDiff(this.canvas1.nativeElement);
         DrawService.clearDiff(this.canvasCheat1.nativeElement);
         this.loadImages();
+    }
+
+    private getRouterParams(): void {
+        this.gameService.playerName = this.route.snapshot.paramMap.get('player') as string;
+        this.gameService.gameName = this.route.snapshot.paramMap.get('gameName') as string;
+        this.gameService.gameType = this.route.snapshot.paramMap.get('gameType') as string;
+        this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
+        this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
+        this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
+        if (this.gameService.mode === 'undefined') this.gameService.mode = '';
     }
 }

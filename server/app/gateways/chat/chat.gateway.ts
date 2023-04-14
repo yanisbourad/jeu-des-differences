@@ -22,7 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     isPlaying: Map<string, boolean> = new Map<string, boolean>();
     unfoundedDifference: Map<string, Set<number>[]> = new Map<string, Set<number>[]>();
     game: Game;
-    isTimeLimit: boolean;
+    isTimeLimit: Map<string, boolean> = new Map<string, boolean>();
     constructor(
         private readonly logger: Logger,
         private readonly serverTime: ServerTimeService,
@@ -55,7 +55,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.game = this.games.get(this.chooseRandomName());
         this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         this.isPlaying.set(this.roomName, true);
-        this.isTimeLimit = true; // not sure
+        this.isTimeLimit.set(this.roomName, true);
         this.playerName = playerName;
         socket.emit(ChatEvents.Hello, `${socket.id}`);
         if (!this.serverTime.timers[this.roomName]) {
@@ -81,6 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.isMulti = true;
             this.gameName = player.gameName;
             this.isPlaying.set(this.roomName, true);
+            this.isTimeLimit.set(this.roomName, true);
             this.gameNames = this.gameService.gamesNames;
             this.games = this.gameService.getGames();
             this.game = this.games.get(this.chooseRandomName());
@@ -98,7 +99,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (!this.serverTime.timers[this.roomName]) {
                 this.serverTime.startCountDown(this.roomName);
             }
-            // this.isTimeLimit = true; // not sure
         } else {
             const game = this.gameService.getGame(this.gameName);
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(game.listDifferences));
@@ -174,7 +174,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async gameEnded(socket: Socket, roomName: string) {
         this.serverTime.removeTimer(roomName)
         this.isPlaying.set(roomName, false);
-        this.isTimeLimit = false; // not sure
+        this.isTimeLimit.set(this.roomName, false);
         socket.disconnect();
     }
 
@@ -202,12 +202,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        if (this.isMulti && this.isPlaying.get(this.roomName)) { // need something else for time limit
+        if (this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit.get(this.roomName) ) { 
             socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName });
         }
-        if (this.isMulti && this.isPlaying.get(this.roomName) && this.isTimeLimit) {
+        if (this.isMulti && this.isPlaying.get(this.roomName) && this.isTimeLimit.get(this.roomName)) {
             socket.to(this.roomName).emit('teammateDisconnected', true);
-            // send message to transform the view to solo Time Limit
         }
         socket.leave(this.roomName);
     }

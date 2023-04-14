@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MouseButton } from '@app/components/play-area/play-area.component';
@@ -276,20 +275,20 @@ export class GameService {
     }
 
     private saveGameRecord(): void {
-        const gameRecord: GameRecord = {
+        const infoGame = {
             gameName: this.gameInformation.gameTitle,
-            typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             playerName: this.playerName,
             dateStart: this.startDate,
             time: this.gameHelper.getGameTime(this.gameTime),
+        };
+        const gameRecord: GameRecord = {
+            ...infoGame,
+            typeGame: this.gameType === 'double' ? 'multi' : 'solo',
             keyServer: '',
         };
         const gamingHistory: GamingHistory = {
-            gameName: this.gameInformation.gameTitle,
+            ...infoGame,
             gameType: this.gameType === 'double' ? 'multi' : 'solo',
-            playerName: this.playerName,
-            dateStart: this.startDate,
-            time: this.gameHelper.getGameTime(this.gameTime),
             opponentName: this.gameType === 'double' ? this.opponentName : '999999999999999',
             hasAbandonedGame: this.hasAbandonedGame,
         };
@@ -298,5 +297,4 @@ export class GameService {
             this.gameDataBase.createGamingHistory(gamingHistory).subscribe();
         }
     }
-
 }

@@ -83,18 +83,7 @@ export class SocketClientService {
         });
 
         this.socketClient.on('message-return', (data: { message: string; userName: string; color: string; pos: string; event: boolean }) => {
-            if (data) {
-                this.messageToAdd.next(
-                    new GameMessageEvent({
-                        message: data.message,
-                        playerName: data.userName,
-                        mine: false,
-                        color: data.color,
-                        pos: data.pos,
-                        event: data.event,
-                    }),
-                );
-            }
+            if (data) this.messageToAdd.next(new GameMessageEvent({ ...data, mine: false, playerName: data.userName }));
         });
     }
 

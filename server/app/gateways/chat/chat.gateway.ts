@@ -38,22 +38,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.JoinRoomSolo)
     async joinRoomSolo(socket: Socket, data: { playerName: string; gameName: string }) {
         this.logger.debug('solo');
-        this.roomName = socket.id
         const game = this.gameService.getGame(data.gameName);
         this.unfoundedDifference.set(socket.id, this.gameService.getSetDifference(game.listDifferences));
         this.isPlaying.set(socket.id, true);
         socket.emit(ChatEvents.Hello, `${socket.id}`);
         if (!this.serverTime.timers[socket.id]) {
             this.serverTime.startChronometer(socket.id);
-            this.logger.debug('startchrono')
-            this.logger.debug(socket.id)
         }
         socket.join(socket.id);
     }
 
     @SubscribeMessage(ChatEvents.StartTimeLimit)
     async startTimeLimit(socket: Socket, playerName: string) {
-        this.logger.debug('time limit');
         this.roomName = socket.id;
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
@@ -89,6 +85,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.gameNames = this.gameService.gamesNames;
             this.games = this.gameService.getGames();
             this.game = this.games.get(this.chooseRandomName()); // i want both of them to have the same game
+            this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         }
     }
 
@@ -98,14 +95,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async sendRoomName(socket: Socket, data: {roomName: string, mode: string}) {
         this.roomName = data.roomName;
         socket.join(this.roomName);
-        if (data.mode) {
-            // this.game = this.games.get(this.chooseRandomName());
-            // this.gameNames = this.gameService.gamesNames;
-            // this.games = this.gameService.getGames();
-            // this.game = this.games.get(this.chooseRandomName());
+        if (data.mode) { // the difference for the other player is not set initially
             socket.to(this.roomName).emit('getRandomGame', this.game);
             socket.to(this.roomName).emit('nbrDifference', this.games.size);
-            this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
             // this.server.to(this.roomName).emit('getRandomGame', this.game);
             // this.server.to(this.roomName).emit('nbrDifference', this.games.size);
             if (!this.serverTime.timers[this.roomName]) {

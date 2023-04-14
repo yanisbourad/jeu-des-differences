@@ -186,11 +186,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.subscribeToGameStatus();
         this.subscribeToTimeLimit();
         this.subscribeToDifference();
-        // window.addEventListener('beforeunload', () => {
-        //     if (this.gameService.gameType === 'double') {
-        //         localStorage.setItem('reload', 'true'); // still not working properly
-        //     }
-        // });
     }
 
     subscribeToTimeLimit(): void {

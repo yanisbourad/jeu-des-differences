@@ -30,8 +30,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     ) {}
 
     @SubscribeMessage(ChatEvents.Connect)
-    connect(_: Socket, message: string) {
-        this.server.emit(ChatEvents.Message, `Message reçu : ${message}`);
+    connect(_: Socket) {
         this.logger.log('connection au socket');
     }
 
@@ -84,12 +83,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.isPlaying.set(this.roomName, true);
             this.gameNames = this.gameService.gamesNames;
             this.games = this.gameService.getGames();
-            this.game = this.games.get(this.chooseRandomName()); // i want both of them to have the same game
+            this.game = this.games.get(this.chooseRandomName());
             this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(this.game.listDifferences));
         }
     }
-
-
 
     @SubscribeMessage(ChatEvents.SendRoomName)
     async sendRoomName(socket: Socket, data: {roomName: string, mode: string}) {
@@ -128,7 +125,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.isMulti = true;
             this.gameName = player.gameName;
         }
-        this.logger.debug('multi')
     }
 
     @SubscribeMessage(ChatEvents.Message)
@@ -176,12 +172,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
-        // this.serverTime.stopChronometer(roomName);
         this.serverTime.removeTimer(roomName)
         this.isPlaying.set(roomName, false);
         this.isTimeLimit = false; // not sure
-        // socket.to(roomName).socketsLeave(roomName);
-        socket.disconnect();// should i remove this ??
+        socket.disconnect();
     }
 
     @SubscribeMessage(ChatEvents.SendGiveUp)

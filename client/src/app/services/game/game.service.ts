@@ -194,18 +194,18 @@ export class GameService {
     }
 
     handleSoloDifference(): void {
-        if (this.totalDifferenceReached() && !this.mode) {
+        if (this.nDifferencesFound === this.totalDifferences && !this.mode) {
             this.endGame();
         }
     }
 
-    totalDifferenceReached(): boolean {
-        return this.nDifferencesFound === this.totalDifferences;
-    }
+    // totalDifferenceReached(): boolean {
+    //     return this.nDifferencesFound === this.totalDifferences;
+    // }
 
     handleDisconnect(): void {
         if (!this.socket.isPlaying && this.gameType === 'double') {
-            this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
+            this.displayGameEnded("vous avez été déconnecté du jeu, vous allez être redirigé vers la page d'accueil", 'finished');
             this.hasAbandonedGame = true;
         }
     }
@@ -230,7 +230,38 @@ export class GameService {
         return this.gameHelper.sendErrorMessage();
     }
 
-    endGame(): void {
+    deleteGame(gameName: string): Observable<HttpResponse<string>> {
+        this.gameCardHandlerService.handleDelete(gameName);
+        return this.gameDataBase.deleteGame(gameName);
+    }
+
+    startPenaltyTimer(): void {
+        this.errorPenalty = true;
+        setTimeout(() => {
+            this.errorPenalty = false;
+        }, constantsTime.BLINKING_TIME);
+    }
+
+    giveUp(): void {
+        this.hasAbandonedGame = true;
+        this.saveGameRecord();
+        this.gameHelper.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
+    }
+
+    deleteOneGameRecords(gameName: string): Observable<Rankings> {
+        return this.gameDataBase.deleteOneGameRecords(gameName);
+    }
+
+    mouseHitDetect(event: MouseEvent): void {
+        const roomName = this.gameId + this.gameName;
+        if (event.button === MouseButton.Left && !this.errorPenalty) {
+            this.mousePosition = { x: event.offsetX, y: event.offsetY };
+            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
+            this.socket.sendMousePosition(distMousePosition, roomName, this.mode);
+        }
+    }
+
+    private endGame(): void {
         this.socket.stopTimer(this.socket.getRoomName(), this.playerName);
         this.gameTime = this.socket.getRoomTime(this.socket.getRoomName());
         this.saveGameRecord();
@@ -244,7 +275,7 @@ export class GameService {
         this.reinitializeGame();
     }
 
-    saveGameRecord(): void {
+    private saveGameRecord(): void {
         const gameRecord: GameRecord = {
             gameName: this.gameInformation.gameTitle,
             typeGame: this.gameType === 'double' ? 'multi' : 'solo',
@@ -268,34 +299,4 @@ export class GameService {
         }
     }
 
-    deleteGame(gameName: string): Observable<HttpResponse<string>> {
-        this.gameCardHandlerService.handleDelete(gameName);
-        return this.gameDataBase.deleteGame(gameName);
-    }
-
-    mouseHitDetect(event: MouseEvent): void {
-        const roomName = this.gameId + this.gameName;
-        if (event.button === MouseButton.Left && !this.errorPenalty) {
-            this.mousePosition = { x: event.offsetX, y: event.offsetY };
-            const distMousePosition: number = this.mousePosition.x + this.mousePosition.y * this.width;
-            this.socket.sendMousePosition(distMousePosition, roomName, this.mode);
-        }
-    }
-
-    startPenaltyTimer(): void {
-        this.errorPenalty = true;
-        setTimeout(() => {
-            this.errorPenalty = false;
-        }, constantsTime.BLINKING_TIME);
-    }
-
-    giveUp(): void {
-        this.hasAbandonedGame = true;
-        this.saveGameRecord();
-        this.gameHelper.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
-    }
-
-    deleteOneGameRecords(gameName: string): Observable<Rankings> {
-        return this.gameDataBase.deleteOneGameRecords(gameName);
-    }
 }

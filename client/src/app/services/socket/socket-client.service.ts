@@ -126,7 +126,6 @@ export class SocketClientService {
         this.socketClient.on('diffFound', (diff: Set<number>) => {
             const data = new Set<number>(diff);
             this.difference.next(data);
-            console.log(data);
         });
 
         this.socketClient.on('findDifference-return', (data: { playerName: string }) => {
@@ -201,6 +200,7 @@ export class SocketClientService {
         this.disconnect();
         this.socketClient.send('leaveRoom');
     }
+
     joinRoomSolo(playerName: string, gameName: string) {
         this.socketClient.send('joinRoomSolo', { playerName, gameName });
     }
@@ -232,10 +232,6 @@ export class SocketClientService {
     sendDifference(diff: Set<number>, roomName: string) {
         this.socketClient.send('feedbackDifference', [Array.from(diff), roomName]);
     }
-
-    // sendGameName(gameName: string) {
-    //     this.socketClient.send('currentGameName', gameName);
-    // }
 
     sendMousePosition(pos: number, roomName: string, mode: string) {
         this.socketClient.send('mousePosition', [pos, roomName, mode]);

@@ -145,7 +145,7 @@ export class GameService {
     }
 
     displayGameEnded(msg: string, type: string, time?: string) {
-        this.gameHelper.displayGameEnded(msg, type, time);
+        this.gameHelper.displayGameEnded({ msg, type, time, mode: this.mode });
     }
 
     setStartDate(date: string): void {

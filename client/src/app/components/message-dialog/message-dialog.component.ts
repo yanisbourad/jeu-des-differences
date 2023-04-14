@@ -20,7 +20,8 @@ export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
     // eslint-disable-next-line max-params
     constructor(
-        @Inject(MAT_DIALOG_DATA) public data: { name: string; gameName: string; message: string; gameType: string; formatTime: string; type: string },
+        @Inject(MAT_DIALOG_DATA)
+        public data: { name: string; gameName: string; message: string; gameType: string; formatTime: string; type: string; mode?: string },
         private router: Router,
         readonly socket: SocketClientService,
         readonly gameService: GameService,

@@ -31,9 +31,9 @@ export class GameHelperService {
         return `${minutes}:${seconds < constantsTime.UNIT ? '0' : ''}${seconds}`;
     }
 
-    displayGameEnded(msg: string, type: string, time?: string) {
+    displayGameEnded(data: { msg: string; type: string; time?: string; mode?: string }) {
         this.dialog.open(MessageDialogComponent, {
-            data: { message: msg, type, formatTime: time },
+            data: { message: data.msg, type: data.type, formatTime: data.time, mode: data.mode },
             disableClose: true,
             minWidth: 'fit-content',
             minHeight: 'fit-content',

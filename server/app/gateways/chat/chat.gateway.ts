@@ -95,11 +95,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async sendRoomName(socket: Socket, data: {roomName: string, mode: string}) {
         this.roomName = data.roomName;
         socket.join(this.roomName);
-        if (data.mode) { // the difference for the other player is not set initially
+        if (data.mode) { 
             socket.to(this.roomName).emit('getRandomGame', this.game);
             socket.to(this.roomName).emit('nbrDifference', this.games.size);
-            // this.server.to(this.roomName).emit('getRandomGame', this.game);
-            // this.server.to(this.roomName).emit('nbrDifference', this.games.size);
             if (!this.serverTime.timers[this.roomName]) {
                 this.serverTime.startCountDown(this.roomName);
             }
@@ -113,15 +111,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         this.isPlaying.set(this.roomName, true);
         socket.emit('sendRoomName', ['multi', this.roomName]);
-        // const game = this.gameService.getGame(this.gameName);
-        // this.roomName = data[0];
-        // if (!data[1]) this.unfoundedDifference.set(this.roomName, this.gameService.getSetDifference(game.listDifferences));
-        // this.isPlaying.set(this.roomName, true);
-        // socket.emit('sendRoomName', ['multi', this.roomName]);
-        // socket.join(this.roomName);
-        // if (!this.serverTime.timers[this.roomName] && !data[1]) {
-        //     this.serverTime.startChronometer(this.roomName);
-        // }
     }
 
     @SubscribeMessage(ChatEvents.StartMultiGame)
@@ -164,20 +153,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.MousePosition)
     async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
-        if (!this.isMulti) {
-            this.roomName = socket.id;
-        } else {
-            this.roomName = data[1];
-        }
+        this.roomName = this.isMulti? data[1]: socket.id;
         const diff = this.unfoundedDifference.get(this.roomName).find((set) => set.has(data[0]));
-        if (diff) {
+        if (!diff) {
+            socket.emit('error');
+            return;
+        } else {
             if (data[2] === 'tempsLimite') {
                 this.goToNextGame();
                 this.serverTime.incrementTime();
             }
             socket.emit('diffFound', Array.from(diff));
-        } else {
-            socket.emit('error');
         }
         const sets = this.unfoundedDifference.get(this.roomName);
         if (sets) {
@@ -190,12 +176,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.GameEnded)
     async gameEnded(socket: Socket, roomName: string) {
-        this.logger.debug('gameEnded')
-        this.serverTime.stopChronometer(roomName);
+        // this.serverTime.stopChronometer(roomName);
         this.serverTime.removeTimer(roomName)
         this.isPlaying.set(roomName, false);
-        this.isTimeLimit = false;
-        socket.to(roomName).socketsLeave(roomName);
+        this.isTimeLimit = false; // not sure
+        // socket.to(roomName).socketsLeave(roomName);
         socket.disconnect();// should i remove this ??
     }
 
@@ -207,7 +192,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.LeaveRoom)
     async leaveRoom(socket: Socket) {
-        this.logger.debug('leaveroom')
         socket.to(this.roomName).socketsLeave(this.roomName);
         this.isPlaying.delete(socket.id);
         socket.disconnect();
@@ -215,7 +199,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.StopTimer)
     async stopTimer(socket: Socket, data: [string, string]) {
-        this.logger.debug('stoptimer')
         socket.to(data[0]).emit('gameEnded', [true, data[1]]);
         // this.isMulti = false;
         this.serverTime.stopChronometer(data[0]);
@@ -287,9 +270,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private goToNextGame(): void {
         if (this.gameNames.length === 1) {
-            // this.serverTime.removeTimer(this.roomName);
             this.server.to(this.roomName).emit('timeLimitStatus', true);
-            this.logger.debug('ici here1');
             return;
         }
         this.gameNames = this.gameNames.filter((name) => name !== this.game.gameName);

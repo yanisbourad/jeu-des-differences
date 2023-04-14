@@ -97,7 +97,6 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
         }
         this.limitedTimeGame = this.gameCardHandlerService.getLimitedTimeGameName();
         if (this.limitedTimeGame) {
-            console.log('limitedTimeGame', this.limitedTimeGame);
             this.dialogReff.close();
             this.gameCardHandlerService.resetGameVariables();
             this.gameCardHandlerService.setNewUpdate(false);

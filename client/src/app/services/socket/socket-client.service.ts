@@ -20,6 +20,7 @@ export class SocketClientService {
     diffLeft: number;
     elapsedTimes: Map<string, number> = new Map<string, number>();
     messageList: { message: string; playerName: string; mine: boolean; color: string; pos: string; event: boolean }[] = [];
+    isPlaying: boolean = false;
     // DEFINE SUBJECTS
     private gameState = new Subject<boolean>();
     private playerFoundDiff = new Subject<string>();

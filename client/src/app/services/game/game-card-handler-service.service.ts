@@ -200,6 +200,7 @@ export class GameCardHandlerService {
                 mode: gamersIdentifier.mode,
             },
         ]);
+        this.socketClientService.isPlaying = true;
     }
 
     redirectToHomePage(): void {

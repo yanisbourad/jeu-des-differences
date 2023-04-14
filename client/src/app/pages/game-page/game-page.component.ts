@@ -73,13 +73,12 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         // needed for the rewind
         this.getRouterParams();
-        // if (this.gameService.mode !== 'tempsLimite')
         this.gameService.setStartDate(new Date().toLocaleString());
-        if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double'){
+        if (this.gameService.mode === 'tempsLimite' && this.gameService.gameType === 'double') {
             this.socket.connect();
         }
         this.gameRecordService.page = this;
-        // this.gameService.handleDisconnect(); // doesn't work properly
+        this.gameService.handleDisconnect(); // doesn't work properly
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
             this.loadImages(this.socket.game);
@@ -126,7 +125,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 if (!this.gameService.mode) this.socket.joinRoomSolo(this.gameService.playerName, this.gameService.gameName);
                 break;
             case 'double':
-                // this.socket.sendGameName(this.gameService.gameName);
                 this.socket.sendRoomName(roomName, this.gameService.mode);
                 break;
             default:
@@ -198,7 +196,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     subscribeToTimeLimit(): void {
         this.timeLimitStatusSubscription = this.socket.timeLimitStatus$.subscribe((newValue) => {
             if (newValue) {
-                this.gameService.displayGameEnded('Félicitaion, vous avez gagné la partie ', 'finished');
+                this.gameService.displayGameEnded('Félicitation, vous avez gagné la partie ', 'finished');
             } else {
                 this.gameService.displayGameEnded('Vous avez perdu la partie, meilleure chance la prochaine fois', 'finished');
             }

@@ -113,13 +113,11 @@ export class GameService {
     }
 
     initRewind(): void {
-        // this.socket.gameTime = 0;
         this.totalDifferences = this.gameInformation.nDifferences;
         this.differencesArray = new Array(this.totalDifferences);
         this.opponentDifferencesArray = new Array(this.totalDifferences);
         this.displayIcons();
         this.socket.messageList = [];
-        // this.playersName = [this.playerName, this.opponentName];
     }
 
     displayIcons(): void {
@@ -166,6 +164,7 @@ export class GameService {
         this.nDifferencesFound = 0;
         this.socket.messageList = [];
         this.mode = '';
+        this.socket.isPlaying = false;
     }
 
     reduceNbrDifferences(): void {
@@ -205,7 +204,7 @@ export class GameService {
     }
 
     handleDisconnect(): void {
-        if (!this.socket.getRoomName() && this.gameType === 'double') {
+        if (!this.socket.isPlaying && this.gameType === 'double') {
             this.displayGameEnded('Vous avez perdu la partie, vous avez été déconnecté du jeu', 'finished');
             this.hasAbandonedGame = true;
         }

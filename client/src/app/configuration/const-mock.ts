@@ -27,6 +27,7 @@ export const MOCK_GAME_RECORDS = [
         gameType: 'multi',
         playerName: 'joueur 1',
         opponentName: 'joueur 2',
+        hasAbandonedGame: false,
     },
     {
         gameName: 'difference EE',
@@ -35,5 +36,6 @@ export const MOCK_GAME_RECORDS = [
         gameType: 'multi',
         playerName: 'joueur 1',
         opponentName: 'joueur 2',
+        hasAbandonedGame: true,
     },
 ];

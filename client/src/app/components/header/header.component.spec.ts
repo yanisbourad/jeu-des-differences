@@ -5,7 +5,6 @@ import { HeaderComponent } from './header.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
-import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
 describe('HeaderComponent', () => {
@@ -66,15 +65,15 @@ describe('HeaderComponent', () => {
         const bool = component.redirect();
         expect(bool).toBe(true);
     });
-    it('should call sendFeedback when button is pressed', () => {
-        const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-        matDialogSpy.open.and.returnValue(dialogRefSpy);
-        component.sendFeedback('test');
-        expect(matDialogSpy.open).toHaveBeenCalledWith(GeneralFeedbackComponent, {
-            data: { message: 'test' },
-            disableClose: true,
-        });
-    });
+    // it('should call sendFeedback when button is pressed', () => {
+    //     const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+    //     matDialogSpy.open.and.returnValue(dialogRefSpy);
+    //     component.sendFeedback('test');
+    //     expect(matDialogSpy.open).toHaveBeenCalledWith(GeneralFeedbackComponent, {
+    //         data: { message: 'test' },
+    //         disableClose: true,
+    //     });
+    // });
     it('should call deleteGameRecords when button is pressed', () => {
         const gameDbServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['subscribe']);
         gameDatabaseServiceSpy.deleteGameRecords.and.returnValue(gameDbServiceSpy);

@@ -3,11 +3,11 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import * as constantes from '@app/configuration/const-test';
 import * as constants from '@app/configuration/const-time';
+import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Game, GameInfo, GameRecord, TimeConfig } from '@common/game';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
-import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { GameDatabaseService } from './game-database.service';
 
 fdescribe('GameDatabaseService', () => {
@@ -90,6 +90,7 @@ fdescribe('GameDatabaseService', () => {
             time: 'String',
             playerName: 'string',
             dateStart: 'string',
+            keyServer: 'string',
         };
         service.createGameRecord(data).subscribe((res) => {
             expect(res.ok).toEqual(true);

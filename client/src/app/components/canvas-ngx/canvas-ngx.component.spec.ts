@@ -1,6 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ERASER, PEN, RECTANGLE } from '@app/configuration/const-styler-type';
-import { BitmapService } from '@app/services/bitmap.service';
+import { BitmapService } from '@app/services/bitmap/bitmap.service';
 import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
 import { CommandService } from '@app/services/command/command.service';
 import { DrawService } from '@app/services/draw/draw.service';

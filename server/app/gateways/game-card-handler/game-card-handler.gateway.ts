@@ -104,6 +104,13 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('cancelGame')
     cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
+        const player = this.gameCardHandlerService.getPlayer(client.id);
+        if (player.gameType === 'limit') {
+            const deletedPlayer = this.gameCardHandlerService.handleLimitedTimeCancel(client.id);
+            this.logger.log(`The limited time creator ${deletedPlayer.id} left the game queue`);
+            this.server.to(client.id).emit('feedBackOnLeave');
+            return;
+        }
         const totalRequest = this.gameCardHandlerService.getTotalRequest(gameName);
         // if there is only one player in the queue
         if (totalRequest === ONLY_CREATOR) {

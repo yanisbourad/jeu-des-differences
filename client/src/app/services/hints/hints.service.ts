@@ -24,7 +24,7 @@ export interface Quadrant {
 })
 export class HintsService {
     blinking: ReturnType<typeof setTimeout>;
-    isCheating: boolean = false;
+    isHintsActive: boolean = false;
     canvas0: ElementRef<HTMLCanvasElement>;
     canvas1: ElementRef<HTMLCanvasElement>;
     unfoundedDifference: Set<number>[];
@@ -66,7 +66,7 @@ export class HintsService {
     ) {}
 
     hintsKeyBinding(): void {
-        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.toggleCheating.bind(this));
+        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -117,21 +117,20 @@ export class HintsService {
         const h = quadrant.h;
 
         if (isLastHint) {
-            console.log(screen.width, screen.height);
             confetti({
                 particleCount: 50,
                 spread: 60,
                 origin: {
-                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x) / screen.width,
-                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y) / screen.height,
+                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
                 },
             });
             confetti({
                 particleCount: 50,
                 spread: 60,
                 origin: {
-                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x) / screen.width,
-                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y) / screen.height,
+                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
                 },
             });
         } else {
@@ -222,16 +221,16 @@ export class HintsService {
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, diff));
     }
 
-    toggleCheating(): void {
+    activateHints(): void {
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
-        this.isCheating = !this.isCheating;
-        if (this.isCheating) {
+        this.isHintsActive = !this.isHintsActive;
+        if (this.isHintsActive) {
             new StartHintsRecord().record(this.gameRecorderService);
-            this.isCheating = !this.isCheating;
+            this.isHintsActive = !this.isHintsActive;
         } else {
             new StopHintsRecord().record(this.gameRecorderService);
-            this.isCheating = !this.isCheating;
+            this.isHintsActive = !this.isHintsActive;
         }
     }
 
@@ -260,7 +259,7 @@ export class HintsService {
 
     resetService(): void {
         this.count = 3;
-        this.isCheating = false;
+        this.isHintsActive = false;
         clearInterval(this.blinking);
         this.unfoundedDifference = new Array();
     }

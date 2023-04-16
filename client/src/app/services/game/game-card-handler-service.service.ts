@@ -200,6 +200,7 @@ export class GameCardHandlerService {
                 mode: gamersIdentifier.mode,
             },
         ]);
+        // used later on to handle the disconnection of a player
         this.socketClientService.isPlaying = true;
     }
 

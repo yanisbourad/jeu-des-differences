@@ -10,7 +10,7 @@ import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GameDatabaseService } from './game-database.service';
 
-fdescribe('GameDatabaseService', () => {
+describe('GameDatabaseService', () => {
     let service: GameDatabaseService;
     let httpTestingController: HttpTestingController;
     let canvasHolderService: CanvasHolderService;

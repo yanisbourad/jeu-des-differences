@@ -10,6 +10,8 @@ import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
 
+import confetti from 'canvas-confetti';
+
 export interface Quadrant {
     x: number;
     y: number;
@@ -113,6 +115,7 @@ export class HintsService {
         const y = quadrant.y;
         const w = quadrant.w;
         const h = quadrant.h;
+
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;
         this.canvas0.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
@@ -120,57 +123,37 @@ export class HintsService {
         this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;
         this.canvas1.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
 
-        // const ctx = this.canvas0.nativeElement.getContext('2d');
+        console.log(this.canvas0.nativeElement.getBoundingClientRect().x);
+        console.log(x);
+        console.log(this.canvas0.nativeElement.getBoundingClientRect().y);
+        console.log(y);
 
-        // // Draw the white background
-        // ctx!.fillStyle = 'white';
-        // ctx!.fillRect(0, 0, constantsCanvas.DEFAULT_WIDTH, constantsCanvas.DEFAULT_HEIGHT);
+        // confetti({
+        //     particleCount: 50,
+        //     spread: 40,
+        //     origin: {
+        //         x: this.canvas0.nativeElement.getBoundingClientRect().x / 1920 + x / 640,
+        //         y: this.canvas0.nativeElement.getBoundingClientRect().y / 1080 + y / 480,
+        //     },
+        // });
 
-        // // Draw the iris (a blue circle)
-        // ctx!.fillStyle = 'blue';
-        // ctx!.beginPath();
-        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 5, 0, 2 * Math.PI);
-        // ctx!.fill();
+        confetti({
+            particleCount: 75,
+            spread: 60,
+            origin: {
+                x: (this.canvas0.nativeElement.getBoundingClientRect().left + x) / 1920,
+                y: (this.canvas0.nativeElement.getBoundingClientRect().top + y) / 1080,
+            },
+        });
 
-        // // Draw the pupil (a black circle)
-        // ctx!.fillStyle = 'black';
-        // ctx!.beginPath();
-        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 10, 0, 2 * Math.PI);
-        // ctx!.fill();
-
-        // // Draw the highlight (a white circle)
-        // ctx!.fillStyle = 'white';
-        // ctx!.beginPath();
-        // ctx!.arc(
-        //     constantsCanvas.DEFAULT_WIDTH / 2 + constantsCanvas.DEFAULT_WIDTH / 20,
-        //     constantsCanvas.DEFAULT_HEIGHT / 2 - constantsCanvas.DEFAULT_WIDTH / 10,
-        //     constantsCanvas.DEFAULT_WIDTH / 25,
-        //     0,
-        //     2 * Math.PI,
-        // );
-        // ctx!.fill();
-
-        // // Draw the upper eyelid (a curved line)
-        // ctx!.beginPath();
-        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, constantsCanvas.DEFAULT_HEIGHT / 3);
-        // ctx!.quadraticCurveTo(
-        //     constantsCanvas.DEFAULT_WIDTH / 2,
-        //     constantsCanvas.DEFAULT_HEIGHT / 4,
-        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
-        //     constantsCanvas.DEFAULT_HEIGHT / 3,
-        // );
-        // ctx!.stroke();
-
-        // // Draw the lower eyelid (a curved line)
-        // ctx!.beginPath();
-        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, (constantsCanvas.DEFAULT_HEIGHT * 2) / 3);
-        // ctx!.quadraticCurveTo(
-        //     constantsCanvas.DEFAULT_WIDTH / 2,
-        //     (constantsCanvas.DEFAULT_HEIGHT * 3) / 4,
-        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
-        //     (constantsCanvas.DEFAULT_HEIGHT * 2) / 3,
-        // );
-        // ctx!.stroke();
+        confetti({
+            particleCount: 75,
+            spread: 60,
+            origin: {
+                x: (this.canvas1.nativeElement.getBoundingClientRect().left + x) / 1920,
+                y: (this.canvas1.nativeElement.getBoundingClientRect().top + y) / 1080,
+            },
+        });
     }
 
     findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isAllQuadrant: boolean): void {
@@ -244,7 +227,7 @@ export class HintsService {
                 break;
             }
             case 1: {
-                this.findInnerQuadrant(true);
+                this.findInnerQuadrant(false);
                 this.count--;
                 break;
             }

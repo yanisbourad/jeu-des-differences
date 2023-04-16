@@ -173,16 +173,8 @@ export class GameService {
     }
 
     handleDifferenceFound(): void {
-        switch (this.gameType) {
-            case 'solo':
-                this.handleSoloDifference();
-                break;
-            case 'double':
-                this.handleMultiDifference();
-                break;
-            default:
-                break;
-        }
+        if (this.gameType === 'solo') this.handleSoloDifference();
+        if (this.gameType === 'double') this.handleMultiDifference();
     }
 
     handleMultiDifference(): void {
@@ -193,14 +185,14 @@ export class GameService {
     }
 
     handleSoloDifference(): void {
-        if (this.nDifferencesFound === this.totalDifferences && !this.mode) {
+        if (this.soloEndConditionReached()) {
             this.endGame();
         }
     }
 
-    // totalDifferenceReached(): boolean {
-    //     return this.nDifferencesFound === this.totalDifferences;
-    // }
+    soloEndConditionReached(): boolean {
+        return this.nDifferencesFound === this.totalDifferences && !this.mode;
+    }
 
     handleDisconnect(): void {
         if (!this.socket.isPlaying && this.gameType === 'double') {

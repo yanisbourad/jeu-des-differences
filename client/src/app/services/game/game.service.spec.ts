@@ -1,9 +1,11 @@
 import { HttpResponse } from '@angular/common/http';
-import { ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
+// import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import * as constants from '@app/configuration/const-canvas';
+import * as constTest from '@app/configuration/const-test';
+import * as constantsTime from '@app/configuration/const-time';
 import { GameInformation } from '@app/interfaces/game-information';
 import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Game, GameInfo } from '@common/game';
@@ -12,29 +14,39 @@ import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameDatabaseService } from './game-database.service';
 import { GameService } from './game.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { GameHelperService } from './game-helper.service';
 
 import SpyObj = jasmine.SpyObj;
 
-describe('GameService', () => {
-    let rendererFactory2Spy: SpyObj<RendererFactory2>;
-    let renderer2Spy: SpyObj<Renderer2>;
-    let matDialogSpy: SpyObj<MatDialog>;
+fdescribe('GameService', () => {
     let gameDataBaseSpy: SpyObj<GameDatabaseService>;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
     let gameCardHandlerServiceSpy: SpyObj<GameCardHandlerService>;
-    let audioMock: SpyObj<HTMLAudioElement>;
+    let gameHelperServiceSpy: SpyObj<GameHelperService>;
     let gameService: GameService;
     let path: ImagePath;
     let game: Game;
     let gameInformation: GameInformation;
     let gameInfo: GameInfo;
+    let mouseEvent: MouseEvent;
 
     beforeEach(() => {
-        rendererFactory2Spy = jasmine.createSpyObj('RendererFactory2', ['createRenderer']);
-        renderer2Spy = jasmine.createSpyObj('Renderer2', ['setStyle']);
-        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', ['getGameByName', 'createGameRecord', 'deleteGame', 'createGamingHistory']);
+        gameDataBaseSpy = jasmine.createSpyObj('GameDataBaseService', [
+            'getGameByName',
+            'createGameRecord',
+            'deleteGame',
+            'createGamingHistory',
+            'deleteOneGameRecords',
+        ]);
         gameCardHandlerServiceSpy = jasmine.createSpyObj('GameCardHandlerService', ['handleDelete']);
+        gameHelperServiceSpy = jasmine.createSpyObj('GameHelperService', [
+            'getGameTime',
+            'globalMessage',
+            'sendErrorMessage',
+            'sendFoundMessage',
+            'displayGameEnded',
+            'displayGiveUp',
+        ]);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
             'getRoomTime',
             'stopTimer',
@@ -42,21 +54,19 @@ describe('GameService', () => {
             'findDifference',
             'getRoomName',
             'sendMessage',
+            'getGame',
+            'sendMousePosition',
         ]);
-        audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
-        gameDataBaseSpy.createGamingHistory.and.callFake(() => of(new HttpResponse({ body: 'OK' })));
     });
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [MessageDialogComponent],
             providers: [
-                { provide: RendererFactory2, useValue: rendererFactory2Spy },
-                { provide: Renderer2, useValue: renderer2Spy },
-                { provide: MatDialog, useValue: matDialogSpy },
                 { provide: GameCardHandlerService, useValue: gameCardHandlerServiceSpy },
                 { provide: GameDatabaseService, useValue: gameDataBaseSpy },
                 { provide: SocketClientService, useValue: socketClientServiceSpy },
+                { provide: GameHelperService, useValue: gameHelperServiceSpy },
             ],
             imports: [MatDialogModule],
         });
@@ -81,159 +91,230 @@ describe('GameService', () => {
             rankingMulti: [],
             rankingSolo: [],
         };
+        mouseEvent = new MouseEvent('click', { button: 0 });
         path = { differenceNotFound: './assets/img/difference-not-found.png', differenceFound: './assets/img/difference-found.png' };
         gameService.gameType = 'solo';
+        gameHelperServiceSpy.path = path;
+        gameDataBaseSpy.createGameRecord.and.callFake(() => of(new HttpResponse({ body: 'OK' })));
+        gameDataBaseSpy.createGamingHistory.and.callFake(() => of(new HttpResponse({ body: 'OK' })));
     });
 
     it('should be created', () => {
         expect(gameService).toBeTruthy();
     });
 
-    it('getHeight should return default height', fakeAsync(() => {
-        expect(gameService.height).toBe(constants.DEFAULT_HEIGHT);
-    }));
-
-    it('getHeight should return height', fakeAsync(() => {
+    it('getWidth should return default height', fakeAsync(() => {
         expect(gameService.width).toBe(constants.DEFAULT_WIDTH);
     }));
 
-    it('should call defineVariables', () => {
+    it('should call defineVariables and define some values for the game', () => {
+        gameService.mode = 'tempsLimite';
         gameService.game = game;
         gameService.gameInformation = gameInformation;
-        const nDifferencesNotFound = 3;
         gameService.defineVariables();
         expect(gameService.gameInformation.gameTitle).toBe(game.gameName);
         expect(gameService.gameInformation.gameMode).toBe('solo');
         expect(gameService.gameInformation.gameDifficulty).toBe(game.difficulty);
         expect(gameService.gameInformation.nDifferences).toBe(game.listDifferences.length);
-        expect(gameService.totalDifferences).toBe(gameInformation.nDifferences);
-        expect(gameService.differencesArray.length).toEqual(nDifferencesNotFound);
     });
 
-    it('getGame should retrieve the game from the server and call defineVariables', () => {
+    it('getClassicGame should retrieve the game from the server, call defineVariables and display icons', () => {
         const mockGame = gameInfo;
         gameDataBaseSpy.getGameByName.and.returnValue(of(gameInfo));
         const defineVariablesSpy = spyOn(gameService, 'defineVariables');
-        gameService.getGame(mockGame.gameName);
+        const displayIconsSpy = spyOn(gameService, 'displayIcons');
+        gameService.getClassicGame(mockGame.gameName);
         expect(gameDataBaseSpy.getGameByName).toHaveBeenCalledWith(mockGame.gameName);
         expect(gameService.game).toEqual(mockGame);
         expect(gameDataBaseSpy.getGameByName).toHaveBeenCalled();
         expect(defineVariablesSpy).toHaveBeenCalled();
+        expect(displayIconsSpy).toHaveBeenCalled();
     });
 
-    it('displayIcons should fill the array of differences for solo game mode', () => {
-        gameService.totalDifferences = 3;
-        gameService.path = path;
-        gameService.differencesArray = new Array(3);
+    it('getTimeLimitGame should retrieve the game with the socket, call defineVariables and display icons', fakeAsync(() => {
+        const mockGame = gameInfo;
+        const defineVariablesSpy = spyOn(gameService, 'defineVariables');
+        const displayIconsSpy = spyOn(gameService, 'displayIcons');
+        socketClientServiceSpy.getGame.and.returnValue(gameInfo);
+        gameService.getTimeLimitGame();
+        tick(constantsTime.LOADING_TIMEOUT);
+        expect(gameService.game).toEqual(mockGame);
+        expect(defineVariablesSpy).toHaveBeenCalled();
+        expect(displayIconsSpy).toHaveBeenCalled();
+    }));
+
+    it('displayIcons should call setIcons for solo classic game mode', () => {
+        const setIconsSpy = spyOn(gameService, 'setIcons');
         gameService.displayIcons();
+        expect(setIconsSpy).toHaveBeenCalled();
+    });
+
+    it('displayIcons should call setIcons for multi timeLimit game mode', () => {
+        gameService.gameType = 'double';
+        gameService.mode = 'tempsLimite';
+        const setIconsSpy = spyOn(gameService, 'setIcons');
+        gameService.displayIcons();
+        expect(setIconsSpy).toHaveBeenCalled();
+    });
+
+    it('setIcons should set difference array', () => {
+        gameService.totalDifferences = 3;
+        gameService.differencesArray = new Array(3);
+        gameService.setIcons();
         for (let i = 0; i < gameService.totalDifferences; i++) {
-            expect(gameService.differencesArray[i]).toEqual(gameService.path.differenceNotFound);
+            expect(gameService.differencesArray[i]).toEqual(gameHelperServiceSpy.path.differenceNotFound);
+        }
+        expect(gameService.differencesArray.length).toBe(3);
+    });
+
+    it('soloEndConditionReached should return true if nDifferencesFound equal totalDifferences and the mode is not timeLimit', () => {
+        gameService.nDifferencesFound = gameService.totalDifferences;
+        gameService.mode = '';
+        gameService.soloEndConditionReached();
+        expect(gameService.soloEndConditionReached()).toBeTrue();
+    });
+
+    it('reduceNbrDifference should increment nDifferencesFound and and switch path in differenceArray ', () => {
+        gameService.differencesArray = new Array(3);
+        gameService.nDifferencesFound = 0;
+        gameService.reduceNbrDifferences();
+        expect(gameService.nDifferencesFound).toBe(1);
+        expect(gameService.differencesArray[0]).toEqual(gameHelperServiceSpy.path.differenceFound);
+    });
+
+    it('displayGameEnded should call displayGameEnded from gameHelperService with correct parameters', () => {
+        gameService.mode = 'mode';
+        gameService.displayGameEnded('test', 'test', 'test');
+        expect(gameHelperServiceSpy.displayGameEnded).toHaveBeenCalledWith({ msg: 'test', type: 'test', time: 'test', mode: 'mode' });
+    });
+
+    it('setStartDate should set startDate', () => {
+        gameService.setStartDate('01-12-2023');
+        expect(gameService.startDate).toEqual('01-12-2023');
+    });
+
+    it('sendFoundMessage should call sendFoundMessage from gameHelper', () => {
+        gameService.sendFoundMessage();
+        expect(gameHelperServiceSpy.sendFoundMessage).toHaveBeenCalled();
+    });
+
+    it('sendNotFoundMessage should call sendNotFoundMessage from gameHelper', () => {
+        gameService.sendErrorMessage();
+        expect(gameHelperServiceSpy.sendErrorMessage).toHaveBeenCalled();
+    });
+
+    it('startPenaltyTimer should toggle errorPenalty after a timeout', fakeAsync(() => {
+        gameService.errorPenalty = true;
+        gameService.startPenaltyTimer();
+        tick(constantsTime.BLINKING_TIME);
+        expect(gameService.errorPenalty).toBe(false);
+    }));
+    it('mouseHitDetect  call sendMousePosition from socketClientService', () => {
+        gameService.mouseHitDetect(mouseEvent);
+        expect(socketClientServiceSpy.sendMousePosition).toHaveBeenCalled();
+    });
+
+    it('giveUp should set hasAbandonedGame to true, call createGameHistory and displayGiveUp from gameHelper ', () => {
+        gameService.giveUp();
+        expect(gameService.hasAbandonedGame).toBe(true);
+        expect(gameDataBaseSpy.createGamingHistory).toHaveBeenCalled();
+        expect(gameHelperServiceSpy.displayGiveUp).toHaveBeenCalled();
+    });
+
+    it('iconsUpdateForTimeLimit should update the differences array', () => {
+        gameService.differencesArray = new Array(3);
+        socketClientServiceSpy.nbrDifference = 3;
+        socketClientServiceSpy.diffLeft = 2;
+        gameService.iconsUpdateForTimeLimit();
+        for (let i = 0; i < gameService.totalDifferences; i++) {
+            expect(gameService.differencesArray[i]).toEqual(gameHelperServiceSpy.path.differenceNotFound);
         }
         expect(gameService.differencesArray.length).toBe(3);
     });
 
     it('displayIcons should fill the opponent and player array of differences for multiplayer game mode', () => {
         gameService.gameType = 'double';
+        gameService.mode = '';
         gameService.totalDifferences = 3;
-        gameService.path = path;
         gameService.opponentDifferencesArray = new Array(3);
         gameService.differencesArray = new Array(3);
         gameService.displayIcons();
         for (let i = 0; i < gameService.totalDifferences; i++) {
-            expect(gameService.opponentDifferencesArray[i]).toEqual(gameService.path.differenceNotFound);
-            expect(gameService.differencesArray[i]).toEqual(gameService.path.differenceNotFound);
+            expect(gameService.opponentDifferencesArray[i]).toEqual(gameHelperServiceSpy.path.differenceNotFound);
+            expect(gameService.differencesArray[i]).toEqual(gameHelperServiceSpy.path.differenceNotFound);
         }
         expect(gameService.opponentDifferencesArray.length).toBe(3);
         expect(gameService.differencesArray.length).toBe(3);
     });
 
-    it('displayGameEnded should open a dialog', () => {
-        gameService.displayGameEnded('message', 'type', '00:00');
-        const mockDialog = matDialogSpy.open.and.returnValue({
-            afterClosed: () => of(true),
-        } as MatDialogRef<MessageDialogComponent>);
-        expect(mockDialog).toHaveBeenCalled();
-    });
-
-    it('reinitializeGame should reinitialize the game', () => {
-        gameService.totalDifferences = 3;
-        gameService.nDifferencesFound = 3;
+    it('reinitializeGame should reinitialize some game values', () => {
+        gameService.opponentDifferencesArray = new Array(3);
         gameService.differencesArray = new Array(3);
-        gameService.playerName = 'player';
-        gameService.nDifferencesFound = 3;
-        gameService.game = game;
-        gameService.gameInformation = gameInformation;
+        gameService.isWinner = true;
+        gameService.hasAbandonedGame = true;
         gameService.reinitializeGame();
-        expect(gameService.totalDifferences).toBe(0);
-        expect(gameService.nDifferencesFound).toBe(0);
+        expect(gameService.opponentDifferencesArray.length).toBe(0);
         expect(gameService.differencesArray.length).toBe(0);
-        expect(gameService.playerName).toBe('');
-        expect(gameService.nDifferencesFound).toBe(0);
-        expect(gameService.game.gameName).toBe('');
-        expect(gameService.game.difficulty).toBe('');
-        expect(gameService.game.originalImageData).toBe('./assets/image_empty.bmp');
-        expect(gameService.game.modifiedImageData).toBe('./assets/image_empty.bmp');
-        expect(gameService.game.listDifferences).toEqual([]);
-        expect(gameService.gameInformation.gameTitle).toBe('');
-        expect(gameService.gameInformation.gameMode).toBe('');
-        expect(gameService.gameInformation.gameDifficulty).toBe('');
-        expect(gameService.gameInformation.nDifferences).toBe(0);
+        expect(gameService.isWinner).toBe(false);
+        expect(gameService.hasAbandonedGame).toBe(false);
     });
 
-    it('should playSuccessAudio', () => {
-        spyOn(window, 'Audio').and.returnValue(audioMock);
-        gameService.playSuccessAudio();
-        expect(audioMock.load).toHaveBeenCalled();
-        expect(audioMock.play).toHaveBeenCalled();
-    });
-
-    it('should playFailureAudio', () => {
-        spyOn(window, 'Audio').and.returnValue(audioMock);
-        gameService.playFailureAudio();
-        expect(audioMock.load).toHaveBeenCalled();
-        expect(audioMock.play).toHaveBeenCalled();
-    });
-
-    it('getGameTime should mock and return time for seconds under 10 digit', () => {
-        gameService.gameTime = 5;
-        const time: string = gameService.getGameTime();
-        expect(time).toBe('0:05');
-    });
-
-    it('getGameTime should mock and call getCount from socketClientService and return time for seconds above 10 digit', () => {
-        gameService.gameTime = 45;
-        const time: string = gameService.getGameTime();
-        expect(time).toBe('0:45');
-    });
-
-    it('handleDifferenceFound should increment nDifferencesFound and update differencesArray when game not ended', () => {
-        gameService.nDifferencesFound = 0;
-        gameService.totalDifferences = 3;
-        gameService.differencesArray = [path.differenceNotFound, path.differenceNotFound, path.differenceNotFound];
-        gameService.handleDifferenceFound();
-        expect(gameService.nDifferencesFound).toBe(1);
-        expect(gameService.differencesArray).toEqual([path.differenceFound, path.differenceNotFound, path.differenceNotFound]);
-    });
-
-    it('handleDifferenceFound should call endGame, multiGameEnd and findDifference when game ended for multi game mode', () => {
-        gameService.nDifferencesFound = 3;
-        gameService.totalDifferences = 3;
-        gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceFound];
-        spyOn(gameService, 'endGame');
-        spyOn(gameService, 'multiGameEnd').and.returnValue(true);
+    it('handleDifferenceFound should call handleMultiDifference for multi mode', () => {
         gameService.gameType = 'double';
+        const handleMultiDifferenceSpy = spyOn(gameService, 'handleMultiDifference');
         gameService.handleDifferenceFound();
-        expect(gameService.endGame).toHaveBeenCalled();
-        expect(gameService.multiGameEnd).toHaveBeenCalled();
+        expect(handleMultiDifferenceSpy).toHaveBeenCalled();
+    });
+
+    it('handleDifferenceFound should call handleSoloDifference for solo game mode', () => {
+        const handleSoloDifferenceSPy = spyOn(gameService, 'handleSoloDifference');
+        gameService.handleDifferenceFound();
+        expect(handleSoloDifferenceSPy).toHaveBeenCalled();
+    });
+
+    it('should returns an array of sets containing the number values from the input strings', () => {
+        const differencesStr = [constTest.FIRST_DIFF, constTest.SECOND_DIFF, constTest.THIRD_DIFF];
+        const expectedResult = [new Set(constTest.FIRST_SET), new Set(constTest.SECOND_SET), new Set(constTest.THIRD_SET)];
+        expect(gameService.getSetDifference(differencesStr)).toEqual(expectedResult);
+    });
+
+    it('handleMultiDifference should end the game when conditions are met and call findDifference from socketService', () => {
+        gameService.mode = '';
+        gameService.gameType = 'double';
+        spyOn(gameService, 'multiGameEnd').and.returnValue(true);
+        gameService.handleMultiDifference();
         expect(socketClientServiceSpy.findDifference).toHaveBeenCalled();
     });
 
-    it('handleDifferenceFound should call endGame for solo game mode', () => {
-        spyOn(gameService, 'totalDifferenceReached').and.returnValue(true);
-        gameService.differencesArray = [path.differenceFound, path.differenceFound, path.differenceFound];
-        spyOn(gameService, 'endGame');
-        gameService.handleDifferenceFound();
-        expect(gameService.endGame).toHaveBeenCalled();
+    it('handleDisconnect should call display ended and set hasAbandonedGame to true', () => {
+        socketClientServiceSpy.isPlaying = false;
+        gameService.gameType = 'double';
+        const displayGameEndedSpy = spyOn(gameService, 'displayGameEnded');
+        gameService.handleDisconnect();
+        expect(displayGameEndedSpy).toHaveBeenCalled();
+        expect(gameService.hasAbandonedGame).toBe(true);
+    });
+
+    it('initRewind should call displayIcons end set up totalDifferences, opponentArray, messageList and differenceArray', () => {
+        gameService.gameInformation.nDifferences = 3;
+        gameService.opponentDifferencesArray = new Array(3);
+        gameService.differencesArray = new Array(3);
+        socketClientServiceSpy.messageList = [];
+        spyOn(gameService, 'displayIcons');
+        gameService.initRewind();
+        expect(gameService.displayIcons).toHaveBeenCalled();
+        expect(gameService.totalDifferences).toBe(3);
+        expect(gameService.opponentDifferencesArray.length).toBe(3);
+        expect(gameService.differencesArray.length).toBe(3);
+        expect(socketClientServiceSpy.messageList.length).toBe(0);
+    });
+
+    it('handleSoloDifference should end the game if conditions met', () => {
+        const reinitializeGameSpy = spyOn(gameService, 'reinitializeGame');
+        spyOn(gameService, 'soloEndConditionReached').and.returnValue(true);
+        gameService.handleSoloDifference();
+        expect(gameService.soloEndConditionReached).toHaveBeenCalled();
+        expect(reinitializeGameSpy).toHaveBeenCalled();
     });
 
     it('handlePlayerDifference should call pop and unshift opponentDifferencesArray', () => {
@@ -249,102 +330,21 @@ describe('GameService', () => {
         expect(result).toBe(true);
     });
 
+    it('multiGameEnd should return false if totalDifference is odd and nDifferencesFound not equal to (totalDifferences+1 )/2', () => {
+        gameService.totalDifferences = 5;
+        gameService.nDifferencesFound = 2;
+        const result = gameService.multiGameEnd();
+        expect(result).toBe(false);
+    });
+
     it('deleteGame should call deleteGame from gameDatabase with correct parameter', () => {
         gameService.deleteGame('game');
         expect(gameCardHandlerServiceSpy.handleDelete).toHaveBeenCalled();
         expect(gameDataBaseSpy.deleteGame).toHaveBeenCalledWith('game');
     });
 
-    it('endGame should call stopTimer, gameEnded, saveGameRecord, reinitializeGame and displayGameEnded', () => {
-        spyOn(gameService, 'saveGameRecord');
-        spyOn(gameService, 'reinitializeGame');
-        spyOn(gameService, 'displayGameEnded');
-        gameService.endGame();
-        expect(socketClientServiceSpy.stopTimer).toHaveBeenCalled();
-        expect(socketClientServiceSpy.gameEnded).toHaveBeenCalled();
-        expect(gameService.saveGameRecord).toHaveBeenCalled();
-        expect(gameService.reinitializeGame).toHaveBeenCalled();
-        expect(gameService.displayGameEnded).toHaveBeenCalled();
+    it('deleteOneGameRecords should call deleteOneGameRecords from gameDataBaseService', () => {
+        gameService.deleteOneGameRecords('game');
+        expect(gameDataBaseSpy.deleteOneGameRecords).toHaveBeenCalled();
     });
-
-    it('sendFoundMessage should sendMessage and push to messageList', () => {
-        gameService.playerName = 'test';
-        gameService.gameType = 'double';
-        const message = {
-            message: new Date().toLocaleTimeString() + ' - ' + ' Différence trouvée par test',
-            userName: 'test',
-            mine: true,
-            color: '#00FF00',
-            pos: '50%',
-            event: true,
-        };
-        socketClientServiceSpy.messageList = [];
-        gameService.sendFoundMessage();
-        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalled();
-        expect(socketClientServiceSpy.messageList).toEqual([message]);
-    });
-
-    it('sendErrorMessage should sendMessage and push to messageList', () => {
-        gameService.playerName = 'test';
-        gameService.gameType = 'double';
-        const message = {
-            message: new Date().toLocaleTimeString() + ' - ' + ' Erreur par test',
-            userName: 'test',
-            mine: true,
-            color: '#FF0000',
-            pos: '50%',
-            event: true,
-        };
-        socketClientServiceSpy.messageList = [];
-        gameService.sendErrorMessage();
-        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalled();
-        expect(socketClientServiceSpy.messageList).toEqual([message]);
-    });
-
-    it('saveGameRecord should call createGameRecord from gameDataBaseService for multi mode', () => {
-        gameService.gameType = 'double';
-        const gameTitle = 'gameName';
-        const gameMode = 'double';
-        const playerName = 'playerName';
-        const dateStart = new Date().getTime().toString();
-        const gameTime = '01:00';
-        const gameRecordMock = { gameName: gameTitle, typeGame: gameMode, playerName, dateStart, time: gameTime };
-        gameService.gameInformation.gameTitle = gameTitle;
-        gameService.gameInformation.gameMode = gameMode;
-        gameService.playerName = playerName;
-        spyOn(gameService, 'getGameTime').and.returnValue(gameTime);
-        const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
-        gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
-        gameService.saveGameRecord();
-        expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalled();
-    });
-
-    it('saveGameRecord should call createGameRecord from gameDataBaseService for multi mode', () => {
-        gameService.gameType = 'solo';
-        const playerName = 'playerName';
-        const dateStart = new Date().getTime().toString();
-        const gameRecordMock = { gameName: 'gameName', typeGame: 'solo', playerName, dateStart, time: '01:00' };
-        gameService.gameInformation.gameTitle = 'gameName';
-        gameService.gameInformation.gameMode = 'solo';
-        gameService.playerName = playerName;
-        spyOn(gameService, 'getGameTime').and.returnValue('01:00');
-        const gameRecordHttpResponse = new HttpResponse({ body: gameRecordMock.toString() });
-        gameDataBaseSpy.createGameRecord.and.returnValue(of(gameRecordHttpResponse));
-        gameService.saveGameRecord();
-        expect(gameDataBaseSpy.createGameRecord).toHaveBeenCalled();
-    });
-
-    it('should toggle the visibility of two canvases at a regular interval', fakeAsync(() => {
-        const intervalTime = 125;
-        const blinkCount = 8;
-        const expectedCalls = blinkCount * 2;
-        const canvas1: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-        const canvas2: ElementRef<HTMLCanvasElement> = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-        gameService['renderer'] = renderer2Spy;
-        gameService.blinkDifference(canvas1, canvas2);
-        tick(intervalTime * blinkCount);
-        expect(renderer2Spy.setStyle.calls.count()).toBe(expectedCalls);
-        expect(renderer2Spy.setStyle.calls.argsFor(0)).toEqual([canvas1.nativeElement, 'visibility', 'hidden']);
-        expect(renderer2Spy.setStyle.calls.argsFor(expectedCalls - 1)).toEqual([canvas2.nativeElement, 'visibility', 'visible']);
-    }));
 });

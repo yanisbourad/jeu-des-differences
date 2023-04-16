@@ -117,20 +117,21 @@ export class HintsService {
         const h = quadrant.h;
 
         if (isLastHint) {
+            console.log(screen.width, screen.height);
             confetti({
-                particleCount: 75,
+                particleCount: 50,
                 spread: 60,
                 origin: {
-                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x) / 1920,
-                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y) / 1080,
+                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x) / screen.width,
+                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y) / screen.height,
                 },
             });
             confetti({
-                particleCount: 75,
+                particleCount: 50,
                 spread: 60,
                 origin: {
-                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x) / 1920,
-                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y) / 1080,
+                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x) / screen.width,
+                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y) / screen.height,
                 },
             });
         } else {

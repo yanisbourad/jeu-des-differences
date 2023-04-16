@@ -47,6 +47,10 @@ export class GameService {
         }
     }
 
+    countGames(): number {
+        return this.gamesNames.length;
+    }
+
     async getAllGames(): Promise<GameInfo[]> {
         const it = this.gamesNames.map(async (gameName) => {
             const game = this.getGame(gameName);

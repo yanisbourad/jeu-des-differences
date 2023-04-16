@@ -93,4 +93,8 @@ export class GameDatabaseService {
     getConstants(): Observable<TimeConfig> {
         return this.http.get<TimeConfig>(`${this.baseUrl}/game/constants`);
     }
+
+    getCount(): Observable<number> {
+        return this.http.get<number>(`${this.baseUrl}/game/count`);
+    }
 }

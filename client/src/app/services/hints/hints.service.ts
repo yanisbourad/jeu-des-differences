@@ -10,6 +10,8 @@ import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
 
+import confetti from 'canvas-confetti';
+
 export interface Quadrant {
     x: number;
     y: number;
@@ -22,7 +24,7 @@ export interface Quadrant {
 })
 export class HintsService {
     blinking: ReturnType<typeof setTimeout>;
-    isCheating: boolean = false;
+    isHintsActive: boolean = false;
     canvas0: ElementRef<HTMLCanvasElement>;
     canvas1: ElementRef<HTMLCanvasElement>;
     unfoundedDifference: Set<number>[];
@@ -64,7 +66,7 @@ export class HintsService {
     ) {}
 
     hintsKeyBinding(): void {
-        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.toggleCheating.bind(this));
+        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -88,7 +90,7 @@ export class HintsService {
         return possibleQuadrant;
     }
 
-    generatePossibleQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isAllQuadrant: boolean): number[] {
+    generatePossibleQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean): number {
         let possibleQuadrant: Set<number> = new Set<number>();
         let coordinates: Point;
         const quadrantWidthLowerBound = isInnerQuadrant ? quadrant.x : 0;
@@ -105,100 +107,66 @@ export class HintsService {
             }
         }
         const index = this.generateRandomMaxNumber(possibleQuadrant.size);
-        return isAllQuadrant ? [...possibleQuadrant] : [[...possibleQuadrant][index]];
+        return [...possibleQuadrant][index];
     }
 
-    displayQuadrant(quadrant: Quadrant): void {
+    displayQuadrant(quadrant: Quadrant, isLastHint: boolean): void {
         const x = quadrant.x;
         const y = quadrant.y;
         const w = quadrant.w;
         const h = quadrant.h;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;
-        this.canvas0.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;
-        this.canvas1.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
 
-        // const ctx = this.canvas0.nativeElement.getContext('2d');
-
-        // // Draw the white background
-        // ctx!.fillStyle = 'white';
-        // ctx!.fillRect(0, 0, constantsCanvas.DEFAULT_WIDTH, constantsCanvas.DEFAULT_HEIGHT);
-
-        // // Draw the iris (a blue circle)
-        // ctx!.fillStyle = 'blue';
-        // ctx!.beginPath();
-        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 5, 0, 2 * Math.PI);
-        // ctx!.fill();
-
-        // // Draw the pupil (a black circle)
-        // ctx!.fillStyle = 'black';
-        // ctx!.beginPath();
-        // ctx!.arc(constantsCanvas.DEFAULT_WIDTH / 2, constantsCanvas.DEFAULT_HEIGHT / 2, constantsCanvas.DEFAULT_WIDTH / 10, 0, 2 * Math.PI);
-        // ctx!.fill();
-
-        // // Draw the highlight (a white circle)
-        // ctx!.fillStyle = 'white';
-        // ctx!.beginPath();
-        // ctx!.arc(
-        //     constantsCanvas.DEFAULT_WIDTH / 2 + constantsCanvas.DEFAULT_WIDTH / 20,
-        //     constantsCanvas.DEFAULT_HEIGHT / 2 - constantsCanvas.DEFAULT_WIDTH / 10,
-        //     constantsCanvas.DEFAULT_WIDTH / 25,
-        //     0,
-        //     2 * Math.PI,
-        // );
-        // ctx!.fill();
-
-        // // Draw the upper eyelid (a curved line)
-        // ctx!.beginPath();
-        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, constantsCanvas.DEFAULT_HEIGHT / 3);
-        // ctx!.quadraticCurveTo(
-        //     constantsCanvas.DEFAULT_WIDTH / 2,
-        //     constantsCanvas.DEFAULT_HEIGHT / 4,
-        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
-        //     constantsCanvas.DEFAULT_HEIGHT / 3,
-        // );
-        // ctx!.stroke();
-
-        // // Draw the lower eyelid (a curved line)
-        // ctx!.beginPath();
-        // ctx!.moveTo(constantsCanvas.DEFAULT_WIDTH / 3, (constantsCanvas.DEFAULT_HEIGHT * 2) / 3);
-        // ctx!.quadraticCurveTo(
-        //     constantsCanvas.DEFAULT_WIDTH / 2,
-        //     (constantsCanvas.DEFAULT_HEIGHT * 3) / 4,
-        //     (constantsCanvas.DEFAULT_WIDTH * 2) / 3,
-        //     (constantsCanvas.DEFAULT_HEIGHT * 2) / 3,
-        // );
-        // ctx!.stroke();
+        if (isLastHint) {
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: {
+                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                },
+            });
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: {
+                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                },
+            });
+        } else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;
+            this.canvas0.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;
+            this.canvas1.nativeElement.getContext('2d')?.fillRect(x, y, w, h);
+        }
     }
 
-    findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isAllQuadrant: boolean): void {
+    findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isLastHint: boolean): void {
         const quadrantUpLeft = { ...quadrant };
         const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h };
         const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
         let blinkCount = 0;
-        const quadrants = this.generatePossibleQuadrant(quadrant, isInnerQuadrant, isAllQuadrant);
+        const currentQuadrant = this.generatePossibleQuadrant(quadrant, isInnerQuadrant);
         this.color = 'rgba(248, 65, 31, 0.5)';
-        for (const currentQuadrant of quadrants) {
-            switch (currentQuadrant) {
-                case constantsQuadrant.QUADRANT_UP_LEFT: {
-                    this.displayQuadrant(quadrantUpLeft);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                    this.displayQuadrant(quadrantUpRight);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                    this.displayQuadrant(quadrantDownLeft);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                    this.displayQuadrant(quadrantDownRight);
-                    break;
-                }
+        switch (currentQuadrant) {
+            case constantsQuadrant.QUADRANT_UP_LEFT: {
+                this.displayQuadrant(quadrantUpLeft, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                this.displayQuadrant(quadrantUpRight, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                this.displayQuadrant(quadrantDownLeft, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                this.displayQuadrant(quadrantDownRight, isLastHint);
+                break;
             }
         }
         this.blinking = setInterval(() => {
@@ -207,26 +175,24 @@ export class HintsService {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
-    findInnerQuadrant(isAllQuadrant: boolean): void {
-        const quadrants = this.generatePossibleQuadrant(this.outerQuadrant, false, isAllQuadrant);
-        for (const currentQuadrant of quadrants) {
-            switch (currentQuadrant) {
-                case constantsQuadrant.QUADRANT_UP_LEFT: {
-                    this.findQuadrant(this.innerQuadrant1, true, isAllQuadrant);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                    this.findQuadrant(this.innerQuadrant2, true, isAllQuadrant);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                    this.findQuadrant(this.innerQuadrant3, true, isAllQuadrant);
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                    this.findQuadrant(this.innerQuadrant4, true, isAllQuadrant);
-                    break;
-                }
+    findInnerQuadrant(isLastHint: boolean): void {
+        const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant, false);
+        switch (currentQuadrant) {
+            case constantsQuadrant.QUADRANT_UP_LEFT: {
+                this.findQuadrant(this.innerQuadrant1, true, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                this.findQuadrant(this.innerQuadrant2, true, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                this.findQuadrant(this.innerQuadrant3, true, isLastHint);
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                this.findQuadrant(this.innerQuadrant4, true, isLastHint);
+                break;
             }
         }
     }
@@ -255,16 +221,16 @@ export class HintsService {
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, diff));
     }
 
-    toggleCheating(): void {
+    activateHints(): void {
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
-        this.isCheating = !this.isCheating;
-        if (this.isCheating) {
+        this.isHintsActive = !this.isHintsActive;
+        if (this.isHintsActive) {
             new StartHintsRecord().record(this.gameRecorderService);
-            this.isCheating = !this.isCheating;
+            this.isHintsActive = !this.isHintsActive;
         } else {
             new StopHintsRecord().record(this.gameRecorderService);
-            this.isCheating = !this.isCheating;
+            this.isHintsActive = !this.isHintsActive;
         }
     }
 
@@ -293,7 +259,7 @@ export class HintsService {
 
     resetService(): void {
         this.count = 3;
-        this.isCheating = false;
+        this.isHintsActive = false;
         clearInterval(this.blinking);
         this.unfoundedDifference = new Array();
     }

@@ -15,7 +15,9 @@ export class ServerTimeService {
     timers: { [key: string]: Subscription } = {};
     elapsedTimes: Map<string, number> = new Map<string, number>();
 
-    constructor(private gameService: GameService) {}
+    constructor(private gameService: GameService) {
+       this.getTimeConstants();
+    }
 
     async getTimeConstants(): Promise<void> {
         this.timeConstants = await this.gameService.getConstants()

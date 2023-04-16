@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -12,16 +14,29 @@ export class MainPageComponent {
     readonly title: string = 'VISUAL QUEST';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     name: string;
-    constructor(public dialog: MatDialog) {}
+    constructor(public dialog: MatDialog, private gameDatabase: GameDatabaseService) {}
 
     openDialog(): void {
-        const dialogRef = this.dialog.open(NamePopupComponent, {
-            data: { name: this.name, isTimeLimit: true },
-            disableClose: true,
-        });
+        this.gameDatabase.getCount().subscribe((count) => {
+            if (count === 0) {
+                this.launchFeedback('Vous devez créer un jeu avant de pouvoir jouer.');
+                return;
+            }
+            const dialogRef = this.dialog.open(NamePopupComponent, {
+                data: { name: this.name, isTimeLimit: true },
+                disableClose: true,
+            });
 
-        dialogRef.afterClosed().subscribe((result) => {
-            this.name = result;
+            dialogRef.afterClosed().subscribe((result) => {
+                this.name = result;
+            });
+        });
+    }
+
+    launchFeedback(showedMessage: string): void {
+        this.dialog.open(GeneralFeedbackComponent, {
+            data: { message: showedMessage },
+            disableClose: true,
         });
     }
 }

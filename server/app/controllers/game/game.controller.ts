@@ -42,6 +42,34 @@ export class GameController {
         }
     }
 
+    @ApiOkResponse({
+        description: 'Get number of games',
+    })
+    @ApiNotFoundResponse({
+        description: 'Return INTERNAL_SERVER_ERROR http status when request fails',
+    })
+    @Get('/count')
+    countGames(@Res() response: Response) {
+        try {
+            const count = this.gamesService.countGames();
+            response.status(HttpStatus.OK).json(count);
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+        }
+    }
+
+    @ApiOkResponse({
+        description: 'Validate Game Name',
+    })
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Get('/validate/:name')
+    async validateGameName(@Param('name') name: string, @Res() response: Response) {
+        const res = this.gamesService.isValidGameName(name);
+        response.status(HttpStatus.OK).json(res);
+    }
+
     @Get('/:id')
     async gameId(@Param('id') id: string, @Res() response: Response) {
         try {
@@ -68,17 +96,7 @@ export class GameController {
         }
     }
 
-    @ApiOkResponse({
-        description: 'Validate Game Name',
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/validate/:name')
-    async validateGameName(@Param('name') name: string, @Res() response: Response) {
-        const res = this.gamesService.isValidGameName(name);
-        response.status(HttpStatus.OK).json(res);
-    }
+
 
     @Delete('/')
     async deleteAllGames(@Res() response: Response) {
@@ -110,4 +128,7 @@ export class GameController {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
+
+
+
 }

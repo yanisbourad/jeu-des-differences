@@ -12,11 +12,12 @@ const mockGameRecords: GamingHistory[] = constantsMock.MOCK_GAME_RECORDS;
 describe('GamingHistoryComponent', () => {
     let component: GamingHistoryComponent;
     let fixture: ComponentFixture<GamingHistoryComponent>;
-    let gameDatabaseServiceSpy: jasmine.SpyObj<GameDatabaseService>;
     let dialogRefSpy: jasmine.SpyObj<MatDialogRef<GamingHistoryComponent>>;
+    let gameDatabaseServiceSpy: jasmine.SpyObj<GameDatabaseService>;
 
     beforeEach(async () => {
         gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getAllGamingHistory', 'deleteGamingHistory']);
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
         await TestBed.configureTestingModule({
             declarations: [GamingHistoryComponent],
             providers: [

@@ -15,7 +15,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('findAllGamesStatus')
     updateGameStatus(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
-        this.logger.log('New connection to find updated games status ');
+        this.logger.log('New request for updating games status ');
         gamer.join(gamer.id);
         const gamesStatus = this.gameCardHandlerService.findAllGamesStatus(payload);
         this.server.to(gamer.id).emit('updateStatus', Array.from(gamesStatus));
@@ -29,7 +29,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             gameName: payload.gameName,
             gameType: payload.gameType,
         };
-        this.logger.log(`New request from ${player.name} to play ${player.gameName} in ${player.gameType} mode`);
+        this.logger.log(`New request from ${player.id} to play ${player.gameName} in ${player.gameType} mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
@@ -104,13 +104,20 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('cancelGame')
     cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
+        const player = this.gameCardHandlerService.getPlayer(client.id);
+        if (player.gameType === 'limit') {
+            const deletedPlayer = this.gameCardHandlerService.handleLimitedTimeCancel(client.id);
+            this.logger.log(`The limited time creator ${deletedPlayer.id} left the game queue`);
+            this.server.to(client.id).emit('feedBackOnLeave');
+            return;
+        }
         const totalRequest = this.gameCardHandlerService.getTotalRequest(gameName);
         // if there is only one player in the queue
         if (totalRequest === ONLY_CREATOR) {
             const creator = this.gameCardHandlerService.deletePlayer(client.id);
             this.gameCardHandlerService.deleteCreator(gameName);
             this.server.to(client.id).emit('feedBackOnLeave');
-            this.logger.log(`The ${gameName} creator ${creator.name} left, room is empty`);
+            this.logger.log(`The ${gameName} creator ${creator.id} left, room is empty`);
         } else {
             // if there is more than one player in the queue
             const player = this.gameCardHandlerService.deletePlayer(client.id);
@@ -123,8 +130,8 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                 const opponent = this.gameCardHandlerService.deletePlayer(players[OPPONENT_INDEX]);
                 this.server.to(opponent.id).emit('feedBackOnLeave');
                 this.server.to(client.id).emit('feedBackOnLeave');
-                this.logger.log(`${player.name} left the queue`);
-                this.logger.log(`${opponent.name} left the queue`);
+                this.logger.log(`${player.id} left the queue`);
+                this.logger.log(`${opponent.id} left the queue`);
                 const joiningPlayers = this.gameCardHandlerService.removePlayers(gameName);
                 joiningPlayers.forEach((gamer) => {
                     this.server.to(gamer).emit('feedBackOnLeave');
@@ -162,7 +169,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         const opponent = this.gameCardHandlerService.deleteOpponent(gamerCreator.id);
         if (opponent) {
             this.server.to(opponent.id).emit('feedbackOnReject', gamerCreatorName);
-            this.logger.log(`The game creator ${gamerCreatorName} rejected ${opponent.name}`);
+            this.logger.log(`The game creator ${gamerCreator.id} rejected ${opponent.id}`);
         }
         const nextOpponent = this.gameCardHandlerService.handleReject(gamerCreator.id);
         if (nextOpponent) {
@@ -171,7 +178,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         } else {
             // if no more waiting Opponent in joining queue
             this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
-            this.logger.log(`The game creator ${gamerCreatorName} is waiting alone`);
+            this.logger.log(`The game creator ${gamerCreator.id} is waiting alone`);
         }
     }
 

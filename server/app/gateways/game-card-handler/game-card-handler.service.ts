@@ -112,6 +112,14 @@ export class GameCardHandlerService {
         }
     }
 
+    handleLimitedTimeCancel(id: string): Player {
+        const index = this.timeLimitedGamesQueue.indexOf(id);
+        if (index !== MINUS_ONE) {
+            this.timeLimitedGamesQueue.splice(index, 1);
+        }
+        return this.deletePlayer(id);
+    }
+
     removePlayerInJoiningQueue(gameName: string, playerId: string) {
         if (this.gamesQueue.get(gameName)) {
             const index = this.joiningPlayersQueue.get(gameName).indexOf(playerId);

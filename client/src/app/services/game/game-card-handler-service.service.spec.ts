@@ -91,6 +91,8 @@ describe('GameCardHandlerService', () => {
             name: 'radius',
             opponentName: '',
             gameName: 'BobLedge',
+            gameType: 'classic',
+            mode: 'classic',
         };
         service.join(game);
         expect(socketSpy.emit).toHaveBeenCalledWith('joinGame', game);
@@ -137,6 +139,7 @@ describe('GameCardHandlerService', () => {
             creatorName: 'test',
             opponentName: 'test',
             gameName: 'test',
+            mode: 'classic',
         });
         expect(routerSpy.navigate).toHaveBeenCalled();
         // expect(socketSpy.disconnect).toHaveBeenCalled();

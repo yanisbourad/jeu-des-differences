@@ -121,6 +121,7 @@ export class HintsService {
             confetti({
                 particleCount: 50,
                 spread: 60,
+                shapes: ['star'],
                 origin: {
                     x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
@@ -129,6 +130,7 @@ export class HintsService {
             confetti({
                 particleCount: 50,
                 spread: 60,
+                shapes: ['star'],
                 origin: {
                     x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,

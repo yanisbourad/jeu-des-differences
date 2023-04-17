@@ -40,11 +40,13 @@ export class CardDisplayerComponent implements OnInit {
             this.changeDetectorRef.detectChanges();
         });
     }
+
     goToNext(): void {
         const isLastPage = this.currentPage === this.allPages;
         const newIndex = isLastPage ? this.currentPage : this.currentPage + 1;
         this.currentPage = newIndex;
     }
+
     goToPrevious(): void {
         const isFirstPage = this.currentPage === 0;
         const newIndex = isFirstPage ? this.currentPage : this.currentPage - 1;
@@ -56,11 +58,7 @@ export class CardDisplayerComponent implements OnInit {
         const endIndex: number = startIndex + this.cardByPage;
         const pageSliced: GameInfo[] = this.allCards.slice(startIndex, endIndex);
         if (this.allCards.length % this.cardByPage === 0) {
-            if (this.allCards.length === 0) {
-                this.allPages = 0;
-            } else {
-                this.allPages = this.allCards.length / this.cardByPage - 1;
-            }
+            this.allPages = this.allCards.length === 0 ? 0 : this.allCards.length / this.cardByPage - 1;
         } else {
             this.allPages = Math.floor(this.allCards.length / this.cardByPage);
         }

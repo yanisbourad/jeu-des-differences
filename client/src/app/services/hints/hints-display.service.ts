@@ -13,7 +13,7 @@ export class HintsDisplayService {
     path: ImagePathHints;
     hintsArray: string[] = [];
     totalHints: number = 3;
-    nHintsLeft: number = 3;
+    nHintsLeft: number = this.hintsService.nHintsLeft;
 
     constructor(private readonly hintsService: HintsService) {
         this.hintsArray = new Array(this.totalHints);

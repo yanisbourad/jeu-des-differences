@@ -47,7 +47,6 @@ export class GameHelperService {
             minWidth: 'fit-content',
             minHeight: 'fit-content',
             panelClass: 'custom-dialog-container',
-            // disableClose: true, // rajouter un bouton annulé pour fermer le popup
         });
     }
 

@@ -5,8 +5,9 @@
     <h1 class="align-text" *ngIf="!gameService.mode && gameService.gameType!=='solo'">Le vainqueur est {{winner}}</h1>
   </div>
   <div  class='btn-display' mat-dialog-actions *ngIf="data.type !== 'timeLimit'" >
-    <button class='end-btn' mat-raised-button mat-dialog-close color="primary" (click)="redirection()">Ok</button>
-    <button *ngIf="data.type ==='giveUp'" class='cancel-btn' mat-raised-button mat-dialog-close color="primary">Annuler</button>
+        <button *ngIf="data.type ==='giveUp'" class='cancel-btn' mat-raised-button mat-dialog-close color="primary">Annuler</button>
+        <button class='end-btn' mat-raised-button mat-dialog-close color="primary" (click)="redirection()">Ok</button>
+
     <div *ngIf="data.mode!=='tempsLimite'">
       <button *ngIf="data.type === 'finished' && !gameService.hasAbandonedGame" class='end-btn' mat-raised-button mat-dialog-close color="primary" (click)="rewindGame()">Revoir La partie</button>
     </div>

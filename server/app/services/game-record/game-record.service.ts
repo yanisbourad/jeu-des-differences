@@ -39,12 +39,12 @@ export class GameRecordService {
             return Promise.reject(`Failed to delete Game records: ${error}`);
         }
     }
-    async deleteGameRecordsForOneGame(name: string): Promise<Rankings> {
+    async deleteGameRecordsForOneGame(name: string): Promise<void> {
         try {
             const response = await this.gameRecordModel.deleteMany({ gameName: name, keyServer: this.gameService.getKey });
             this.logger.log(`All ${response.deletedCount} Game Records have been deleted successfully for ${name}`);
-            const newRecords: Rankings = this.gameService.populateFakeGameRecordsForOneGame(name);
-            return Promise.resolve(newRecords);
+            this.gameService.populateFakeGameRecordsForOneGame(name);
+            // return Promise.resolve(newRecords);
         } catch (error) {
             return Promise.reject(`Failed to delete Game records: ${error}`);
         }

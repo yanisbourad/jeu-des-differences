@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HintsService } from './hints.service';
 
 export interface ImagePathHints {
     hintsNotUsed: string;
@@ -13,9 +12,8 @@ export class HintsDisplayService {
     path: ImagePathHints;
     hintsArray: string[] = [];
     totalHints: number = 3;
-    nHintsLeft: number = 3;
 
-    constructor(private readonly hintsService: HintsService) {
+    constructor() {
         this.hintsArray = new Array(this.totalHints);
         this.path = {
             hintsNotUsed: './assets/img/hint-not-used.png',
@@ -30,9 +28,7 @@ export class HintsDisplayService {
         }
     }
 
-    useHint(): void {
-        this.nHintsLeft--;
-        this.hintsService.activateHints();
+    updateIcons(): void {
         this.hintsArray.shift();
         this.hintsArray.push(this.path.hintsUsed);
     }

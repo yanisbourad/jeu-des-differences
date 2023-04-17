@@ -11,14 +11,16 @@ import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 })
 export class DifferencePopupComponent implements AfterViewInit {
     @ViewChild('dd', { static: false }) private canvas!: ElementRef<HTMLCanvasElement>;
-    showPixel: boolean = true;
+    showPixel: boolean;
     ctx: CanvasRenderingContext2D;
-    showValidation: boolean = false;
-    showMessage: string = '';
-    showDifference: number = 0;
-    lowerLimitDifferenceAllowed;
-    upperLimitDifferenceAllowed;
+    showValidation: boolean;
+    showMessage: string;
+    showDifference: number;
+    lowerLimitDifferenceAllowed: number;
+    upperLimitDifferenceAllowed: number;
 
+    // On a utilisé 2 params additionnels <Matdialog, MatdialogRef> dans le constructeur
+    // pour permettre d'appeler un autre modal permettant de sauvegarder le nom du joueur
     // eslint-disable-next-line max-params
     constructor(
         public dialog: MatDialog,
@@ -26,7 +28,11 @@ export class DifferencePopupComponent implements AfterViewInit {
         private readonly imageDifferenceService: ImageDiffService,
         private changeDetectorRef: ChangeDetectorRef,
     ) {
+        this.showPixel = true;
         this.showValidation = false;
+        this.showMessage = '';
+        this.showValidation = false;
+        this.showDifference = 0;
         this.lowerLimitDifferenceAllowed = 2;
         this.upperLimitDifferenceAllowed = 10;
     }
@@ -44,7 +50,7 @@ export class DifferencePopupComponent implements AfterViewInit {
             this.showValidation = true;
         } else {
             this.showValidation = false;
-            this.showMessage = '(quantite valide -- entre 3 et 9)';
+            this.showMessage = '(Quantité valide -- entre 3 et 9)';
         }
         this.changeDetectorRef.detectChanges();
     }
@@ -61,6 +67,7 @@ export class DifferencePopupComponent implements AfterViewInit {
             dialogRefGame.afterClosed();
         }
     }
+
     closeOnAbort() {
         this.dialogRef.close();
     }

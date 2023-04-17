@@ -22,6 +22,7 @@ export class VerificationFeedbackComponent {
 
     onConfirm(): void {
         this.data.confirmFunction();
+        location.reload();
         this.dialogReff.close();
     }
 }

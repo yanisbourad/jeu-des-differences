@@ -137,6 +137,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.ModifyTime)
     async modifyTime(_: Socket, gameMode: string) {
+        this.logger.debug(['modifyTime', gameMode]);
         if (gameMode === 'tempsLimite')  this.serverTime.decrementTime(this.roomName);
         else this.serverTime.incrementTime();
     }

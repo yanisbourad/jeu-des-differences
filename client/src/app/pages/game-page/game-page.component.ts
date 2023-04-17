@@ -97,6 +97,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.hintsService.hintsKeyBinding();
             this.hintsService.canvas0 = this.canvasCheat0;
             this.hintsService.canvas1 = this.canvasCheat1;
+            this.hintsService.gameMode = this.gameService.mode;
         }
     }
 

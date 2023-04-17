@@ -226,7 +226,7 @@ export class SocketClientService {
         this.socketClient.send('mousePosition', [pos, roomName, mode]);
     }
 
-    modifyTime(gameType: string, gameMode: string) {
-        this.socketClient.send('modifyTime', [gameType, gameMode]);
+    modifyTime(gameMode: string) {
+        this.socketClient.send('modifyTime', gameMode);
     }
 }

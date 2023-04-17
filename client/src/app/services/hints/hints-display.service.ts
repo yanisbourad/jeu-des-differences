@@ -50,4 +50,8 @@ export class HintsDisplayService {
         this.socket.sendMessage(hintMessage);
         return { ...hintMessage, mine: true };
     }
+
+    modifyTime(gameMode: string): void {
+        this.socket.modifyTime(gameMode);
+    }
 }

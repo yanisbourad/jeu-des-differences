@@ -34,6 +34,7 @@ export class HintsService {
     color: string = 'black';
     nHintsLeft: number = 3;
     randomQuadrant: number[] = [];
+    gameMode: string;
     outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
     innerQuadrant1: Quadrant = {
         x: 0,
@@ -266,6 +267,7 @@ export class HintsService {
     }
 
     activateHints(): void {
+        this.hintsDisplayService.modifyTime(this.gameMode);
         new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');

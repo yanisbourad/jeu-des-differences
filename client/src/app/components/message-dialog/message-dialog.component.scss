@@ -15,11 +15,24 @@
   margin-top: 10px;
   font-size: 20px;
 }
-.giveUp {
-  margin-left: 45%;
+.cancel-btn {
   background: rgb(230, 100, 100);
   border-radius: 10px;
-  padding: 10px;
+  width: fit-content;
+  margin: 10px;
+}
+
+.end-btn{
+  background: rgb(36, 228, 126);
+  border-radius: 10px;
+  width: fit-content;
+  margin: 10px;
+}
+
+.btn-display{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 

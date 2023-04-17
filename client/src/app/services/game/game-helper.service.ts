@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import * as constantsTime from '@app/configuration/const-time';
-import { GameRecord } from '@common/game';
-import { SocketClientService } from '@app/services/socket/socket-client.service';
-import { ImagePath } from '@app/interfaces/hint-diff-path';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import * as constantsTime from '@app/configuration/const-time';
+import { ImagePath } from '@app/interfaces/hint-diff-path';
 import { Message } from '@app/interfaces/message';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { GameRecord } from '@common/game';
 
 @Injectable({
     providedIn: 'root',

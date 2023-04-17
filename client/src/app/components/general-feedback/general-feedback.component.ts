@@ -16,7 +16,7 @@ export class GeneralFeedbackComponent implements OnInit {
         this.message = this.data.message;
     }
 
-    onClose() {
+    onClose(): void {
         this.message = '';
         this.dialogReff.close();
     }

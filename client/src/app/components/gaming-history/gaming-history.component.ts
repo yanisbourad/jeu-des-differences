@@ -53,7 +53,7 @@ export class GamingHistoryComponent implements AfterContentChecked {
             .subscribe();
     }
 
-    async eraseGamingHistory() {
+    eraseGamingHistory(): void {
         this.gameDatabaseService.deleteGamingHistory().subscribe((res) => {
             if (res.status === this.statusTwoHundredOk) {
                 this.gamingHistory = [];
@@ -62,7 +62,7 @@ export class GamingHistoryComponent implements AfterContentChecked {
         });
     }
 
-    close() {
+    close(): void {
         this.dialogReff.close();
     }
 }

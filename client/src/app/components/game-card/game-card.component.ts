@@ -82,7 +82,7 @@ export class GameCardComponent implements OnInit {
         return '';
     }
 
-    async onDelete(gameName: string) {
+    async onDelete(gameName: string): Promise<void> {
         try {
             await firstValueFrom(this.gameService.deleteGame(gameName));
             this.gameDeleted.emit();
@@ -91,7 +91,7 @@ export class GameCardComponent implements OnInit {
         }
     }
 
-    async onReinitialise(gameName: string) {
+    async onReinitialise(gameName: string): Promise<void> {
         this.gameService.deleteOneGameRecords(gameName).subscribe();
     }
 

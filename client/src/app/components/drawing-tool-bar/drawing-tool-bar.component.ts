@@ -28,14 +28,16 @@ export class DrawingToolBarComponent {
         return constants;
     }
 
-    togglePencil() {
+    togglePencil(): void {
         this.drawingService.setTool = stylers.PEN;
         this.tool = 'pencil';
     }
-    toggleRectangle() {
+
+    toggleRectangle(): void {
         this.drawingService.setTool = stylers.RECTANGLE;
         this.tool = 'rectangle';
     }
+
     toggleErase(): void {
         this.drawingService.setTool = stylers.ERASER;
         this.tool = 'erase';
@@ -56,6 +58,7 @@ export class DrawingToolBarComponent {
     undo(): void {
         this.commandService.undo();
     }
+
     redo(): void {
         this.commandService.redo();
     }

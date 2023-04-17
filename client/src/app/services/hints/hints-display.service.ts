@@ -45,7 +45,6 @@ export class HintsDisplayService {
     }
 
     sendHintMessage(): Message {
-        console.log('roomName: ' + this.socket.getRoomName());
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Indice utilisé';
         const hintMessage = { message: this.message, ...this.subMessage };
         this.socket.sendMessage(hintMessage);

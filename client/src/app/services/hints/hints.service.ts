@@ -11,6 +11,7 @@ import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
 import confetti from 'canvas-confetti';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
 
 export interface Quadrant {
     x: number;
@@ -265,6 +266,7 @@ export class HintsService {
     }
 
     activateHints(): void {
+        new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;

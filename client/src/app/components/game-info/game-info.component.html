@@ -13,7 +13,7 @@
                     src={{differences}} alt="Differences trouvées" />
             </div>
         </div>
-        
+
         <div *ngIf="gameService.gameType === 'double' && !gameService.mode">
             <p class="sub-title">Différences trouvées par - {{gameService.playerName}}</p>
             <div>
@@ -27,7 +27,8 @@
             </div>
         </div>
         <div *ngIf="gameService.gameType === 'double' && gameService.mode">
-            <p class="sub-title">Différences trouvées par - {{gameService.playerName}} - {{gameService.opponentName}}</p>
+            <p class="sub-title">Différences trouvées par - {{gameService.playerName}} - {{gameService.opponentName}}
+            </p>
             <div>
                 <img *ngFor="let differences of gameService.differencesArray" class="differences-trouvees-img"
                     src={{differences}} alt="Differences trouvées" />
@@ -52,10 +53,11 @@
         <div *ngIf="gameService.gameType === 'solo'">
             <p class="sub-title">Indices restants</p>
             <div>
-                <img *ngFor="let hints of hintsDisplayService.hintsArray" class="differences-trouvees-img"
-                    src={{hints}} alt="Indices restants" />
+                <img *ngFor="let hints of hintsDisplayService.hintsArray" class="differences-trouvees-img" src={{hints}}
+                    alt="Indices restants" />
             </div>
-            <button class="btn btn-primary" [disabled]= "hintsService.nHintsLeft===0" (click)="hintsService.activateHints()">Utiliser un indice</button>
+            <button class="btn btn-primary" [disabled]="hintsService.nHintsLeft===0"
+                (click)="hintsService.activateHints()">Utiliser un indice</button>
         </div>
     </div>
 </div>

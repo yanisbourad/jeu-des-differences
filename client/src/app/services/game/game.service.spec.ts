@@ -45,7 +45,6 @@ describe('GameService', () => {
             'sendFoundMessage',
             'displayGameEnded',
             'displayGiveUp',
-            'sendHintMessage',
         ]);
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
             'getRoomTime',
@@ -195,11 +194,6 @@ describe('GameService', () => {
     it('sendNotFoundMessage should call sendNotFoundMessage from gameHelper', () => {
         gameService.sendErrorMessage();
         expect(gameHelperServiceSpy.sendErrorMessage).toHaveBeenCalled();
-    });
-
-    it('sendHintUsed should call sendHintMessage from gameHelper', () => {
-        gameService.sendHintUsed();
-        expect(gameHelperServiceSpy.sendHintMessage).toHaveBeenCalled();
     });
 
     it('startPenaltyTimer should toggle errorPenalty after a timeout', fakeAsync(() => {

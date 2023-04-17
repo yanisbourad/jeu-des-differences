@@ -79,7 +79,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.handleDisconnect();
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
-            this.loadImages(this.socket.game);
+            if (this.gameService.gameType !== 'double') this.loadImages(this.socket.game);
             this.socket.imageLoaded$.subscribe((game: Game) => {
                 setTimeout(() => {
                     this.loadImages(game);

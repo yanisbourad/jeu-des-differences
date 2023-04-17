@@ -70,17 +70,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         });
         const myPlayers: PlayerMulti[] = this.playersMatch();
         this.roomName = player.gameId + player.gameName;
+        socket.join(this.roomName);
         if (myPlayers.length === 2) {
             this.isMulti = true;
-            this.setGame('',player.gameName);
+            this.setGame('', player.gameName);
         }
     }
 
     @SubscribeMessage(ChatEvents.SendRoomName)
-    async sendRoomName(socket: Socket, data: {roomName: string, mode: string}) {
+    async sendRoomName(socket: Socket, data: { roomName: string, mode: string }) {
         this.roomName = data.roomName;
         socket.join(this.roomName);
-        if (data.mode) { 
+        if (data.mode) {
             socket.to(this.roomName).emit('getRandomGame', this.game);
             socket.to(this.roomName).emit('nbrDifference', this.games.size);
             if (!this.serverTime.timers[this.roomName]) {
@@ -136,7 +137,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.MousePosition)
     async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
-        this.roomName = this.isMulti? data[1]: socket.id;
+        this.roomName = this.isMulti ? data[1] : socket.id;
         const diff = this.unfoundedDifference.get(this.roomName).find((set) => set.has(data[0]));
         if (!diff) {
             socket.emit('error');
@@ -189,7 +190,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     async handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id: ${socket.id} `);
-        if (this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit.get(this.roomName) ) { 
+        if (this.isMulti && this.isPlaying.get(this.roomName) && !this.isTimeLimit.get(this.roomName)) {
             socket.to(this.roomName).emit('giveup-return', { playerName: this.playerName });
         }
         if (this.isMulti && this.isPlaying.get(this.roomName) && this.isTimeLimit.get(this.roomName)) {

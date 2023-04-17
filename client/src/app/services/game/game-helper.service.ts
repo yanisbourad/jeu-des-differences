@@ -58,6 +58,13 @@ export class GameHelperService {
         return { ...foundMessage, mine: true };
     }
 
+    sendHintMessage(): Message {
+        this.message = new Date().toLocaleTimeString() + ' - ' + ' Indice utilisé';
+        const hintMessage = { message: this.message, ...this.subMessage };
+        this.socket.sendMessage(hintMessage);
+        return { ...hintMessage, mine: true };
+    }
+
     sendErrorMessage(): Message {
         this.message = new Date().toLocaleTimeString() + ' - ' + ' Erreur';
         if (this.gameType === 'double') this.message = this.message + ' par ' + this.playerName;

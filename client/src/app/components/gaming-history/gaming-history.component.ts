@@ -11,6 +11,7 @@ import { GamingHistory } from '@common/game';
 export class GamingHistoryComponent implements AfterContentChecked {
     gamingHistory: GamingHistory[];
     hasGameRecords: boolean;
+    statusTwoHundredOk: number;
 
     constructor(
         private readonly gameDatabaseService: GameDatabaseService,
@@ -20,6 +21,7 @@ export class GamingHistoryComponent implements AfterContentChecked {
         this.hasGameRecords = false;
         this.gamingHistory = [];
         this.gamingHistory = this.getAllGamingHistory();
+        this.statusTwoHundredOk = 200;
     }
 
     ngAfterContentChecked(): void {
@@ -50,7 +52,7 @@ export class GamingHistoryComponent implements AfterContentChecked {
 
     async eraseGamingHistory() {
         this.gameDatabaseService.deleteGamingHistory().subscribe((res) => {
-            if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
+            if (res.status === this.statusTwoHundredOk) {
                 this.gamingHistory = [];
             }
             this.hasGameRecords = false;

@@ -99,6 +99,7 @@ describe('GameCardHandlerService', () => {
             id: 'rac',
             name: 'John Do',
             gameName: 'uno',
+            gameType: 'classic',
         });
         service.gamesQueue.set('uno', ['rac']);
         expect(JSON.stringify(service.deletePlayer('rac'))).toBe(
@@ -106,6 +107,7 @@ describe('GameCardHandlerService', () => {
                 id: 'rac',
                 name: 'John Do',
                 gameName: 'uno',
+                gameType: 'classic',
             }),
         );
     });
@@ -116,6 +118,7 @@ describe('GameCardHandlerService', () => {
             id: 'rac',
             name: 'John Do',
             gameName: 'uno',
+            gameType: 'classic',
         };
         expect(service.isPlayerWaiting(player)).toBeTruthy();
     });
@@ -127,6 +130,7 @@ describe('GameCardHandlerService', () => {
                 id: 'gad',
                 name: 'Pablo',
                 gameName: 'duo',
+                gameType: 'classic',
             }),
         ).toBeTruthy();
     });
@@ -138,6 +142,7 @@ describe('GameCardHandlerService', () => {
                 id: 'duo',
                 name: 'Pablo',
                 gameName: 'uno',
+                gameType: 'classic',
             }),
         ).toBe(2);
     });
@@ -148,6 +153,8 @@ describe('GameCardHandlerService', () => {
                 id: 'duo',
                 name: 'Pablo',
                 gameName: 'uno',
+                gameType: 'classic',
+
             }),
         ).toBe(3);
         expect(service.joiningPlayersQueue.get('uno').length).toBe(1);
@@ -158,12 +165,16 @@ describe('GameCardHandlerService', () => {
             id: 'back',
             name: 'Peter',
             gameName: 'uno',
+            gameType: 'classic',
+
         });
         expect(
             service.dispatchPlayer({
                 id: 'duo',
                 name: 'Pablo',
                 gameName: 'uno',
+                gameType: 'classic',
+
             }),
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         ).toBe(4);
@@ -176,6 +187,8 @@ describe('GameCardHandlerService', () => {
                 id: 'duo',
                 name: 'Pablo',
                 gameName: 'uno',
+                gameType: 'classic',
+
             }),
         ).toBe(3);
     });
@@ -187,6 +200,8 @@ describe('GameCardHandlerService', () => {
                 id: 'z',
                 name: 'Pablo',
                 gameName: 'uno',
+                gameType: 'classic',
+
             }),
         ).toBe(OVER_CROWDED);
     });
@@ -205,14 +220,14 @@ describe('GameCardHandlerService', () => {
         const spy = jest.spyOn(service, 'isPlayerWaiting');
         service.gamesQueue.set('uno', []);
         service.joiningPlayersQueue.set('uno', []);
-        expect(service.stackPlayer({ id: 'ric', name: 'Mat', gameName: 'uno' })).toBe(1);
+        expect(service.stackPlayer({ id: 'ric', name: 'Mat', gameName: 'uno', gameType: 'classic' })).toBe(1);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should return 2 if player is waiting', () => {
         const spy = jest.spyOn(service, 'dispatchPlayer');
         service.gamesQueue.set('uno', ['rac']);
-        expect(service.stackPlayer({ id: 'ric', name: 'Mat', gameName: 'uno' })).toBe(2);
+        expect(service.stackPlayer({ id: 'ric', name: 'Mat', gameName: 'uno', gameType: 'classic' })).toBe(2);
         expect(spy).toHaveBeenCalled();
     });
     it('should return stacked players that are about to play', () => {
@@ -230,8 +245,8 @@ describe('GameCardHandlerService', () => {
     it('should return both 2 players', () => {
         service.gamesQueue.set('uno', ['rac', 'ric']);
         service.joiningPlayersQueue.set('uno', ['tic', 'gac', 'bac']);
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
-        service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
+        service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' });
         expect(service.acceptOpponent('rac')).toEqual([
             { id: 'rac', name: 'Bad', gameName: 'uno' },
             { id: 'ric', name: 'Best', gameName: 'uno' },
@@ -240,17 +255,17 @@ describe('GameCardHandlerService', () => {
 
     it('should return as oponent was deleted', () => {
         service.gamesQueue.set('uno', ['rac', 'ric']);
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
-        service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
+        service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' });
         expect(JSON.stringify(service.deleteOpponent('ric'))).toBe(JSON.stringify({ id: 'ric', name: 'Best', gameName: 'uno' }));
     });
 
     it('should return player object if there is the provided player id', () => {
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         expect(service.getPlayer('rac')).toEqual({ id: 'rac', name: 'Bad', gameName: 'uno' });
     });
     it('should return null if there is no such player id', () => {
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         expect(service.getPlayer('ric')).toEqual(null);
     });
 
@@ -261,7 +276,7 @@ describe('GameCardHandlerService', () => {
     });
 
     it('should return 1 as one player is waiting', () => {
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         service.gamesQueue.set('uno', ['dac', 'pat']);
         service.joiningPlayersQueue.set('uno', ['rac']);
         expect(JSON.stringify(service.removePlayers('uno'))).toBe(JSON.stringify(['rac']));
@@ -269,8 +284,8 @@ describe('GameCardHandlerService', () => {
 
     // test for handleReject
     it('should return 1 player is waiting', () => {
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
-        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
+        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno', gameType: 'classic' });
         service.gamesQueue.set('uno', ['rac']);
         service.joiningPlayersQueue.set('uno', ['tas']);
         expect(JSON.stringify(service.handleReject('rac'))).toBe(
@@ -283,8 +298,8 @@ describe('GameCardHandlerService', () => {
     });
 
     it('should return null as no player is waiting', () => {
-        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno' });
-        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno' });
+        service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
+        service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno', gameType: 'classic' });
         service.gamesQueue.set('uno', ['rac']);
         service.joiningPlayersQueue.set('uno', []);
         expect(JSON.stringify(service.handleReject('rac'))).toBe(JSON.stringify(null));

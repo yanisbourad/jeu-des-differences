@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 import { NamePopupComponent } from './name-popup.component';
 import SpyObj = jasmine.SpyObj;
@@ -96,6 +97,18 @@ describe('NamePopupComponent', () => {
             disableClose: true,
         });
     });
+    it('should call launchGameTypeSelection when button is pressed', () => {
+        const spy = spyOn(component.dialog, 'open').and.callThrough();
+        component.data.name = 'test';
+        component.data.gameType = 'double';
+        component.launchGameTypeSelection();
+        expect(spy).toHaveBeenCalledWith(MessageDialogComponent, {
+            disableClose: true,
+            minWidth: '250px',
+            minHeight: '110px',
+            panelClass: 'custom-dialog-container',
+        });
+    });
 
     it('should redirect to the game route on redirect', () => {
         spyOn(route, 'navigate');
@@ -105,9 +118,23 @@ describe('NamePopupComponent', () => {
         expect(route.navigate).toHaveBeenCalledWith(['/game', Object({ player: 'player', gameName: 'gameName', gameType: 'solo' })]);
     });
     it('should launch modal on calling redirect', () => {
+        component.data.name = 'deeff';
         spyOn(component, 'launchDialog');
         component.data.gameType = 'double';
         component.redirect();
         expect(component.launchDialog).toHaveBeenCalled();
+    });
+    it('should call validatePlayerName on calling redirect', () => {
+        component.data.name = '';
+        spyOn(component, 'launchFeedback');
+        component.data.gameType = 'double';
+        component.redirect();
+        expect(component.launchFeedback).toHaveBeenCalled();
+    });
+    it('should call launchFeedback on calling launGameTypeSelection', () => {
+        component.data.name = '';
+        spyOn(component, 'launchFeedback');
+        component.launchGameTypeSelection();
+        expect(component.launchFeedback).toHaveBeenCalled();
     });
 });

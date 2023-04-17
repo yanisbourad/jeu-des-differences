@@ -95,12 +95,12 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
             this.resetState();
             this.gameCardHandlerService.resetGameVariables();
         }
-        this.limitedTimeGame = this.gameCardHandlerService.getLimitedTimeGameName();
-        if (this.limitedTimeGame) {
-            this.dialogReff.close();
-            this.gameCardHandlerService.resetGameVariables();
-            this.gameCardHandlerService.setNewUpdate(false);
-        }
+        // this.limitedTimeGame = this.gameCardHandlerService.getLimitedTimeGameName();
+        // if (this.limitedTimeGame) {
+        //     this.dialogReff.close();
+        //     this.gameCardHandlerService.resetGameVariables();
+        //     this.gameCardHandlerService.setNewUpdate(false);
+        // }
     }
 
     leaveGame(): void {

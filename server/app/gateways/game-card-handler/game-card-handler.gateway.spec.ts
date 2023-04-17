@@ -122,8 +122,10 @@ describe('GameCardHandlerGateway', () => {
     });
     it('Should call join with two stacked player()', async () => {
         const payload = { name: 'test', gameName: 'uno' };
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const player1 = {
+            id: '123', name: 'test', gameName: 'uno', gameType: 'classic'
+        };
+        const player2 = { id: '134', name: 'test', gameName: 'uno', gameType: 'classic' };
         const map = new Map();
         map.set('test', 1);
         map.set('best', 1);
@@ -164,8 +166,8 @@ describe('GameCardHandlerGateway', () => {
     });
     it('Should call join with more than two stacked player()', async () => {
         const payload = { name: 'test', gameName: 'uno' };
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno', gameType: 'classic' };
         const map = new Map();
         map.set('test', 1);
         map.set('best', 1);
@@ -199,9 +201,9 @@ describe('GameCardHandlerGateway', () => {
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
     });
     it('Should call reject player in the stack of two()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '134', name: 'test', gameName: 'uno' };
-        const player3 = { id: '144', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player3 = { id: '144', name: 'test', gameName: 'uno', gameType: 'classic' };
         stub(socket, 'rooms').value(new Set(['test']));
         jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
         jest.spyOn(gameCardHandlerService, 'deleteOpponent').mockReturnValueOnce(player2);
@@ -220,7 +222,7 @@ describe('GameCardHandlerGateway', () => {
         expect(logger.log).toHaveBeenCalled();
     });
     it('Should call reject player and do nothing when creator is alone()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
         stub(socket, 'rooms').value(new Set(['test']));
         jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
         jest.spyOn(gameCardHandlerService, 'deleteOpponent').mockReturnValueOnce(null);
@@ -239,8 +241,8 @@ describe('GameCardHandlerGateway', () => {
         expect(logger.log).toHaveBeenCalled();
     });
     it('Should call accept player when creator agreed()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno', gameType: 'classic' };
         const map = new Map();
         map.set('test', 1);
         map.set('best', 1);
@@ -280,9 +282,9 @@ describe('GameCardHandlerGateway', () => {
         expect(logger.log).toHaveBeenCalled();
     });
     it('Should call handle disconnect when player is disconnected()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '123', name: 'test', gameName: 'uno' };
-        const player3 = { id: '123', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player2 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player3 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
         const map = new Map();
         map.set('test', 1);
         map.set('best', 1);
@@ -310,7 +312,7 @@ describe('GameCardHandlerGateway', () => {
         gateway.handleDisconnect(socket);
     });
     it('Should call handle cancel when player cancel the game()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
         const map = new Map();
         map.set('test', 1);
         map.set('best', 1);
@@ -339,8 +341,8 @@ describe('GameCardHandlerGateway', () => {
         expect(logger.log).toHaveBeenCalled();
     });
     it('Should call cancel when a player is a creator ()', async () => {
-        const player1 = { id: '123', name: 'test', gameName: 'uno' };
-        const player2 = { id: '134', name: 'test', gameName: 'uno' };
+        const player1 = { id: '123', name: 'test', gameName: 'uno', gameType: 'classic' };
+        const player2 = { id: '134', name: 'test', gameName: 'uno', gameType: 'classic' };
         const opponent = {
             id: 'client id',
             emit: jest.fn(),

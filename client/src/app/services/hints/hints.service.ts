@@ -9,7 +9,6 @@ import * as constantsCanvas from '@app/configuration/const-canvas';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
-
 import confetti from 'canvas-confetti';
 
 export interface Quadrant {
@@ -17,6 +16,7 @@ export interface Quadrant {
     y: number;
     w: number;
     h: number;
+    isInnerQuadrant: boolean;
 }
 
 @Injectable({
@@ -31,32 +31,35 @@ export class HintsService {
     indexEvent: number | undefined;
     color: string = 'black';
     count: number = 3;
-
-    outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2 };
-
+    randomQuadrant: number[] = [];
+    outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
     innerQuadrant1: Quadrant = {
         x: 0,
         y: 0,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant2: Quadrant = {
         x: constantsCanvas.DEFAULT_WIDTH / 2,
         y: 0,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant3: Quadrant = {
         x: 0,
         y: constantsCanvas.DEFAULT_HEIGHT / 2,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant4: Quadrant = {
         x: constantsCanvas.DEFAULT_WIDTH / 2,
         y: constantsCanvas.DEFAULT_HEIGHT / 2,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
 
     constructor(
@@ -90,14 +93,13 @@ export class HintsService {
         return possibleQuadrant;
     }
 
-    generatePossibleQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean): number {
+    generatePossibleQuadrant(quadrant: Quadrant): number {
         let possibleQuadrant: Set<number> = new Set<number>();
         let coordinates: Point;
-        const quadrantWidthLowerBound = isInnerQuadrant ? quadrant.x : 0;
-        const quadrantWidthUpperBound = isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
-        const quadrantHeightLowerBound = isInnerQuadrant ? quadrant.y : 0;
-        const quadrantHeightUpperBound = isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
-
+        const quadrantWidthLowerBound = quadrant.isInnerQuadrant ? quadrant.x : 0;
+        const quadrantWidthUpperBound = quadrant.isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
+        const quadrantHeightLowerBound = quadrant.isInnerQuadrant ? quadrant.y : 0;
+        const quadrantHeightUpperBound = quadrant.isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
         for (const set of this.unfoundedDifference) {
             coordinates = this.imageDiffService.getPositionFromAbsolute(set.entries().next().value[1]);
             if (coordinates.x <= quadrantWidthUpperBound && coordinates.x >= quadrantWidthLowerBound) {
@@ -115,7 +117,6 @@ export class HintsService {
         const y = quadrant.y;
         const w = quadrant.w;
         const h = quadrant.h;
-
         if (isLastHint) {
             confetti({
                 particleCount: 50,
@@ -143,13 +144,12 @@ export class HintsService {
         }
     }
 
-    findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isLastHint: boolean): void {
+    findQuadrant(quadrant: Quadrant, currentQuadrant: number, isLastHint: boolean): void {
         const quadrantUpLeft = { ...quadrant };
-        const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h };
-        const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
-        const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
+        const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
+        const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
+        const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         let blinkCount = 0;
-        const currentQuadrant = this.generatePossibleQuadrant(quadrant, isInnerQuadrant);
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
@@ -175,23 +175,22 @@ export class HintsService {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
-    findInnerQuadrant(isLastHint: boolean): void {
-        const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant, false);
-        switch (currentQuadrant) {
+    findInnerQuadrant(outerQuadrant: number, innerQuadrant: number, isLastHint: boolean): void {
+        switch (outerQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
-                this.findQuadrant(this.innerQuadrant1, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant1, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                this.findQuadrant(this.innerQuadrant2, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant2, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                this.findQuadrant(this.innerQuadrant3, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant3, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                this.findQuadrant(this.innerQuadrant4, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant4, innerQuadrant, isLastHint);
                 break;
             }
         }
@@ -200,18 +199,22 @@ export class HintsService {
     showHints(): void {
         switch (this.count) {
             case 3: {
-                this.findQuadrant(this.outerQuadrant, false, false);
+                this.findQuadrant(this.outerQuadrant, this.randomQuadrant[0], false);
                 this.count--;
                 break;
             }
             case 2: {
-                this.findInnerQuadrant(false);
+                this.findInnerQuadrant(this.randomQuadrant[1], this.randomQuadrant[2], false);
                 this.count--;
                 break;
             }
             case 1: {
-                this.findInnerQuadrant(true);
+                this.findInnerQuadrant(this.randomQuadrant[3], this.randomQuadrant[4], true);
                 this.count--;
+                break;
+            }
+            case 0: {
+                this.removeHotkeysEventListener();
                 break;
             }
         }
@@ -221,7 +224,38 @@ export class HintsService {
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, diff));
     }
 
+    handleRandomInnerQuadrant(outerQuadrant: number): void {
+        switch (outerQuadrant) {
+            case constantsQuadrant.QUADRANT_UP_LEFT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
+                break;
+            }
+        }
+    }
+
+    handleRandomQuadrant(): void {
+        this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+        if (this.count === 2) {
+            this.handleRandomInnerQuadrant(this.randomQuadrant[1]);
+        } else if (this.count === 1) {
+            this.handleRandomInnerQuadrant(this.randomQuadrant[3]);
+        }
+    }
+
     activateHints(): void {
+        this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
         this.isHintsActive = !this.isHintsActive;
@@ -245,8 +279,7 @@ export class HintsService {
     }
 
     removeHotkeysEventListener(): void {
-        // indexEvent is undefined when the user is not in the game
-        // indexEvent is possibly 0 so we can't use !indexEvent
+        // indexEvent is undefined when the user is not in the game and indexEvent is possibly 0 so we can't use !indexEvent
         if (this.indexEvent === undefined) return;
         this.hotkeysService.removeHotkeysEventListener(this.indexEvent);
         this.indexEvent = undefined;

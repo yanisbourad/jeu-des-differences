@@ -11,7 +11,6 @@ import { Game, GameInfo, GameRecord, GamingHistory, Rankings, TimeConfig } from 
 })
 export class GameDatabaseService {
     twoHundredOkResponse: number;
-    isEmpty: boolean = false;
 
     private readonly baseUrl: string = environment.serverUrl;
 
@@ -77,13 +76,6 @@ export class GameDatabaseService {
             error: () => isSaved.next(false),
         });
         return isSaved;
-    }
-    async isDataBaseEmpty(): Promise<void> {
-        this.getAllGames().subscribe((res: GameInfo[]) => {
-            if (res.length === 0) {
-                this.isEmpty = true;
-            }
-        });
     }
 
     updateConstants(constants: TimeConfig): Observable<HttpResponse<string>> {

@@ -19,11 +19,11 @@ export class GameNameSaveComponent {
 
     // eslint-disable-next-line max-params
     constructor(
-        public dialogRef: MatDialogRef<GameNameSaveComponent>,
-        private readonly gameDataBase: GameDatabaseService,
-        private differenceService: ImageDiffService,
         private router: Router,
         public dialog: MatDialog,
+        public dialogRef: MatDialogRef<GameNameSaveComponent>,
+        private differenceService: ImageDiffService,
+        private readonly gameDataBase: GameDatabaseService,
     ) {
         this.gameName = '';
         this.showFeedback = '';
@@ -39,7 +39,7 @@ export class GameNameSaveComponent {
         return false;
     }
 
-    getGameData() {
+    getGameData(): void {
         if (this.validateGameName(this.gameName.toLocaleLowerCase())) {
             const isSaved = this.gameDataBase.saveGame(this.gameName);
             isSaved.subscribe((response) => {
@@ -59,7 +59,7 @@ export class GameNameSaveComponent {
         this.gameName = '';
     }
 
-    closeOnAbort() {
+    closeOnAbort(): void {
         this.dialogRef.close();
     }
 

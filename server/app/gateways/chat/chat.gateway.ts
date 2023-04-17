@@ -135,6 +135,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.to(data[1]).emit('feedbackDifference', data[0]);
     }
 
+    @SubscribeMessage(ChatEvents.ModifyTime)
+    async modifyTime(_: Socket, gameMode: string) {
+        if (gameMode === 'tempsLimite')  this.serverTime.decrementTime(this.roomName);
+        else this.serverTime.incrementTime();
+    }
+
     @SubscribeMessage(ChatEvents.MousePosition)
     async mouseDetect(socket: Socket, data: [position: number, roomName: string, mode: string]) {
         this.roomName = this.isMulti ? data[1] : socket.id;

@@ -25,11 +25,11 @@
             <canvas #canvas2 style="top: -335%;" [attr.width]="width" [attr.height]="height"></canvas>
         </div>
     </div>
-    <div *ngIf="notRewinding" class="footer">
-        <button mat-raised-button class="giveUp btn" (click)="this.gameService.giveUp()">Abandonner la partie</button>
+    <div class="footer">
+        <button *ngIf="notRewinding" mat-raised-button class="giveUp btn" (click)="this.gameService.giveUp()">Abandonner la partie</button>
+        <app-rewind-control-bar class="rewindControlBar" *ngIf="!notRewinding" #rewindControlBar></app-rewind-control-bar>
     </div>
     <div class="message">
         <app-message-area #chatComponent id="chat" [playerName]="this.gameService.playerName"></app-message-area>
     </div>
 </div>
-<app-rewind-control-bar *ngIf="!notRewinding" #rewindControlBar></app-rewind-control-bar>

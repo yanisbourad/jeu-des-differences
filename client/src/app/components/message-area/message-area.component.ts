@@ -57,8 +57,6 @@ export class MessageAreaComponent implements OnInit {
             pos: this.position[1],
             event: false,
         });
-        // no idea why this is here // remove this if unused
-        this.socketClient.messageList.push();
         this.message = '';
     }
 

@@ -4,8 +4,9 @@ import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
 import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { GameService } from '@app/services/game/game.service';
-import { GameInfo, Rankings } from '@common/game';
+import { GameInfo } from '@common/game';
 import { firstValueFrom } from 'rxjs';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
     selector: 'app-game-card',
@@ -20,6 +21,8 @@ export class GameCardComponent implements OnInit {
     gameName: string;
     typePage: 'Classique' | 'Configuration';
     url: string;
+    messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
+    messageDeleteGame: string = 'Êtes-vous sur de vouloir supprimer ce jeu?';
 
     // eslint-disable-next-line max-params
     constructor(
@@ -80,10 +83,32 @@ export class GameCardComponent implements OnInit {
         }
     }
     async onReinitialise(gameName: string) {
-        this.gameService.deleteOneGameRecords(gameName).subscribe((newRankings: Rankings) => {
-            this.card.rankingMulti = newRankings.rankingMulti;
-            this.card.rankingSolo = newRankings.rankingSolo;
-        });
-        // should update the view to reflect initial game records
+        this.gameService.deleteOneGameRecords(gameName).subscribe();
+    }
+
+    launchFeedbackResetSpecificGameRecords(gameName: string, showedMessage: string): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: { message: showedMessage, confirmFunction: async () => this.onReinitialise(gameName) },
+                disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
+            })
+            .afterClosed()
+            .subscribe();
+    }
+
+    launchFeedbackDeleteGame(gameName: string, showedMessage: string): void {
+        this.dialog
+            .open(VerificationFeedbackComponent, {
+                data: { message: showedMessage, confirmFunction: async () => this.onDelete(gameName) },
+                disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
+            })
+            .afterClosed()
+            .subscribe();
     }
 }

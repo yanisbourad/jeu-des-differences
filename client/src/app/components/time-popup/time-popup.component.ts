@@ -84,6 +84,9 @@ export class TimePopupComponent implements AfterContentChecked {
             .open(VerificationFeedbackComponent, {
                 data: { message: showedMessage, confirmFunction: () => this.resetConstants() },
                 disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             })
             .afterClosed()
             .subscribe(() => {

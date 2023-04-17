@@ -58,7 +58,7 @@ export class ServerTimeService {
     }
 
     decrementTime(id: string): void {
-        if (this.tamponTime - this.timeConstants.timePen < 0) {
+        if (this.tamponTime - this.timeConstants.timePen <= 0) {
             this.tamponTime = 0;
             this.stopChronometer(id);
         } else {

@@ -3,7 +3,7 @@ import { GameRecordService } from '@app/services/game-record/game-record.service
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { GameRecordController } from './game-record.constroller';
 
 describe('GameRecordController', () => {
@@ -29,6 +29,7 @@ describe('GameRecordController', () => {
             time: 'test',
             playerName: 'test',
             dateStart: 'test',
+            keyServer: 'test',
         };
     });
 

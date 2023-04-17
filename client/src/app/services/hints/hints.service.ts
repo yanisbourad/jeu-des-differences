@@ -9,7 +9,6 @@ import * as constantsCanvas from '@app/configuration/const-canvas';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
-
 import confetti from 'canvas-confetti';
 
 export interface Quadrant {
@@ -35,7 +34,6 @@ export class HintsService {
     randomQuadrant: number[] = [];
 
     outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
-
     innerQuadrant1: Quadrant = {
         x: 0,
         y: 0,
@@ -103,7 +101,6 @@ export class HintsService {
         const quadrantWidthUpperBound = quadrant.isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
         const quadrantHeightLowerBound = quadrant.isInnerQuadrant ? quadrant.y : 0;
         const quadrantHeightUpperBound = quadrant.isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
-
         for (const set of this.unfoundedDifference) {
             coordinates = this.imageDiffService.getPositionFromAbsolute(set.entries().next().value[1]);
             if (coordinates.x <= quadrantWidthUpperBound && coordinates.x >= quadrantWidthLowerBound) {
@@ -121,7 +118,6 @@ export class HintsService {
         const y = quadrant.y;
         const w = quadrant.w;
         const h = quadrant.h;
-
         if (isLastHint) {
             confetti({
                 particleCount: 50,
@@ -251,15 +247,10 @@ export class HintsService {
     }
 
     handleRandomQuadrant(): void {
-        if (this.count === 3) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
-        }
+        this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
         if (this.count === 2) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
             this.handleRandomInnerQuadrant(this.randomQuadrant[1]);
-        }
-        if (this.count === 1) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+        } else if (this.count === 1) {
             this.handleRandomInnerQuadrant(this.randomQuadrant[3]);
         }
     }
@@ -289,8 +280,7 @@ export class HintsService {
     }
 
     removeHotkeysEventListener(): void {
-        // indexEvent is undefined when the user is not in the game
-        // indexEvent is possibly 0 so we can't use !indexEvent
+        // indexEvent is undefined when the user is not in the game and indexEvent is possibly 0 so we can't use !indexEvent
         if (this.indexEvent === undefined) return;
         this.hotkeysService.removeHotkeysEventListener(this.indexEvent);
         this.indexEvent = undefined;

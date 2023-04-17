@@ -6,7 +6,6 @@ import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/pla
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
-import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameService } from '@app/services/game/game.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
@@ -18,6 +17,7 @@ import { SocketClientService } from '@app/services/socket/socket-client.service'
 })
 export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
+    gameCount: number;
     // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)
@@ -27,11 +27,8 @@ export class MessageDialogComponent {
         readonly gameService: GameService,
         public dialog: MatDialog,
         private gameRecorderService: GameRecorderService,
-        private gameDataBaseService: GameDatabaseService,
         private gameCardHandlerService: GameCardHandlerService,
-    ) {
-        this.gameDataBaseService.isDataBaseEmpty();
-    }
+    ) {}
 
     rewindGame() {
         this.socket.leaveRoom();
@@ -40,15 +37,11 @@ export class MessageDialogComponent {
     }
 
     launchSolo(): void {
-        if (this.gameDataBaseService.isEmpty) {
-            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
-        } else {
-            this.socket.connect();
-            this.socket.startTimeLimit(this.gameService.playerName);
-            setTimeout(() => {
-                this.router.navigate(['/game', { player: this.data.name, gameType: 'solo', mode: 'tempsLimite' }]);
-            }, constantsTime.LOADING);
-        }
+        this.socket.connect();
+        this.socket.startTimeLimit(this.gameService.playerName);
+        setTimeout(() => {
+            this.router.navigate(['/game', { player: this.data.name, gameType: 'solo', mode: 'tempsLimite' }]);
+        }, constantsTime.LOADING);
     }
 
     launchFeedback(showedMessage: string): void {
@@ -59,25 +52,13 @@ export class MessageDialogComponent {
     }
 
     launchCooperation(): void {
-        if (this.gameDataBaseService.isEmpty) {
-            this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer");
-        } else {
-            // this.socket.connect();
-            // this.socket.startTimeLimit(this.gameService.playerName); should be done when two players join the game
-            // console.log('launchCooperation', 'name ', this.data.name, ' gamename ', this.data.gameName, ' gameType ', this.data.gameType);
-            this.gameCardHandlerService.connect();
-            this.dialog.open(PlayerWaitPopupComponent, {
-                data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
-                disableClose: true,
-                height: '600px',
-                width: '600px',
-            });
-            // dialog.afterClosed().subscribe((res) => {
-            // if (res) {
-            //     return res;
-            //     }
-            // });
-        }
+        this.gameCardHandlerService.connect();
+        this.dialog.open(PlayerWaitPopupComponent, {
+            data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
+            disableClose: true,
+            height: '600px',
+            width: '600px',
+        });
     }
 
     redirection(): void {

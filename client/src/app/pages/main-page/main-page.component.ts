@@ -19,7 +19,7 @@ export class MainPageComponent {
     openDialog(): void {
         this.gameDatabase.getCount().subscribe((count) => {
             if (count === 0) {
-                this.launchFeedback('Vous devez créer un jeu avant de pouvoir jouer.');
+                this.launchFeedback("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer.");
                 return;
             }
             const dialogRef = this.dialog.open(NamePopupComponent, {

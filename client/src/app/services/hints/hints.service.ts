@@ -30,7 +30,7 @@ export class HintsService {
     unfoundedDifference: Set<number>[];
     indexEvent: number | undefined;
     color: string = 'black';
-    count: number = 3;
+    nHintsLeft: number = 3;
     randomQuadrant: number[] = [];
     outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
     innerQuadrant1: Quadrant = {
@@ -121,6 +121,7 @@ export class HintsService {
             confetti({
                 particleCount: 50,
                 spread: 60,
+                shapes: ['star'],
                 origin: {
                     x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
@@ -129,6 +130,7 @@ export class HintsService {
             confetti({
                 particleCount: 50,
                 spread: 60,
+                shapes: ['star'],
                 origin: {
                     x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
@@ -197,20 +199,20 @@ export class HintsService {
     }
 
     showHints(): void {
-        switch (this.count) {
+        switch (this.nHintsLeft) {
             case 3: {
                 this.findQuadrant(this.outerQuadrant, this.randomQuadrant[0], false);
-                this.count--;
+                this.nHintsLeft--;
                 break;
             }
             case 2: {
                 this.findInnerQuadrant(this.randomQuadrant[1], this.randomQuadrant[2], false);
-                this.count--;
+                this.nHintsLeft--;
                 break;
             }
             case 1: {
                 this.findInnerQuadrant(this.randomQuadrant[3], this.randomQuadrant[4], true);
-                this.count--;
+                this.nHintsLeft--;
                 break;
             }
             case 0: {
@@ -247,9 +249,9 @@ export class HintsService {
 
     handleRandomQuadrant(): void {
         this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
-        if (this.count === 2) {
+        if (this.nHintsLeft === 2) {
             this.handleRandomInnerQuadrant(this.randomQuadrant[1]);
-        } else if (this.count === 1) {
+        } else if (this.nHintsLeft === 1) {
             this.handleRandomInnerQuadrant(this.randomQuadrant[3]);
         }
     }
@@ -291,7 +293,7 @@ export class HintsService {
     }
 
     resetService(): void {
-        this.count = 3;
+        this.nHintsLeft = 3;
         this.isHintsActive = false;
         clearInterval(this.blinking);
         this.unfoundedDifference = new Array();

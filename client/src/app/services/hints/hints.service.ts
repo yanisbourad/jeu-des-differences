@@ -32,7 +32,6 @@ export class HintsService {
     color: string = 'black';
     count: number = 3;
     randomQuadrant: number[] = [];
-
     outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
     innerQuadrant1: Quadrant = {
         x: 0,

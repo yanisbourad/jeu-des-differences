@@ -25,9 +25,9 @@ export class CanvasNgxComponent implements AfterViewInit {
     @ViewChild('CanvasTemp', { static: false }) private canvasTemp!: ElementRef<HTMLCanvasElement>;
     @ViewChild('fileUpload', { static: false }) private fileUpload!: ElementRef<HTMLInputElement>;
     tempCommand: CommandSpecific | undefined;
-    listDraw: Drawing[] = [];
-    isDrawing = false;
-    currentDrawing: Drawing = { points: [] };
+    listDraw: Drawing[];
+    isDrawing: boolean;
+    currentDrawing: Drawing;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -35,7 +35,11 @@ export class CanvasNgxComponent implements AfterViewInit {
         private readonly bitmap: BitmapService,
         private readonly canvasHolderService: CanvasHolderService,
         private readonly commandService: CommandService,
-    ) {}
+    ) {
+        this.listDraw = [];
+        this.isDrawing = false;
+        this.currentDrawing = { points: [] };
+    }
 
     // needed for the canvas size
     get width(): number {

@@ -184,16 +184,10 @@ export class GameService {
         return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
     }
     populateFakeGameRecordsForOneGame(_name: string): void {
-        // const name = _name + this.key;
-        // const basRecords: GameRecord[] = this.getFakeGameRecords(name);
-        // this.gameRecordModel.insertMany(basRecords);
-        // return {
-        //     rankingMulti: basRecords.filter((record: GameRecord) => record.typeGame === 'multi').sort((a: GameRecord, b: GameRecord) => a.time.localeCompare(b.time)),
-        //     rankingSolo: basRecords.filter((record: GameRecord) => record.typeGame === 'solo').sort((a: GameRecord, b: GameRecord) => a.time.localeCompare(b.time)),
-        // } as Rankings
         const basRecords: GameRecord[] = this.getFakeGameRecords(_name);
         this.gameRecordModel.insertMany(basRecords);
     }
+    
     populateFakeGameRecords(): void {
         this.gamesNames.forEach((gameName) => {
             this.populateFakeGameRecordsForOneGame(gameName);

@@ -45,6 +45,9 @@ export class GamingHistoryComponent implements AfterContentChecked {
                     },
                 },
                 disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             })
             .afterClosed()
             .subscribe();

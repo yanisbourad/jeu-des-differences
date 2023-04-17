@@ -68,8 +68,8 @@ export class GameRecordController {
     @Delete('/:gameName')
     async deleteSpecificGameRecords(@Param('gameName') gameName: string, @Res() response: Response) {
         try {
-            const res = await this.gamesRecordService.deleteGameRecordsForOneGame(gameName);
-            response.status(HttpStatus.OK).json(res);
+            await this.gamesRecordService.deleteGameRecordsForOneGame(gameName);
+            response.status(HttpStatus.OK).json('Game records were deleted successfully');
         } catch (error) {
             response.status(HttpStatus.NO_CONTENT).send(error.message);
         }

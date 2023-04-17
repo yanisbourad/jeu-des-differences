@@ -75,54 +75,6 @@ export class HintsService {
         this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
     }
 
-    handleQuadrants(): void {
-        if (this.count === 3) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
-        }
-        if (this.count === 2) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
-            switch (this.randomQuadrant[1]) {
-                case constantsQuadrant.QUADRANT_UP_LEFT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
-                    break;
-                }
-            }
-        }
-        if (this.count === 1) {
-            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
-            switch (this.randomQuadrant[3]) {
-                case constantsQuadrant.QUADRANT_UP_LEFT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
-                    break;
-                }
-                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
-                    break;
-                }
-            }
-        }
-    }
-
     generateRandomMaxNumber(max: number): number {
         return Math.floor(Math.random() * Math.floor(max));
     }
@@ -203,7 +155,6 @@ export class HintsService {
         const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         let blinkCount = 0;
-        // const currentQuadrant = this.generatePossibleQuadrant(quadrant);
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
@@ -230,7 +181,6 @@ export class HintsService {
     }
 
     findInnerQuadrant(outerQuadrant: number, innerQuadrant: number, isLastHint: boolean): void {
-        // const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant);
         switch (outerQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
                 this.findQuadrant(this.innerQuadrant1, innerQuadrant, isLastHint);
@@ -251,7 +201,6 @@ export class HintsService {
         }
     }
 
-    // eslint-disable-next-line complexity
     showHints(): void {
         switch (this.count) {
             case 3: {
@@ -280,8 +229,43 @@ export class HintsService {
         this.unfoundedDifference = this.unfoundedDifference.filter((set) => !this.eqSet(set, diff));
     }
 
+    handleRandomInnerQuadrant(outerQuadrant: number): void {
+        switch (outerQuadrant) {
+            case constantsQuadrant.QUADRANT_UP_LEFT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
+                break;
+            }
+            case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
+                break;
+            }
+        }
+    }
+
+    handleRandomQuadrant(): void {
+        if (this.count === 3) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+        }
+        if (this.count === 2) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+            this.handleRandomInnerQuadrant(this.randomQuadrant[1]);
+        }
+        if (this.count === 1) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+            this.handleRandomInnerQuadrant(this.randomQuadrant[3]);
+        }
+    }
+
     activateHints(): void {
-        this.handleQuadrants();
+        this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
         this.isHintsActive = !this.isHintsActive;

@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
-import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
 
 @Component({
     selector: 'app-header',
@@ -16,9 +16,8 @@ export class HeaderComponent {
     newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
-    messageDeleteGames: string = "êtes-vous sur de vouloir supprimer tous les jeux? si oui, vous allez être redirigé vers la page d'accueil";
-    messageDeleteRecords: string =
-        "êtes-vous sur de vouloir reinitialiser tous les meilleurs temps? si oui, vous allez être redirigé vers la page d'accueil";
+    messageDeleteGames: string = 'êtes-vous sur de vouloir supprimer tous les jeux?';
+    messageDeleteRecords: string = 'êtes-vous sur de vouloir reinitialiser tous les meilleurs temps?';
     constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {

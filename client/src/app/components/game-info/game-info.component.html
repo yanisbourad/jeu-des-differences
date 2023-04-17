@@ -55,7 +55,7 @@
                 <img *ngFor="let hints of hintsDisplayService.hintsArray" class="differences-trouvees-img"
                     src={{hints}} alt="Indices restants" />
             </div>
-            <button class="btn btn-primary" [disabled]= "hintsDisplayService.nHintsLeft===0" (click)="hintsDisplayService.useHint()">Utiliser un indice</button>
+            <button class="btn btn-primary" [disabled]= "hintsService.nHintsLeft===0" (click)="hintsService.activateHints()">Utiliser un indice</button>
         </div>
     </div>
 </div>

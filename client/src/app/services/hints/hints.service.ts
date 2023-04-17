@@ -1,3 +1,4 @@
+import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { ElementRef, Injectable } from '@angular/core';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
 import { StopHintsRecord } from '@app/classes/game-records/stop-hints';
@@ -62,11 +63,15 @@ export class HintsService {
         isInnerQuadrant: true,
     };
 
+    // eslint-disable-next-line max-params
     constructor(
         private readonly hotkeysService: HotkeysService,
+        private readonly hintsDisplayService: HintsDisplayService,
         public gameRecorderService: GameRecorderService,
         public imageDiffService: ImageDiffService,
-    ) {}
+    ) {
+        this.hintsDisplayService.setIcons();
+    }
 
     hintsKeyBinding(): void {
         this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
@@ -203,16 +208,19 @@ export class HintsService {
             case 3: {
                 this.findQuadrant(this.outerQuadrant, this.randomQuadrant[0], false);
                 this.nHintsLeft--;
+                this.hintsDisplayService.updateIcons();
                 break;
             }
             case 2: {
                 this.findInnerQuadrant(this.randomQuadrant[1], this.randomQuadrant[2], false);
                 this.nHintsLeft--;
+                this.hintsDisplayService.updateIcons();
                 break;
             }
             case 1: {
                 this.findInnerQuadrant(this.randomQuadrant[3], this.randomQuadrant[4], true);
                 this.nHintsLeft--;
+                this.hintsDisplayService.updateIcons();
                 break;
             }
             case 0: {
@@ -293,6 +301,7 @@ export class HintsService {
     }
 
     resetService(): void {
+        this.hintsDisplayService.setIcons();
         this.nHintsLeft = 3;
         this.isHintsActive = false;
         clearInterval(this.blinking);

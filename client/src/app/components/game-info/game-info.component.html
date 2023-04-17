@@ -48,4 +48,14 @@
         </div>
         <app-timer></app-timer>
     </div>
+    <div class="right">
+        <div *ngIf="gameService.gameType === 'solo'">
+            <p class="sub-title">Indices restants</p>
+            <div>
+                <img *ngFor="let hints of hintsDisplayService.hintsArray" class="differences-trouvees-img"
+                    src={{hints}} alt="Indices restants" />
+            </div>
+            <button class="btn btn-primary" [disabled]= "hintsDisplayService.nHintsLeft===0" (click)="hintsDisplayService.useHint()">Utiliser un indice</button>
+        </div>
+    </div>
 </div>

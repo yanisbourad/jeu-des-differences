@@ -214,6 +214,10 @@ export class HintsService {
                 this.count--;
                 break;
             }
+            case 0: {
+                this.removeHotkeysEventListener();
+                break;
+            }
         }
     }
 

@@ -243,10 +243,6 @@ export class GameService {
         return this.gameDataBase.deleteOneGameRecords(gameName);
     }
 
-    sendHintUsed(): void {
-        this.gameHelper.sendHintMessage();
-    }
-
     mouseHitDetect(event: MouseEvent): void {
         const roomName = this.gameId + this.gameName;
         if (event.button === MouseButton.Left && !this.errorPenalty) {

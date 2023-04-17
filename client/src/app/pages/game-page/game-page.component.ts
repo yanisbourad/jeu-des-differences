@@ -93,9 +93,11 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.cheatModeKeyBinding();
         this.cheatModeService.canvas0 = this.canvasCheat0;
         this.cheatModeService.canvas1 = this.canvasCheat1;
-        this.hintsService.hintsKeyBinding();
-        this.hintsService.canvas0 = this.canvasCheat0;
-        this.hintsService.canvas1 = this.canvasCheat1;
+        if (this.gameService.gameType === 'solo') {
+            this.hintsService.hintsKeyBinding();
+            this.hintsService.canvas0 = this.canvasCheat0;
+            this.hintsService.canvas1 = this.canvasCheat1;
+        }
     }
 
     loading(): void {

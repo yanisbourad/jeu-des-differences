@@ -17,6 +17,7 @@ export interface Quadrant {
     y: number;
     w: number;
     h: number;
+    isInnerQuadrant: boolean;
 }
 
 @Injectable({
@@ -32,31 +33,35 @@ export class HintsService {
     color: string = 'black';
     count: number = 3;
 
-    outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2 };
+    outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
 
     innerQuadrant1: Quadrant = {
         x: 0,
         y: 0,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant2: Quadrant = {
         x: constantsCanvas.DEFAULT_WIDTH / 2,
         y: 0,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant3: Quadrant = {
         x: 0,
         y: constantsCanvas.DEFAULT_HEIGHT / 2,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
     innerQuadrant4: Quadrant = {
         x: constantsCanvas.DEFAULT_WIDTH / 2,
         y: constantsCanvas.DEFAULT_HEIGHT / 2,
         w: constantsCanvas.DEFAULT_WIDTH / constantsQuadrant.QUARTER,
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
+        isInnerQuadrant: true,
     };
 
     constructor(
@@ -90,13 +95,13 @@ export class HintsService {
         return possibleQuadrant;
     }
 
-    generatePossibleQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean): number {
+    generatePossibleQuadrant(quadrant: Quadrant): number {
         let possibleQuadrant: Set<number> = new Set<number>();
         let coordinates: Point;
-        const quadrantWidthLowerBound = isInnerQuadrant ? quadrant.x : 0;
-        const quadrantWidthUpperBound = isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
-        const quadrantHeightLowerBound = isInnerQuadrant ? quadrant.y : 0;
-        const quadrantHeightUpperBound = isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
+        const quadrantWidthLowerBound = quadrant.isInnerQuadrant ? quadrant.x : 0;
+        const quadrantWidthUpperBound = quadrant.isInnerQuadrant ? quadrant.x + constantsCanvas.DEFAULT_WIDTH / 2 : constantsCanvas.DEFAULT_WIDTH;
+        const quadrantHeightLowerBound = quadrant.isInnerQuadrant ? quadrant.y : 0;
+        const quadrantHeightUpperBound = quadrant.isInnerQuadrant ? quadrant.y + constantsCanvas.DEFAULT_HEIGHT / 2 : constantsCanvas.DEFAULT_HEIGHT;
 
         for (const set of this.unfoundedDifference) {
             coordinates = this.imageDiffService.getPositionFromAbsolute(set.entries().next().value[1]);
@@ -143,13 +148,13 @@ export class HintsService {
         }
     }
 
-    findQuadrant(quadrant: Quadrant, isInnerQuadrant: boolean, isLastHint: boolean): void {
+    findQuadrant(quadrant: Quadrant, isLastHint: boolean): void {
         const quadrantUpLeft = { ...quadrant };
-        const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h };
-        const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
-        const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h };
+        const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
+        const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
+        const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         let blinkCount = 0;
-        const currentQuadrant = this.generatePossibleQuadrant(quadrant, isInnerQuadrant);
+        const currentQuadrant = this.generatePossibleQuadrant(quadrant);
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
@@ -176,22 +181,22 @@ export class HintsService {
     }
 
     findInnerQuadrant(isLastHint: boolean): void {
-        const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant, false);
+        const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant);
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
-                this.findQuadrant(this.innerQuadrant1, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant1, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                this.findQuadrant(this.innerQuadrant2, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant2, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                this.findQuadrant(this.innerQuadrant3, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant3, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                this.findQuadrant(this.innerQuadrant4, true, isLastHint);
+                this.findQuadrant(this.innerQuadrant4, isLastHint);
                 break;
             }
         }
@@ -200,7 +205,7 @@ export class HintsService {
     showHints(): void {
         switch (this.count) {
             case 3: {
-                this.findQuadrant(this.outerQuadrant, false, false);
+                this.findQuadrant(this.outerQuadrant, false);
                 this.count--;
                 break;
             }
@@ -212,6 +217,10 @@ export class HintsService {
             case 1: {
                 this.findInnerQuadrant(true);
                 this.count--;
+                break;
+            }
+            case 0: {
+                this.removeHotkeysEventListener();
                 break;
             }
         }

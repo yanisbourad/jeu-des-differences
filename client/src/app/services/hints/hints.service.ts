@@ -32,6 +32,7 @@ export class HintsService {
     indexEvent: number | undefined;
     color: string = 'black';
     count: number = 3;
+    randomQuadrant: number[] = [];
 
     outerQuadrant: Quadrant = { x: 0, y: 0, w: constantsCanvas.DEFAULT_WIDTH / 2, h: constantsCanvas.DEFAULT_HEIGHT / 2, isInnerQuadrant: false };
 
@@ -72,6 +73,54 @@ export class HintsService {
 
     hintsKeyBinding(): void {
         this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
+    }
+
+    handleQuadrants(): void {
+        if (this.count === 3) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+        }
+        if (this.count === 2) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+            switch (this.randomQuadrant[1]) {
+                case constantsQuadrant.QUADRANT_UP_LEFT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
+                    break;
+                }
+            }
+        }
+        if (this.count === 1) {
+            this.randomQuadrant.push(this.generatePossibleQuadrant(this.outerQuadrant));
+            switch (this.randomQuadrant[3]) {
+                case constantsQuadrant.QUADRANT_UP_LEFT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant1));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_UP_RIGHT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant2));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_LEFT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant3));
+                    break;
+                }
+                case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
+                    this.randomQuadrant.push(this.generatePossibleQuadrant(this.innerQuadrant4));
+                    break;
+                }
+            }
+        }
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -148,13 +197,13 @@ export class HintsService {
         }
     }
 
-    findQuadrant(quadrant: Quadrant, isLastHint: boolean): void {
+    findQuadrant(quadrant: Quadrant, currentQuadrant: number, isLastHint: boolean): void {
         const quadrantUpLeft = { ...quadrant };
         const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         let blinkCount = 0;
-        const currentQuadrant = this.generatePossibleQuadrant(quadrant);
+        // const currentQuadrant = this.generatePossibleQuadrant(quadrant);
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
@@ -180,42 +229,43 @@ export class HintsService {
         }, constantsTime.BLINKING_TIMEOUT);
     }
 
-    findInnerQuadrant(isLastHint: boolean): void {
-        const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant);
-        switch (currentQuadrant) {
+    findInnerQuadrant(outerQuadrant: number, innerQuadrant: number, isLastHint: boolean): void {
+        // const currentQuadrant = this.generatePossibleQuadrant(this.outerQuadrant);
+        switch (outerQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
-                this.findQuadrant(this.innerQuadrant1, isLastHint);
+                this.findQuadrant(this.innerQuadrant1, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                this.findQuadrant(this.innerQuadrant2, isLastHint);
+                this.findQuadrant(this.innerQuadrant2, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                this.findQuadrant(this.innerQuadrant3, isLastHint);
+                this.findQuadrant(this.innerQuadrant3, innerQuadrant, isLastHint);
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                this.findQuadrant(this.innerQuadrant4, isLastHint);
+                this.findQuadrant(this.innerQuadrant4, innerQuadrant, isLastHint);
                 break;
             }
         }
     }
 
+    // eslint-disable-next-line complexity
     showHints(): void {
         switch (this.count) {
             case 3: {
-                this.findQuadrant(this.outerQuadrant, false);
+                this.findQuadrant(this.outerQuadrant, this.randomQuadrant[0], false);
                 this.count--;
                 break;
             }
             case 2: {
-                this.findInnerQuadrant(false);
+                this.findInnerQuadrant(this.randomQuadrant[1], this.randomQuadrant[2], false);
                 this.count--;
                 break;
             }
             case 1: {
-                this.findInnerQuadrant(true);
+                this.findInnerQuadrant(this.randomQuadrant[3], this.randomQuadrant[4], true);
                 this.count--;
                 break;
             }
@@ -231,6 +281,7 @@ export class HintsService {
     }
 
     activateHints(): void {
+        this.handleQuadrants();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;
         this.isHintsActive = !this.isHintsActive;

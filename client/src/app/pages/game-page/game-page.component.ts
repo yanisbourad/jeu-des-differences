@@ -180,6 +180,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.hintsService.resetService();
         this.notRewinding = true;
         this.chat.isNotRewinding = true;
+        this.hintsService.randomQuadrant = [];
     }
 
     subscriptions(): void {

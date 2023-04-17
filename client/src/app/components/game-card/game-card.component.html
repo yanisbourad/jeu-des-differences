@@ -47,7 +47,7 @@
         (click)="launchDialog()">{{createJoinState}}</button>
 
     <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="deleteButton"
-        (click)="onDelete(card.gameName)">Supprimer</button>
+        (click)="launchFeedbackDeleteGame(card.gameName, messageDeleteGame)">Supprimer</button>
     <button *ngIf="changeButton() === 'Configuration'" class="playingButtons" id="resetButton"
-        (click)="onReinitialise(card.gameName)">Reinitialiser</button>
+        (click)="launchFeedbackResetSpecificGameRecords(card.gameName, messageDeleteRecords)">Reinitialiser</button>
 </div>

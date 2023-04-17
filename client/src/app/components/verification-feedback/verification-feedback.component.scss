@@ -6,31 +6,52 @@
     border-radius: 4px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     margin-bottom: 20px;
-    background-color: #fff;
+    font-size: 1.2em;
+    // background-color: #fff;
 }
 
 .btn-box {
     display: flex;
-    flex-direction: row;
+    // flex-direction: row;
     justify-content: center;
     margin-top: 25px;
 }
 
-.btn-box button {
-    margin: 0 10px;
-    color: red;
-    border: 1px solid rgb(249, 100, 100);
-}
+// .btn-box button {
+//     margin: 0 10px;
+//     color: red;
+//     border: 1px solid rgb(249, 100, 100);
+// }
 
-#btn-abbort {
-    color: #00a65a;
-    border-color: #00a65a;
-    width: 100px;
+// #btn-abbort {
+//     color: #00a65a;
+//     border-color: #00a65a;
+//     width: 100px;
+//     border-radius: 10px;
+// }
+// #btn-confirm {
+//     color: red;
+//     border-color: red;
+//     width: 80px;
+//     border-radius: 10px;
+// }
+
+#cancel-btn {
+    background: rgb(230, 100, 100);
     border-radius: 10px;
-}
-#btn-confirm {
-    color: red;
-    border-color: red;
-    width: 80px;
+    padding: 10px;
+    width: 75px;
+    border: none;
+    margin: 10px;
+    color: white;
+  }
+  
+#end-btn{
+    background: rgb(36, 228, 126);
     border-radius: 10px;
-}
+    padding: 10px;
+    border: none;
+    width: 75px;
+    margin: 10px;
+    color: white;
+  }

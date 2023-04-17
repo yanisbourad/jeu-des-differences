@@ -8,7 +8,7 @@ import { Message } from '@app/interfaces/message';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
-import { Game, GameRecord, GamingHistory, Rankings } from '@common/game';
+import { Game, GameRecord, GamingHistory } from '@common/game';
 import { Observable } from 'rxjs';
 import { GameCardHandlerService } from './game-card-handler-service.service';
 import { GameHelperService } from './game-helper.service';
@@ -239,7 +239,7 @@ export class GameService {
         this.gameHelper.displayGiveUp('Êtes-vous sûr de vouloir abandonner la partie? Cette action est irréversible.', 'giveUp');
     }
 
-    deleteOneGameRecords(gameName: string): Observable<Rankings> {
+    deleteOneGameRecords(gameName: string): Observable<HttpResponse<string>> {
         return this.gameDataBase.deleteOneGameRecords(gameName);
     }
 

@@ -16,8 +16,8 @@ export class HeaderComponent {
     newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
-    messageDeleteGames: string = 'êtes-vous sur de vouloir supprimer tous les jeux?';
-    messageDeleteRecords: string = 'êtes-vous sur de vouloir reinitialiser tous les meilleurs temps?';
+    messageDeleteGames: string = 'Êtes-vous sur de vouloir supprimer tous les jeux?';
+    messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser tous les meilleurs temps?';
     constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
@@ -37,11 +37,7 @@ export class HeaderComponent {
     }
 
     async eraseGameRecords() {
-        this.gameDatabaseService.deleteGameRecords().subscribe((res) => {
-            if (res.status === this.gameDatabaseService.twoHundredOkResponse) {
-                this.router.navigate(['/home']);
-            }
-        });
+        this.gameDatabaseService.deleteGameRecords().subscribe();
     }
     redirect(): boolean {
         this.newUrl = this.router.url.split(';')[0];
@@ -56,21 +52,23 @@ export class HeaderComponent {
             .open(VerificationFeedbackComponent, {
                 data: { message: showedMessage, confirmFunction: () => this.resetGames() },
                 disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             })
             .afterClosed()
-            .subscribe(() => {
-                location.reload();
-            });
+            .subscribe();
     }
     launchFeedbackResetRecords(showedMessage: string): void {
         this.dialog
             .open(VerificationFeedbackComponent, {
                 data: { message: showedMessage, confirmFunction: async () => this.eraseGameRecords() },
                 disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             })
             .afterClosed()
-            .subscribe(() => {
-                location.reload();
-            });
+            .subscribe();
     }
 }

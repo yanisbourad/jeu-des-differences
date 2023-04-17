@@ -5,7 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GameRecordController } from './controllers/game-record/game-record.constroller';
 import { GameController } from './controllers/game/game.controller';
 import { GamingHistoryController } from './controllers/gaming-history/gaming-history.controller';
-import { GameCardHandlerModule } from './gateways/game-card-handler/game-card-handler.module';
+import { GameCardHandlerGateway } from './gateways/game-card-handler/game-card-handler.gateway';
+import { GameCardHandlerService } from './gateways/game-card-handler/game-card-handler.service';
 import { GameRecord, gameRecordSchema } from './model/database/game-record';
 import { GamingHistory, gamingHistorySchema } from './model/database/gaming-history';
 import { TimerConstantsModel, timerConstantsShema } from './model/database/timer-constants';
@@ -27,9 +28,9 @@ import { ServerTimeService } from './services/time/server-time.service';
             { name: GamingHistory.name, schema: gamingHistorySchema },
             { name: TimerConstantsModel.name, schema: timerConstantsShema },
         ]),
-        GameCardHandlerModule,
+        // GameCardHandlerModule,
     ],
     controllers: [GameRecordController, GameController, GamingHistoryController],
-    providers: [ChatGateway, GameService, GameRecordService, Logger, ServerTimeService],
+    providers: [ChatGateway, GameCardHandlerGateway, GameService, GameRecordService, GameCardHandlerService, Logger, ServerTimeService],
 })
 export class AppModule {}

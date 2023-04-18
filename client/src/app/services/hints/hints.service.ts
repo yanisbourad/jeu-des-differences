@@ -223,9 +223,6 @@ export class HintsService {
                 this.findInnerQuadrant(this.randomQuadrant[3], this.randomQuadrant[4], true);
                 this.nHintsLeft--;
                 this.hintsDisplayService.updateIcons();
-                break;
-            }
-            case 0: {
                 this.removeHotkeysEventListener();
                 break;
             }
@@ -267,10 +264,8 @@ export class HintsService {
     }
 
     activateHints(): void {
-        if (this.nHintsLeft !== 0) {
-            this.hintsDisplayService.modifyTime(this.gameMode);
-            new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
-        }
+        this.hintsDisplayService.modifyTime(this.gameMode);
+        new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;

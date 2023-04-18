@@ -36,7 +36,7 @@ export class ServerTimeService {
 
     async startCountDown(id: string): Promise<void> {
         await this.getTimeConstants();
-        let count = 0;
+        let count = 1;
         this.countDown = this.timeConstants.timeInit;
         this.tamponTime = this.countDown;
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {

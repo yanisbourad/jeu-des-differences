@@ -234,7 +234,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private emitTime(): void {
         setInterval(() => {
-            if (this.serverTime.countDown === 0) {
+            if (this.serverTime.countDown <= 0) {
                 this.server.to(this.roomName).emit('timeLimitStatus', false);
                 this.serverTime.removeTimer(this.roomName);
             }

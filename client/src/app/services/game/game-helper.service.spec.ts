@@ -6,16 +6,18 @@ import SpyObj = jasmine.SpyObj;
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { of } from 'rxjs';
+import { GameRecord } from '@common/game';
 
 describe('GameHelperService', () => {
     let gameHelper: GameHelperService;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
     let matDialogSpy: SpyObj<MatDialog>;
     let foundMessage: { message: string; playerName: string; color: string; pos: string; gameId: string; event: boolean };
+    let ranking: GameRecord[];
 
     beforeEach(() => {
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['sendMessage']);
+        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['sendMessage', 'getRoomName']);
     });
 
     beforeEach(() => {
@@ -129,4 +131,55 @@ describe('GameHelperService', () => {
     });
 
     /** TODO: test sendWinnerMessage et globalMessage */
+    it('sendWinnerMessage should send message via socket', () => {
+        gameHelper.message =
+            new Date().toLocaleTimeString() + ' - ' + ' Alice obtient la première position dans les meilleurs temps du jeu game en double';
+        gameHelper.winnerMessage = {
+            message: gameHelper.message,
+            playerName: 'Alice',
+            color: '#FF0000',
+            pos: '50%',
+            gameId: socketClientServiceSpy.getRoomName(),
+            event: true,
+        };
+        socketClientServiceSpy.messageList = [];
+        gameHelper.sendWinnerMessage(1);
+        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalledWith(gameHelper.winnerMessage);
+        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalled();
+    });
+    it('sendGlobalMessage should send message via socket', () => {
+        ranking = [
+            {
+                gameName: 'difference 2',
+                typeGame: 'solo',
+                time: '2:34',
+                playerName: 'joueur 2',
+                dateStart: '2023-02-02',
+                keyServer: 'key',
+            },
+            {
+                gameName: 'difference 2',
+                typeGame: 'solo',
+                time: '2:34',
+                playerName: 'joueur 2',
+                dateStart: '2023-02-02',
+                keyServer: 'key',
+            },
+            {
+                gameName: 'difference 2',
+                typeGame: 'mlyi',
+                time: '2:34',
+                playerName: 'joueur 2',
+                dateStart: '2023-02-02',
+                keyServer: 'key',
+            },
+        ];
+        const time = 5;
+        socketClientServiceSpy.messageList = [];
+        gameHelper.globalMessage(time, ranking);
+        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalled();
+        const time2 = 125;
+        gameHelper.globalMessage(time2, ranking);
+        expect(socketClientServiceSpy.sendMessage).toHaveBeenCalled();
+    });
 });

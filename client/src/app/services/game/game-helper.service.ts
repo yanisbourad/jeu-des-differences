@@ -17,6 +17,7 @@ export class GameHelperService {
     gameName: string;
     gameType: string;
     message: string;
+    winnerMessage: { message: string; playerName: string; color: string; pos: string; gameId: string; event: boolean };
     subMessage: { playerName: string; color: string; pos: string; gameId: string; event: boolean };
     constructor(private socket: SocketClientService, private dialog: MatDialog) {
         this.path = {
@@ -70,7 +71,7 @@ export class GameHelperService {
         const positions = ['', 'première', 'deuxième', 'troisième'];
         const msg = ` obtient la ${positions[position]} position dans les meilleurs temps du jeu`;
         this.message = new Date().toLocaleTimeString() + ' - ' + this.playerName + msg + this.gameName + ' en ' + this.gameType;
-        const winnerMessage = {
+        this.winnerMessage = {
             message: this.message,
             playerName: 'meilleur temps',
             color: '#FF0000',
@@ -78,8 +79,8 @@ export class GameHelperService {
             gameId: this.socket.getRoomName(),
             event: true,
         };
-        this.socket.sendMessage(winnerMessage);
-        this.socket.messageList.push({ ...winnerMessage, mine: true });
+        this.socket.sendMessage(this.winnerMessage);
+        this.socket.messageList.push({ ...this.winnerMessage, mine: true });
     }
 
     globalMessage(gameTime: number, rankingCopy: GameRecord[]) {

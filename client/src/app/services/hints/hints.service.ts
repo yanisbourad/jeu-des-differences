@@ -10,7 +10,7 @@ import * as constantsCanvas from '@app/configuration/const-canvas';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
-import confetti from 'canvas-confetti';
+//import confetti from 'canvas-confetti';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 
 export interface Quadrant {
@@ -125,24 +125,24 @@ export class HintsService {
         const w = quadrant.w;
         const h = quadrant.h;
         if (isLastHint) {
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                shapes: ['star'],
-                origin: {
-                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
-                },
-            });
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                shapes: ['star'],
-                origin: {
-                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
-                },
-            });
+            // confetti({
+            //     particleCount: 50,
+            //     spread: 60,
+            //     shapes: ['star'],
+            //     origin: {
+            //         x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+            //         y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+            //     },
+            // });
+            // confetti({
+            //     particleCount: 50,
+            //     spread: 60,
+            //     shapes: ['star'],
+            //     origin: {
+            //         x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
+            //         y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+            //     },
+            // });
         } else {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;

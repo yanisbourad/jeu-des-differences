@@ -76,7 +76,7 @@ export class HintsService {
     }
 
     hintsKeyBinding(): void {
-        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.activateHints.bind(this));
+        this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.triggerHints.bind(this));
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -263,7 +263,7 @@ export class HintsService {
         }
     }
 
-    activateHints(): void {
+    triggerHints(): void {
         this.hintsDisplayService.modifyTime(this.gameMode);
         new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();

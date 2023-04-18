@@ -4,7 +4,7 @@ import { HintsDisplayService } from './hints-display.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
 import SpyObj = jasmine.SpyObj;
 
-fdescribe('HintsDisplayService', () => {
+describe('HintsDisplayService', () => {
     let hintsDisplayService: HintsDisplayService;
     let socketClientServiceSpy: SpyObj<SocketClientService>;
     let foundMessage: { message: string; playerName: string; color: string; pos: string; gameId: string; event: boolean };

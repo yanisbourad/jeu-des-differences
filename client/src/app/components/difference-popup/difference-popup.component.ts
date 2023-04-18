@@ -54,8 +54,9 @@ export class DifferencePopupComponent implements AfterViewInit {
         this.showDifference = this.imageDifferenceService.listDifferences.length;
         const dialogRefGame = this.dialog.open(GameNameSaveComponent, {
             disableClose: true,
-            height: '250px',
-            width: '500px',
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
         this.dialogRef.close();
         dialogRefGame.afterClosed();

@@ -1,18 +1,18 @@
 .container {
     display: flex;
-    justify-content: center;
     flex-direction: column;
-    margin: 0 auto;
-}
-
-.container p {
-    font-size: 1.5em;
-    color: red;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    font-size: 1.2em;
 }
 
 .feedback-message {
     display: flex;
     justify-content: center;
+    font-size: 1.2em;
 }
 
 .image-pixel {
@@ -30,14 +30,21 @@
 }
 
 .validate {
-    background-color: red;
-    border: 1px solid red;
-    width: 20%;
+    background: rgb(36, 228, 126);
+    border-radius: 10px;
+    padding: 10px;
+    border: none;
+    width: 90px;
+    margin: 10px;
+    color: white;
 }
 
 .cancel {
-    background-color: rgb(6, 97, 48);
-    border: 1px solid rgb(7, 85, 26);
-    width: 20%;
-    margin-right: 5px;
+    background: rgb(230, 100, 100);
+    border-radius: 10px;
+    padding: 10px;
+    width: 90px;
+    border: none;
+    margin: 10px;
+    color: white;
 }

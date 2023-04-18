@@ -46,7 +46,7 @@ export class BitmapService {
         const bitDepth = infoHeader[14];
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (header[0] !== 0x42 || header[1] !== 0x4d) {
-            alert('Not a bitmap file');
+            alert("Mauvais format d'image. Veuillez seulement téléverser des images dans un format bitmap (BMP) 24-bit de taille 640x480 pixels");
             return false;
         }
         if (bitDepth !== constants.DESIRED_BIT_DEPTH) {

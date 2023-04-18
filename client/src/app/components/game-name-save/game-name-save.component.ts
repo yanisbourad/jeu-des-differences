@@ -52,7 +52,7 @@ export class GameNameSaveComponent {
                     this.launchFeedback('Votre Jeu a été sauvegardée avec succès!');
                 } else {
                     this.showFeedback = 'The game was not saved';
-                    this.launchFeedback('Ce nom est déjà utilisé, Veille choisir un autre.');
+                    this.launchFeedback('Ce nom est déjà utilisé. Veillez choisir un autre nom de jeu.');
                 }
             });
         }
@@ -67,6 +67,9 @@ export class GameNameSaveComponent {
         this.dialog.open(GeneralFeedbackComponent, {
             data: { message: showedMessage },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
     }
 }

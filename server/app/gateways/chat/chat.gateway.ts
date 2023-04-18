@@ -136,16 +136,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.ModifyTime)
-    async modifyTime(_: Socket, gameMode: string) {
-        this.logger.debug(['modifyTime', gameMode]);
+    async modifyTime(socket: Socket, gameMode: string) {
         if (gameMode === 'tempsLimite') {
             this.serverTime.decrementTime(this.roomName);
         }
         else {
-            const time =  this.serverTime.elapsedTimes.get(this.roomName);
-            if (time) {
-                this.serverTime.elapsedTimes.set(this.roomName, time + this.serverTime.timeConstants.timeBonus);
-            }
+            this.serverTime.count.set(socket.id, this.serverTime.count.get(socket.id) + this.serverTime.timeConstants.timeBonus)
         }
     }
 

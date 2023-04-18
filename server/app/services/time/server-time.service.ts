@@ -14,6 +14,8 @@ export class ServerTimeService {
     timeConstants: TimeConfig;
     timers: { [key: string]: Subscription } = {};
     elapsedTimes: Map<string, number> = new Map<string, number>();
+    count: Map<string, number> = new Map<string, number>();
+    incrementCount: boolean;
 
     constructor(private gameService: GameService) {
        this.getTimeConstants();
@@ -23,11 +25,12 @@ export class ServerTimeService {
         this.timeConstants = await this.gameService.getConstants()
     }
 
-    startChronometer(id: string): void {
-        let count = 0;
+    async startChronometer(id: string): Promise<void> {
+        await this.getTimeConstants();
+        this.count.set(id, 0)
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {
-            count++;
-            this.elapsedTimes.set(id, count);
+            this.count.set(id, this.count.get(id)+1)
+            this.elapsedTimes.set(id, this.count.get(id));
         });
     }
 
@@ -69,6 +72,7 @@ export class ServerTimeService {
     stopChronometer(id: string): number {
         this.timers[id].unsubscribe();
         const time = this.elapsedTimes.get(id);
+        this.count.delete(id);
         this.resetTimer(id);
         return time;
     }
@@ -95,6 +99,7 @@ export class ServerTimeService {
         this.getTimeConstants();
         this.timers[id].unsubscribe();
         this.elapsedTimes.delete(id);
+        this.count.delete(id);
         this.countDown = this.timeConstants.timeInit;
     }
 }

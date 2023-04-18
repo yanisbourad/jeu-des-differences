@@ -267,8 +267,10 @@ export class HintsService {
     }
 
     activateHints(): void {
-        this.hintsDisplayService.modifyTime(this.gameMode);
-        new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
+        if (this.nHintsLeft !== 0) {
+            this.hintsDisplayService.modifyTime(this.gameMode);
+            new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
+        }
         this.handleRandomQuadrant();
         const chatBox = document.getElementById('chat-box');
         if (document.activeElement === chatBox) return;

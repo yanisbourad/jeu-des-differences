@@ -1,3 +1,4 @@
 export const DELAY_BEFORE_EMITTING_TIME = 1000;
 export const TRANSFORM_TO_SECONDS = 1000;
+export const COUNTDOWN_DELAY = 30000;
 export const MAX_COUNTDOWN = 120;

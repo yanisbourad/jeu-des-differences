@@ -56,8 +56,9 @@ export class ServerTimeService {
     incrementTime(): void {
         if (this.tamponTime + this.timeConstants.timeBonus > MAX_COUNTDOWN) {
             this.tamponTime = MAX_COUNTDOWN;
+        } else {
+            this.tamponTime += this.timeConstants.timeBonus;
         }
-        this.tamponTime += this.timeConstants.timeBonus;
     }
 
     decrementTime(id: string): void {
@@ -81,12 +82,12 @@ export class ServerTimeService {
         return this.elapsedTimes.get(id);
     }
 
-    resetTimer(id: string): void { // maybe to remove later
+    resetTimer(id: string): void { 
         this.elapsedTimes.set(id, 0);
         this.elapsedTime = 0;
     }
 
-    resetAllTimers(): void { // maybe to remove later
+    resetAllTimers(): void { // used to reset all timers when test suite is finished
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
         // unsubscribe to every timers

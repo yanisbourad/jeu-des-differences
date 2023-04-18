@@ -1,11 +1,12 @@
 <div class="form-group">
-    <p class="index">Entrer le nom du Jeu SVP (3 a 10 caracteres)</p>
+    <p class="index">Entrez le nom du jeu (3 à 10 caractères)</p>
     <div class="input-block">
-        <label for="gamename">Nom du Jeu</label>
-        <input name="gameName" [(ngModel)]="gameName" id="gameName" type="text" placeholder="Papa Docker" required
+        <label for="gamename">Nom du jeu</label>
+        <input name="gameName" [(ngModel)]="gameName" id="gameName" type="text" placeholder="exemple: jeu 1" required
             minlength="2" appForbiddenName="   ">
+            
     </div>
-    <p>Niveau du Jeu : {{level}}</p>
+    <p id = 'difficulty'>Niveau du jeu : {{level}}</p>
     <div class="btn-block">
         <button class="btn cancel" (click)="closeOnAbort()">Annuler</button>
         <button class="btn accept" (click)="getGameData()">Submit</button>

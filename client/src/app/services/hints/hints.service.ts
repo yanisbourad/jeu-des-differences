@@ -269,8 +269,6 @@ export class HintsService {
         this.hintsDisplayService.modifyTime(this.gameMode);
         new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();
-        const chatBox = document.getElementById('chat-box');
-        if (document.activeElement === chatBox) return;
         this.isHintsActive = !this.isHintsActive;
         if (this.isHintsActive) {
             new StartHintsRecord().record(this.gameRecorderService);

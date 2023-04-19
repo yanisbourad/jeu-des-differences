@@ -307,6 +307,7 @@ export class HintsService {
         this.isHintsActive = false;
         clearInterval(this.blinking);
         this.unfoundedDifference = new Array();
+        confetti.reset();
     }
 
     eqSet(set1: Set<number>, set2: Set<number>): boolean {

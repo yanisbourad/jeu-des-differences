@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
 import { DELAY_BEFORE_EMITTING_TIME, SEC_TO_MILLISEC, UNIT_DELAY_INTERVAL } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { Subject } from 'rxjs';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { Subject } from 'rxjs';
 import { GameService } from './game.service';
 @Injectable({
     providedIn: 'root',
@@ -11,6 +11,7 @@ import { GameService } from './game.service';
 export class GameRecorderService {
     gamePage: GamePageComponent;
     list: GameRecordCommand[] = [];
+    serviceTime: number = 0;
     tempList: GameRecordCommand[] = [];
     position = 0;
     action: GameRecordCommand | undefined;
@@ -19,6 +20,8 @@ export class GameRecorderService {
     myTimeout: ReturnType<typeof setTimeout> | undefined;
     progress$ = new Subject<number>();
     startingTime: number = 0;
+    sumPenalty: number = 0;
+
     constructor(private gameService: GameService, private socketClient: SocketClientService) {
         this.socketClient.messageToAdd$.subscribe((message) => {
             this.do(message);
@@ -28,12 +31,13 @@ export class GameRecorderService {
     get isPaused(): boolean {
         return this.paused;
     }
+
     get currentTime(): number {
         return this.socketClient.getRoomTime(this.socketClient.getRoomName()) || 0;
     }
 
-    get currentTimeInMilliseconds(): number {
-        return this.currentTime * SEC_TO_MILLISEC;
+    get currentTimeInMillisecondsWithoutPenalty(): number {
+        return (this.currentTime - this.sumPenalty) * SEC_TO_MILLISEC;
     }
 
     get maxTime(): number {
@@ -47,6 +51,7 @@ export class GameRecorderService {
     set timeStart(time: number) {
         this.startingTime = time;
     }
+
     // this will be used to set the speed of the rewind
     // the default speed is 1 second per second
     // the speed can be set to 2, 3, 4
@@ -80,6 +85,7 @@ export class GameRecorderService {
     // need to make all the user interactions blocked during the rewind
     // will start the rewind from the beginning
     startRewind(gamePage: GamePageComponent = this.gamePage) {
+        this.serviceTime = 0;
         this.gamePage = gamePage;
         this.gamePage.initForRewind();
         if (this.list.length === 0) {
@@ -122,7 +128,7 @@ export class GameRecorderService {
         this.progress$.next(this.currentTime / this.maxTime);
 
         // while the current action is not null and its time is less than the current time
-        while (this.action && this.action.gameTime(this.startingTime) <= this.currentTimeInMilliseconds) {
+        while (this.action && this.action.gameTime(this.startingTime) <= this.currentTimeInMillisecondsWithoutPenalty) {
             this.redo();
             this.action = this.list[this.position++];
         }
@@ -141,6 +147,8 @@ export class GameRecorderService {
 
     private redo() {
         if (!this.action) return;
+        this.socketClient.gameTime = this.currentTime + this.action.penalty;
+        this.sumPenalty += this.action.penalty;
         this.action.do(this.gamePage);
     }
     // this will be used to record the actions

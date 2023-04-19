@@ -25,15 +25,10 @@ describe('ClientTimeService', () => {
         }).compile();
         service = module.get<ServerTimeService>(ServerTimeService);
         service.timeConstants = {timeBonus: 5, timeInit: 30, timePen: 5};
-        const mockTimeConfig: TimeConfig = {
-            timeInit: 30,
-            timePen: 5,
-            timeBonus: 5
-          };
+        const mockTimeConfig: TimeConfig = { timeInit: 30, timePen: 5, timeBonus: 5 };
         jest.spyOn(gameService, 'getConstants').mockReturnValue(
             Promise.resolve(mockTimeConfig)
         )
-        service.tamponTime = 116;
     });
 
     afterEach(() => {
@@ -41,10 +36,13 @@ describe('ClientTimeService', () => {
         service.resetAllTimers();
     });
 
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+    });
+
     it('should get the time constants from cache', async () => {
-        const time = await gameService.getConstants();
         await service.getTimeConstants();
-        expect(service.timeConstants).toEqual(time);
+        expect(service.timeConstants).toEqual({timeBonus: 5, timeInit: 30, timePen: 5});
     });
 
     it('should start the chronometer', async() => {

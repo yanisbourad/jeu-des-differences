@@ -1,6 +1,6 @@
 <div class="infos">
     <div class="left">
-        <p class="title">{{gameService.gameInformation.gameTitle}}</p>
+        <p class="title">{{gameService.game.gameName}}</p>
         <p class="sub-title game-infos" *ngIf="gameService.gameType === 'solo'; else multiBlock">
             {{gameService.gameType}}</p>
         <ng-template #multiBlock>
@@ -56,7 +56,7 @@
                 <img *ngFor="let hints of hintsDisplayService.hintsArray" class="differences-trouvees-img" src={{hints}}
                     alt="Indices restants" />
             </div>
-            <button class="btn btn-primary" [disabled]="hintsService.nHintsLeft===0"
+            <button class="btn btn-primary" [disabled]="hintsService.nHintsLeft===0 || !notRewinding"
                 (click)="hintsService.triggerHints()">Utiliser un indice</button>
         </div>
     </div>

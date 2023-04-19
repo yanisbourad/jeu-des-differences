@@ -217,10 +217,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.emitTime();
     }
 
-    defineDifferences(roomName: string, diffList: string[]): void {
-        this.unfoundedDifference.set(roomName, this.gameService.getSetDifference(diffList));
-    }
-
     private setGame(playerName?: string, gameName?: string): void { // from time to time i don't have the set of difference for the other player unless the other other find of difference need to fix that
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();

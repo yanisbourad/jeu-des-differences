@@ -10,7 +10,7 @@ import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 export abstract class GameRecordCommand {
     time: number;
-
+    penalty = 0;
     // the time the action was performed
     // in milliseconds
     // this will be used to determine the
@@ -20,6 +20,9 @@ export abstract class GameRecordCommand {
         this.time = Date.now();
     }
 
+    get timePenalty(): number {
+        return this.penalty;
+    }
     gameTime(startingTime: number): number {
         return this.time - startingTime || 0;
     }

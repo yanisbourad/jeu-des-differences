@@ -1,18 +1,19 @@
-import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { ElementRef, Injectable } from '@angular/core';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
 import { StopHintsRecord } from '@app/classes/game-records/stop-hints';
-import * as constantsTime from '@app/configuration/const-time';
-import { DrawService } from '@app/services/draw/draw.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import * as constantsCanvas from '@app/configuration/const-canvas';
-import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
-import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
+import * as constantsTime from '@app/configuration/const-time';
+import { Point } from '@app/interfaces/point';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HintsDisplayService } from '@app/services/hints/hints-display.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { TimeConfig } from '@common/game';
 import confetti from 'canvas-confetti';
-import { GameMessageEvent } from '@app/classes/game-records/message-event';
-
 export interface Quadrant {
     x: number;
     y: number;
@@ -65,18 +66,39 @@ export class HintsService {
         isInnerQuadrant: true,
     };
 
+    listOfQuadrants: { quadrant: Quadrant; isLast: boolean }[] = [];
+    penaltyHint: number;
+    intervalId: ReturnType<typeof setTimeout>;
+
     // eslint-disable-next-line max-params
     constructor(
         private readonly hotkeysService: HotkeysService,
         private readonly hintsDisplayService: HintsDisplayService,
         public gameRecorderService: GameRecorderService,
         public imageDiffService: ImageDiffService,
+        private gameDatabaseService: GameDatabaseService,
     ) {
         this.hintsDisplayService.setIcons();
+        this.launchHints();
+    }
+
+    launchHints() {
+        let toggle = true;
+        this.intervalId = setInterval(() => {
+            toggle = !toggle;
+            if (toggle) this.listOfQuadrants.forEach((it) => this.displayQuadrant(it.quadrant, it.isLast));
+            else this.stopHints();
+        }, constantsTime.BLINKING_TIMEOUT);
+    }
+
+    stopInterval() {
+        clearInterval(this.intervalId);
+        this.listOfQuadrants = [];
     }
 
     hintsKeyBinding(): void {
         this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.triggerHints.bind(this));
+        this.gameDatabaseService.getConstants().subscribe((timeConfig: TimeConfig) => (this.penaltyHint = timeConfig.timePen));
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -135,8 +157,8 @@ export class HintsService {
                 colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
                 particleCount: 50,
                 origin: {
-                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / constantsQuadrant.SCREEN_WIDTH,
+                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / constantsQuadrant.SCREEN_HEIGHT,
                 },
             });
             confetti({
@@ -149,8 +171,8 @@ export class HintsService {
                 colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
                 particleCount: 50,
                 origin: {
-                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / constantsQuadrant.SCREEN_WIDTH,
+                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / constantsQuadrant.SCREEN_HEIGHT,
                 },
             });
         } else {
@@ -170,30 +192,32 @@ export class HintsService {
         const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
-        let blinkCount = 0;
+        let targetQuadrant: Quadrant = quadrantUpLeft;
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
-                this.displayQuadrant(quadrantUpLeft, isLastHint);
+                targetQuadrant = quadrantUpLeft;
                 break;
             }
             case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                this.displayQuadrant(quadrantUpRight, isLastHint);
+                targetQuadrant = quadrantUpRight;
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                this.displayQuadrant(quadrantDownLeft, isLastHint);
+                targetQuadrant = quadrantDownLeft;
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                this.displayQuadrant(quadrantDownRight, isLastHint);
+                targetQuadrant = quadrantDownRight;
                 break;
             }
         }
-        this.blinking = setInterval(() => {
-            blinkCount++;
-            if (blinkCount === constantsTime.BLINKING_COUNT * 2) this.stopHints();
-        }, constantsTime.BLINKING_TIMEOUT);
+
+        this.listOfQuadrants.push({ quadrant: targetQuadrant, isLast: isLastHint });
+
+        setTimeout(() => {
+            this.listOfQuadrants = this.listOfQuadrants.filter((a) => a.quadrant !== targetQuadrant);
+        }, constantsTime.HINT_TIMEOUT);
     }
 
     findInnerQuadrant(outerQuadrant: number, innerQuadrant: number, isLastHint: boolean): void {
@@ -281,7 +305,7 @@ export class HintsService {
         this.handleRandomQuadrant();
         this.isHintsActive = !this.isHintsActive;
         if (this.isHintsActive) {
-            new StartHintsRecord().record(this.gameRecorderService);
+            new StartHintsRecord(this.penaltyHint).record(this.gameRecorderService);
             this.isHintsActive = !this.isHintsActive;
         } else {
             new StopHintsRecord().record(this.gameRecorderService);

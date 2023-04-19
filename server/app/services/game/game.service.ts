@@ -1,6 +1,6 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { TimerConstantsModel } from '@app/model/database/timer-constants';
-import { Game, GameInfo, Rankings, TimeConfig } from '@common/game';
+import { Game, GameInfo, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
@@ -36,6 +36,7 @@ export class GameService {
     get getKey() {
         return this.key;
     }
+
     loadKeyForThisServer() {
         const pathKey = join(process.cwd(), 'assets', 'key.text');
         if (fs.existsSync(pathKey)) {
@@ -183,11 +184,12 @@ export class GameService {
     getFileTime(dirName: string, fileName: string): string {
         return fs.readFileSync(`${this.rootPathTime}/${dirName}/${fileName}`, 'utf8');
     }
-    populateFakeGameRecordsForOneGame(_name: string): void {
-        const basRecords: GameRecord[] = this.getFakeGameRecords(_name);
+
+    populateFakeGameRecordsForOneGame(gameName: string): void {
+        const basRecords: GameRecord[] = this.getFakeGameRecords(gameName);
         this.gameRecordModel.insertMany(basRecords);
     }
-    
+
     populateFakeGameRecords(): void {
         this.gamesNames.forEach((gameName) => {
             this.populateFakeGameRecordsForOneGame(gameName);

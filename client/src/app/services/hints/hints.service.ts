@@ -1,18 +1,19 @@
-import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { ElementRef, Injectable } from '@angular/core';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
 import { StopHintsRecord } from '@app/classes/game-records/stop-hints';
-import * as constantsTime from '@app/configuration/const-time';
-import { DrawService } from '@app/services/draw/draw.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import * as constantsCanvas from '@app/configuration/const-canvas';
-import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
-import { Point } from '@app/interfaces/point';
 import * as constantsQuadrant from '@app/configuration/const-quadrant';
+import * as constantsTime from '@app/configuration/const-time';
+import { Point } from '@app/interfaces/point';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HintsDisplayService } from '@app/services/hints/hints-display.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { TimeConfig } from '@common/game';
 import confetti from 'canvas-confetti';
-import { GameMessageEvent } from '@app/classes/game-records/message-event';
-
 export interface Quadrant {
     x: number;
     y: number;
@@ -65,18 +66,22 @@ export class HintsService {
         isInnerQuadrant: true,
     };
 
+    penaltyHint: number;
+
     // eslint-disable-next-line max-params
     constructor(
         private readonly hotkeysService: HotkeysService,
         private readonly hintsDisplayService: HintsDisplayService,
         public gameRecorderService: GameRecorderService,
         public imageDiffService: ImageDiffService,
+        private gameDatabaseService: GameDatabaseService,
     ) {
         this.hintsDisplayService.setIcons();
     }
 
     hintsKeyBinding(): void {
         this.indexEvent = this.hotkeysService.hotkeysEventListener(['i'], true, this.triggerHints.bind(this));
+        this.gameDatabaseService.getConstants().subscribe((timeConfig: TimeConfig) => (this.penaltyHint = timeConfig.timePen));
     }
 
     generateRandomMaxNumber(max: number): number {
@@ -281,7 +286,7 @@ export class HintsService {
         this.handleRandomQuadrant();
         this.isHintsActive = !this.isHintsActive;
         if (this.isHintsActive) {
-            new StartHintsRecord().record(this.gameRecorderService);
+            new StartHintsRecord(this.penaltyHint).record(this.gameRecorderService);
             this.isHintsActive = !this.isHintsActive;
         } else {
             new StopHintsRecord().record(this.gameRecorderService);

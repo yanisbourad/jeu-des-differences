@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing';
 import { ElementRef } from '@angular/core';
-import { HintsService } from './hints.service';
-import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
-import SpyObj = jasmine.SpyObj;
-import { HintsDisplayService } from '@app/services/hints/hints-display.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { TestBed } from '@angular/core/testing';
 import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HintsDisplayService } from '@app/services/hints/hints-display.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
+import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { HintsService } from './hints.service';
+import SpyObj = jasmine.SpyObj;
 
 describe('HintsService', () => {
     let hintsService: HintsService;

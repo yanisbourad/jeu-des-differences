@@ -260,6 +260,7 @@ describe('HintsService', () => {
         spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
         hintsService.clearCanvas(canvasA, canvasB);
         expect(hintsService.clearCanvas).toHaveBeenCalled();
+        expect(DrawService.clearDiff).toHaveBeenCalled();
     });
 
     it('resetService should reinitialize all variables', () => {

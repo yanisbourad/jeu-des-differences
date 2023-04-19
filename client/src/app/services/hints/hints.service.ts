@@ -140,8 +140,8 @@ export class HintsService {
                 colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
                 particleCount: 50,
                 origin: {
-                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                    x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / constantsQuadrant.SCREEN_WIDTH,
+                    y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / constantsQuadrant.SCREEN_HEIGHT,
                 },
             });
             confetti({
@@ -154,8 +154,8 @@ export class HintsService {
                 colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
                 particleCount: 50,
                 origin: {
-                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
-                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
+                    x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / constantsQuadrant.SCREEN_WIDTH,
+                    y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / constantsQuadrant.SCREEN_HEIGHT,
                 },
             });
         } else {

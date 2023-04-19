@@ -7,7 +7,7 @@ import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { GameRecordCommand } from './game-record';
 
-fdescribe('GameRecordCommand', () => {
+describe('GameRecordCommand', () => {
     let gameRecordCommand: GameRecordCommand;
     let gamePage: jasmine.SpyObj<GamePageComponent>;
     let gameRecordService: jasmine.SpyObj<GameRecorderService>;

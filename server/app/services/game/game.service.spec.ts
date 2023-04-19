@@ -45,7 +45,7 @@ describe('GameService', () => {
         logger = new Logger();
         service = new GameService(gameRecordModel, logger, timerConstantsModel);
         service.addGame(mockGame);
-        service.updateConstants(newConstants);
+        service.updateConstants(newConstants); // TODO : a changer, doit être un mock sinon ca change les vrai valeurs dans le jeu
         // notice that only the functions we call from the model are mocked
         // we can´t use sinon because mongoose Model is an interface and not a class
     });

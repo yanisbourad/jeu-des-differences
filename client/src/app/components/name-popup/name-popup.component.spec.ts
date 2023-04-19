@@ -6,7 +6,7 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
@@ -18,6 +18,7 @@ describe('NamePopupComponent', () => {
     let fixture: ComponentFixture<NamePopupComponent>;
     let route: Router;
     const data = { name: 'test', gameName: 'gameName', gameType: 'double' };
+    const mockData = { name: 'test', gameName: 'gameName', message: 'Veuillez sélectionner un mode de jeu', type: 'timeLimit' };
     let dialogRefSpy: SpyObj<MatDialogRef<NamePopupComponent>>;
 
     beforeEach(() => {
@@ -26,7 +27,7 @@ describe('NamePopupComponent', () => {
 
     beforeEach(async () => {
         TestBed.configureTestingModule({
-            imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
+            imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule, HttpClientTestingModule],
             declarations: [NamePopupComponent, PlayerWaitPopupComponent, GeneralFeedbackComponent],
             providers: [
                 // { provider: MatDialog, useValue: dialogSpy },
@@ -49,7 +50,7 @@ describe('NamePopupComponent', () => {
     });
     it('should initialize data.name to an empty string', () => {
         component.ngOnInit();
-        expect(component.data.name).toBe(' ');
+        expect(component.data.name).toBe('');
     });
     it('should return true if the name is valid', () => {
         expect(component.validatePlayerName('test')).toBeTrue();
@@ -77,6 +78,9 @@ describe('NamePopupComponent', () => {
         expect(spy).toHaveBeenCalledWith(GeneralFeedbackComponent, {
             data: { message: 'test' },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
     });
     it('should call launchFeedback when launchDialog  is called', () => {
@@ -92,9 +96,10 @@ describe('NamePopupComponent', () => {
         component.launchDialog();
         expect(spy).toHaveBeenCalledWith(PlayerWaitPopupComponent, {
             data,
-            height: '600px',
-            width: '600px',
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
     });
     it('should call launchGameTypeSelection when button is pressed', () => {
@@ -103,6 +108,7 @@ describe('NamePopupComponent', () => {
         component.data.gameType = 'double';
         component.launchGameTypeSelection();
         expect(spy).toHaveBeenCalledWith(MessageDialogComponent, {
+            data: mockData,
             disableClose: true,
             minWidth: '250px',
             minHeight: '110px',

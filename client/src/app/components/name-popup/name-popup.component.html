@@ -1,14 +1,14 @@
 <div id="popup">
-    <mat-dialog-content id="popup-content">
-        <p id="title-popup">Veuillez entrez le nom du joueur</p>
-        <mat-form-field id="name">
-            <label id="zeb">nom: </label>
-            <input id="name-input" type="text" matInput [(ngModel)]="data.name">
-        </mat-form-field>
-    </mat-dialog-content>
-    <mat-dialog-actions id="popup-button">
+    <div id="popup-content">
+        <p id="title-popup">Veuillez entrer le nom du joueur. (Entre 2 et 10 caractères)</p>
+        <div id="name">
+            <label id="zeb">Nom du joueur :  </label>
+            <input id="name-input" type="text" matInput [(ngModel)]="data.name" placeholder="exemple: Daniel">
+        </div>
+    </div>
+    <div id="popup-button">
         <button mat-button id="cancel-button" (click)="onNoClick()">Annuler</button>
         <button [disabled]="this.data.name === ''" mat-button id="confirmation-button" [mat-dialog-close]="data.name"
             cdkFocusInitial (click)="data.isTimeLimit? launchGameTypeSelection():redirect()">Continuer</button>
-    </mat-dialog-actions>
+    </div>
 </div>

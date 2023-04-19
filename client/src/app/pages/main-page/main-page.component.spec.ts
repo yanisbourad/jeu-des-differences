@@ -2,16 +2,20 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 describe('MainPageComponent', () => {
     let component: MainPageComponent;
     let fixture: ComponentFixture<MainPageComponent>;
+    // let dialogSpy: jasmine.SpyObj<MatDialogRef<MainPageComponent>>;
 
     beforeEach(async () => {
+        // dialogSpy = jasmine.createSpyObj('MatDialogRef<GameNameSaveComponent>', ['close']);
+
         await TestBed.configureTestingModule({
-            imports: [RouterTestingModule, HttpClientModule],
+            imports: [RouterTestingModule, HttpClientModule, MatDialogModule],
             declarations: [MainPageComponent],
-            providers: [],
+            // providers: [{ provide: MatDialogRef<MainPageComponent>, useValue: dialogSpy }],
         }).compileComponents();
     });
 

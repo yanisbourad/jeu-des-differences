@@ -49,8 +49,9 @@ describe('DifferencePopupComponent', () => {
         component.openName();
         expect(matDialogSpy.open).toHaveBeenCalledWith(GameNameSaveComponent, {
             disableClose: true,
-            height: '250px',
-            width: '500px',
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
         expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
     });
@@ -61,21 +62,10 @@ describe('DifferencePopupComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should show validation', () => {
-        component['imageDifferenceService'].listDifferences = [
-            new Set(constants.FIRST_SET),
-            new Set(constants.FIFTH_SET),
-            new Set(constants.FOURTH_SET),
-        ];
-        component.ngAfterViewInit();
-        expect(component.showMessage).toBe('');
-        expect(component.showValidation).toBeTrue();
-    });
-
     it('should not show validation', () => {
         component['imageDifferenceService'].listDifferences = [new Set(constants.FIRST_SET), new Set(constants.FIFTH_SET)];
         component.ngAfterViewInit();
-        expect(component.showMessage).toBe('(valide entre 3 et 9)');
+        expect(component.showMessage).toBe('(Quantité valide -- entre 3 et 9)');
         expect(component.showValidation).toBeFalsy();
     });
 });

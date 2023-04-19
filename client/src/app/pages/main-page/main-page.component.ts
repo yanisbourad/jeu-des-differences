@@ -25,6 +25,9 @@ export class MainPageComponent {
             const dialogRef = this.dialog.open(NamePopupComponent, {
                 data: { name: this.name, isTimeLimit: true },
                 disableClose: true,
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             });
 
             dialogRef.afterClosed().subscribe((result) => {
@@ -37,6 +40,9 @@ export class MainPageComponent {
         this.dialog.open(GeneralFeedbackComponent, {
             data: { message: showedMessage },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
     }
 }

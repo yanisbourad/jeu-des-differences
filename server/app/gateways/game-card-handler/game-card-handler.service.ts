@@ -101,14 +101,6 @@ export class GameCardHandlerService {
             this.players.delete(player.id);
             this.timeLimitedGamesQueue = [];
             return [player, opponent];
-        } else {
-            const players = [];
-            this.timeLimitedGamesQueue.forEach((playerId) => {
-                players.push(this.players.get(playerId));
-                this.players.delete(playerId);
-            });
-            this.timeLimitedGamesQueue = [];
-            return players;
         }
     }
 

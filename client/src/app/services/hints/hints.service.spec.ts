@@ -1,10 +1,14 @@
 import { ElementRef } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import * as constantsTime from '@app/configuration/const-time';
+import { GameDatabaseService } from '@app/services//game/game-database.service';
 import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { TimeConfig } from '@common/game';
+import { Subject } from 'rxjs';
 import { HintsService } from './hints.service';
 import SpyObj = jasmine.SpyObj;
 
@@ -14,6 +18,7 @@ describe('HintsService', () => {
     let hintsDisplayServiceSpy: SpyObj<HintsDisplayService>;
     let gameRecorderServiceSpy: SpyObj<GameRecorderService>;
     let imageDiffServiceSpy: SpyObj<ImageDiffService>;
+    let gameDatabaseServiceSpy: SpyObj<GameDatabaseService>;
     const dist = { dist1: 9000, dist2: 90000, dist3: 150000, dist4: 250000 };
     const quad = { quad1: 1, quad2: 2, quad3: 3, quad4: 4 };
 
@@ -22,12 +27,14 @@ describe('HintsService', () => {
         hintsDisplayServiceSpy = jasmine.createSpyObj('HintsDisplayService', ['setIcons', 'updateIcons', 'sendHintMessage', 'modifyTime']);
         gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['do']);
         imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['getPositionFromAbsolute']);
+        gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getConstants']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: HotkeysService, useValue: hotkeysServiceSpy },
                 { provide: HintsDisplayService, useValue: hintsDisplayServiceSpy },
                 { provide: GameRecorderService, useValue: gameRecorderServiceSpy },
                 { provide: ImageDiffService, useValue: imageDiffServiceSpy },
+                { provide: GameDatabaseService, useValue: gameDatabaseServiceSpy },
             ],
         });
         hintsService = TestBed.inject(HintsService);
@@ -40,9 +47,13 @@ describe('HintsService', () => {
     });
 
     it('hintsKeyBinding should call hotkeysService.hotkeysEventListener', () => {
+        const subject = new Subject<TimeConfig>();
+        gameDatabaseServiceSpy.getConstants.and.returnValue(subject);
         hintsService.hintsKeyBinding();
+        subject.next({ timeInit: 0, timePen: 3, timeBonus: 0 } as TimeConfig);
         expect(hotkeysServiceSpy.hotkeysEventListener).toHaveBeenCalled();
         expect(hintsService.indexEvent).toBeUndefined();
+        expect(hintsService.penaltyHint).toBe(3);
     });
 
     it('generateRandomMaxNumber should return a number between 0 and max', () => {
@@ -124,7 +135,7 @@ describe('HintsService', () => {
         hintsService.displayQuadrant(quadrant, isLastHint2);
     });
 
-    it('findQuadrant should call displayQuadrant when currentQuadrant is between 1 and 4', () => {
+    it('findQuadrant should call displayQuadrant when currentQuadrant is between 1 and 4', fakeAsync(() => {
         const quadrant = { x: 0, y: 0, w: 320, h: 240, isInnerQuadrant: false };
         const currentQuadrant = [quad.quad1, quad.quad2, quad.quad3, quad.quad4];
         const isLastHint = false;
@@ -132,10 +143,12 @@ describe('HintsService', () => {
         spyOn(hintsService, 'displayQuadrant').and.callFake(() => ({}));
         spyOn(hintsService, 'stopHints').and.callFake(() => ({}));
         for (const q of currentQuadrant) {
+            const lastQuadrantSize = hintsService.listOfQuadrants.length;
             hintsService.findQuadrant(quadrant, q, isLastHint);
-            expect(hintsService.displayQuadrant).toHaveBeenCalled();
+            expect(hintsService.listOfQuadrants.length).toEqual(lastQuadrantSize + 1);
+            tick(constantsTime.BLINKING_TIME * 3);
         }
-    });
+    }));
 
     it('findInnerQuadrant should call findQuadrant when outerQuadrant', () => {
         const outerQuadrant = [quad.quad1, quad.quad2, quad.quad3, quad.quad4];
@@ -289,4 +302,24 @@ describe('HintsService', () => {
         const set2 = new Set([1, 2]);
         expect(hintsService.eqSet(set1, set2)).toBe(false);
     });
+
+    it('should call displayQuadrant', fakeAsync(() => {
+        spyOn(hintsService, 'displayQuadrant').and.callThrough();
+        spyOn(hintsService, 'stopHints').and.callThrough();
+        hintsService.listOfQuadrants.push({
+            quadrant: {
+                x: 1,
+                y: 1,
+                w: 1,
+                h: 1,
+                isInnerQuadrant: true,
+            },
+            isLast: true,
+        });
+        hintsService.launchHints();
+        tick(constantsTime.BLINKING_TIME);
+        expect(hintsService.displayQuadrant).toHaveBeenCalled();
+        expect(hintsService.stopHints).toHaveBeenCalled();
+        hintsService.stopInterval();
+    }));
 });

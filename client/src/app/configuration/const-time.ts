@@ -10,6 +10,7 @@ export const TIMER_3_INIT = 5;
 export const UNIT_DELAY_INTERVAL = 50;
 export const TIMER_INCREMENT = 1;
 export const BLINKING_TIME = 1000;
+export const HINT_TIMEOUT = 2000;
 export const BLINKING_TIMEOUT = 125;
 export const BLINKING_COUNT = 8;
 export const LOADING_TIMEOUT = 500;

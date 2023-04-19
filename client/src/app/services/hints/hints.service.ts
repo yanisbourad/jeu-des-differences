@@ -66,7 +66,9 @@ export class HintsService {
         isInnerQuadrant: true,
     };
 
+    listOfQuadrants: { quadrant: Quadrant; isLast: boolean }[] = [];
     penaltyHint: number;
+    intervalId: ReturnType<typeof setTimeout>;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -77,6 +79,21 @@ export class HintsService {
         private gameDatabaseService: GameDatabaseService,
     ) {
         this.hintsDisplayService.setIcons();
+        this.launchHints();
+    }
+
+    launchHints() {
+        let toggle = true;
+        this.intervalId = setInterval(() => {
+            toggle = !toggle;
+            if (toggle) this.listOfQuadrants.forEach((it) => this.displayQuadrant(it.quadrant, it.isLast));
+            else this.stopHints();
+        }, constantsTime.BLINKING_TIMEOUT);
+    }
+
+    stopInterval() {
+        clearInterval(this.intervalId);
+        this.listOfQuadrants = [];
     }
 
     hintsKeyBinding(): void {
@@ -175,30 +192,32 @@ export class HintsService {
         const quadrantUpRight = { x: quadrant.x + quadrant.w, y: quadrant.y, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownLeft = { x: quadrant.x, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
         const quadrantDownRight = { x: quadrant.x + quadrant.w, y: quadrant.y + quadrant.h, w: quadrant.w, h: quadrant.h, isInnerQuadrant: true };
-        let blinkCount = 0;
+        let targetQuadrant: Quadrant = quadrantUpLeft;
         this.color = 'rgba(248, 65, 31, 0.5)';
         switch (currentQuadrant) {
             case constantsQuadrant.QUADRANT_UP_LEFT: {
-                this.displayQuadrant(quadrantUpLeft, isLastHint);
+                targetQuadrant = quadrantUpLeft;
                 break;
             }
             case constantsQuadrant.QUADRANT_UP_RIGHT: {
-                this.displayQuadrant(quadrantUpRight, isLastHint);
+                targetQuadrant = quadrantUpRight;
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_LEFT: {
-                this.displayQuadrant(quadrantDownLeft, isLastHint);
+                targetQuadrant = quadrantDownLeft;
                 break;
             }
             case constantsQuadrant.QUADRANT_DOWN_RIGHT: {
-                this.displayQuadrant(quadrantDownRight, isLastHint);
+                targetQuadrant = quadrantDownRight;
                 break;
             }
         }
-        this.blinking = setInterval(() => {
-            blinkCount++;
-            if (blinkCount === constantsTime.BLINKING_COUNT * 2) this.stopHints();
-        }, constantsTime.BLINKING_TIMEOUT);
+
+        this.listOfQuadrants.push({ quadrant: targetQuadrant, isLast: isLastHint });
+
+        setTimeout(() => {
+            this.listOfQuadrants = this.listOfQuadrants.filter((a) => a.quadrant !== targetQuadrant);
+        }, constantsTime.HINT_TIMEOUT);
     }
 
     findInnerQuadrant(outerQuadrant: number, innerQuadrant: number, isLastHint: boolean): void {

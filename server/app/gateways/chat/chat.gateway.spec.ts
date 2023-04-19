@@ -66,11 +66,9 @@ describe('ChatGateway', () => {
         gateway = module.get<ChatGateway>(ChatGateway);
         // We want to assign a value to the private field
         gateway['server'] = server;
-        timeService.timers = {
-            timer1: new Subscription(),
-            timer2: new Subscription(),
-            timer3: new Subscription(),
-        };
+        timeService.timers = { timer1: new Subscription(), timer2: new Subscription(), timer3: new Subscription() };
+        timeService.count = new Map<string, number>();
+        timeService.timeConstants = {timeBonus: 5, timeInit: 30, timePen: 5};
     });
 
     afterEach(() => {
@@ -81,38 +79,82 @@ describe('ChatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('connect() should call the logger.log method', () => {
+    it('connect() should call the logger.log method', () => { //ok
         gateway.connect(socket);
         expect(logger.log.calledOnce).toBeTruthy();
     });
 
-    it('socket handleConnection should be logged', () => {
+    it('socket handleConnection should be logged', () => { //ok
         gateway.handleConnection(socket);
         expect(logger.log.calledOnce).toBeTruthy();
     });
 
-    it('socket disconnection should be logged', () => {
+    it('handleDisconnect should be logged  and leave room', () => { // ok
         gateway.handleDisconnect(socket);
         expect(logger.log.calledOnce).toBeTruthy();
-    });
-
-    it('handleDisconnect should leave room and called removeRoom', async () => {
-        // jest.spyOn(playerService, 'removeRoom').mockImplementation(async () => {
-        //     return Promise.resolve();
-        // });
-        await gateway.handleDisconnect(socket);
         expect(socket.leave.calledOnce).toBeTruthy();
     });
 
-    it('afterInit() should trigger emit serverTime with correct parameters ', () => {
-        // jest.spyOn(gateway, 'emitTime').mockImplementation(jest.fn());
-        gateway.afterInit();
-        // expect(gateway.emitTime).toBeCalled();
+    it('handleDisconnect should emit giveup-return', async () => { // ok
+        gateway.isMulti = true;
+        gateway.isPlaying.set('test', true);
+        gateway.isTimeLimit.set('test', false);
+        gateway.roomName = 'test';    
+        stub(socket, 'rooms').value(new Set(['test']));
+        jest.spyOn(socket, 'to').mockReturnValue({
+            emit: (event: string) => {
+                expect(event).toEqual('giveup-return');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+        gateway.handleDisconnect(socket);
     });
 
-    it('joinRoomSolo() should join the socket room', async () => {
-        // jest.spyOn(playerService, 'getRoomIndex').mockResolvedValue(INDEX_NOT_FOUND);
-        // await gateway.joinRoomSolo(socket, 'some name');
+    it('handleDisconnect should emit teammateDisconnected', async () => { // ok
+        gateway.isMulti = true;
+        gateway.roomName = 'test';
+        gateway.isPlaying.set('test', true);
+        gateway.isTimeLimit.set('test', true);
+        gateway.playerName = 'test';
+        stub(socket, 'rooms').value(new Set(['test']));
+        jest.spyOn(socket, 'to').mockReturnValue({
+            emit: (event: string) => {
+                expect(event).toEqual('teammateDisconnected');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+        gateway.handleDisconnect(socket);     
+    });
+    jest.useFakeTimers();
+    // it('afterInit() should trigger emit serverTime with correct parameters ', () => {
+    //     gateway.afterInit();
+    //     timeService.elapsedTimes = new Map<string, number>([['timer1', 0],['timer2', 100],['timer3', 200]]);
+    //     jest.advanceTimersByTime(1000);
+    //     expect(server.emit.calledWith(ChatEvents.ServerTime, match.any)).toBeTruthy();
+    // });
+    it('afterInit() should emit timeLimitStatus and call removeTimer if countDown <= 0 then trigger emit serverTime with correct parameters ', () => {
+        const roomName = 'myRoom';
+        gateway.roomName = roomName;
+        timeService.countDown = 0;
+        stub(socket, 'rooms').value(new Set([roomName]));
+        jest.spyOn(server, 'to').mockReturnValue({
+            emit: (event: string) => {
+                expect(event).toEqual('timeLimitStatus');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+        jest.spyOn(timeService, 'removeTimer').mockImplementation(jest.fn());
+        gateway.afterInit();
+        timeService.elapsedTimes = new Map<string, number>([['timer1', 0],['timer2', 100],['timer3', 200]]);
+        jest.advanceTimersByTime(1000);
+        expect(timeService.removeTimer).toBeCalledWith(roomName);
+        expect(server.emit.calledWith(ChatEvents.ServerTime, match.any)).toBeTruthy();
+    });
+    /**etInterval(() => {
+            Iif (this.serverTime.countDown <= 0) {
+                this.server.to(this.roomName).emit('timeLimitStatus', false);
+                this.serverTime.removeTimer(this.roomName);
+            } */
+
+    it('joinRoomSolo() should join the socket room and set isPlaying to true', async () => {
+        expect(gateway.isPlaying.get(socket.id)).toBe(true);
         expect(socket.join.calledOnce).toBeTruthy();
     });
 
@@ -200,42 +242,34 @@ describe('ChatGateway', () => {
         await gateway.startMultiGame(socket, mockPlayer);
         // expect(playerService.addRoomMulti).toHaveBeenCalled();
     });
-    it('gameEnded should call removeRoom(), socketsLeave and removeTimer', async () => {
-        // jest.spyOn(playerService, 'removeRoom').mockImplementation(async () => {
-        //     return Promise.resolve();
-        // });
+
+    it('gameEnded should call disconnect(), removeTimer and set isPlaying ans isTimeLimit to false', async () => { //ok
         jest.spyOn(timeService, 'removeTimer').mockImplementation(jest.fn());
         const roomName = 'myRoom';
-        stub(socket, 'rooms').value(new Set([roomName]));
-        jest.spyOn(socket, 'to').mockReturnValue({
-            socketsLeave: (event: string) => {
-                expect(event).toEqual('myRoom');
-            },
-        } as BroadcastOperator<unknown, unknown>);
+        gateway.isPlaying.set(roomName, true);
+        gateway.isTimeLimit.set(gateway.roomName, true);
         await gateway.gameEnded(socket, roomName);
-        // expect(playerService.removeRoom).toHaveBeenCalled();
         expect(timeService.removeTimer).toHaveBeenCalled();
+        expect(socket.disconnect.calledOnce).toBeTruthy();
+        expect(gateway.isPlaying.get(roomName)).toBe(false);
+        expect(gateway.isTimeLimit.get(gateway.roomName)).toBe(false);
     });
 
-    jest.useFakeTimers();
-    it('emitTime() should emit the time', () => {
-        // gateway.emitTime();
-        timeService.elapsedTimes = new Map<string, number>([
-            ['timer1', 0],
-            ['timer2', 100],
-            ['timer3', 200],
-        ]);
-        jest.advanceTimersByTime(1000);
-        expect(server.emit.calledWith(ChatEvents.ServerTime, match.any)).toBeTruthy();
-    });
+    // jest.useFakeTimers();
+    // it('emitTime() should emit the time', () => {
+    //     // gateway.emitTime();
+    //     timeService.elapsedTimes = new Map<string, number>([
+    //         ['timer1', 0],
+    //         ['timer2', 100],
+    //         ['timer3', 200],
+    //     ]);
+    //     jest.advanceTimersByTime(1000);
+    //     expect(server.emit.calledWith(ChatEvents.ServerTime, match.any)).toBeTruthy();
+    // });
 
-    it('handleConnection should call logger.log()', () => {
-        gateway.handleConnection(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
-    });
-
-    it('stopTimer() should call stopChronometer() with correct parameter and emit gameEnded', () => {
+    it('stopTimer() should call stopChronometer() with correct parameter, emit gameEnded, call removeTimer and disconnect', () => {
         const roomName = 'myRoom';
+        gateway.isMulti = true;
         stub(socket, 'rooms').value(new Set([roomName]));
         jest.spyOn(socket, 'to').mockReturnValue({
             emit: (event: string) => {
@@ -243,22 +277,26 @@ describe('ChatGateway', () => {
             },
         } as BroadcastOperator<unknown, unknown>);
         jest.spyOn(timeService, 'stopChronometer').mockImplementation(jest.fn());
-        gateway.stopTimer(socket, ['timer1', 'myRoom']);
-        expect(timeService.stopChronometer).toBeCalledWith('timer1');
-    });
-
-    it('stopTimer() should call removeTimer() with correct parameter', () => {
-        const roomName = 'myRoom';
-        stub(socket, 'rooms').value(new Set([roomName]));
-        jest.spyOn(socket, 'to').mockReturnValue({
-            emit: (event: string) => {
-                expect(event).toEqual('gameEnded');
-            },
-        } as BroadcastOperator<unknown, unknown>);
         jest.spyOn(timeService, 'removeTimer').mockImplementation(jest.fn());
         gateway.stopTimer(socket, ['timer1', 'myRoom']);
+        expect(timeService.stopChronometer).toBeCalledWith('timer1');
         expect(timeService.removeTimer).toBeCalledWith('timer1');
+        expect(socket.disconnect.calledOnce).toBeTruthy();
+        expect(gateway.isMulti).toBe(false);
     });
+
+    // it('stopTimer() should call removeTimer() with correct parameter', () => {
+    //     const roomName = 'myRoom';
+    //     stub(socket, 'rooms').value(new Set([roomName]));
+    //     jest.spyOn(socket, 'to').mockReturnValue({
+    //         emit: (event: string) => {
+    //             expect(event).toEqual('gameEnded');
+    //         },
+    //     } as BroadcastOperator<unknown, unknown>);
+    //     jest.spyOn(timeService, 'removeTimer').mockImplementation(jest.fn());
+    //     gateway.stopTimer(socket, ['timer1', 'myRoom']);
+    //     expect(timeService.removeTimer).toBeCalledWith('timer1');
+    // });
 
     it('message should emit message-return', () => {
         const myArray: [string, string, string, string, string, boolean] = ['hello', 'world', 'foo', 'bar', 'baz', true];
@@ -270,30 +308,25 @@ describe('ChatGateway', () => {
         gateway.message(socket, myArray);
     });
 
-    it('findDifference should emit findDifference-return', () => {
-        const infos = {
-            playerName: 'myPlayer',
-            roomName: 'myRoom',
-        };
-        jest.spyOn(socket, 'to').mockReturnValue({
-            emit: (event: string) => {
-                expect(event).toEqual('findDifference-return');
-            },
-        } as BroadcastOperator<unknown, unknown>);
-        gateway.findDifference(socket, infos);
+    // it('message should broadcast message-return', () => {
+    //     // const broadcastSpy = jest.spyOn(socket, 'broadcast').mockImplementation(() => ({
+    //     //     emit: jest.fn(),
+    //     //   }));
+    //     const myArray: [string, string, string, string, string, boolean] = ['hello', 'meilleur temps', 'foo', 'bar', 'baz', true];
+    //     expect(socket.broadcast.emit).toHaveBeenCalledWith('message-return', { message: 'Hello', userName: 'meilleur temps', color: 'red', pos: '1', event: true });
+    //     gateway.message(socket, myArray);
+   
+    // });
+
+    it('should broadcast message to all clients except sender when second element is "meilleur temps"', () => { // doesn't work
+        const data: [string, string, string, string, string, boolean] = ['Hello', 'meilleur temps', 'red', 'top', 'room1', true];
+        const expectedMessage = { message: 'Hello', userName: 'meilleur temps', color: 'red', pos: 'top', event: true };
+        jest.spyOn(socket.broadcast, 'emit').mockImplementation(jest.fn().mockReturnValue(true));
+        gateway.message(socket, data);
+        expect(socket.broadcast.emit).toHaveBeenCalledWith('message-return', expectedMessage);
     });
 
-    it('differenceFound should emit feedbackDifference', () => {
-        const infos = [[], 'myRoom'];
-        jest.spyOn(socket, 'to').mockReturnValue({
-            emit: (event: string) => {
-                expect(event).toEqual('feedbackDifference');
-            },
-        } as BroadcastOperator<unknown, unknown>);
-        // gateway.differenceFound(socket, infos);
-    });
-
-    it('sendGiveUp should emit giveup-return', () => {
+    it('sendGiveUp should emit giveup-return', () => { // to verify
         const infos = {
             playerName: 'myPlayer',
             roomName: 'myRoom',
@@ -304,6 +337,46 @@ describe('ChatGateway', () => {
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.sendGiveUp(socket, infos);
+    });
+
+    it('findDifference() emit findDifference-return', () => { // to verify
+        const infos = { playerName: 'myPlayer', roomName: 'myRoom' };
+        gateway.playerName = infos.playerName;
+        jest.spyOn(socket, 'to').mockReturnValue({
+            emit: (event: string) => {
+                expect(event).toEqual('findDifference-return');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+        gateway.findDifference(socket, infos);
+    });
+
+
+    it('differenceFound() should emit feedbackDifference', () => { // to verify
+        const data: [Array<number>, string]= [[1,2,3], 'myRoom'];
+        jest.spyOn(socket, 'to').mockReturnValue({
+            emit: (event: string) => {
+                expect(event).toEqual('feedbackDifference');
+            },
+        } as BroadcastOperator<unknown, unknown>);
+        gateway.differenceFound(socket, data);
+
+    });
+
+    it('modifyTime() should call decrementTime from serverTime service if gameMode is tempsLimite', () => {
+        gateway.roomName = 'test';
+        const gameMode = 'tempsLimite';
+        jest.spyOn(timeService, 'decrementTime').mockImplementation(jest.fn());
+        gateway.modifyTime(socket, gameMode);
+        expect(timeService.decrementTime).toHaveBeenCalledWith(gateway.roomName);
+    });
+
+    it('modifyTime() should increment count from serverTime service if gameMode is not tempsLimite', () => { // to verify
+        gateway.roomName = 'test';
+        const gameMode = '';
+        timeService.count.set(socket.id, 3);
+        const expectedTime = timeService.count.get(socket.id) + timeService.timeConstants.timeBonus;
+        gateway.modifyTime(socket, gameMode);
+        expect(timeService.count.get(socket.id)).toEqual(expectedTime);
     });
 
     // it('playersMatch() should return an empty array if there are no matching players', () => {

@@ -68,4 +68,13 @@ describe('DifferencePopupComponent', () => {
         expect(component.showMessage).toBe('(Quantité valide -- entre 3 et 9)');
         expect(component.showValidation).toBeFalsy();
     });
+    it('should show validation', () => {
+        component['imageDifferenceService'].listDifferences = [
+            new Set(constants.FIRST_SET),
+            new Set(constants.FOURTH_SET),
+            new Set(constants.FIRST_SET),
+        ];
+        component.ngAfterViewInit();
+        expect(component.showMessage).toBe('');
+    });
 });

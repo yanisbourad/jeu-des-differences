@@ -46,7 +46,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         public gameService: GameService,
         public socket: SocketClientService,
         public route: ActivatedRoute,
-        private gameRecordService: GameRecorderService,
+        readonly gameRecordService: GameRecorderService,
         public cheatModeService: CheatModeService,
         public hintsService: HintsService,
     ) {}

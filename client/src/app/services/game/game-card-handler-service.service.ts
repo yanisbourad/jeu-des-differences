@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Game, GamersInfo } from '@app/interfaces/game-handler';
+import { Game, GameIdentifier, GamersInfo } from '@app/interfaces/game-handler';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
@@ -63,10 +63,6 @@ export class GameCardHandlerService {
         return this.isGameAvailable;
     }
 
-    getLimitedTimeGameName(): string {
-        return this.gameName;
-    }
-
     connect() {
         this.socketClient.connect();
         this.socket = this.socketClient.socket;
@@ -86,61 +82,62 @@ export class GameCardHandlerService {
         this.isNewUpdate = isNewUpdate;
     }
 
+    startSpecificGame(gameIdentifier: GameIdentifier): void {
+        if (gameIdentifier.gameName === 'limitedTime99999') {
+            this.socketClientService.startMultiTimeLimit(gameIdentifier);
+            this.gameName = gameIdentifier.gameName as string;
+        } else {
+            this.socketClientService.startMultiGame(gameIdentifier);
+        }
+        this.isReadyToPlay = true;
+        this.redirect(gameIdentifier);
+    }
+
+    runAction(event: string, object: unknown): void {
+        switch (event) {
+            case 'gameUnavailable':
+                this.isGameAvailable = false;
+                break;
+            case 'feedbackOnJoin':
+                this.isCreator = true;
+                this.opponentPlayer = object as string;
+                break;
+            case 'feedbackOnAccept':
+                this.opponentPlayer = object as string;
+                if (this.isCreator) this.state = 'Accepter';
+                break;
+            case 'feedbackOnWait':
+                this.opponentPlayer = object as string;
+                break;
+            case 'feedbackOnWaitLonger':
+                this.opponentPlayer = object as string;
+                break;
+            case 'feedbackOnStart':
+                this.startSpecificGame(object as GameIdentifier);
+                break;
+            case 'feedBackOnLeave':
+                this.isCreatorLeft = true;
+                this.isLeaving = true;
+                break;
+            case 'feedbackOnReject':
+                this.isRejected = true;
+                this.isLeaving = true;
+                break;
+            case 'disconnect':
+                this.isLeaving = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     listenToFeedBack() {
-        this.socket.on('gameUnavailable', () => {
-            this.isGameAvailable = false;
-        });
-        this.socket.on('feedbackOnJoin', () => {
-            this.isCreator = true;
-            this.opponentPlayer = "Attente d'un adversaire";
-        });
-        this.socket.on('feedbackOnAccept', (name) => {
-            this.opponentPlayer = name;
-            if (this.isCreator) this.state = 'Accepter';
-        });
-
-        this.socket.on('feedbackOnWait', (name) => {
-            this.opponentPlayer = name;
-        });
-
-        this.socket.on('feedbackOnWaitLonger', (name) => {
-            this.opponentPlayer = name;
-        });
-
-        this.socket.on('feedbackOnStart', (gameIdentifier) => {
-            // call method to redirect to game from service with gameIdentifier
-            if (gameIdentifier.gameName === 'limitedTime99999') {
-                this.socketClientService.startMultiTimeLimit(gameIdentifier);
-                this.gameName = gameIdentifier.gameName;
-            } else {
-                this.socketClientService.startMultiGame(gameIdentifier);
-            }
-            this.isReadyToPlay = true;
-            this.redirect(gameIdentifier);
-        });
-
-        this.socket.on('feedBackOnLeave', () => {
-            // send pop up to player
-            this.isCreatorLeft = true;
-            this.isLeaving = true;
-        });
-
-        this.socket.on('feedbackOnReject', () => {
-            this.isRejected = true;
-            this.isLeaving = true;
-        });
-
-        this.socket.on('byeTillNext', () => {
-            this.isCreatorLeft = true;
-            this.isLeaving = true;
-        });
         this.socket.on('updateStatus', (gamesStatus) => {
             this.games = new Map(gamesStatus);
             this.isNewUpdate = true;
         });
-
-        this.socket.on('disconnect', () => {
-            this.isLeaving = true;
+        this.socket.on('globalEvent', (response) => {
+            this.runAction(response.event, response.object);
         });
     }
 
@@ -171,6 +168,7 @@ export class GameCardHandlerService {
 
     leave(gameName: string): void {
         this.socket.emit('cancelGame', gameName);
+        this.isCreator = false;
         this.listenToFeedBack();
     }
 

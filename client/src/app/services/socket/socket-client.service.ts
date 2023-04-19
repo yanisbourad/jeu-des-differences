@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { GiveUpMessagePopupComponent } from '@app/components/give-up-message-popup/give-up-message-popup.component';
+import { GameIdentifier } from '@app/interfaces/game-handler';
 import { SocketClient } from '@app/utils/socket-client';
 import { Game } from '@common/game';
 import { Subject } from 'rxjs';
@@ -203,11 +204,24 @@ export class SocketClientService {
         this.socketClient.send('sendRoomName', { roomName, mode });
     }
 
-    startMultiGame(player: { gameId: string; creatorName: string; gameName: string; opponentName: string }): void {
+    startMultiGame(gameIdentifier: GameIdentifier): void {
+        const player = {
+            gameId: gameIdentifier.gameId,
+            creatorName: gameIdentifier.creatorName,
+            gameName: gameIdentifier.gameName,
+            opponentName: gameIdentifier.opponentName,
+        };
         this.socketClient.send('startMultiGame', player);
     }
 
-    startMultiTimeLimit(player: { gameId: string; creatorName: string; gameName: string; opponentName: string; mode: string }): void {
+    startMultiTimeLimit(gameIdentifier: GameIdentifier): void {
+        const player = {
+            gameId: gameIdentifier.gameId,
+            creatorName: gameIdentifier.creatorName,
+            gameName: gameIdentifier.gameName,
+            opponentName: gameIdentifier.opponentName,
+            mode: gameIdentifier.mode,
+        };
         this.socketClient.send('startMultiTimeLimit', player);
     }
 

@@ -57,6 +57,7 @@ describe('HeaderComponent', () => {
             height: '774px',
             width: '1107px',
             disableClose: true,
+            panelClass: 'custom-history',
         });
         expect(dialogRefSpy.afterClosed).toHaveBeenCalled();
     });

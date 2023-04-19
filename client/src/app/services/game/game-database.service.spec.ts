@@ -5,7 +5,7 @@ import * as constantes from '@app/configuration/const-test';
 import * as constants from '@app/configuration/const-time';
 import { CanvasHolderService } from '@app/services/canvas-holder/canvas-holder.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
-import { Game, GameInfo, GameRecord, TimeConfig } from '@common/game';
+import { Game, GameInfo, GameRecord, GamingHistory, TimeConfig } from '@common/game';
 import { of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GameDatabaseService } from './game-database.service';
@@ -47,6 +47,14 @@ describe('GameDatabaseService', () => {
             expect(games).toEqual(data);
         });
         httpTestingController.expectOne(`${baseUrl}/game`).flush(data);
+    });
+
+    it('should get game history', () => {
+        const data: GamingHistory[] = [];
+        service.getAllGamingHistory().subscribe((games) => {
+            expect(games).toEqual(data);
+        });
+        httpTestingController.expectOne(`${baseUrl}/gamingHistory`).flush(data);
     });
 
     it('should get game by name', () => {
@@ -96,6 +104,22 @@ describe('GameDatabaseService', () => {
             expect(res.ok).toEqual(true);
         });
         httpTestingController.expectOne({ method: 'POST', url: `${baseUrl}/gameRecord/create` }).flush('true');
+    });
+
+    it('should create game history', () => {
+        const data: GamingHistory = {
+            gameName: 'string',
+            dateStart: 'string',
+            time: 'String',
+            gameType: 'string',
+            playerName: 'string',
+            opponentName: 'string',
+            hasAbandonedGame: true,
+        };
+        service.createGamingHistory(data).subscribe((res) => {
+            expect(res.ok).toEqual(true);
+        });
+        httpTestingController.expectOne({ method: 'POST', url: `${baseUrl}/gamingHistory/create` }).flush('true');
     });
 
     it('should validate game name', async () => {
@@ -160,6 +184,19 @@ describe('GameDatabaseService', () => {
         req.flush('Successfully deleted game', { status: 200, statusText: 'OK' });
     });
 
+    it('should delete one game records', () => {
+        const gameName = 'test';
+        const status = 200;
+        service.deleteOneGameRecords(gameName).subscribe((response) => {
+            expect(response.status).toEqual(status);
+            expect(response.body).toEqual('Successfully deleted game');
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/gameRecord/${gameName}`);
+        expect(req.request.method).toBe('DELETE');
+
+        req.flush('Successfully deleted game', { status: 200, statusText: 'OK' });
+    });
     //  should test updateConstants
     it('should update time config', () => {
         const data: TimeConfig = {
@@ -185,6 +222,14 @@ describe('GameDatabaseService', () => {
         httpTestingController.expectOne(`${baseUrl}/game/constants`).flush(data);
     });
 
+    it('should get count', () => {
+        const data = 0;
+        service.getCount().subscribe((game) => {
+            expect(game).toEqual(data);
+        });
+        httpTestingController.expectOne(`${baseUrl}/game/count`).flush(data);
+    });
+
     // test deleteAllGames() in the service
     it('should delete all games', () => {
         const status = 200;
@@ -194,6 +239,32 @@ describe('GameDatabaseService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/game/`);
+        expect(req.request.method).toBe('DELETE');
+
+        req.flush('Successfully deleted all games', { status: 200, statusText: 'OK' });
+    });
+
+    it('should delete gaming history', () => {
+        const status = 200;
+        service.deleteGamingHistory().subscribe((response) => {
+            expect(response.status).toEqual(status);
+            expect(response.body).toEqual('Successfully deleted all games');
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/gamingHistory`);
+        expect(req.request.method).toBe('DELETE');
+
+        req.flush('Successfully deleted all games', { status: 200, statusText: 'OK' });
+    });
+
+    it('should delete game records', () => {
+        const status = 200;
+        service.deleteGameRecords().subscribe((response) => {
+            expect(response.status).toEqual(status);
+            expect(response.body).toEqual('Successfully deleted all games');
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/gameRecord`);
         expect(req.request.method).toBe('DELETE');
 
         req.flush('Successfully deleted all games', { status: 200, statusText: 'OK' });

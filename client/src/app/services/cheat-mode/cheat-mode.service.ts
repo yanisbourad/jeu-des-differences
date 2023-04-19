@@ -44,10 +44,8 @@ export class CheatModeService {
         this.isCheating = !this.isCheating;
         if (this.isCheating) {
             new StartCheatModeRecord().record(this.gameRecorderService);
-            // this.cheatMode();
         } else {
             new StopCheatModeRecord().record(this.gameRecorderService);
-            // this.stopCheating();
         }
     }
 

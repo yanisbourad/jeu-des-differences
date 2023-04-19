@@ -23,6 +23,7 @@ export abstract class GameRecordCommand {
     get timePenalty(): number {
         return this.penalty;
     }
+
     gameTime(startingTime: number): number {
         return this.time - startingTime || 0;
     }
@@ -57,8 +58,8 @@ export abstract class GameRecordCommand {
         let blinkCount = 0;
         const intervalId = setInterval(() => {
             isVisible = !isVisible;
-            canvas1.nativeElement.style.visibility = isVisible ? 'visible' : 'hidden';
-            canvas2.nativeElement.style.visibility = isVisible ? 'visible' : 'hidden';
+            canvas1.nativeElement.style.setProperty('visibility', isVisible ? 'visible' : 'hidden');
+            canvas2.nativeElement.style.setProperty('visibility', isVisible ? 'visible' : 'hidden');
             blinkCount++;
             if (blinkCount === BLINKING_COUNT) {
                 clearInterval(intervalId);

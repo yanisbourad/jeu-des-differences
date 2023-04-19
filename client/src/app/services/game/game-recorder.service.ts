@@ -11,7 +11,6 @@ import { GameService } from './game.service';
 export class GameRecorderService {
     gamePage: GamePageComponent;
     list: GameRecordCommand[] = [];
-    serviceTime: number = 0;
     tempList: GameRecordCommand[] = [];
     position = 0;
     action: GameRecordCommand | undefined;
@@ -85,7 +84,8 @@ export class GameRecorderService {
     // need to make all the user interactions blocked during the rewind
     // will start the rewind from the beginning
     startRewind(gamePage: GamePageComponent = this.gamePage) {
-        this.serviceTime = 0;
+        this.sumPenalty = 0;
+
         this.gamePage = gamePage;
         this.gamePage.initForRewind();
         if (this.list.length === 0) {

@@ -72,6 +72,19 @@ describe('CheatModeService', () => {
         cheatModeService.toggleCheating();
         expect(cheatModeService.isCheating).toBe(false);
         expect(gameRecorderServiceSpy.do).toHaveBeenCalled();
+        const dummyElement = document.createElement('textarea');
+        dummyElement.setAttribute('id', 'chat-box');
+        dummyElement.setAttribute('maxlength', '200');
+        dummyElement.setAttribute('cols', '40');
+        dummyElement.setAttribute('rows', '5');
+        dummyElement.setAttribute('placeholder', 'Écrire à ${gameService.opponentName}… (200 caractères maximum)');
+        dummyElement.setAttribute('disabled', "gameService.gameType === 'solo' || !notRewinding ? 'disabled' : null");
+        document.body.appendChild(dummyElement);
+        dummyElement.focus();
+        Object.defineProperty(document, 'activeElement', { value: dummyElement });
+        cheatModeService.isCheating = true;
+        cheatModeService.toggleCheating();
+        expect(document.activeElement).toEqual(dummyElement);
     });
 
     it('stopCheating should call clearInterval and clearCanvasCheat', () => {

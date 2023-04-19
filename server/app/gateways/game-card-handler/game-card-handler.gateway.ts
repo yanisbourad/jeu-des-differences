@@ -10,8 +10,19 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
     countGame: number = 0;
+    responseOnJoin: { event: string, object: string };
+    responseOnLeave: { event: string, object: string };
 
-    constructor(private readonly logger: Logger, private readonly gameCardHandlerService: GameCardHandlerService) {}
+    constructor(private readonly logger: Logger, private readonly gameCardHandlerService: GameCardHandlerService) {
+        this.responseOnJoin = {
+            event: 'feedbackOnJoin',
+            object: "Attente d'un adversaire"
+        }
+        this.responseOnLeave = {
+            event: 'feedBackOnLeave',
+            object: "empty"
+        }
+    }
 
     @SubscribeMessage('findAllGamesStatus')
     updateGameStatus(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
@@ -24,7 +35,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
     joinLimitedTimeMode(player: Player) {
         const players = this.gameCardHandlerService.manageJoinLimitMode(player)
         if (players.length === 1) {
-            this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+            this.server.to(players[0].id).emit('globalEvent', this.responseOnJoin);
         } else if (players.length === 2) {
             const gameInfo = {
                 gameId: this.countGame++,
@@ -33,8 +44,12 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                 opponentName: players[OPPONENT_INDEX].name,
                 mode: "tempsLimite"
             };
-            this.server.to(players[0].id).emit('feedbackOnStart', gameInfo);
-            this.server.to(players[1].id).emit('feedbackOnStart', gameInfo);
+            const response = {
+                event: 'feedbackOnStart',
+                object: gameInfo,
+            }
+            this.server.to(players[0].id).emit('globalEvent', response);
+            this.server.to(players[1].id).emit('globalEvent', response);
         } else {
             while (players.length % 2 === 0) {
                 const gameInfo = {
@@ -44,37 +59,55 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                     opponentName: players[OPPONENT_INDEX].name,
                     mode: "tempsLimite"
                 };
-                this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
-                this.server.to(players.shift().id).emit('feedbackOnStart', gameInfo);
+                const response = {
+                    event: 'feedbackOnStart',
+                    object: gameInfo,
+                }
+                this.server.to(players.shift().id).emit('globalEvent', response);
+                this.server.to(players.shift().id).emit('globalEvent', response);
             }
             if (players.length === 1) {
-                this.server.to(players[0].id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                this.server.to(players[0].id).emit('globalEvent', this.responseOnJoin);
             }
         }
     }
 
     joinClassicMode(player: Player) {
         const stackedPlayerNumber = this.gameCardHandlerService.stackPlayer(player);
+
         switch (stackedPlayerNumber) {
             // when this is the creator
             case ONLY_CREATOR: {
-                this.server.to(player.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                this.server.to(player.id).emit('globalEvent', this.responseOnJoin);
                 break;
             }
             // when this is the opponent
             case CREATOR_WITH_OPPONENT: {
+                this.logger.log(`New request from ${player.name}`);
                 const players = this.gameCardHandlerService.getStackedPlayers(player.gameName);
                 const creator = this.gameCardHandlerService.getPlayer(players[0]);
                 const opponent = this.gameCardHandlerService.getPlayer(players[1]);
-                this.server.to(players[0]).emit('feedbackOnAccept', opponent.name);
-                this.server.to(players[1]).emit('feedbackOnWait', creator.name);
+                const creatorResponse = {
+                    event: 'feedbackOnAccept',
+                    object: opponent.name,
+                }
+                const opponentResponse = {
+                    event: 'feedbackOnWait',
+                    object: creator.name,
+                }
+                this.server.to(players[0]).emit('globalEvent', creatorResponse);
+                this.server.to(players[1]).emit('globalEvent', opponentResponse);
                 break;
             }
             // when this is an opponent but there is 1 or more opponent in the stack
             default: {
                 // call a function to remove player from queue and send feedback to player
                 // make new pairs of players
-                this.server.to(player.id).emit('feedbackOnWaitLonger', "Attente d'un adversaire");
+                const response = {
+                    event: 'feedbackOnWaitLonger',
+                    object: "Attente d'un adversaire",
+                }
+                this.server.to(player.id).emit('globalEvent', response);
                 break;
             }
         }
@@ -88,11 +121,16 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             gameName: payload.gameName,
             gameType: payload.gameType,
         };
+        this.logger.log(`New request from ${player.id} to play ${player} in ${player.gameType} mode`);
         this.logger.log(`New request from ${player.id} to play ${player.gameName} in ${player.gameType} mode`);
         // send feedback to player
         // create queue for each game and add gamer to queue
         if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
-            this.server.to(gamer.id).emit('gameUnavailable', 'game deleted by admin');
+            const response = {
+                event: 'gameUnavailable',
+                object: 'game deleted by admin',
+            }
+            this.server.to(gamer.id).emit('globalEvent', response);
             return;
         }
 
@@ -111,11 +149,12 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('cancelGame')
     cancel(@MessageBody() gameName, @ConnectedSocket() client: Socket) {
+        this.logger.log(`New request from ${client.id} to cancel`);
         const player = this.gameCardHandlerService.getPlayer(client.id);
         if (player.gameType === 'limit') {
             const deletedPlayer = this.gameCardHandlerService.handleLimitedTimeCancel(client.id);
             this.logger.log(`The limited time creator ${deletedPlayer.id} left the game queue`);
-            this.server.to(client.id).emit('feedBackOnLeave');
+            this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
             return;
         }
         const totalRequest = this.gameCardHandlerService.getTotalRequest(gameName);
@@ -123,7 +162,7 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         if (totalRequest === ONLY_CREATOR) {
             const creator = this.gameCardHandlerService.deletePlayer(client.id);
             this.gameCardHandlerService.deleteCreator(gameName);
-            this.server.to(client.id).emit('feedBackOnLeave');
+            this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
             this.logger.log(`The ${gameName} creator ${creator.id} left, room is empty`);
         } else {
             // if there is more than one player in the queue
@@ -135,13 +174,13 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                 this.logger.log(`The ${gameName} game creator left, room is empty`);
                 const players = this.gameCardHandlerService.deleteCreator(gameName);
                 const opponent = this.gameCardHandlerService.deletePlayer(players[OPPONENT_INDEX]);
-                this.server.to(opponent.id).emit('feedBackOnLeave');
-                this.server.to(client.id).emit('feedBackOnLeave');
+                this.server.to(opponent.id).emit('globalEvent', this.responseOnLeave);
+                this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
                 this.logger.log(`${player.id} left the queue`);
                 this.logger.log(`${opponent.id} left the queue`);
                 const joiningPlayers = this.gameCardHandlerService.removePlayers(gameName);
                 joiningPlayers.forEach((gamer) => {
-                    this.server.to(gamer).emit('feedBackOnLeave');
+                    this.server.to(gamer).emit('globalEvent', this.responseOnLeave);
                 });
             } else {
                 // could have been match with creator or waiting in the join queue
@@ -154,16 +193,28 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
                     const creator = this.gameCardHandlerService.getPlayer(this.gameCardHandlerService.getCreatorId(gameName));
                     if (opponents.length === 2) {
                         const newOpponent = this.gameCardHandlerService.getPlayer(opponents[1]);
-                        this.server.to(client.id).emit('feedBackOnLeave');
-                        this.server.to(newOpponent.id).emit('feedbackOnWait', creator.name);
-                        this.server.to(creator.id).emit('feedbackOnAccept', newOpponent.name);
+                        const creatorResponse = {
+                            event: 'feedbackOnAccept',
+                            object: newOpponent.name,
+                        }
+                        const opponentResponse = {
+                            event: 'feedbackOnWait',
+                            object: creator.name,
+                        }
+                        this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
+                        this.server.to(newOpponent.id).emit('globalEvent', opponentResponse);
+                        this.server.to(creator.id).emit('globalEvent', creatorResponse);
                     } else {
-                        this.server.to(client.id).emit('feedBackOnLeave');
-                        this.server.to(creator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+                        const creatorResponse = {
+                            event: 'feedbackOnJoin',
+                            object: "Attente d'un adversaire",
+                        }
+                        this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
+                        this.server.to(creator.id).emit('globalEvent', creatorResponse);
                     }
                     this.logger.log(`The ${gameName} game opponent left`);
                 }
-                this.server.to(client.id).emit('feedBackOnLeave');
+                this.server.to(client.id).emit('globalEvent', this.responseOnLeave);
             }
         }
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
@@ -175,16 +226,28 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         const gamerCreatorName = this.gameCardHandlerService.getPlayer(gamerCreator.id).name;
         const opponent = this.gameCardHandlerService.deleteOpponent(gamerCreator.id);
         if (opponent) {
-            this.server.to(opponent.id).emit('feedbackOnReject', gamerCreatorName);
+            const opponentResponse = {
+                event: 'feedbackOnReject',
+                object: gamerCreatorName,
+            }
+            this.server.to(opponent.id).emit('globalEvent', opponentResponse);
             this.logger.log(`The game creator ${gamerCreator.id} rejected ${opponent.id}`);
         }
         const nextOpponent = this.gameCardHandlerService.handleReject(gamerCreator.id);
         if (nextOpponent) {
-            this.server.to(nextOpponent.id).emit('feedbackOnWait', gamerCreatorName);
-            this.server.to(gamerCreator.id).emit('feedbackOnAccept', nextOpponent.name);
+            const creatorResponse = {
+                event: 'feedbackOnAccept',
+                object: nextOpponent.name,
+            }
+            const opponentResponse = {
+                event: 'feedbackOnWait',
+                object: gamerCreatorName,
+            }
+            this.server.to(nextOpponent.id).emit('globalEvent', opponentResponse);
+            this.server.to(gamerCreator.id).emit('globalEvent', creatorResponse);
         } else {
             // if no more waiting Opponent in joining queue
-            this.server.to(gamerCreator.id).emit('feedbackOnJoin', "Attente d'un adversaire");
+            this.server.to(gamerCreator.id).emit('globalEvent', this.responseOnJoin);
             this.logger.log(`The game creator ${gamerCreator.id} is waiting alone`);
         }
     }
@@ -200,13 +263,22 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             gameName: playersList[CREATOR_INDEX].gameName,
             creatorName: playersList[CREATOR_INDEX].name,
             opponentName: playersList[OPPONENT_INDEX].name,
+            mode: "classic",
         };
-        this.server.to(playersList[CREATOR_INDEX].id).emit('feedbackOnStart', gameInfo);
-        this.server.to(playersList[OPPONENT_INDEX].id).emit('feedbackOnStart', gameInfo);
+        const response = {
+            event: 'feedbackOnStart',
+            object: gameInfo,
+        }
+        this.server.to(playersList[CREATOR_INDEX].id).emit('globalEvent', response);
+        this.server.to(playersList[OPPONENT_INDEX].id).emit('globalEvent', response);
         // call a function to remove players from joining queue and send feedback to them
         const removedPlayers: string[] = this.gameCardHandlerService.removePlayers(playersList[CREATOR_INDEX].gameName);
         removedPlayers.forEach((playerId) => {
-            this.server.to(playerId).emit('byeTillNext', 'refuser par createur');
+            const response = {
+                event: 'feedBackOnLeave',
+                object: 'refuser par createur',
+            }
+            this.server.to(playerId).emit('globalEvent', response);
         });
         this.logger.log(`Players were matched, ${removedPlayers.length} players left ${gameInfo.gameName} queue`);
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
@@ -219,7 +291,11 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
         else {
             const players = this.gameCardHandlerService.deleteAllWaitingPlayerByGame(gameName);
             players.forEach((gamer) => {
-                this.server.to(gamer).emit('gameUnavailable', 'game deleted by admin');
+                const response = {
+                    event: 'gameUnavailable',
+                    object: 'game deleted by admin',
+                }
+                this.server.to(gamer).emit('globalEvent', response);
             });
         }
         this.logger.log(`The game ${gameName} was deleted by admin`);

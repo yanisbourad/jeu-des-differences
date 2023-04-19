@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ElementRef, Injectable } from '@angular/core';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
@@ -65,7 +66,6 @@ export class HintsService {
         h: constantsCanvas.DEFAULT_HEIGHT / constantsQuadrant.QUARTER,
         isInnerQuadrant: true,
     };
-
     listOfQuadrants: { quadrant: Quadrant; isLast: boolean }[] = [];
     penaltyHint: number;
     intervalId: ReturnType<typeof setTimeout>;
@@ -81,7 +81,6 @@ export class HintsService {
         this.hintsDisplayService.setIcons();
         this.launchHints();
     }
-
     launchHints() {
         let toggle = true;
         this.intervalId = setInterval(() => {
@@ -176,13 +175,9 @@ export class HintsService {
                 },
             });
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.canvas0.nativeElement.getContext('2d')!.fillRect(x, y, w, h);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.canvas1.nativeElement.getContext('2d')!.fillRect(x, y, w, h);
         }
     }
@@ -212,9 +207,7 @@ export class HintsService {
                 break;
             }
         }
-
         this.listOfQuadrants.push({ quadrant: targetQuadrant, isLast: isLastHint });
-
         setTimeout(() => {
             this.listOfQuadrants = this.listOfQuadrants.filter((a) => a.quadrant !== targetQuadrant);
         }, constantsTime.HINT_TIMEOUT);

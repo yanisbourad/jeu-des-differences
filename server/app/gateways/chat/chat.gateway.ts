@@ -212,12 +212,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id: ${socket.id} `);
     }
-
+    
     afterInit() {
         this.emitTime();
     }
+    
+    private chooseRandomName(): string {
+        return this.gameNames[Math.floor(Math.random() * this.gameNames.length)];
+    }
 
-    private setGame(playerName?: string, gameName?: string): void { // from time to time i don't have the set of difference for the other player unless the other other find of difference need to fix that
+    private setGame(playerName?: string, gameName?: string): void { 
         this.gameNames = this.gameService.gamesNames;
         this.games = this.gameService.getGames();
         this.game = this.games.get(this.chooseRandomName());
@@ -253,10 +257,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private removePlayerFromQueue(player: PlayerMulti): void {
         this.playersQueue = this.playersQueue.filter((p) => p.id !== player.id);
-    }
-
-    private chooseRandomName(): string {
-        return this.gameNames[Math.floor(Math.random() * this.gameNames.length)];
     }
 
     private goToNextGame(): void {

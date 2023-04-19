@@ -64,7 +64,6 @@ export class GameCreationPageComponent {
     openCanvas(): void {
         this.dialog.open(DifferencePopupComponent, {
             disableClose: true,
-            panelClass: 'custom-dialog-container',
             minHeight: 'fit-content',
             minWidth: 'fit-content',
         });

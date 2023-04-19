@@ -56,8 +56,9 @@ export class MessageDialogComponent {
         this.dialog.open(PlayerWaitPopupComponent, {
             data: { name: this.data.name, gameName: this.data.gameName, gameType: 'tempsLimite' },
             disableClose: true,
-            height: '600px',
-            width: '600px',
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
     }
 

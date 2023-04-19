@@ -6,6 +6,7 @@ import SpyObj = jasmine.SpyObj;
 import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
+import { DrawService } from '@app/services/draw/draw.service';
 
 describe('HintsService', () => {
     let hintsService: HintsService;
@@ -14,11 +15,12 @@ describe('HintsService', () => {
     let gameRecorderServiceSpy: SpyObj<GameRecorderService>;
     let imageDiffServiceSpy: SpyObj<ImageDiffService>;
     const dist = { dist1: 9000, dist2: 90000, dist3: 150000, dist4: 250000 };
+    const quad = { quad1: 1, quad2: 2, quad3: 3, quad4: 4 };
 
     beforeEach(() => {
-        hotkeysServiceSpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener']);
+        hotkeysServiceSpy = jasmine.createSpyObj('HotkeysService', ['hotkeysEventListener', 'removeHotkeysEventListener']);
         hintsDisplayServiceSpy = jasmine.createSpyObj('HintsDisplayService', ['setIcons', 'updateIcons', 'sendHintMessage', 'modifyTime']);
-        gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['']);
+        gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['do']);
         imageDiffServiceSpy = jasmine.createSpyObj('ImageDiffService', ['getPositionFromAbsolute']);
         TestBed.configureTestingModule({
             providers: [
@@ -29,6 +31,8 @@ describe('HintsService', () => {
             ],
         });
         hintsService = TestBed.inject(HintsService);
+        hintsService.canvas0 = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
+        hintsService.canvas1 = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
     });
 
     it('should be created', () => {
@@ -38,6 +42,7 @@ describe('HintsService', () => {
     it('hintsKeyBinding should call hotkeysService.hotkeysEventListener', () => {
         hintsService.hintsKeyBinding();
         expect(hotkeysServiceSpy.hotkeysEventListener).toHaveBeenCalled();
+        expect(hintsService.indexEvent).toBeUndefined();
     });
 
     it('generateRandomMaxNumber should return a number between 0 and max', () => {
@@ -80,7 +85,7 @@ describe('HintsService', () => {
         const possibleQuadrant = new Set<number>();
 
         hintsService.createPossibleQuadrantArray(coordinates, quadrant, possibleQuadrant);
-        expect(possibleQuadrant.has(3 + 1)).toBeTrue();
+        expect(possibleQuadrant.has(quad.quad4)).toBeTrue();
     });
 
     it('generatePossibleQuadrant should return a random number between 1 and 4', () => {
@@ -104,8 +109,6 @@ describe('HintsService', () => {
     });
 
     it('displayQuadrant should call fillStyle and fillRect if isLastHint is false', () => {
-        hintsService.canvas0 = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
-        hintsService.canvas1 = new ElementRef<HTMLCanvasElement>(document.createElement('canvas'));
         const quadrant = { x: 0, y: 0, w: 320, h: 240, isInnerQuadrant: false };
         const isLastHint = false;
         spyOn(hintsService, 'displayQuadrant').and.callThrough();
@@ -119,5 +122,171 @@ describe('HintsService', () => {
         expect(hintsService.canvas1.nativeElement.getContext('2d')?.fillRect).not.toHaveBeenCalled();
         const isLastHint2 = true;
         hintsService.displayQuadrant(quadrant, isLastHint2);
+    });
+
+    it('findQuadrant should call displayQuadrant when currentQuadrant is between 1 and 4', () => {
+        const quadrant = { x: 0, y: 0, w: 320, h: 240, isInnerQuadrant: false };
+        const currentQuadrant = [quad.quad1, quad.quad2, quad.quad3, quad.quad4];
+        const isLastHint = false;
+        spyOn(hintsService, 'findQuadrant').and.callThrough();
+        spyOn(hintsService, 'displayQuadrant').and.callFake(() => ({}));
+        spyOn(hintsService, 'stopHints').and.callFake(() => ({}));
+        for (const q of currentQuadrant) {
+            hintsService.findQuadrant(quadrant, q, isLastHint);
+            expect(hintsService.displayQuadrant).toHaveBeenCalled();
+        }
+    });
+
+    it('findInnerQuadrant should call findQuadrant when outerQuadrant', () => {
+        const outerQuadrant = [quad.quad1, quad.quad2, quad.quad3, quad.quad4];
+        const innerQuadrant = 1;
+        const isLastHint = false;
+        spyOn(hintsService, 'findInnerQuadrant').and.callThrough();
+        spyOn(hintsService, 'findQuadrant').and.callFake(() => ({}));
+        for (const q of outerQuadrant) {
+            hintsService.findInnerQuadrant(q, innerQuadrant, isLastHint);
+            expect(hintsService.findQuadrant).toHaveBeenCalled();
+        }
+    });
+
+    it('showHints should call different methods with nHintsLeft', () => {
+        spyOn(hintsService, 'showHints').and.callThrough();
+        spyOn(hintsService, 'findQuadrant').and.callFake(() => ({}));
+        spyOn(hintsService, 'findInnerQuadrant').and.callFake(() => ({}));
+        spyOn(hintsService, 'removeHotkeysEventListener').and.callFake(() => ({}));
+        expect(hintsService.nHintsLeft).toEqual(3);
+        hintsService.showHints();
+        expect(hintsService.findQuadrant).toHaveBeenCalled();
+        expect(hintsService.nHintsLeft).toEqual(2);
+        expect(hintsDisplayServiceSpy.updateIcons).toHaveBeenCalled();
+        hintsService.showHints();
+        expect(hintsService.findInnerQuadrant).toHaveBeenCalled();
+        expect(hintsService.nHintsLeft).toEqual(1);
+        expect(hintsDisplayServiceSpy.updateIcons).toHaveBeenCalled();
+        hintsService.showHints();
+        expect(hintsService.findInnerQuadrant).toHaveBeenCalled();
+        expect(hintsService.nHintsLeft).toEqual(0);
+        expect(hintsDisplayServiceSpy.updateIcons).toHaveBeenCalled();
+        expect(hintsService.removeHotkeysEventListener).toHaveBeenCalled();
+    });
+
+    it('removeDifference should  call eqSet and removeDifferenceFromUnfoundedDifference', () => {
+        const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
+        spyOn(hintsService, 'removeDifference').and.callThrough();
+        spyOn(hintsService, 'eqSet').and.callThrough();
+        hintsService.unfoundedDifference = [diff];
+        hintsService.removeDifference(diff);
+        hintsService.unfoundedDifference = hintsService.unfoundedDifference.filter((set) => !hintsService.eqSet(set, diff));
+        expect(hintsService.eqSet).toHaveBeenCalled();
+        expect(hintsService.unfoundedDifference).toEqual([]);
+    });
+
+    it('handleRandomInnerQuadrant should call generatePossibleQuadrant', () => {
+        const outerQuadrant = [quad.quad1, quad.quad2, quad.quad3, quad.quad4];
+        spyOn(hintsService, 'handleRandomInnerQuadrant').and.callThrough();
+        spyOn(hintsService, 'generatePossibleQuadrant').and.callFake(() => 1);
+        for (const q of outerQuadrant) {
+            hintsService.handleRandomInnerQuadrant(q);
+            expect(hintsService.generatePossibleQuadrant).toHaveBeenCalled();
+        }
+    });
+
+    it('handleRandomQuadrant should call generatePossibleQuadrant and handleRandomInnerQuadrant', () => {
+        spyOn(hintsService, 'handleRandomQuadrant').and.callThrough();
+        spyOn(hintsService, 'generatePossibleQuadrant').and.callFake(() => 1);
+        spyOn(hintsService, 'handleRandomInnerQuadrant').and.callFake(() => ({}));
+        hintsService.handleRandomQuadrant();
+        expect(hintsService.generatePossibleQuadrant).toHaveBeenCalled();
+        hintsService.nHintsLeft--;
+        hintsService.handleRandomQuadrant();
+        expect(hintsService.generatePossibleQuadrant).toHaveBeenCalled();
+        expect(hintsService.handleRandomInnerQuadrant).toHaveBeenCalled();
+        hintsService.nHintsLeft--;
+        hintsService.handleRandomQuadrant();
+        expect(hintsService.generatePossibleQuadrant).toHaveBeenCalled();
+        expect(hintsService.handleRandomInnerQuadrant).toHaveBeenCalled();
+    });
+
+    it('triggerHints should call modifyTime, sendHintMessage and handleRandomQuadrant', () => {
+        spyOn(hintsService, 'triggerHints').and.callThrough();
+        spyOn(hintsService, 'handleRandomQuadrant').and.callFake(() => ({}));
+        hintsService.triggerHints();
+        expect(hintsDisplayServiceSpy.modifyTime).toHaveBeenCalled();
+        expect(hintsDisplayServiceSpy.sendHintMessage).toHaveBeenCalled();
+        expect(gameRecorderServiceSpy.do).toHaveBeenCalled();
+        expect(hintsService.handleRandomQuadrant).toHaveBeenCalled();
+        hintsService.isHintsActive = true;
+        hintsService.triggerHints();
+        expect(gameRecorderServiceSpy.do).toHaveBeenCalled();
+        hintsService.isHintsActive = false;
+        hintsService.triggerHints();
+        expect(gameRecorderServiceSpy.do).toHaveBeenCalled();
+    });
+
+    it('stopHints should call clearInterval and clearCanvas', () => {
+        spyOn(hintsService, 'stopHints').and.callThrough();
+        spyOn(hintsService, 'clearCanvas').and.callFake(() => ({}));
+        hintsService.stopHints();
+        expect(hintsService.clearCanvas).toHaveBeenCalled();
+    });
+
+    it('drawDifference should call drawDiff', () => {
+        const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
+        spyOn(hintsService, 'drawDifference').and.callThrough();
+        spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
+        hintsService.drawDifference(diff);
+        expect(hintsService.drawDifference).toHaveBeenCalled();
+    });
+
+    it('removeHotkeysEventListener should call not removeEventListener if indexEvent is undefined', () => {
+        hintsService.indexEvent = undefined;
+        spyOn(hintsService, 'removeHotkeysEventListener').and.callThrough();
+        hintsService.removeHotkeysEventListener();
+        expect(hotkeysServiceSpy.removeHotkeysEventListener).not.toHaveBeenCalled();
+    });
+
+    it('removeHotkeysEventListener should call removeEventListener if indexEvent is not undefined', () => {
+        hintsService.indexEvent = 0;
+        spyOn(hintsService, 'removeHotkeysEventListener').and.callThrough();
+        hintsService.removeHotkeysEventListener();
+        expect(hotkeysServiceSpy.removeHotkeysEventListener).toHaveBeenCalled();
+        expect(hintsService.indexEvent).toBeUndefined();
+    });
+
+    it('clearCanvas should call clearDiff', () => {
+        const canvasA = document.createElement('canvas');
+        const canvasB = document.createElement('canvas');
+        spyOn(hintsService, 'clearCanvas').and.callThrough();
+        spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
+        hintsService.clearCanvas(canvasA, canvasB);
+        expect(hintsService.clearCanvas).toHaveBeenCalled();
+        expect(DrawService.clearDiff).toHaveBeenCalled();
+    });
+
+    it('resetService should reinitialize all variables', () => {
+        spyOn(hintsService, 'resetService').and.callThrough();
+        hintsService.resetService();
+        expect(hintsDisplayServiceSpy.setIcons).toHaveBeenCalled();
+        expect(hintsService.nHintsLeft).toEqual(3);
+        expect(hintsService.isHintsActive).toBe(false);
+        expect(hintsService.unfoundedDifference).toEqual([]);
+    });
+
+    it('should return true if sets are equal', () => {
+        const set1 = new Set([1, 2, 3]);
+        const set2 = new Set([3, 2, 1]);
+        expect(hintsService.eqSet(set1, set2)).toBe(true);
+    });
+
+    it('should return false if sets are not equal', () => {
+        const set1 = new Set([1, 2, 3]);
+        const set2 = new Set([0, 0, 0]);
+        expect(hintsService.eqSet(set1, set2)).toBe(false);
+    });
+
+    it('should return false if sets are different sizes', () => {
+        const set1 = new Set([1, 2, 3]);
+        const set2 = new Set([1, 2]);
+        expect(hintsService.eqSet(set1, set2)).toBe(false);
     });
 });

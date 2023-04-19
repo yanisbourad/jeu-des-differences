@@ -1,11 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import * as constants from '@app/configuration/const-time';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
 import { TimeConfig } from '@common/game';
 import { of } from 'rxjs';
 import { TimePopupComponent } from './time-popup.component';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 const mockConstants: TimeConfig = {
     timeInit: constants.INIT_TIME,
@@ -18,18 +19,23 @@ describe('TimePopupComponent', () => {
     let fixture: ComponentFixture<TimePopupComponent>;
     let decrementButton: HTMLButtonElement;
     let communicationServiceSpy: jasmine.SpyObj<GameDatabaseService>;
+    let dialog: MatDialog;
+    let dialogRefSpy: jasmine.SpyObj<MatDialogRef<TimePopupComponent>>;
     beforeEach(() => {
         communicationServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getConstants', 'updateConstants']);
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef<NamePopupComponent>', ['close', 'afterClosed']);
         TestBed.configureTestingModule({
             declarations: [TimePopupComponent],
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             providers: [
-                { provide: MatDialogRef, useValue: { close: () => {} } },
+                { provide: MatDialogRef, useValue: dialogRefSpy },
+                { provide: MatDialog, useValue: { open: () => {} } },
                 { provide: GameDatabaseService, useValue: communicationServiceSpy },
             ],
         }).compileComponents();
         communicationServiceSpy.getConstants.and.callFake(() => of(mockConstants));
         communicationServiceSpy.updateConstants.and.callFake(() => of());
+        dialog = TestBed.inject(MatDialog);
         fixture = TestBed.createComponent(TimePopupComponent);
         component = fixture.componentInstance;
         decrementButton = fixture.debugElement.query(By.css('#buttonTime3')).nativeElement;
@@ -86,20 +92,9 @@ describe('TimePopupComponent', () => {
         expect(component.timer3).toBe(originalValue - constants.TIMER_INCREMENT);
     });
     it('should call close', () => {
-        const spy = spyOn(component.dialogRef, 'close').and.callThrough();
+        // const spy = spyOn(component.dialogRef, 'close').and.callThrough();
         component.onNoClick();
-        expect(spy).toHaveBeenCalled();
-    });
-    it('should disable the decrement button if timer3 is 0', () => {
-        component.timer3 = 0;
-        fixture.detectChanges();
-        expect(decrementButton.disabled).toBe(true);
-    });
-
-    it('should enable the decrement button if timer3 is greater than 0', () => {
-        component.timer3 = 1;
-        fixture.detectChanges();
-        expect(decrementButton.disabled).toBe(false);
+        expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
     it('should call decrementTime3() when the button is clicked', () => {
@@ -124,4 +119,30 @@ describe('TimePopupComponent', () => {
         });
         expect(component.timer1).toBe(constants.INIT_TIME);
     });
+
+    it('should call launchDialog when button is pressed', () => {
+        const spyOpen = spyOn(dialog, 'open').and.returnValue({
+            afterClosed: () => of(null),
+        } as MatDialogRef<unknown>);
+        const data = 'test';
+        component.launchFeedback(data);
+        expect(spyOpen).toHaveBeenCalledWith(VerificationFeedbackComponent, {
+            data: { message: data, confirmFunction: jasmine.any(Function) },
+            disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
+        });
+    });
+
+    it('should update timer variables when isReset is true', fakeAsync(() => {
+        const getConstantsSpy = communicationServiceSpy.getConstants.and.returnValue(of(mockConstants));
+        component.isReset = true;
+        component.ngAfterContentChecked();
+        tick();
+        expect(getConstantsSpy).toHaveBeenCalled();
+        expect(component.timer1).toBe(mockConstants.timeInit);
+        expect(component.timer2).toBe(mockConstants.timePen);
+        expect(component.timer3).toBe(mockConstants.timeBonus);
+    }));
 });

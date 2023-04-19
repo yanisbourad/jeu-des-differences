@@ -21,6 +21,7 @@ describe('GamingHistoryComponent', () => {
     beforeEach(async () => {
         gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['getAllGamingHistory', 'deleteGamingHistory']);
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         await TestBed.configureTestingModule({
             imports: [MatDialogModule],
             declarations: [GamingHistoryComponent],
@@ -62,12 +63,17 @@ describe('GamingHistoryComponent', () => {
     it('should call launchFeedback', () => {
         const dialogCloseSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
         matDialogSpy.open.and.returnValue(dialogCloseSpy);
+        dialogCloseSpy.afterClosed.and.returnValue(of('test'));
         component.launchFeedback();
         expect(matDialogSpy.open).toHaveBeenCalledWith(VerificationFeedbackComponent, {
             data: {
                 message: "Voulez vous vraiment supprimer l'historique des parties?",
+                confirmFunction: jasmine.any(Function),
             },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
         expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
     });

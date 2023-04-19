@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
-import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { GameService } from '@app/services/game/game.service';
 import { GameInfo } from '@common/game';
 import { firstValueFrom } from 'rxjs';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
     selector: 'app-game-card',
@@ -16,35 +16,30 @@ import { firstValueFrom } from 'rxjs';
 export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
     @Output() gameDeleted = new EventEmitter<void>();
-    createJoinState: string;
+    createJoinState: string = 'Créer';
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
     url: string;
-    messageDeleteRecords: string;
-    messageDeleteGame: string;
+    messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
+    messageDeleteGame: string = 'Êtes-vous sur de vouloir supprimer ce jeu?';
 
-    // Mise a part les services qu'on utilise pour communiquer avec le serveur, on a 2 parametres dans
-    // le constructeur pour rediriger l'utilisateur vers une autre page dans une des methode de la classe
-    // et pour ouvrir une fenetre de dialogue
     // eslint-disable-next-line max-params
     constructor(
+        readonly gameService: GameService,
         public dialog: MatDialog,
         private router: Router,
-        readonly gameService: GameService,
         private readonly gameCardHandlerService: GameCardHandlerService,
-    ) {
-        this.createJoinState = 'Créer';
-        this.messageDeleteRecords = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
-        this.messageDeleteGame = 'Êtes-vous sur de vouloir supprimer ce jeu?';
-    }
-
+    ) {}
     openDialog(): void {
         this.gameService.rankingSoloCopy = this.card.rankingSolo;
         this.gameService.rankingMultiCopy = this.card.rankingMulti;
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'solo' },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -60,6 +55,9 @@ export class GameCardComponent implements OnInit {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'double' },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -82,7 +80,7 @@ export class GameCardComponent implements OnInit {
         return '';
     }
 
-    async onDelete(gameName: string): Promise<void> {
+    async onDelete(gameName: string) {
         try {
             await firstValueFrom(this.gameService.deleteGame(gameName));
             this.gameDeleted.emit();
@@ -90,8 +88,7 @@ export class GameCardComponent implements OnInit {
             alert('la suppression du jeu a échoué');
         }
     }
-
-    async onReinitialise(gameName: string): Promise<void> {
+    async onReinitialise(gameName: string) {
         this.gameService.deleteOneGameRecords(gameName).subscribe();
     }
 

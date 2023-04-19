@@ -33,7 +33,7 @@ export class NamePopupComponent implements OnInit {
         this.upperLimitNameLength = 10;
     }
     ngOnInit(): void {
-        this.data.name = ' ';
+        this.data.name = '';
     }
     onNoClick(): void {
         this.dialogRef.close();
@@ -43,6 +43,9 @@ export class NamePopupComponent implements OnInit {
         const dialog = this.dialog.open(GeneralFeedbackComponent, {
             data: { message: showedMessage },
             disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
         dialog.afterClosed().subscribe((result) => {
             this.name = result;
@@ -58,8 +61,9 @@ export class NamePopupComponent implements OnInit {
         const dialog = this.dialog.open(PlayerWaitPopupComponent, {
             data: { name: this.data.name, gameName: this.data.gameName, gameType: 'double' },
             disableClose: true,
-            height: '600px',
-            width: '600px',
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
         });
         dialog.afterClosed().subscribe((result) => {
             this.name = result;

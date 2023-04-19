@@ -126,18 +126,28 @@ export class HintsService {
         const h = quadrant.h;
         if (isLastHint) {
             confetti({
-                particleCount: 50,
-                spread: 60,
+                spread: 360,
+                ticks: 50,
+                gravity: 0,
+                decay: 0.94,
+                startVelocity: 15,
                 shapes: ['star'],
+                colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+                particleCount: 50,
                 origin: {
                     x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
                 },
             });
             confetti({
-                particleCount: 50,
-                spread: 60,
+                spread: 360,
+                ticks: 50,
+                gravity: 0,
+                decay: 0.94,
+                startVelocity: 15,
                 shapes: ['star'],
+                colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+                particleCount: 50,
                 origin: {
                     x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
@@ -269,8 +279,6 @@ export class HintsService {
         this.hintsDisplayService.modifyTime(this.gameMode);
         new GameMessageEvent(this.hintsDisplayService.sendHintMessage()).record(this.gameRecorderService);
         this.handleRandomQuadrant();
-        const chatBox = document.getElementById('chat-box');
-        if (document.activeElement === chatBox) return;
         this.isHintsActive = !this.isHintsActive;
         if (this.isHintsActive) {
             new StartHintsRecord().record(this.gameRecorderService);
@@ -309,6 +317,7 @@ export class HintsService {
         this.isHintsActive = false;
         clearInterval(this.blinking);
         this.unfoundedDifference = new Array();
+        confetti.reset();
     }
 
     eqSet(set1: Set<number>, set2: Set<number>): boolean {

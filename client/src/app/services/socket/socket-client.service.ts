@@ -138,8 +138,9 @@ export class SocketClientService {
             const dialog = this.dialog.open(GiveUpMessagePopupComponent, {
                 data: { name: this.playerGaveUp },
                 disableClose: true,
-                width: '544px',
-                height: '255px',
+                panelClass: 'custom-dialog-container',
+                minHeight: 'fit-content',
+                minWidth: 'fit-content',
             });
             dialog.afterClosed().subscribe(() => {
                 this.disconnect();

@@ -73,6 +73,8 @@ describe('ChatGateway', () => {
         gateway.game = mockGame;
         gameService.gamesNames = [];
         timeService.timeConstants = {timeBonus: 5, timeInit: 30, timePen: 5};
+        gateway.unfoundedDifference = new Map<string, Set<number>[]>();
+        gateway.unfoundedDifference.set('myRoom', [new Set([1, 2, 3]), new Set([4, 5, 6])]); 
         gameService.games.set('test', mockGame);
         gameService.gamesNames.push('test');
         jest.spyOn(gameService, 'getGame').mockReturnValue( await Promise.resolve(mockGame));
@@ -188,7 +190,6 @@ describe('ChatGateway', () => {
         expect(mockSocket.to(mockSocket.id).emit).toHaveBeenCalledWith('getRandomGame', mockGame);
         expect(mockSocket.to(mockSocket.id).emit).toHaveBeenCalledWith('nbrDifference', 0);
         expect(timeService.startCountDown).toHaveBeenCalled();
-
     });
 
     it('leaveRoom() should call socketsLeave, call removeRoom() from playerService and disconnect', async () => {
@@ -298,12 +299,40 @@ describe('ChatGateway', () => {
         gateway.roomName = 'test';
         timeService.count.set(socket.id, 3);
         gateway.modifyTime(socket, '');
-        expect(timeService.count.get(socket.id)).toEqual(timeService.count.get(socket.id) + timeService.timeConstants.timeBonus);
+        expect(timeService.count.get(socket.id)).toEqual(3 + timeService.timeConstants.timeBonus);
     });
 
-    it('mouseDetect() should emit diff found and call goToNext game in timeLimit mode', () => {
+    it('mouseDetect() should emit diffFound and emit timeLimitStatus when game in timeLimit mode and gameNames.length === 1', () => {
         const data: [number, string, string]= [1, 'myRoom', 'tempsLimite'];
+        gateway.isMulti = true;
+        gateway.gameNames = ['test'];
+        const mockSocket = { id: 'test', join: jest.fn(), emit: jest.fn(), to: jest.fn(), rooms: new Set([]) } as any;
+        jest.spyOn(gateway.server, 'to').mockReturnValue({ emit: jest.fn()} as any);
         gateway.mouseDetect(socket, data);
-        expect(socket.to).toHaveBeenCalledWith(data[1]);
+        expect(server.to(mockSocket.id).emit).toHaveBeenCalledWith('timeLimitStatus', true);
+        expect(socket.emit.calledWith('diffFound', match.array)).toBeTruthy();
+    });
+
+    it('mouseDetect() should emit diffFound and emit getRandomGame and nbrDiffLeft when game in timeLimit mode and gameNames.length !== 1', () => {
+        const data: [number, string, string]= [1, 'myRoom', 'tempsLimite'];
+        gateway.isMulti = false;
+        gateway.roomName = socket.id
+        gateway.game = mockGame;
+        gateway.unfoundedDifference.set(gateway.roomName, [new Set([1, 2, 3]), new Set([4, 5, 6])]); 
+        gateway.gameNames = ['test2', 'test2'];
+        gateway.games.set('test2', mockGame);
+        const mockSocket = { id: 'test', join: jest.fn(), emit: jest.fn(), to: jest.fn(), rooms: new Set([]) } as any;
+        jest.spyOn(gateway.server, 'to').mockReturnValue({ emit: jest.fn()} as any);
+        gateway.mouseDetect(socket, data);
+        expect(server.to(mockSocket.id).emit).toHaveBeenCalledWith('getRandomGame', mockGame);
+        expect(server.to(mockSocket.id).emit).toHaveBeenCalledWith('nbrDiffLeft', gateway.gameNames.length);
+    });
+
+    it('mouseDetect() should emit error when diff not found', () => {
+        const data: [number, string, string]= [1, 'testRoom', ''];
+        gateway.isMulti = true;
+        gateway.unfoundedDifference.set('testRoom', [new Set([])]); 
+        gateway.mouseDetect(socket, data);
+        expect(socket.emit.calledWith('error')).toBeTruthy();
     });
 });

@@ -2,10 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MessageAreaComponent } from './message-area.component';
 import { GameService } from '@app/services/game/game.service';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { Message } from '@app/interfaces/message';
 
 describe('MessageAreaComponent', () => {
     let component: MessageAreaComponent;
     let fixture: ComponentFixture<MessageAreaComponent>;
+    const gameRecorderService = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do']);
 
     // mock services and dependencies
     const gameServiceMock = {
@@ -23,6 +26,7 @@ describe('MessageAreaComponent', () => {
             providers: [
                 { provide: GameService, useValue: gameServiceMock },
                 { provide: SocketClientService, useValue: socketClientMock },
+                { provide: GameRecorderService, useValue: gameRecorderService}
             ],
         }).compileComponents();
     });
@@ -100,5 +104,31 @@ describe('MessageAreaComponent', () => {
         blurSpy.and.callThrough();
         component.handleGameClick(mockMouseEvent);
         expect(blurSpy).not.toHaveBeenCalled();
+    });
+    it('should push a message to the socket client message list', () => {
+        // Arrange
+        const message = {
+            message: 'Hello World',
+            playerName: 'John Doe',
+            color: component.defaultColor[0],
+            pos: component.position[0],
+            gameId: '123TestGame',
+            event: false,
+        } as unknown as Message;
+        socketClientMock.messageList = [];
+        // Act
+        const spyPush = spyOn(component, 'pushMessage').and.callThrough();
+        component.pushMessage(message);
+        // Assert
+        expect(spyPush).toHaveBeenCalledWith(message);
+    });
+    it('should set notRewinding property to true', () => {
+        component.isNotRewinding = true;
+        expect(component.notRewinding).toBe(true);
+    });
+
+    it('should set notRewinding property to false', () => {
+        component.isNotRewinding = false;
+        expect(component.notRewinding).toBe(false);
     });
 });

@@ -126,18 +126,28 @@ export class HintsService {
         const h = quadrant.h;
         if (isLastHint) {
             confetti({
-                particleCount: 50,
-                spread: 60,
+                spread: 360,
+                ticks: 50,
+                gravity: 0,
+                decay: 0.94,
+                startVelocity: 15,
                 shapes: ['star'],
+                colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+                particleCount: 50,
                 origin: {
                     x: (this.canvas0.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas0.nativeElement.getBoundingClientRect().top + y + h) / screen.height,
                 },
             });
             confetti({
-                particleCount: 50,
-                spread: 60,
+                spread: 360,
+                ticks: 50,
+                gravity: 0,
+                decay: 0.94,
+                startVelocity: 15,
                 shapes: ['star'],
+                colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+                particleCount: 50,
                 origin: {
                     x: (this.canvas1.nativeElement.getBoundingClientRect().left + x + w / 2) / screen.width,
                     y: (this.canvas1.nativeElement.getBoundingClientRect().top + y + h) / screen.height,

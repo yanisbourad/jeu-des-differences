@@ -1,6 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
-import { BLINKING_COUNT, BLINKING_TIME } from '@app/configuration/const-time';
+import { BLINKING_COUNT } from '@app/configuration/const-time';
 import { Vec2 } from '@app/interfaces/vec2';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { DrawService } from '@app/services/draw/draw.service';
@@ -104,16 +104,17 @@ describe('GameRecordCommand', () => {
         expect(canvas2.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);
     }));
 
-    it('should clear the canvas', fakeAsync(() => {
+    it('should clear the canvas', async () => {
         const canvas1 = {
             nativeElement: document.createElement('canvas'),
         };
         const canvas2 = {
             nativeElement: document.createElement('canvas'),
         };
-        spyOn(DrawService, 'clearCanvas').and.callThrough();
+        const spy = spyOn(DrawService, 'clearCanvas').and.callThrough();
         gameRecordCommand.clearCanvas(canvas1.nativeElement, canvas2.nativeElement);
-        tick(BLINKING_TIME * 2);
-        expect(DrawService.clearCanvas).toHaveBeenCalled();
-    }));
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        await new Promise((f) => setTimeout(f, 500));
+        expect(spy).toHaveBeenCalled();
+    });
 });

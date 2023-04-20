@@ -1,15 +1,15 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from './draw.service';
-describe('DrawService', () => {
+describe('DrawService', async () => {
     let service: DrawService;
     let canvas: HTMLCanvasElement;
     let image: ImageBitmap;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const diff = new Set([1, 2, 3, 4]);
 
-    beforeAll(() => {
+    beforeAll(async () => {
         // read the image file as a data URL
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
@@ -21,6 +21,8 @@ describe('DrawService', () => {
             });
         };
         xhr.send();
+        // wait for the image to be loaded
+        await new Promise((f) => setTimeout(f, 500));
     });
 
     beforeEach(() => {
@@ -116,13 +118,11 @@ describe('DrawService', () => {
         expect(service.getRectangleIsSquare).toEqual(false);
     });
 
-    it('should translate the image dataUrl to ImageData', fakeAsync(() => {
+    it('should translate the image dataUrl to ImageData', async () => {
         const thisCanvas = document.createElement('canvas');
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tick(3000);
         context.drawImage(image, 0, 0);
         const imageData = thisCanvas.toDataURL('image/png');
         expect(imageData).toBeTruthy();
@@ -132,19 +132,21 @@ describe('DrawService', () => {
             expect(data.height).toEqual(constants.DEFAULT_HEIGHT);
             expect(data).toEqual(context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT));
         });
-    }));
 
-    it('should draw the imageData on canvas', fakeAsync(() => {
+        // wait for the image to be loaded and the test to be done
+        await new Promise((f) => setTimeout(f, 500));
+    });
+
+    it('should draw the imageData on canvas', async () => {
         const thisCanvas = document.createElement('canvas');
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tick(3000);
         context.drawImage(image, 0, 0);
         const imageDataUrl = thisCanvas.toDataURL('image/png');
         const imageDate: ImageData = context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         DrawService.drawImage(imageDate, thisCanvas);
         expect(imageDataUrl).toEqual(thisCanvas.toDataURL('image/png'));
-    }));
+        // await new Promise((f) => setTimeout(f, 500));
+    });
 });

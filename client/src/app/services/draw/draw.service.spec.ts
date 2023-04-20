@@ -6,9 +6,9 @@ describe('DrawService', async () => {
     let service: DrawService;
     let canvas: HTMLCanvasElement;
     let image: ImageBitmap;
+    const timeOut = 500;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const diff = new Set([1, 2, 3, 4]);
-
     beforeAll(async () => {
         // read the image file as a data URL
         const xhr = new XMLHttpRequest();
@@ -22,7 +22,7 @@ describe('DrawService', async () => {
         };
         xhr.send();
         // wait for the image to be loaded
-        await new Promise((f) => setTimeout(f, 500));
+        await new Promise((f) => setTimeout(f, timeOut));
     });
 
     beforeEach(() => {
@@ -134,7 +134,7 @@ describe('DrawService', async () => {
         });
 
         // wait for the image to be loaded and the test to be done
-        await new Promise((f) => setTimeout(f, 500));
+        await new Promise((f) => setTimeout(f, timeOut));
     });
 
     it('should draw the imageData on canvas', async () => {
@@ -142,11 +142,16 @@ describe('DrawService', async () => {
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-        context.drawImage(image, 0, 0);
+        try {
+            context.drawImage(image, 0, 0);
+        } catch (e) {
+            // wait for the image to be loaded
+            await new Promise((f) => setTimeout(f, timeOut));
+            context.drawImage(image, 0, 0);
+        }
         const imageDataUrl = thisCanvas.toDataURL('image/png');
         const imageDate: ImageData = context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         DrawService.drawImage(imageDate, thisCanvas);
         expect(imageDataUrl).toEqual(thisCanvas.toDataURL('image/png'));
-        // await new Promise((f) => setTimeout(f, 500));
     });
 });

@@ -329,4 +329,42 @@ describe('GameController', () => {
             expect(spy).toBeCalled();
         });
     });
+
+    // write a test for @Get('/count')
+    describe('/count', () => {
+        it('should return the count of games', async () => {
+            const spy = jest.spyOn(gameService, 'countGames').mockImplementation(() => {
+                return 1;
+            });
+            const res = {} as unknown as Response;
+            res.status = (code) => {
+                expect(code).toBe(HttpStatus.OK);
+                return res;
+            };
+            res.json = (body) => {
+                expect(body).toStrictEqual(1);
+                return res;
+            };
+
+            await controller.countGames(res);
+            expect(spy).toHaveBeenCalled();
+        });
+        it('should return error message', async () => {
+            const spy = jest.spyOn(gameService, 'countGames').mockImplementation(() => {
+                throw new Error('test error');
+            });
+
+            const res = {} as unknown as Response;
+            res.status = (code) => {
+                expect(code).toBe(500);
+                return res;
+            };
+            res.send = (message) => {
+                expect(message).toBe('test error');
+                return res;
+            };
+            await controller.countGames(res);
+            expect(spy).toHaveBeenCalled();
+        });
+      });
 });

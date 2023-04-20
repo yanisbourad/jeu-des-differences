@@ -101,7 +101,6 @@ describe('GameCardHandlerGateway', () => {
         expect(gameCardHandlerService.stackPlayer).toHaveBeenCalled();
     });
     it('Should call join with oned3rrrrrrrrrrrrrr stacked player()', async () => {
-        gateway.player.gameType = 'Double';
         stub(socket, 'rooms').value(new Set(['ric']));
         jest.spyOn(gameCardHandlerService, 'isGameAvailable').mockImplementation(() => {
             return false;
@@ -307,24 +306,21 @@ describe('GameCardHandlerGateway', () => {
     it('Should call handle disconnect when time limited player is disconnected()', async () => {
         stub(socket, 'rooms').value(new Set(['123']));
         jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player4);
+        jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
         jest.spyOn(gameCardHandlerService, 'deletePlayer').mockReturnValueOnce(null);
         gateway.handleDisconnect(socket);
         expect(gameCardHandlerService.deletePlayer).toHaveBeenCalled();
     });
     it('Should call handle cancel when player cancel the game()', async () => {
         stub(socket, 'rooms').value(new Set(['123']));
+        jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
         jest.spyOn(gameCardHandlerService, 'getTotalRequest').mockReturnValueOnce(1);
         jest.spyOn(gameCardHandlerService, 'deletePlayer').mockReturnValueOnce(player1);
         jest.spyOn(gameCardHandlerService, 'deleteCreator').mockReturnValueOnce(['123', '134']);
         jest.spyOn(gameCardHandlerService, 'removeOpponent').mockReturnValueOnce(['123', '134']);
         jest.spyOn(server, 'to').mockReturnValue({
             emit: (event: string) => {
-                if (event === 'feedbackOnStart') expect(event).toEqual('feedbackOnStart');
-                if (event === 'byeTillNext') expect(event).toEqual('byeTillNext');
-                if (event === 'feedbackOnWait') expect(event).toEqual('feedbackOnWait');
-                if (event === 'feedbackOnAccept') expect(event).toEqual('feedbackOnAccept');
-                if (event === 'feedbackOnLeave') expect(event).toEqual('feedbackOnLeave');
-                if (event === 'updateStatus') expect(event).toEqual('updateStatus');
+                if (event === 'globalEvent') expect(event).toEqual('globalEvent');
             },
         } as BroadcastOperator<unknown, unknown>);
         jest.spyOn(logger, 'log').mockImplementation(() => {
@@ -342,7 +338,8 @@ describe('GameCardHandlerGateway', () => {
             emit: jest.fn(),
         } as unknown as jest.Mocked<Socket>;
         stub(socket, 'rooms').value(new Set(['123']));
-        jest.spyOn(gameCardHandlerService, 'deletePlayer').mockReturnValueOnce(player1);
+        jest.spyOn(gameCardHandlerService, 'getPlayer').mockReturnValueOnce(player1);
+        jest.spyOn(gameCardHandlerService, 'deletePlayer').mockReturnValueOnce(player4);
         jest.spyOn(gameCardHandlerService, 'isCreator').mockReturnValueOnce(true);
         jest.spyOn(gameCardHandlerService, 'getTotalRequest').mockReturnValueOnce(2);
         jest.spyOn(gameCardHandlerService, 'deleteCreator').mockReturnValueOnce(['123', '134']);
@@ -351,7 +348,7 @@ describe('GameCardHandlerGateway', () => {
         jest.spyOn(gameCardHandlerService, 'removePlayers').mockReturnValueOnce(['123', opponent.id]);
         jest.spyOn(server, 'to').mockReturnValue({
             emit: (event: string) => {
-                expect(event).toEqual('feedBackOnLeave');
+                expect(event).toEqual('globalEvent');
             },
         } as BroadcastOperator<unknown, unknown>);
         jest.spyOn(logger, 'log').mockImplementation(() => {

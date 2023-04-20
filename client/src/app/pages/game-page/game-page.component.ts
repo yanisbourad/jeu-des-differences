@@ -272,6 +272,6 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.opponentName = this.route.snapshot.paramMap.get('opponentName') as string;
         this.gameService.gameId = this.route.snapshot.paramMap.get('gameId') as string;
         this.gameService.mode = this.route.snapshot.paramMap.get('mode') as string;
-        if (this.gameService.mode === 'undefined') this.gameService.mode = '';
+        if (this.gameService.mode === 'classic') this.gameService.mode = '';
     }
 }

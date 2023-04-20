@@ -9,24 +9,24 @@ describe('DrawService', () => {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const diff = new Set([1, 2, 3, 4]);
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({});
-        service = TestBed.inject(DrawService);
-        canvas = document.createElement('canvas');
-
+    beforeAll(() => {
         // read the image file as a data URL
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
         xhr.responseType = 'blob';
-        if (!image) {
-            xhr.onload = () => {
-                const blob = xhr.response;
-                createImageBitmap(blob).then((bmp) => {
-                    image = bmp;
-                });
-            };
-            xhr.send();
-        }
+        xhr.onload = () => {
+            const blob = xhr.response;
+            createImageBitmap(blob).then((bmp) => {
+                image = bmp;
+            });
+        };
+        xhr.send();
+    });
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(DrawService);
+        canvas = document.createElement('canvas');
     });
 
     it('should create an instance', () => {
@@ -121,8 +121,8 @@ describe('DrawService', () => {
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        tick(100);
+
+        tick(3000);
         context.drawImage(image, 0, 0);
         const imageData = thisCanvas.toDataURL('image/png');
         expect(imageData).toBeTruthy();
@@ -132,8 +132,6 @@ describe('DrawService', () => {
             expect(data.height).toEqual(constants.DEFAULT_HEIGHT);
             expect(data).toEqual(context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT));
         });
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        tick(2000);
     }));
 
     it('should draw the imageData on canvas', fakeAsync(() => {
@@ -142,8 +140,7 @@ describe('DrawService', () => {
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        tick(100);
+        tick(3000);
         context.drawImage(image, 0, 0);
         const imageDataUrl = thisCanvas.toDataURL('image/png');
         const imageDate: ImageData = context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);

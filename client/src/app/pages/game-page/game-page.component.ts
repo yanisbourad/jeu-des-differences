@@ -79,7 +79,13 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameService.handleDisconnect();
         if (this.gameService.mode === 'tempsLimite') {
             this.gameService.getTimeLimitGame();
-            if (this.gameService.gameType !== 'double') this.loadImages(this.socket.game);
+            if (this.gameService.gameType !== 'double') {
+                setTimeout(() => {
+                    this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+                    this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+                }, TIMEOUT * 3);
+                this.loadImages(this.socket.game);
+            }
             this.socket.imageLoaded$.subscribe((game: Game) => {
                 setTimeout(() => {
                     this.loadImages(game);
@@ -95,6 +101,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.canvas1 = this.canvasCheat1;
         if (this.gameService.gameType === 'solo') {
             this.hintsService.hintsKeyBinding();
+            this.hintsService.launchHints();
             this.hintsService.canvas0 = this.canvasCheat0;
             this.hintsService.canvas1 = this.canvasCheat1;
             this.hintsService.gameMode = this.gameService.mode;
@@ -182,6 +189,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.notRewinding = true;
         this.chat.isNotRewinding = true;
         this.hintsService.randomQuadrant = [];
+        this.hintsService.stopInterval();
     }
 
     subscriptions(): void {
@@ -239,6 +247,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
                 if (this.gameService.mode === 'tempsLimite') {
                     this.gameService.game = this.socket.getGame();
                     this.cheatModeService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
+                    this.hintsService.unfoundedDifference = this.gameService.getSetDifference(this.gameService.game.listDifferences);
                 }
             } else {
                 new ShowNotADiffRecord(canvases, this.gameService.mousePosition).record(this.gameRecordService);

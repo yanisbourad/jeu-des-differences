@@ -11,13 +11,33 @@ import { DrawService } from '@app/services/draw/draw.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
-//import SpyObj = jasmine.SpyObj;
+import { Subject } from 'rxjs';
+// import { of } from 'rxjs';
+import SpyObj = jasmine.SpyObj;
 //import { of } from 'rxjs';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
-    // let gameService: GameService;
+    let gameService: GameService;
+    let gameState: Subject<boolean>;
+    let playerFoundDiff: Subject<string>;
+    let diffFound: Subject<Set<number>>;
+    let timeLimitStatus: Subject<boolean>;
+    // let teammateStatus: Subject<boolean>;
+
+    // const socketClientMock = {
+    //     messageList: [],
+    //     sendMessage: jasmine.createSpy('sendMessage'),
+    //     joinRoomSolo: jasmine.createSpy('joinRoomSolo'),
+    //     joinRoomOpponent: jasmine.createSpy('joinRoomOpponent'),
+    //     leaveRoom: jasmine.createSpy('leaveRoom'),
+    //     connect: jasmine.createSpy('connect'),
+    //     subscribe: jasmine.createSpy('subscribe'),
+    //     disconnect: jasmine.createSpy('disconnect'),
+    // };
+    const gameRecorderService = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do']);
+    let socketClientServiceSpy: SpyObj<SocketClientService>;
     // let socketClientService: SocketClientService;
     // let gameRecorderService: GameRecorderService;
     // let cheatModeService: CheatModeService;
@@ -25,6 +45,16 @@ describe('GamePageComponent', () => {
     // let activatedRoute: ActivatedRoute;
     // let socketClientServiceSpy: SpyObj<SocketClientService>;
     beforeEach(async () => {
+        socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
+            'connect',
+            'joinRoomSolo',
+            'disconnect',
+            'leaveRoom',
+            'getRoomName',
+            'getRoomTime',
+            'sendRoomName',
+            'sendDifference',
+        ]);
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent, MessageAreaComponent],
             providers: [
@@ -44,6 +74,18 @@ describe('GamePageComponent', () => {
                         },
                     },
                 },
+                { provide: SocketClientService, useValue: socketClientServiceSpy },
+                { provide: GameRecorderService, useValue: gameRecorderService },
+                {
+                    provide: CheatModeService,
+                    useValue: jasmine.createSpyObj('CheatModeService', [
+                        'isCheatMode',
+                        'cheatModeKeyBinding',
+                        'removeHotkeysEventListener',
+                        'resetService',
+                    ]),
+                },
+                { provide: HintsService, useValue: jasmine.createSpyObj('HintsService', ['getHints', 'removeHotkeysEventListener', 'resetService']) },
             ],
             imports: [RouterTestingModule, MatDialogModule, HttpClientModule],
         }).compileComponents();
@@ -52,13 +94,22 @@ describe('GamePageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
-        // gameService = TestBed.inject(GameService);
+        gameService = TestBed.inject(GameService);
         // socketClientService = TestBed.inject(SocketClientService);
         // gameRecorderService = TestBed.inject(GameRecorderService);
         // cheatModeService = TestBed.inject(CheatModeService);
         // hintsService = TestBed.inject(HintsService);
         // activatedRoute = TestBed.inject(ActivatedRoute);
         // socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['sendMessage', 'getRoomName', 'connect']);
+        gameState = new Subject<boolean>();
+        playerFoundDiff = new Subject<string>();
+        diffFound = new Subject<Set<number>>();
+        socketClientServiceSpy.gameState$ = gameState.asObservable();
+        socketClientServiceSpy.playerFoundDiff$ = playerFoundDiff.asObservable();
+        socketClientServiceSpy.diffFound$ = diffFound.asObservable();
+        socketClientServiceSpy.timeLimitStatus$ = timeLimitStatus.asObservable();
+        // socketClientServiceSpy.teammateStatus$ = teammateStatus.asObservable();
+
         fixture.detectChanges();
     });
 
@@ -119,6 +170,28 @@ describe('GamePageComponent', () => {
             expect(component.gameService.initRewind).not.toHaveBeenCalled();
             expect(component.cheatModeService.removeHotkeysEventListener).not.toHaveBeenCalled();
             expect(component.hintsService.removeHotkeysEventListener).not.toHaveBeenCalled();
+        });
+    });
+    // it('should handle loading', fakeAsync(() => {
+    //     //const game = { originalImageData: 'url', modifiedImageData: 'url' };
+    //     const drawService = TestBed.inject(DrawService);
+    //     spyOn(DrawService, 'getImageDateFromDataUrl').and.returnValue(of(new ImageData(1, 1)));
+    //     component.loading();
+    //     fixture.detectChanges();
+    //     expect(DrawService.getImageDateFromDataUrl).toHaveBeenCalledTimes(2);
+    //     const mille = 1000;
+    //     tick(mille);
+    // }));
+    describe('GamePageComponent', () => {
+        it('should create', () => {
+            expect(component).toBeTruthy();
+        });
+        it('should ngAfterViewInit', () => {
+            gameService.gameType = 'solo';
+            gameService.mode = '';
+            component.ngAfterViewInit();
+            expect(socketClientServiceSpy.joinRoomSolo).toHaveBeenCalled();
+            expect(component.ngAfterViewInit).toBeTruthy();
         });
     });
 });

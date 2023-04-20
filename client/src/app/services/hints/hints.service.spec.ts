@@ -121,9 +121,11 @@ describe('HintsService', () => {
 
     it('displayQuadrant should call fillStyle and fillRect if isLastHint is false', () => {
         const quadrant = { x: 0, y: 0, w: 320, h: 240, isInnerQuadrant: false };
-        const isLastHint = false;
+        const isLastHintFalse = false;
+        const isLastHintTrue = true;
+        hintsService.displayQuadrant(quadrant, isLastHintTrue);
         spyOn(hintsService, 'displayQuadrant').and.callThrough();
-        hintsService.displayQuadrant(quadrant, isLastHint);
+        hintsService.displayQuadrant(quadrant, isLastHintFalse);
         hintsService.color = '#000000';
         spyOn(hintsService.canvas0.nativeElement.getContext('2d') as CanvasRenderingContext2D, 'fillRect').and.callThrough();
         spyOn(hintsService.canvas1.nativeElement.getContext('2d') as CanvasRenderingContext2D, 'fillRect').and.callThrough();
@@ -131,8 +133,6 @@ describe('HintsService', () => {
         expect(hintsService.canvas0.nativeElement.getContext('2d')?.fillRect).not.toHaveBeenCalled();
         expect(hintsService.canvas1.nativeElement.getContext('2d')?.fillStyle).toEqual(hintsService.color);
         expect(hintsService.canvas1.nativeElement.getContext('2d')?.fillRect).not.toHaveBeenCalled();
-        const isLastHint2 = true;
-        hintsService.displayQuadrant(quadrant, isLastHint2);
     });
 
     it('findQuadrant should call displayQuadrant when currentQuadrant is between 1 and 4', fakeAsync(() => {

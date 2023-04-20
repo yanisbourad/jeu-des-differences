@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ElementRef, Injectable } from '@angular/core';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { StartHintsRecord } from '@app/classes/game-records/start-hints';
@@ -175,6 +174,7 @@ export class HintsService {
                 },
             });
         } else {
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
             this.canvas0.nativeElement.getContext('2d')!.fillStyle = this.color;
             this.canvas0.nativeElement.getContext('2d')!.fillRect(x, y, w, h);
             this.canvas1.nativeElement.getContext('2d')!.fillStyle = this.color;

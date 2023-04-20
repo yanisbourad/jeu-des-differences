@@ -85,6 +85,7 @@ describe('CheatModeService', () => {
         cheatModeService.isCheating = true;
         cheatModeService.toggleCheating();
         expect(document.activeElement).toEqual(dummyElement);
+        dummyElement.setAttribute('style', 'display: none');
     });
 
     it('stopCheating should call clearInterval and clearCanvasCheat', () => {

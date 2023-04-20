@@ -113,7 +113,7 @@ export class GameRecorderService {
     }
 
     stopRewind() {
-        clearInterval(this.myTimeout);
+        if (this.myTimeout) clearInterval(this.myTimeout);
     }
 
     // this will be used to tick the rewind

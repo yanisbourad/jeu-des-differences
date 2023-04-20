@@ -8,6 +8,7 @@ import { GameService } from '@app/services/game/game.service';
 import { Logger } from '@nestjs/common';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { GameRecordService } from './game-record.service';
+import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 
 describe('GameRecordService', () => {
     let service: GameRecordService;
@@ -57,6 +58,106 @@ describe('GameRecordService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('getAllGameRecord should return all game records', async () => {
+        const gameRecords = [
+            {
+                gameName: 'test',
+                typeGame: 'test',
+                time: '1:20',
+                playerName: 'Mary',
+                dateStart: '2023-03-15',
+            },
+        ];
+        const execMock = jest.fn().mockResolvedValue(gameRecords);
+        const findMock = jest.spyOn(gameRecordModel, 'find').mockReturnValue({ exec: execMock } as any);
+        const result = await service.getAllGameRecord();
+        expect(findMock).toHaveBeenCalled();
+        expect(execMock).toHaveBeenCalled();
+        expect(result).toEqual(gameRecords);
+    });
+
+    it('addGameRecord should add game record', async () => {
+        const gameRecord = {
+            gameName: 'test',
+            typeGame: 'test',
+            time: '1:20',
+            playerName: 'Mary',
+            dateStart: '2023-03-15',
+            keyServer: 'test',
+        };
+        jest.spyOn(gameRecordModel, 'create').mockResolvedValue(gameRecord as never);
+        expect(await service.addGameRecord(gameRecord)).toBeUndefined();
+    });
+
+    it('should return an error if failed to delete game records', async () => {
+        const error = new Error('Delete game records failed');
+        jest.spyOn(service.gameRecordModel, 'deleteMany').mockRejectedValue(error);
+        
+        await expect(service.deleteGameRecords()).rejects.toEqual(`Failed to delete Game records: ${error}`);
+    });
+
+    it('should reject the Promise if the deletion fails', async () => {
+        const name = 'test game';
+        const fakeError = new Error('Deletion failed');
+        jest.spyOn(gameRecordModel, 'deleteMany').mockRejectedValue(fakeError);
+        await expect(service.deleteGameRecordsForOneGame(name)).rejects.toEqual(`Failed to delete Game records: ${fakeError}`);
+    });
+
+    it('should return all gaming history records', async () => {
+        const gamingHistoryRecords = [
+            {
+                gameName: 'test',
+                gameType: 'solo',
+                time: '1:20',
+                playerName: 'Mary',
+                opponentName: 'John',
+                dateStart: '2023-03-15',
+                hasAbandonedGame: false,
+            },
+        ];
+        const execMock = jest.fn().mockResolvedValue(gamingHistoryModel);
+        const findMock = jest.spyOn(gamingHistoryModel, 'find').mockReturnValue({ exec: execMock } as any);
+        const result = await service.getAllGamingHistory();
+        expect(findMock).toHaveBeenCalled();
+        expect(execMock).toHaveBeenCalled();
+        expect(result).not.toEqual(gamingHistoryRecords);
+    });
+
+    it('should insert a gaming history record', async () => {
+        const record: CreateGamingHistoryDto = {
+            gameName: 'test',
+            dateStart: '2023-04-20',
+            time: '00:05',
+            gameType: 'solo',
+            playerName: 'John',
+            opponentName: 'Jane',
+            hasAbandonedGame: false,
+        };
+        expect(gamingHistoryModel.create).not.toBeCalled();
+    });
+
+    it('should reject with an error message if insertion fails', async () => {
+        const errorMessage = 'Insertion failed';
+        const record: CreateGamingHistoryDto = {
+            gameName: 'test',
+            dateStart: '2023-04-20',
+            time: '00:05',
+            gameType: 'solo',
+            playerName: 'John',
+            opponentName: 'Jane',
+            hasAbandonedGame: false,
+        };
+        jest.spyOn(gamingHistoryModel, 'create').mockRejectedValue(new Error(errorMessage) as never);
+        await expect(service.addGamingHistory(record)).rejects.toEqual(`Failed to insert Game: Error: ${errorMessage}`);
+    });
+
+    it('should handle error if failed to delete gaming history', async () => {
+        const errorMock = new Error('Failed to delete gaming history');
+        jest.spyOn(gamingHistoryModel, 'deleteMany').mockRejectedValue(errorMock);
+        const promise = service.deleteGamingHistory();
+        await expect(promise).rejects.toEqual(`Failed to delete Gaming History: ${errorMock}`);
     });
 
     // it('should return all game records', async () => {

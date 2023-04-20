@@ -55,7 +55,6 @@ describe('DrawService', () => {
 
     it('should draw all differences', () => {
         const spy = spyOn(DrawService, 'drawDiff');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         DrawService.drawAllDiff([diff], canvas);
         expect(spy).toHaveBeenCalledOnceWith(diff, canvas);
     });
@@ -142,9 +141,9 @@ describe('DrawService', () => {
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
+
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         tick(100);
-
         context.drawImage(image, 0, 0);
         const imageDataUrl = thisCanvas.toDataURL('image/png');
         const imageDate: ImageData = context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);

@@ -91,10 +91,39 @@ describe('GameRecordService', () => {
         expect(await service.addGameRecord(gameRecord)).toBeUndefined();
     });
 
+    it('addGameRecord should add game record', async () => {
+        const gameRecord = {
+            gameName: 'test',
+            typeGame: 'test',
+            time: '1:20',
+            playerName: 'Mary',
+            dateStart: '2023-03-15',
+            keyServer: 'test',
+        };
+        const errorMessage = 'Failed to insert Game: test error';
+    
+        jest.spyOn(gameRecordModel, 'create').mockImplementation(() => {
+            throw new Error('test error');
+        });
+    
+        await expect(service.addGameRecord(gameRecord)).rejects.not.toThrow(errorMessage);
+    });
+
+    it('should delete game records for one game and log success', async () => {
+        const name = 'test';
+        const response = { deletedCount: 2 };
+        const logSpy = jest.spyOn(loggerSpy, 'log');
+        const populateFakeGameRecordsSpy = jest.spyOn(gameServiceSpy, 'populateFakeGameRecordsForOneGame');
+        jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue(response as any);
+        await service.deleteGameRecordsForOneGame(name);
+        expect(gameRecordModel.deleteMany).toHaveBeenCalledWith({ gameName: name, keyServer: gameServiceSpy.getKey });
+        expect(logSpy).toHaveBeenCalledWith(`All ${response.deletedCount} Game Records have been deleted successfully for ${name}`);
+        expect(populateFakeGameRecordsSpy).toHaveBeenCalledWith(name);
+    });
+
     it('should return an error if failed to delete game records', async () => {
         const error = new Error('Delete game records failed');
         jest.spyOn(service.gameRecordModel, 'deleteMany').mockRejectedValue(error);
-        
         await expect(service.deleteGameRecords()).rejects.toEqual(`Failed to delete Game records: ${error}`);
     });
 
@@ -153,187 +182,17 @@ describe('GameRecordService', () => {
         await expect(service.addGamingHistory(record)).rejects.toEqual(`Failed to insert Game: Error: ${errorMessage}`);
     });
 
+    it('should log the number of deleted records', async () => {
+        jest.spyOn(gamingHistoryModel, 'deleteMany').mockResolvedValueOnce({ deletedCount: 5 } as any);
+        const logSpy = jest.spyOn(loggerSpy, 'log');
+        await service.deleteGamingHistory();
+        expect(logSpy).toHaveBeenCalledWith('All 5 Game Records have been deleted successfully');
+    });
+
     it('should handle error if failed to delete gaming history', async () => {
         const errorMock = new Error('Failed to delete gaming history');
         jest.spyOn(gamingHistoryModel, 'deleteMany').mockRejectedValue(errorMock);
         const promise = service.deleteGamingHistory();
         await expect(promise).rejects.toEqual(`Failed to delete Gaming History: ${errorMock}`);
     });
-
-    // it('should return all game records', async () => {
-    //     const gameRecords = [
-    //         {
-    //             gameName: 'test',
-    //             typeGame: 'test',
-    //             time: '1:20',
-    //             playerName: 'Mary',
-    //             dateStart: '2023-03-15',
-    //         },
-    //     ];
-    //     jest.spyOn(gameRecordModel, 'find').mockResolvedValue(gameRecords);
-    //     expect(await service.getAllGameRecord()).toEqual(gameRecords);
-    // });
-
-    // it('should return empty array if no game records', async () => {
-    //     jest.spyOn(gameRecordModel, 'find').mockResolvedValue([]);
-    //     expect(await service.getAllGameRecord()).toEqual([]);
-    // });
-
-    // it('should return all gaming history', async () => {
-    //     const gamingHistory = [
-    //         {
-    //             gameName: 'test',
-    //             typeGame: 'test',
-    //             time: '1:20',
-    //             playerName: 'Mary',
-    //             dateStart: '2023-03-15',
-    //         },
-    //     ];
-    //     jest.spyOn(gamingHistoryModel, 'find').mockResolvedValue(gamingHistory); // mock the find method of the model
-    //     expect(await service.getAllGamingHistory()).toEqual(gamingHistory);
-    // });
-
-    // it('should return empty array if no gaming history', async () => {
-    //     jest.spyOn(gamingHistoryModel, 'find').mockResolvedValue([]);
-    //     expect(await service.getAllGamingHistory()).toEqual([]);
-    // });
-
-    // describe('getAllGameRecord', () => {
-    //     it('should return all game records', async () => {
-    //         const gameRecords = [
-    //             {
-    //                 gameName: 'test',
-    //                 typeGame: 'test',
-    //                 time: '1:20',
-    //                 playerName: 'Mary',
-    //                 dateStart: '2023-03-15',
-    //             },
-    //         ];
-    //         jest.spyOn(gameRecordModel, 'find').mockResolvedValue(gameRecords);
-    //         expect(await service.getAllGameRecord()).toEqual(gameRecords);
-    //     });
-
-    //     it('should return empty array if no game records', async () => {
-    //         jest.spyOn(gameRecordModel, 'find').mockResolvedValue([]);
-    //         expect(await service.getAllGameRecord()).toEqual([]);
-    //     });
-    // });
-
-    // describe('getAllGamingHistory', () => {
-    //     it('should return all gaming history', async () => {
-    //         const gamingHistory = [
-    //             {
-    //                 gameName: 'test',
-    //                 typeGame: 'test',
-    //                 time: '1:20',
-    //                 playerName: 'Mary',
-    //                 dateStart: '2023-03-15',
-    //             },
-    //         ];
-    //         jest.spyOn(gamingHistoryModel, 'find').mockResolvedValue(gamingHistory); // mock the find method of the model
-    //         expect(await service.getAllGamingHistory()).toEqual(gamingHistory);
-    //     });
-
-    //     it('should return empty array if no gaming history', async () => {
-    //         jest.spyOn(gamingHistoryModel, 'find').mockResolvedValue([]);
-    //         expect(await service.getAllGamingHistory()).toEqual([]);
-    //     });
-    // });
-
-    // describe('createGameRecord', () => {
-    //     it('should create a game record', async () => {
-    //         const createGameRecordDto: CreateGameRecordDto = {
-    // gameName: 'test',
-    // typeGame: 'test',
-    // time: '1:20',
-    // playerName: 'Mary',
-    // dateStart: '2023-03-15',
-    //         };
-    //         const gameRecord = {
-    //             gameName: 'test',
-    //             typeGame: 'test',
-    //             time: '1:20',
-    //             playerName: 'Mary',
-    //             dateStart: '2023-03-15',
-    //         };
-    //         jest.spyOn(gameRecordModel, 'create').mockResolvedValue(gameRecord);
-    //         expect(await service.createGameRecord(createGameRecordDto)).toEqual(gameRecord);
-    //     });
-    // });
-
-    // describe('createGamingHistory', () => {
-    //     it('should create a gaming history', async () => {
-    //         const createGamingHistoryDto: CreateGamingHistoryDto = {
-    //             gameName: 'test',
-
-    //             gameType: 'test',
-    //             gameMode: 'test',
-    //             gameDuration: 1,
-    //             gameResult: 'test',
-    //             gameScore: 1,
-    //             gameDate: new Date(),
-    //         };
-    //         const gamingHistory = {
-    //             gameName: 'test',
-    //             gameType: 'test',
-    //             gameMode: 'test',
-    //             gameDuration: 1,
-
-    //             gameResult: 'test',
-    //             gameScore: 1,
-    //             gameDate: new Date(),
-    //         };
-    //         jest.spyOn(gamingHistoryModel, 'create').mockResolvedValue(gamingHistory);
-    //         expect(await service.createGamingHistory(createGamingHistoryDto)).toEqual(gamingHistory);
-    //     });
-    // });
-
-    // describe('deleteGameRecords', () => {
-    //     it('should delete all game records', async () => {
-    //         jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGameRecords()).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGamingHistory', () => {
-    //     it('should delete all gaming history', async () => {
-    //         jest.spyOn(gamingHistoryModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGamingHistory()).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGameRecordsByGameName', () => {
-    //     it('should delete all game records by game name', async () => {
-    //         jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGameRecordsByGameName('test')).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGamingHistoryByGameName', () => {
-    //     it('should delete all gaming history by game name', async () => {
-    //         jest.spyOn(gamingHistoryModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGamingHistoryByGameName('test')).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGameRecordsByGameType', () => {
-    //     it('should delete all game records by game type', async () => {
-    //         jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGameRecordsByGameType('test')).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGamingHistoryByGameType', () => {
-    //     it('should delete all gaming history by game type', async () => {
-    //         jest.spyOn(gamingHistoryModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGamingHistoryByGameType('test')).toEqual({ deletedCount: 1 });
-    //     });
-    // });
-
-    // describe('deleteGameRecordsByGameMode', () => {
-    //     it('should delete all game records by game mode', async () => {
-    //         jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue({ deletedCount: 1 });
-    //         expect(await service.deleteGameRecordsByGameMode('test')).toEqual({ deletedCount: 1 });
-    //     });
-    // });
 });

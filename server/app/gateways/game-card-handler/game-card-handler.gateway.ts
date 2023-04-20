@@ -50,25 +50,6 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             }
             this.server.to(players[0].id).emit('globalEvent', response);
             this.server.to(players[1].id).emit('globalEvent', response);
-        } else {
-            while (players.length % 2 === 0) {
-                const gameInfo = {
-                    gameId: this.countGame++,
-                    gameName: "limitedTime99999",
-                    creatorName: players[CREATOR_INDEX].name,
-                    opponentName: players[OPPONENT_INDEX].name,
-                    mode: "tempsLimite"
-                };
-                const response = {
-                    event: 'feedbackOnStart',
-                    object: gameInfo,
-                }
-                this.server.to(players.shift().id).emit('globalEvent', response);
-                this.server.to(players.shift().id).emit('globalEvent', response);
-            }
-            if (players.length === 1) {
-                this.server.to(players[0].id).emit('globalEvent', this.responseOnJoin);
-            }
         }
     }
 

@@ -4,7 +4,7 @@ import { DrawService } from '@app/services/draw/draw.service';
 import { of } from 'rxjs';
 import { ShowDiffRecord } from './show-diff';
 
-fdescribe('ShowDiffRecord', () => {
+describe('ShowDiffRecord', () => {
     let canvas1: ElementRef<HTMLCanvasElement>;
     let canvas2: ElementRef<HTMLCanvasElement>;
     let canvas0: ElementRef<HTMLCanvasElement>;

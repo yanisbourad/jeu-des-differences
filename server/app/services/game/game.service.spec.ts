@@ -1,11 +1,11 @@
-import { GameRecordDocument } from '@app/model/database/game-record';
+import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
+import { TimerConstantsModel } from '@app/model/database/timer-constants';
 import { Game, TimeConfig } from '@common/game';
 import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import { Model, Query } from 'mongoose';
 import { join } from 'path';
 import { GameService } from './game.service';
-import { TimerConstantsModel } from '@app/model/database/timer-constants';
 /**
  * There is two way to test the service :
  * - Mock the mongoose Model implementation and do what ever we want to do with it (see describe GameService) or
@@ -127,6 +127,24 @@ describe('GameService', () => {
         spyDbSaveMany.mockRestore();
     });
 
+    // it('should throw an error if the game already exists', async () => {
+    //     // Arrange
+    //     const mockGame1 = {
+    //         gameName: 'huebj',
+    //         difficulty: 'easy',
+    //         originalImageData: 'test',
+    //         modifiedImageData: 'test',
+    //         listDifferences: [],
+    //     } as Game;
+    //     service.gamesNames = ['huebj'];
+    //     await service.addGame(mockGame1);
+    //     jest.spyOn(service, 'addGame').mockRejectedValue(new Error(`Failed to insert Game: ${mockGame1.gameName} already exists`));
+
+    //     // Act & Assert
+    //     await expect(service.addGame(mockGame1)).rejects.toThrow(`Failed to insert Game: ${mockGame1.gameName} already exists`);
+    // });
+
+
     it('should return the same game as saved game', async () => {
         const result = await service.getGame(mockGame.gameName);
         expect(result).toBeDefined();
@@ -205,43 +223,56 @@ describe('GameService', () => {
         expect(service.gamesNames).not.toContain(mockGame.gameName);
         service.gamesNames.push(mockGame.gameName);
     });
-    
+
     it('should write new constants to file and update database', async () => {
         const spyDbSaveMany = jest.spyOn(service.timerConstantsModel, 'updateOne').mockImplementation();
         const spyWriteFileSync = jest.spyOn(fs, 'writeFileSync').mockImplementation();
         const spyMkdirSync = jest.spyOn(fs, 'mkdirSync').mockImplementation();
         const spyExistsSync = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
-      
+
         try {
-          await service.updateConstants(newConstants);
-      
-          expect(spyWriteFileSync).toHaveBeenCalledWith(`${service.rootPathTime}/time/infoTime.json`, JSON.stringify(newConstants), 'utf8');
-          expect(spyExistsSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
-          expect(spyMkdirSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
-          expect(spyDbSaveMany).toHaveBeenCalledWith({}, newConstants, { upsert: true });
-      
-          spyWriteFileSync.mockRestore();
-          spyMkdirSync.mockRestore();
-          spyExistsSync.mockRestore();
-          spyDbSaveMany.mockRestore();
+            await service.updateConstants(newConstants);
+
+            expect(spyWriteFileSync).toHaveBeenCalledWith(`${service.rootPathTime}/time/infoTime.json`, JSON.stringify(newConstants), 'utf8');
+            expect(spyExistsSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
+            expect(spyMkdirSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
+            expect(spyDbSaveMany).toHaveBeenCalledWith({}, newConstants, { upsert: true });
+
+            spyWriteFileSync.mockRestore();
+            spyMkdirSync.mockRestore();
+            spyExistsSync.mockRestore();
+            spyDbSaveMany.mockRestore();
         } catch (error) {
-          console.error(error);
-          fail();
+            console.error(error);
+            fail();
         }
-      });
-    // test getConstants() in the service
-    it('should return the same game as saved game', async () => {
+    });
+
+    it('should return the time constants from infoTime.json', async () => {
         const mockedResult = {
             timeInit: 0,
             timePen: 0,
             timeBonus: 0,
-          };
-          const spy = jest.spyOn(service, 'getConstants').mockImplementation(() => Promise.resolve(mockedResult));
+        };
+        const fileSpy = jest.spyOn(service, 'getFileTime').mockReturnValueOnce(JSON.stringify(mockedResult));
+
+        // Act
         const result = await service.getConstants();
-        expect(result).toBeDefined();
-        expect(result.timeInit).toEqual(newConstants.timeInit);
-        expect(result.timePen).toEqual(newConstants.timePen);
-        expect(result.timeBonus).toEqual(newConstants.timeBonus);
+        expect(fileSpy).toHaveBeenCalled();
+        expect(result).toEqual(mockedResult);
+        fileSpy.mockRestore();
+    });
+
+    it('should read the file contents and return as string', async () => {
+        // Arrange
+        const mockDirName = 'time';
+        const mockFileName = 'infoTime.json';
+        const expectedContents = await service.getConstants();
+
+        // Act
+        const result = service.getFileTime(mockDirName, mockFileName);
+        // Assert
+        expect(JSON.parse(result) as TimeConfig).toEqual(expectedContents);
     });
 
     // should test deleteAllGames() in the service
@@ -254,4 +285,200 @@ describe('GameService', () => {
         expect(service.gamesNames).not.toContain(mockGame.gameName);
         service.gamesNames.push(mockGame.gameName);
     });
+
+    it('should count the number of games', () => {
+        // service.gamesNames = ['game1', 'game2', 'game3'];
+        service.gamesNames.length = 1;
+        const spyCount = jest.spyOn(service, 'countGames');
+        const result = service.countGames();
+        expect(result).toBe(1);
+        expect(spyCount).toHaveBeenCalled();
+      });
+
+    it('should populate fake game records for a given game name', async () => {
+        // Arrange
+        const mockGameName = 'test-game';
+        const mockGameRecords = {
+            gameName: 'game1',
+            typeGame: 'easy',
+            time: 'imageData',
+            playerName: 'modifiedImageData',
+            dateStart: 'yo',
+            keyServer: 'yo',
+        } as GameRecord;
+        const spyInsertMany = jest.spyOn(service.gameRecordModel, 'insertMany').mockImplementation();
+        const spyptn = jest.spyOn(service, 'getFakeGameRecords').mockImplementation();
+        // Act
+        service.populateFakeGameRecordsForOneGame(mockGameName);
+
+        // Assert
+        expect(spyInsertMany).toHaveBeenCalled();
+        expect(spyptn).toHaveBeenCalled();
+        spyInsertMany.mockRestore();
+        spyptn.mockRestore();
+    });
+
+    // it('should populate fake game records for all game name', async () => {
+    //     // Arrange
+    //     const mockGameName = 'test-game';
+    //     const mockGameRecords = {
+    //         gameName: 'game1',
+    //         typeGame: 'easy',
+    //         time: 'imageData',
+    //         playerName: 'modifiedImageData',
+    //         dateStart: 'yo',
+    //         keyServer: 'yo',
+    //     } as GameRecord;
+    //     const spyInsertMany = jest.spyOn(service.gameRecordModel, 'insertMany').mockImplementation();
+    //     const spyptn = jest.spyOn(service, 'populateFakeGameRecordsForOneGame').mockImplementation();
+    //     // Act
+    //     service.populateFakeGameRecords();
+
+    //     // Assert
+    //     expect(spyInsertMany).toHaveBeenCalled();
+    //     expect(spyptn).toHaveBeenCalled();
+    //     spyInsertMany.mockRestore();
+    //     spyptn.mockRestore();
+    // });
+
+    it('should call populateFakeGameRecordsForOneGame for each game in gamesNames', async () => {
+        // Arrange
+        let spyPopulate = jest.spyOn(service, 'populateFakeGameRecordsForOneGame').mockImplementation();
+        service.gamesNames = ['game1'];
+
+        // Act
+        service.populateFakeGameRecords();
+
+        // Assert
+        expect(spyPopulate).toHaveBeenCalledTimes(1);
+        expect(spyPopulate).toHaveBeenCalledWith('game1');
+
+        spyPopulate.mockRestore();
+    });
+
+    it('should log an error if there is an error deleting the directory', () => {
+        // Arrange
+        const mockedError = new Error('Failed to delete directory');
+        const spyRm = jest.spyOn(fs, 'rm').mockImplementation((path, options, callback) => {
+            callback(mockedError);
+        });
+        const spyLog = jest.spyOn(service.logger, 'error').mockImplementation();
+
+        // Act
+        service.deleteDirectory('testDir');
+
+        // Assert
+        expect(spyRm).toHaveBeenCalledWith(`${service.rootPath}/testDir`, { recursive: true }, expect.any(Function));
+        expect(spyLog).toHaveBeenCalledWith(`Failed to delete directory testDir`);
+
+        // Cleanup
+        spyRm.mockRestore();
+        spyLog.mockRestore();
+    });
+
+    it('should return an array of sets with the correct elements', () => {
+        const differencesStr = ['1,2,3', '2,3,4', '3,4,5'];
+        const expected = [new Set([1, 2, 3]),
+        new Set([2, 3, 4]),
+        new Set([3, 4, 5]),
+        ];
+
+        const result = service.getSetDifference(differencesStr);
+
+        expect(result).toEqual(expected);
+    });
+
+    it('should return a Map of games', async () => {
+        // Arrange
+        jest.spyOn(service, 'getGame').mockReturnValue(mockGame);
+        const games = ['game1', 'game2', 'game3'];
+        service.gamesNames = games;
+        const expected = new Map<string, Game>();
+        games.forEach((gameName) => expected.set(gameName, service.getGame(gameName)));
+
+        // Act
+        const result = service.getGames();
+
+        // Assert
+        expect(result).toEqual(expected);
+        jest.restoreAllMocks();
+    });
+
+    it('should log an error and return an empty map if there are no games', () => {
+        const mockLogger = { error: jest.fn() };
+        const mockGetGame = jest.fn();
+        const gameService = service;
+
+        // Set gamesNames to an empty array to trigger the no games error
+        gameService.gamesNames = [];
+
+        gameService.getGames();
+        expect(mockGetGame).not.toHaveBeenCalled();
+    });
+
+    it('should throw error if game already exists', async () => {
+        const spyDbSaveMany = jest.spyOn(service.gameRecordModel, 'insertMany').mockImplementation();
+        const existingGame: Game = {
+        gameName: 'existingGame',
+        originalImageData: 'test',
+        modifiedImageData: 'test',
+        listDifferences: [],
+        difficulty: 'easy'
+        };
+        service.gamesNames = ['existingGame'];
+        await expect(service.addGame(existingGame)).rejects.toThrowError('Failed to insert Game: existingGame already exists');
+        expect(spyDbSaveMany).not.toHaveBeenCalled();
+        spyDbSaveMany.mockRestore();
+        // expect(loggerSpy).toHaveBeenCalledWith(`Failed to insert Game: ${existingGame.gameName} already exists`);
+    });
+
+    it('should throw error if cant delete game', async () => {
+        const spyDbSaveMany = jest.spyOn(service.gameRecordModel, 'deleteMany').mockImplementation();
+        const existingGame: Game = {
+        gameName: 'existingGame1',
+        originalImageData: 'test',
+        modifiedImageData: 'test',
+        listDifferences: [],
+        difficulty: 'easy'
+        };
+        service.gamesNames = ['existingGame'];
+        await expect(service.deleteGame(existingGame.gameName)).rejects.toThrowError('Does not exist');
+        expect(spyDbSaveMany).not.toHaveBeenCalled();
+        spyDbSaveMany.mockRestore();
+        // expect(loggerSpy).toHaveBeenCalledWith(`Failed to insert Game: ${existingGame.gameName} already exists`);
+    });
+    // it('should generate a fake record info', () => {
+    //     const spyFloor = jest.spyOn(Math, 'floor');
+    //     spyFloor.mockReturnValueOnce(2);
+    //     spyFloor.mockReturnValueOnce(23);
+    //     spyFloor.mockReturnValueOnce(1);
+    //     const result = service.generateFakeRecordInfo();
+    //     expect(result).toEqual({ name: 'name1', time: '23:01' });
+    //     expect(spyFloor).toHaveBeenCalledTimes(3);
+    //     spyFloor.mockRestore();
+    //   });
+    
+    //   it('should generate a fake record info with zero-padded seconds', () => {
+    //     const spyFloor = jest.spyOn(Math, 'floor');
+    //     spyFloor.mockReturnValueOnce(5);
+    //     spyFloor.mockReturnValueOnce(3);
+    //     spyFloor.mockReturnValueOnce(2);
+    //     const result = service.generateFakeRecordInfo();
+    //     expect(result).toEqual({ name: 'name1', time: '5:03' });
+    //     expect(spyFloor).toHaveBeenCalledTimes(3);
+    //     spyFloor.mockRestore();
+    //   });
+
+    it('should return a random name and time', () => {
+        const spyFloor = jest.spyOn(Math, 'floor');
+        const spyRandom = jest.spyOn(Math, 'random');
+        spyFloor.mockReturnValueOnce(2);
+        spyFloor.mockReturnValueOnce(58);
+        spyRandom.mockReturnValueOnce(0.1);
+        service.generateFakeRecordInfo();
+        expect(spyFloor).toHaveBeenCalledTimes(3);
+        expect(spyRandom).toHaveBeenCalledTimes(3);
+        spyFloor.mockRestore();
+        spyRandom.mockRestore();
+      });
 });

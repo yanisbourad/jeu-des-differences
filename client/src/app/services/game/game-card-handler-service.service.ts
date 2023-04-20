@@ -127,6 +127,7 @@ export class GameCardHandlerService {
                 this.isLeaving = true;
                 break;
             default:
+                this.isLeaving = false;
                 break;
         }
     }
@@ -198,7 +199,6 @@ export class GameCardHandlerService {
                 mode: gamersIdentifier.mode,
             },
         ]);
-        // used later on to handle the disconnection of a player
         this.socketClientService.isPlaying = true;
     }
 

@@ -7,7 +7,7 @@ import { GamingHistory, GamingHistoryDocument } from '@app/model/database/gaming
 import { CreateGameRecordDto } from '@app/model/dto/game-record/create-game-record.dto';
 import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 import { GameService } from '@app/services/game/game.service';
-import { Rankings } from '@common/game';
+
 @Injectable()
 export class GameRecordService {
     // eslint-disable-next-line max-params
@@ -67,5 +67,4 @@ export class GameRecordService {
             return Promise.reject(`Failed to delete Gaming History: ${error}`);
         }
     }
-
 }

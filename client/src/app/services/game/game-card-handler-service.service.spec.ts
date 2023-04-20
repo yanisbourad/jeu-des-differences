@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { GameIdentifier } from '@app/interfaces/game-handler';
 import { SocketClient } from '@app/utils/socket-client';
 import { SocketTestHelper } from '@app/utils/socket-helper';
 import { Socket } from 'socket.io-client';
@@ -11,6 +12,7 @@ describe('GameCardHandlerService', () => {
     let service: GameCardHandlerService;
     let socketSpy: SpyObj<Socket>;
     let socketClient: SpyObj<SocketClient>;
+
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     beforeEach(() => {
@@ -84,7 +86,8 @@ describe('GameCardHandlerService', () => {
     it('should call socket on when communicating with server', () => {
         service.listenToFeedBack();
         expect(socketSpy.on).toHaveBeenCalled();
-        expect(socketSpy.on).toHaveBeenCalledWith('feedbackOnJoin', jasmine.any(Function));
+        expect(socketSpy.on).toHaveBeenCalledWith('updateStatus', jasmine.any(Function));
+        expect(socketSpy.on).toHaveBeenCalledWith('globalEvent', jasmine.any(Function));
     });
     it('should call emit join game when joining a game', () => {
         const game = {
@@ -142,7 +145,6 @@ describe('GameCardHandlerService', () => {
             mode: 'classic',
         });
         expect(routerSpy.navigate).toHaveBeenCalled();
-        // expect(socketSpy.disconnect).toHaveBeenCalled();
     });
     it('should redirect player to home page', () => {
         service.redirectToHomePage();
@@ -157,5 +159,109 @@ describe('GameCardHandlerService', () => {
         service.handleDelete('test');
         expect(socketSpy.emit).toHaveBeenCalledWith('handleDelete', 'test');
         expect(socketSpy.on).toHaveBeenCalled();
+    });
+
+    // test for updateGameStatus
+    it('should send findAllGamesStatus when calling updateGameStatus', () => {
+        const gameNames = ['test', 'toaster', 'dad'];
+        service.updateGameStatus(gameNames);
+        expect(socketClient.send).toHaveBeenCalled();
+    });
+
+    // test for startSpecificGame
+    it('should emit startGame when calling startSpecificGame', () => {
+        const gameIdentifier: GameIdentifier = {
+            gameId: 1,
+            gameName: 'limitedTime99999',
+            creatorName: 'string',
+            opponentName: 'string',
+            mode: 'string',
+        };
+        service.startSpecificGame(gameIdentifier);
+        expect(service.gameName).toEqual('limitedTime99999');
+    });
+    it('should emit startGame when calling startSpecificGame', () => {
+        const gameIdentifier: GameIdentifier = {
+            gameId: 1,
+            gameName: 'bug',
+            creatorName: 'string',
+            opponentName: 'string',
+            mode: 'classic',
+        };
+        service.startSpecificGame(gameIdentifier);
+        expect(service.isReadyToPlay).toBeTruthy();
+    });
+    // test for runAction(event: string, object: unknown)
+    it('should call runAction for gameUnavailable', () => {
+        const event = 'gameUnavailable';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isGameAvailable).toBeFalsy();
+    });
+    it('should call runAction for feedbackOnJoin', () => {
+        const event = 'feedbackOnJoin';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isCreator).toBeTruthy();
+        expect(service.opponentPlayer).toBe('test');
+    });
+    it('should call runAction for feedbackOnAccept', () => {
+        const event = 'feedbackOnAccept';
+        const object = 'test';
+        service.isCreator = true;
+        service.runAction(event, object);
+        expect(service.state).toBe('Accepter');
+        expect(service.opponentPlayer).toBe('test');
+    });
+    it('should call runAction for feedbackOnWait', () => {
+        const event = 'feedbackOnWait';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.opponentPlayer).toBe('test');
+    });
+    it('should call runAction for feedbackOnWaitLonger', () => {
+        const event = 'feedbackOnWaitLonger';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.opponentPlayer).toBe('test');
+    });
+    it('should call runAction for feedbackOnStart', () => {
+        const event = 'feedbackOnStart';
+
+        const object: GameIdentifier = {
+            gameId: 1,
+            gameName: 'bug',
+            creatorName: 'string',
+            opponentName: 'string',
+            mode: 'classic',
+        };
+        service.runAction(event, object);
+        expect(service.isReadyToPlay).toBeTruthy();
+    });
+    it('should call runAction for feedbackOnLeave', () => {
+        const event = 'feedBackOnLeave';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isCreatorLeft).toBeTruthy();
+        expect(service.isLeaving).toBeTruthy();
+    });
+    it('should call runAction for feedbackOnReject', () => {
+        const event = 'feedbackOnReject';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isRejected).toBeTruthy();
+        expect(service.isLeaving).toBeTruthy();
+    });
+    it('should call runAction for disconnect', () => {
+        const event = 'disconnect';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isLeaving).toBeTruthy();
+    });
+    it('should call runAction for default', () => {
+        const event = 'callDefault';
+        const object = 'test';
+        service.runAction(event, object);
+        expect(service.isLeaving).toBeFalsy();
     });
 });

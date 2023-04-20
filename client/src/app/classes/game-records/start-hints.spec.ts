@@ -1,5 +1,5 @@
 import { StartHintsRecord } from './start-hints';
-fdescribe('StartHints', () => {
+describe('StartHints', () => {
     let startHintsRecord: StartHintsRecord;
 
     beforeEach(() => {

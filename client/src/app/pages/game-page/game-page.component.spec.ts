@@ -89,6 +89,7 @@ describe('GamePageComponent', () => {
             'resetService',
             'stopHints',
             'hintsKeyBinding',
+            'stopInterval',
         ]);
         drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearDiff', 'getImageDateFromDataUrl']);
         gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do', 'startRewind']);

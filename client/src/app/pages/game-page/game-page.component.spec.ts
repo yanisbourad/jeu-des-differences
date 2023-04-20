@@ -16,6 +16,7 @@ import { Subject } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
 import { Game } from '@common/game';
+import { ElementRef } from '@angular/core';
 class ActivatedRouteMock {
     params = { subscribe: jasmine.createSpy('subscribe') };
     snapshot = {
@@ -41,6 +42,7 @@ fdescribe('GamePageComponent', () => {
     let teammateStatus: Subject<boolean>;
     let messageToAdd: Subject<GameMessageEvent>;
     let imageLoaded: Subject<Game>;
+    let mouseEvent: MouseEvent;
 
     beforeEach(() => {
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
@@ -59,15 +61,17 @@ fdescribe('GamePageComponent', () => {
             'handleDisconnect',
             'getClassicGame',
             'reinitializeGame',
+            'mouseHitDetect',
         ]);
         cheatModeServiceSpy = jasmine.createSpyObj('CheatModeService', [
             'isCheatMode',
             'cheatModeKeyBinding',
             'removeHotkeysEventListener',
             'resetService',
+            'stopCheating',
         ]);
-        hintsServiceSpy = jasmine.createSpyObj('HintsService', ['getHints', 'removeHotkeysEventListener', 'resetService']);
-        gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do']);
+        hintsServiceSpy = jasmine.createSpyObj('HintsService', ['getHints', 'removeHotkeysEventListener', 'resetService', 'stopHints']);
+        gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do', 'startRewind']);
         gameState = new Subject<boolean>();
         playerFoundDiff = new Subject<string>();
         diffFound = new Subject<Set<number>>();
@@ -84,6 +88,7 @@ fdescribe('GamePageComponent', () => {
         socketClientServiceSpy.teammateStatus$ = teammateStatus.asObservable();
         socketClientServiceSpy.messageToAdd$ = messageToAdd.asObservable();
         socketClientServiceSpy.imageLoaded$ = imageLoaded.asObservable();
+        mouseEvent = new MouseEvent('click', { button: 0 });
     });
 
     beforeEach(async () => {
@@ -180,5 +185,50 @@ fdescribe('GamePageComponent', () => {
         component.ngAfterViewInit();
         expect(socketClientServiceSpy.joinRoomSolo).toHaveBeenCalled();
         expect(component.ngAfterViewInit).toBeTruthy();
+    });
+
+    it('startRewind should call stopCheating, stopHints and startRewind', () => {
+        component.notRewinding = false;
+        component.startRewind();
+        expect(cheatModeServiceSpy.stopCheating).toHaveBeenCalled();
+        expect(hintsServiceSpy.stopHints).toHaveBeenCalled();
+        expect(gameRecorderServiceSpy.startRewind).toHaveBeenCalled();
+    });
+
+    it('startRewind should call initForRewind if notRewinding is true', () => {
+        spyOn(component, 'initForRewind');
+        component.notRewinding = true;
+        component.startRewind();
+        expect(component.initForRewind).toHaveBeenCalled();
+    });
+
+    it('gameTime should return gameService gameTime', () => {
+        gameServiceSpy.gameTime = 10;
+        expect(component.gameTime).toEqual(gameServiceSpy.gameTime);
+    });
+
+    it('currentTimer should return roomTime', () => {
+        const expectedTime = 10;
+        socketClientServiceSpy.getRoomTime.and.returnValue(expectedTime);
+        expect(component.currentTimer).toEqual(expectedTime);
+    });
+
+    it('getCanvasImageModifier should return modifiedImage.nativeElement', () => {
+        const expectedImage = 'image';
+        component.modifiedImage = { nativeElement: expectedImage } as unknown as ElementRef<HTMLCanvasElement>;
+        expect(component.getCanvasImageModifier).toEqual(component.modifiedImage.nativeElement);
+    });
+
+    it('mouseHitDetect should call mouseHitDetect from gameService', () => {
+        component.mouseHitDetect(mouseEvent);
+        expect(gameServiceSpy.mouseHitDetect).toHaveBeenCalled();
+    });
+
+    it('showMessage should call pushMessage with correct parameters', () => {
+        const message = { message: 'test', playerName: 'str', mine: true, color: 'st', pos: 'string', event: true };
+        spyOn(component.chat, 'pushMessage').and.callThrough();
+        socketClientServiceSpy.messageList = new Array();
+        component.showMessage(message);
+        expect(component.chat.pushMessage).toHaveBeenCalledWith(message);
     });
 });

@@ -5,7 +5,7 @@ import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { Subject } from 'rxjs';
 import { RewindControlBarComponent } from './rewind-control-bar.component';
 
-fdescribe('RewindControlBarComponent', () => {
+describe('RewindControlBarComponent', () => {
     let component: RewindControlBarComponent;
     let fixture: ComponentFixture<RewindControlBarComponent>;
     let gameRecorderService: jasmine.SpyObj<GameRecorderService>;

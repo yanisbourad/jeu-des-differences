@@ -121,9 +121,8 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             gameName: payload.gameName,
             gameType: payload.gameType,
         };
-        this.logger.log(`New request from ${player.id} to play ${player} in ${player.gameType} mode`);
         this.logger.log(`New request from ${player.id} to play ${player.gameName} in ${player.gameType} mode`);
-        // send feedback to player
+        // send feedback to this.player
         // create queue for each game and add gamer to queue
         if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
             const response = {

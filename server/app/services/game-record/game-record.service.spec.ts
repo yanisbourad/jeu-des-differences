@@ -109,6 +109,15 @@ describe('GameRecordService', () => {
         await expect(service.addGameRecord(gameRecord)).rejects.not.toThrow(errorMessage);
     });
 
+    it('should delete game records for all game and log success', async () => {
+        const response = { deletedCount: 2 };
+        const logSpy = jest.spyOn(loggerSpy, 'log');
+        jest.spyOn(gameRecordModel, 'deleteMany').mockResolvedValue(response as any);
+        await service.deleteGameRecords();
+        expect(gameRecordModel.deleteMany).toHaveBeenCalledWith({ keyServer: gameServiceSpy.getKey });
+        expect(logSpy).toHaveBeenCalledWith(`All ${response.deletedCount} Game Records have been deleted successfully`);
+    });
+
     it('should delete game records for one game and log success', async () => {
         const name = 'test';
         const response = { deletedCount: 2 };

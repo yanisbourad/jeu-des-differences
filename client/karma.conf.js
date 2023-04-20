@@ -35,7 +35,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['Chrome'],
+        browsers: ['ChromeNoAutoplay'],
         singleRun: false,
         restartOnFileChange: true,
         customLaunchers: {
@@ -43,6 +43,12 @@ module.exports = function (config) {
                 base: 'ChromeHeadless',
                 flags: ['--no-sandbox'],
             },
+            ChromeNoAutoplay: {
+                base: 'Chrome',
+                flags: [
+                  '--autoplay-policy=no-user-gesture-required'
+                ]
+              }
         },
     });
 };

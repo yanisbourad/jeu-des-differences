@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { GameRecordCommand } from '@app/classes/game-record';
 import { DELAY_BEFORE_EMITTING_TIME, SEC_TO_MILLISEC, UNIT_DELAY_INTERVAL } from '@app/configuration/const-time';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
@@ -8,12 +8,12 @@ import { GameService } from './game.service';
 @Injectable({
     providedIn: 'root',
 })
-export class GameRecorderService {
+export class GameRecorderService implements OnDestroy {
     gamePage: GamePageComponent;
     list: GameRecordCommand[] = [];
     tempList: GameRecordCommand[] = [];
     position = 0;
-    action: GameRecordCommand | undefined;
+    action: GameRecordCommand;
     speed: number = 1;
     paused: boolean = false;
     myTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -57,6 +57,7 @@ export class GameRecorderService {
     // representing the multiplier of the speed
     // 2 means 2 seconds per second ...
     set rewindSpeed(speed: number) {
+        if (speed < 1) throw new Error('The ');
         this.speed = speed;
         if (this.myTimeout) {
             clearInterval(this.myTimeout);
@@ -68,6 +69,10 @@ export class GameRecorderService {
         this.gamePage = gamePage;
         this.list = [];
         this.position = 0;
+    }
+
+    ngOnDestroy(): void {
+        clearInterval(this.myTimeout);
     }
 
     togglePause() {
@@ -89,8 +94,7 @@ export class GameRecorderService {
         this.gamePage = gamePage;
         this.gamePage.initForRewind();
         if (this.list.length === 0) {
-            alert('No actions to rewind');
-            return;
+            throw new Error('No actions to rewind');
         }
         // prepare the game for the rewind
         this.socketClient.gameTime = 0;
@@ -98,9 +102,13 @@ export class GameRecorderService {
         this.action = this.list[this.position++];
         this.lunchRewind();
     }
+    stopRewind() {
+        if (this.myTimeout) clearInterval(this.myTimeout);
+        this.myTimeout = undefined;
+    }
 
-    lunchRewind() {
-        clearInterval(this.myTimeout);
+    private lunchRewind() {
+        this.stopRewind();
         this.myTimeout = setInterval(() => {
             if (this.position <= this.list.length) {
                 this.tick();
@@ -111,11 +119,6 @@ export class GameRecorderService {
             }
         }, this.timeoutDelay);
     }
-
-    stopRewind() {
-        if (this.myTimeout) clearInterval(this.myTimeout);
-    }
-
     // this will be used to tick the rewind
     // will be called every second
     private tick(): void {
@@ -138,20 +141,15 @@ export class GameRecorderService {
     // will alert the user that the rewind is over
     // will redirect the user to the home page
     private endRewind() {
-        clearInterval(this.myTimeout);
-
+        this.stopRewind();
         this.paused = true;
         this.progress$.next(0);
         this.startRewind();
     }
 
     private redo() {
-        if (!this.action) return;
         this.socketClient.gameTime = this.currentTime + this.action.penalty;
         this.sumPenalty += this.action.penalty;
         this.action.do(this.gamePage);
     }
-    // this will be used to record the actions
-    // that the user performs
-    // the actions will be stored in a list
 }

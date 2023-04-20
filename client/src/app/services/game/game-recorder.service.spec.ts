@@ -9,7 +9,7 @@ import { Subject } from 'rxjs';
 import { GameRecorderService } from './game-recorder.service';
 import { GameService } from './game.service';
 
-fdescribe('GameRecorderService', () => {
+describe('GameRecorderService', () => {
     let service: GameRecorderService;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let socketClientSpy: jasmine.SpyObj<SocketClientService>;

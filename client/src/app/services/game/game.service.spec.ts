@@ -191,7 +191,7 @@ describe('GameService', () => {
         expect(gameHelperServiceSpy.sendFoundMessage).toHaveBeenCalled();
     });
 
-    it('sendNotFoundMessage should call sendNotFoundMessage from gameHelper', () => {
+    it('sendErrorMessage should call sendErrorMessage from gameHelper', () => {
         gameService.sendErrorMessage();
         expect(gameHelperServiceSpy.sendErrorMessage).toHaveBeenCalled();
     });

@@ -45,6 +45,7 @@ describe('GamePageComponent', () => {
     let messageToAdd: Subject<GameMessageEvent>;
     let imageLoaded: Subject<Game>;
     let mouseEvent: MouseEvent;
+    let notADiff: Set<number>;
 
     beforeEach(() => {
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
@@ -52,12 +53,12 @@ describe('GamePageComponent', () => {
             'joinRoomSolo',
             'disconnect',
             'leaveRoom',
-            'getRoomName',
             'getRoomTime',
             'sendRoomName',
             'sendDifference',
             'gameEnded',
             'getGame',
+            'getRoomName',
         ]);
         gameServiceSpy = jasmine.createSpyObj('GameService', [
             'displayIcons',
@@ -73,6 +74,7 @@ describe('GamePageComponent', () => {
             'getLimitGameTime',
             'sendFoundMessage',
             'handleDifferenceFound',
+            'sendErrorMessage',
         ]);
         cheatModeServiceSpy = jasmine.createSpyObj('CheatModeService', [
             'isCheatMode',
@@ -107,6 +109,7 @@ describe('GamePageComponent', () => {
         socketClientServiceSpy.messageToAdd$ = messageToAdd.asObservable();
         socketClientServiceSpy.imageLoaded$ = imageLoaded.asObservable();
         mouseEvent = new MouseEvent('click', { button: 0 });
+        gameServiceSpy.mode = 'classic';
     });
 
     beforeEach(async () => {
@@ -317,11 +320,14 @@ describe('GamePageComponent', () => {
         socketClientServiceSpy.getRoomName.and.returnValue('room');
         socketClientServiceSpy.getGame.and.returnValue(game1);
         gameServiceSpy.mode = 'tempsLimite';
-
         component.subscribeToDifference();
-
         expect(socketClientServiceSpy.sendDifference).toHaveBeenCalledWith(mockDifference, 'room');
         expect(gameServiceSpy.getSetDifference).not.toHaveBeenCalledWith([]);
+    });
+    it('should call the appropriate methods when a difference is not found', () => {
+        difference.next(undefined as unknown as Set<number>);
+        component.subscribeToDifference();
+        expect(socketClientServiceSpy.sendDifference).not.toHaveBeenCalledWith(notADiff, 'room');
     });
 
     it('ngOnInit should not call getLimitGameTime', () => {
@@ -332,7 +338,7 @@ describe('GamePageComponent', () => {
             modifiedImageData: 'imageModifie1',
             listDifferences: ['diffrence 1', 'difference 2'],
         };
-        component.gameService.mode = 'tempsLimite';
+        component.gameService.mode = 'classic';
         component.gameService.gameType = 'solo';
         component.ngOnInit();
         expect(gameServiceSpy.getTimeLimitGame).not.toHaveBeenCalled();
@@ -346,23 +352,22 @@ describe('GamePageComponent', () => {
             listDifferences: ['diffrence 1', 'difference 2'],
         };
         gameServiceSpy.gameType = 'solo';
-        component.ngOnInit();
         expect(hintsServiceSpy.hintsKeyBinding).not.toHaveBeenCalled();
     });
     it('should ngOnInit call loadImages', () => {
-        const game1 = {
-            gameName: 'difference 1',
+        const mockGame: Game = {
+            gameName: 'G1',
             difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        } as Game;
-        component.gameService.game = game1;
+            originalImageData: '000',
+            modifiedImageData: '4565',
+            listDifferences: ['1', '2'],
+        };
+        spyOn(component, 'loadImages').and.callThrough();
+        component.gameService.game = mockGame;
         component.gameService.gameType = 'solo';
         component.gameService.mode = 'tempsLimite';
-        spyOn(component, 'loadImages');
-        socketClientServiceSpy.imageLoaded$ = of(game1);
+        socketClientServiceSpy.imageLoaded$ = of(mockGame);
         component.ngOnInit();
-        expect(component.loadImages).not.toHaveBeenCalled();
+        expect(component.loadImages).toHaveBeenCalled();
     });
 });

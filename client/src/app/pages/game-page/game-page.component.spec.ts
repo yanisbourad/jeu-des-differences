@@ -26,7 +26,7 @@ class ActivatedRouteMock {
     };
 }
 
-fdescribe('GamePageComponent', () => {
+describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let gameServiceSpy: SpyObj<GameService>;

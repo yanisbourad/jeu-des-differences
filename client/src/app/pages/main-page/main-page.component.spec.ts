@@ -2,26 +2,37 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { of } from 'rxjs';
+import SpyObj = jasmine.SpyObj;
+import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
 
 describe('MainPageComponent', () => {
     let component: MainPageComponent;
     let fixture: ComponentFixture<MainPageComponent>;
-    // let dialogSpy: jasmine.SpyObj<MatDialogRef<MainPageComponent>>;
+    let matDialog: MatDialog;
+    let gameDatabaseService: GameDatabaseService;
+    let matDialogSpy: SpyObj<MatDialog>;
+    let dialogCloseSpy: SpyObj<MatDialogRef<MainPageComponent>>;
 
     beforeEach(async () => {
-        // dialogSpy = jasmine.createSpyObj('MatDialogRef<GameNameSaveComponent>', ['close']);
-
+        matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+        dialogCloseSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
         await TestBed.configureTestingModule({
             imports: [RouterTestingModule, HttpClientModule, MatDialogModule],
             declarations: [MainPageComponent],
-            // providers: [{ provide: MatDialogRef<MainPageComponent>, useValue: dialogSpy }],
+            providers: [GameDatabaseService, { provide: MatDialog, useValue: matDialogSpy }, { provide: MatDialogRef, useValue: dialogCloseSpy }],
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(MainPageComponent);
         component = fixture.componentInstance;
+        matDialog = TestBed.inject(MatDialog);
+        gameDatabaseService = TestBed.inject(GameDatabaseService);
+        dialogCloseSpy.afterClosed.and.returnValue(of(true));
+        matDialogSpy.open.and.returnValue(dialogCloseSpy);
         fixture.detectChanges();
     });
 
@@ -58,5 +69,35 @@ describe('MainPageComponent', () => {
     it('should have a team number', () => {
         const team = fixture.nativeElement;
         expect(team.querySelector('#team').textContent).toContain('Équipe: 208');
+    });
+
+    it('should open dialog if there is at least one game available', () => {
+        matDialogSpy.open.and.returnValue(dialogCloseSpy);
+        spyOn(gameDatabaseService, 'getCount').and.returnValue(of(1));
+
+        component.openDialog();
+
+        expect(matDialog.open).toHaveBeenCalled();
+        expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
+    });
+
+    it('should open general feedback dialog with message', () => {
+        const message = 'This is a test message.';
+        component.launchFeedback(message);
+
+        expect(matDialogSpy.open).toHaveBeenCalledWith(GeneralFeedbackComponent, {
+            data: { message },
+            disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
+        });
+    });
+
+    it("should launch feedback when there aren't any games available", () => {
+        spyOn(gameDatabaseService, 'getCount').and.returnValue(of(0));
+        spyOn(component, 'launchFeedback');
+        component.openDialog();
+        expect(component.launchFeedback).toHaveBeenCalledWith("Il n'y a pas de jeu disponible. Veuillez en créer un pour commencer à jouer.");
     });
 });

@@ -243,19 +243,19 @@ describe('GameCardHandlerService', () => {
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' });
         expect(service.acceptOpponent('rac')).toEqual([
-            { id: 'rac', name: 'Bad', gameName: 'uno' },
-            { id: 'ric', name: 'Best', gameName: 'uno' },
+            { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' },
+            { id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' },
         ]);
     });
-    it('should return as oponent was deleted', () => {
+    it('should return player as oponent was deleted', () => {
         service.gamesQueue.set('uno', ['rac', 'ric']);
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         service.players.set('ric', { id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' });
-        expect(JSON.stringify(service.deleteOpponent('ric'))).toBe(JSON.stringify({ id: 'ric', name: 'Best', gameName: 'uno' }));
+        expect(JSON.stringify(service.deleteOpponent('ric'))).toBe(JSON.stringify({ id: 'ric', name: 'Best', gameName: 'uno', gameType: 'classic' }));
     });
     it('should return player object if there is the provided player id', () => {
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
-        expect(service.getPlayer('rac')).toEqual({ id: 'rac', name: 'Bad', gameName: 'uno' });
+        expect(service.getPlayer('rac')).toEqual({ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
     });
     it('should return null if there is no such player id', () => {
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
@@ -282,6 +282,7 @@ describe('GameCardHandlerService', () => {
                 id: 'tas',
                 name: 'Baddy',
                 gameName: 'uno',
+                gameType: 'classic'
             }),
         );
     });

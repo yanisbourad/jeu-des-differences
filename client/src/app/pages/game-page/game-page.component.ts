@@ -95,6 +95,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cheatModeService.canvas1 = this.canvasCheat1;
         if (this.gameService.gameType === 'solo') {
             this.hintsService.hintsKeyBinding();
+            this.hintsService.launchHints();
             this.hintsService.canvas0 = this.canvasCheat0;
             this.hintsService.canvas1 = this.canvasCheat1;
             this.hintsService.gameMode = this.gameService.mode;
@@ -182,6 +183,7 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.notRewinding = true;
         this.chat.isNotRewinding = true;
         this.hintsService.randomQuadrant = [];
+        this.hintsService.stopInterval();
     }
 
     subscriptions(): void {

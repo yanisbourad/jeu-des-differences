@@ -78,7 +78,7 @@ export class HintsService {
         private gameDatabaseService: GameDatabaseService,
     ) {
         this.hintsDisplayService.setIcons();
-        this.launchHints();
+        // this.launchHints();
     }
     launchHints() {
         let toggle = true;

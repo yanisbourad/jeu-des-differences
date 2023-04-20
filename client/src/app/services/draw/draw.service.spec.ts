@@ -2,7 +2,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from './draw.service';
-fdescribe('DrawService', () => {
+describe('DrawService', () => {
     let service: DrawService;
     let canvas: HTMLCanvasElement;
     let image: ImageBitmap;

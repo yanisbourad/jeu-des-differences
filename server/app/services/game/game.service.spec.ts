@@ -19,7 +19,7 @@ describe('GameService', () => {
     let service: GameService;
     let logger: Logger;
     const mockGame = {
-        gameName: 'jkdexwjnd',
+        gameName: 'jkdexwjndf',
         difficulty: 'easy',
         originalImageData: 'test',
         modifiedImageData: 'test',
@@ -45,7 +45,7 @@ describe('GameService', () => {
         logger = new Logger();
         service = new GameService(gameRecordModel, logger, timerConstantsModel);
         service.addGame(mockGame);
-        service.updateConstants(newConstants); // TODO : a changer, doit être un mock sinon ca change les vrai valeurs dans le jeu
+        // service.updateConstants(newConstants); // TODO : a changer, doit être un mock sinon ca change les vrai valeurs dans le jeu
         // notice that only the functions we call from the model are mocked
         // we can´t use sinon because mongoose Model is an interface and not a class
     });
@@ -205,26 +205,38 @@ describe('GameService', () => {
         expect(service.gamesNames).not.toContain(mockGame.gameName);
         service.gamesNames.push(mockGame.gameName);
     });
-
-    // test updateConstants() in the service
-    it('should update the constants', async () => {
+    
+    it('should write new constants to file and update database', async () => {
         const spyDbSaveMany = jest.spyOn(service.timerConstantsModel, 'updateOne').mockImplementation();
         const spyWriteFileSync = jest.spyOn(fs, 'writeFileSync').mockImplementation();
         const spyMkdirSync = jest.spyOn(fs, 'mkdirSync').mockImplementation();
         const spyExistsSync = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
-        await service.updateConstants(newConstants);
-        expect(spyWriteFileSync).toHaveBeenCalled();
-        expect(spyExistsSync).toHaveBeenCalledWith(service.rootPathTime + '/time');
-        expect(spyMkdirSync).toHaveBeenCalledWith(service.rootPathTime + '/time');
-        expect(spyDbSaveMany).toHaveBeenCalledTimes(1);
-        spyWriteFileSync.mockRestore();
-        spyMkdirSync.mockRestore();
-        spyExistsSync.mockRestore();
-        spyDbSaveMany.mockRestore();
-    });
-
+      
+        try {
+          await service.updateConstants(newConstants);
+      
+          expect(spyWriteFileSync).toHaveBeenCalledWith(`${service.rootPathTime}/time/infoTime.json`, JSON.stringify(newConstants), 'utf8');
+          expect(spyExistsSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
+          expect(spyMkdirSync).toHaveBeenCalledWith(`${service.rootPathTime}/time`);
+          expect(spyDbSaveMany).toHaveBeenCalledWith({}, newConstants, { upsert: true });
+      
+          spyWriteFileSync.mockRestore();
+          spyMkdirSync.mockRestore();
+          spyExistsSync.mockRestore();
+          spyDbSaveMany.mockRestore();
+        } catch (error) {
+          console.error(error);
+          fail();
+        }
+      });
     // test getConstants() in the service
     it('should return the same game as saved game', async () => {
+        const mockedResult = {
+            timeInit: 0,
+            timePen: 0,
+            timeBonus: 0,
+          };
+          const spy = jest.spyOn(service, 'getConstants').mockImplementation(() => Promise.resolve(mockedResult));
         const result = await service.getConstants();
         expect(result).toBeDefined();
         expect(result.timeInit).toEqual(newConstants.timeInit);

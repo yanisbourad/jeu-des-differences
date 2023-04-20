@@ -7,6 +7,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GamingHistoryComponent } from '@app/components/gaming-history/gaming-history.component';
 import { TimePopupComponent } from '@app/components/time-popup/time-popup.component';
 import { GameDatabaseService } from '@app/services/game/game-database.service';
+import { of } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 describe('HeaderComponent', () => {
     let component: HeaderComponent;
     let fixture: ComponentFixture<HeaderComponent>;
@@ -14,7 +17,7 @@ describe('HeaderComponent', () => {
     let matDialogSpy: jasmine.SpyObj<MatDialog>;
 
     beforeEach(async () => {
-        gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['deleteGameRecords']);
+        gameDatabaseServiceSpy = jasmine.createSpyObj('GameDatabaseService', ['deleteGameRecords', 'deleteAllGames']);
         matDialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
         await TestBed.configureTestingModule({
             imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
@@ -24,7 +27,8 @@ describe('HeaderComponent', () => {
                 { provide: GameDatabaseService, useValue: gameDatabaseServiceSpy },
             ],
         }).compileComponents();
-
+        const response = new HttpResponse({ status: 200, body: 'OK' });
+        gameDatabaseServiceSpy.deleteAllGames.and.returnValue(of(response));
         fixture = TestBed.createComponent(HeaderComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -82,5 +86,48 @@ describe('HeaderComponent', () => {
         component.eraseGameRecords();
         expect(gameDatabaseServiceSpy.deleteGameRecords).toHaveBeenCalled();
         expect(gameDbServiceSpy.subscribe).toHaveBeenCalled();
+    });
+
+    it('should call deleteAllGames() on the gameDatabaseService', () => {
+        component.resetGames();
+        expect(gameDatabaseServiceSpy.deleteAllGames).toHaveBeenCalled();
+    });
+
+    it('should open a dialog with the given message and a confirm function that calls resetGames()', () => {
+        const dialogCloseSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        matDialogSpy.open.and.returnValue(dialogCloseSpy);
+        dialogCloseSpy.afterClosed.and.returnValue(of('test'));
+        const msg = "Voulez vous vraiment supprimer l'historique des parties?";
+        component.launchFeedbackResetGames(msg);
+        expect(matDialogSpy.open).toHaveBeenCalledWith(VerificationFeedbackComponent, {
+            data: {
+                message: msg,
+                confirmFunction: jasmine.any(Function),
+            },
+            disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
+        });
+        expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
+    });
+
+    it('should open a dialog with the given message and a confirm function that calls launchFeedbackResetRecords()', () => {
+        const dialogCloseSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        matDialogSpy.open.and.returnValue(dialogCloseSpy);
+        dialogCloseSpy.afterClosed.and.returnValue(of('test'));
+        const msg = "Voulez vous vraiment supprimer l'historique des parties?";
+        component.launchFeedbackResetRecords(msg);
+        expect(matDialogSpy.open).toHaveBeenCalledWith(VerificationFeedbackComponent, {
+            data: {
+                message: msg,
+                confirmFunction: jasmine.any(Function),
+            },
+            disableClose: true,
+            panelClass: 'custom-dialog-container',
+            minHeight: 'fit-content',
+            minWidth: 'fit-content',
+        });
+        expect(dialogCloseSpy.afterClosed).toHaveBeenCalled();
     });
 });

@@ -1,4 +1,4 @@
-<div class="infos">
+<div *ngIf="gameService.game" class="infos">
     <div class="left">
         <p class="title">{{gameService.game.gameName}}</p>
         <p class="sub-title game-infos" *ngIf="gameService.gameType === 'solo'; else multiBlock">

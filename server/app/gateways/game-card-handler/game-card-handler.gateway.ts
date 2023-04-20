@@ -10,7 +10,6 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
     countGame: number = 0;
-    player: Player;
     responseOnJoin: { event: string, object: string };
     responseOnLeave: { event: string, object: string };
 
@@ -116,16 +115,16 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('joinGame')
     join(@MessageBody() payload, @ConnectedSocket() gamer: Socket) {
-        this.player = {
+        const player = {
             id: gamer.id,
             name: payload.name,
             gameName: payload.gameName,
             gameType: payload.gameType,
         };
-        this.logger.log(`New request from ${this.player.id} to play ${this.player.gameName} in ${this.player.gameType} mode`);
+        this.logger.log(`New request from ${player.id} to play ${player.gameName} in ${player.gameType} mode`);
         // send feedback to this.player
         // create queue for each game and add gamer to queue
-        if (!this.gameCardHandlerService.isGameAvailable(this.player.gameName) && this.player.gameType === 'Double') {
+        if (!this.gameCardHandlerService.isGameAvailable(player.gameName) && player.gameType === 'Double') {
             const response = {
                 event: 'gameUnavailable',
                 object: 'game deleted by admin',
@@ -134,16 +133,16 @@ export class GameCardHandlerGateway implements OnGatewayDisconnect {
             return;
         }
 
-        gamer.join(this.player.id);
+        gamer.join(player.id);
 
         // handle limited time mode
-        if (this.player.gameType === 'limit') {
-            this.joinLimitedTimeMode(this.player);
+        if (player.gameType === 'limit') {
+            this.joinLimitedTimeMode(player);
             return;
         }
 
         // handle classic mode
-        this.joinClassicMode(this.player);
+        this.joinClassicMode(player);
         this.server.emit('updateStatus', Array.from(this.gameCardHandlerService.updateGameStatus()));
     }
 

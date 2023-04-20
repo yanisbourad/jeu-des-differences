@@ -57,7 +57,7 @@ export class BitmapService {
     }
     validateSize(imageBitmap: ImageBitmap) {
         if (imageBitmap.width !== constants.DEFAULT_WIDTH || imageBitmap.height !== constants.DEFAULT_HEIGHT) {
-            alert('Image size is not correct');
+            alert("La taille de l'image n'est pas correcte. Veuillez seulement téléverser des images de taille 640x480 pixels");
             return false;
         }
         return true;

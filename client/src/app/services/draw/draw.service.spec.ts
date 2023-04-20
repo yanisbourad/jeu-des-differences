@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import * as constants from '@app/configuration/const-canvas';
 import { Vec2 } from '@app/interfaces/vec2';
 import { DrawService } from './draw.service';
@@ -9,7 +9,7 @@ describe('DrawService', async () => {
     const timeOut = 500;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const diff = new Set([1, 2, 3, 4]);
-    beforeAll(async () => {
+    beforeAll((done) => {
         // read the image file as a data URL
         const xhr = new XMLHttpRequest();
         xhr.open('GET', './assets/image_empty.bmp');
@@ -18,11 +18,10 @@ describe('DrawService', async () => {
             const blob = xhr.response;
             createImageBitmap(blob).then((bmp) => {
                 image = bmp;
+                done();
             });
         };
         xhr.send();
-        // wait for the image to be loaded
-        await new Promise((f) => setTimeout(f, timeOut));
     });
 
     beforeEach(() => {
@@ -61,15 +60,17 @@ describe('DrawService', async () => {
         expect(spy).toHaveBeenCalledOnceWith(diff, canvas);
     });
 
-    it('should draw the same part of the image', fakeAsync(() => {
+    it('should draw the same part of the image', async () => {
         const thisCanvas = document.createElement('canvas');
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
+        context.drawImage(image, 0, 0);
         const spy = spyOn(DrawService.getContext(thisCanvas), 'fillRect');
-        DrawService.drawDiff(diff, thisCanvas, '', context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT));
+        const data = await context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
+        DrawService.drawDiff(diff, thisCanvas, '', data);
         expect(spy).toHaveBeenCalledTimes(diff.size);
-    }));
+    });
 
     it('should draw a difference', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,11 +119,12 @@ describe('DrawService', async () => {
         expect(service.getRectangleIsSquare).toEqual(false);
     });
 
-    it('should translate the image dataUrl to ImageData', async () => {
+    it('should translate the image dataUrl to ImageData', (done) => {
         const thisCanvas = document.createElement('canvas');
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
+
         context.drawImage(image, 0, 0);
         const imageData = thisCanvas.toDataURL('image/png');
         expect(imageData).toBeTruthy();
@@ -131,10 +133,8 @@ describe('DrawService', async () => {
             expect(data.width).toEqual(constants.DEFAULT_WIDTH);
             expect(data.height).toEqual(constants.DEFAULT_HEIGHT);
             expect(data).toEqual(context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT));
+            done();
         });
-
-        // wait for the image to be loaded and the test to be done
-        await new Promise((f) => setTimeout(f, timeOut));
     });
 
     it('should draw the imageData on canvas', async () => {

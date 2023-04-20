@@ -22,3 +22,5 @@ export const MAX_INIT_TIME = 60;
 export const MAX_PENALTY_TIME = 10;
 export const MAX_BONUS_TIME = 10;
 export const TIMEOUT = 200;
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+export const REWIND_SPEEDS = [1, 2, 4];

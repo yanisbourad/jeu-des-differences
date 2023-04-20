@@ -1,22 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { RewindControlBarComponent } from './rewind-control-bar.component';
-import { MatDialogModule } from '@angular/material/dialog';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { Router } from '@angular/router';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { Subject } from 'rxjs';
+import { RewindControlBarComponent } from './rewind-control-bar.component';
 
 describe('RewindControlBarComponent', () => {
     let component: RewindControlBarComponent;
     let fixture: ComponentFixture<RewindControlBarComponent>;
-    let gameRecorderServiceSpy: jasmine.SpyObj<GameRecorderService>;
+    let gameRecorderService: jasmine.SpyObj<GameRecorderService>;
+    let router: jasmine.SpyObj<Router>;
+    let process: Subject<number>;
     beforeEach(async () => {
-        gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['stopRewind', 'togglePause']);
+        gameRecorderService = jasmine.createSpyObj('GameRecorderService', ['rewindSpeed', 'progress$', 'stopRewind', 'startRewind', 'togglePause']);
+        gameRecorderService.stopRewind.and.callThrough();
+        process = new Subject<number>();
+        gameRecorderService.progress$ = process;
+        router = jasmine.createSpyObj('Router', ['navigate']);
         await TestBed.configureTestingModule({
-            imports: [RouterTestingModule, MatDialogModule, HttpClientTestingModule],
             declarations: [RewindControlBarComponent],
-            providers: [{ provide: GameRecorderService, useVlue: gameRecorderServiceSpy }],
+            providers: [
+                { provide: GameRecorderService, useValue: gameRecorderService },
+                { provide: Router, useValue: router },
+            ],
         }).compileComponents();
-        // gameRecorderServiceSpy.startRewind.and.callThrough();
 
         fixture = TestBed.createComponent(RewindControlBarComponent);
         component = fixture.componentInstance;
@@ -27,18 +34,36 @@ describe('RewindControlBarComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // it('should update the rewind speed', () => {
-    //     const expectedSpeed = 2;
-    //     component.speed = expectedSpeed;
-    //     component.updateSpeed();
-    //     expect(2).toEqual(2);
-    // });
+    it('should set the rewindSpeed on gameRecorderService', () => {
+        component.updateSpeed();
+        expect(gameRecorderService.rewindSpeed).toEqual(component.speed);
+        component.speed += 1;
+        component.updateSpeed();
+        expect(gameRecorderService.rewindSpeed).toEqual(component.speed);
+    });
 
-    // it('should call startRewind method on gameRecorderService when restart is called', () => {
-    //     spyOn(gameRecorderServiceSpy, 'startRewind').and.callFake(() => {
-    //         console.log('startRewind called');
-    //     });
-    //     component.restart();
-    //     expect(gameRecorderServiceSpy.startRewind).toHaveBeenCalled();
-    // });
+    it(' should update the process', () => {
+        let newProcess = 0.5;
+        process.next(newProcess);
+        expect(component.process).toEqual(newProcess);
+        newProcess = 2;
+        process.next(newProcess);
+        expect(component.process).toEqual(newProcess);
+    });
+
+    it('should call startRewind on gameRecorderService', () => {
+        component.restart();
+        expect(gameRecorderService.startRewind).toHaveBeenCalled();
+    });
+
+    it('should call togglePause on gameRecorderService', () => {
+        component.togglePause();
+        expect(gameRecorderService.togglePause).toHaveBeenCalled();
+    });
+
+    it('should call stopRewind on gameRecorderService and redirect to mainPage', () => {
+        component.redirect();
+        expect(gameRecorderService.stopRewind).toHaveBeenCalled();
+        expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
 });

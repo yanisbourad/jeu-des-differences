@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { REWIND_SPEEDS } from '@app/configuration/const-time';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { Subscription } from 'rxjs';
 
@@ -9,8 +10,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./rewind-control-bar.component.scss'],
 })
 export class RewindControlBarComponent implements OnDestroy {
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    speeds: number[] = [1, 2, 4];
+    speeds: number[] = REWIND_SPEEDS;
     speed: number = 1;
     subs: Subscription;
     process: number = 0;

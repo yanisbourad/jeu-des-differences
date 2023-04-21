@@ -19,6 +19,8 @@ describe('GameRecordCommand', () => {
     };
     const mousePosition: Vec2 = { x: 10, y: 10 };
     const word = 'Test word';
+    const tickTime = 2000;
+    const timout = 500;
 
     beforeEach(() => {
         gamePage = jasmine.createSpyObj<GamePageComponent>('GamePageComponent', ['clearCanvases']);
@@ -114,8 +116,7 @@ describe('GameRecordCommand', () => {
         };
         const spy = spyOn(DrawService, 'clearCanvas').and.callThrough();
         gameRecordCommand.clearCanvas(canvas1.nativeElement, canvas2.nativeElement);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        await new Promise((f) => setTimeout(f, 500));
+        await new Promise((f) => setTimeout(f, timout));
         expect(spy).toHaveBeenCalled();
     });
 });

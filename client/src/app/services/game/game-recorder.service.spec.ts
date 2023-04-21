@@ -15,6 +15,7 @@ describe('GameRecorderService', () => {
     let socketClientSpy: jasmine.SpyObj<SocketClientService>;
     const messageToAdd = new Subject<GameMessageEvent>();
     const gamePage = { initForRewind: jasmine.createSpy('initForRewind').and.returnValue(0) } as unknown as GamePageComponent;
+    let command: GameRecordCommand;
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['']);
         socketClientSpy = jasmine.createSpyObj('SocketClientService', ['messageToAdd$', 'getRoomTime', 'getRoomName', 'gameTime']);
@@ -27,7 +28,7 @@ describe('GameRecorderService', () => {
         });
         TestBed.configureTestingModule({});
         service = TestBed.inject(GameRecorderService);
-        const command = {
+        command = {
             do: () => {
                 expect(true).toBeTrue();
             },
@@ -37,7 +38,7 @@ describe('GameRecorderService', () => {
             },
 
             penalty: 1,
-        };
+        } as unknown as GameRecordCommand;
         service.page = gamePage;
 
         service.list = [command, command, command, command] as unknown as GameRecordCommand[];
@@ -194,6 +195,7 @@ describe('GameRecorderService', () => {
         const tickTime = 4000;
         socketClientSpy.getRoomTime.and.returnValue(roomTime);
         service.speed = 1;
+        service.list = [command, command, command, command] as unknown as GameRecordCommand[];
         service.startRewind();
         tick(tickTime);
         expect(service.sumPenalty).toEqual(service.list.length);

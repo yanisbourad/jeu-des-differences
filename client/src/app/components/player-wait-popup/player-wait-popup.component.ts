@@ -21,6 +21,8 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     isTriggered: boolean;
     isGameAvailable: boolean;
     limitedTimeGame: string;
+    // On a utilisé 2 params additionnels <Matdialog, MatdialogRef> dans le constructeur
+    // pour permettre d'appeler un autre modal permettant de sauvegarder le nom du joueur
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,

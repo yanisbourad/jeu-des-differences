@@ -40,7 +40,8 @@ export class GamePageComponent implements OnInit, AfterViewInit, OnDestroy {
     differenceSubscription: Subscription = new Subscription();
     teammateStatusSubscription: Subscription = new Subscription();
     notRewinding: boolean = true;
-
+    // cette classe est le corps principale de notre jeu, donc elle fait appel à plusieurs services et contient
+    // une plus grande quantité de méthode qu'un component normal.
     // eslint-disable-next-line max-params
     constructor(
         public gameService: GameService,

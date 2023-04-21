@@ -18,6 +18,9 @@ import { SocketClientService } from '@app/services/socket/socket-client.service'
 export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
     gameCount: number;
+    // message dialog est la modale principale utilisé par notre application, donc il fait appel à plusieurs autres services
+    // pour cette raison, il est necessaire de passer les toutes ces dependances dans le constructeur
+    // de la classe et d'ou la raison d'utiliser le eslint-disable pour les max-params
     // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)

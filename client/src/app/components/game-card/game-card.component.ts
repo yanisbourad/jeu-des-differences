@@ -23,7 +23,8 @@ export class GameCardComponent implements OnInit {
     url: string;
     messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
     messageDeleteGame: string = 'Êtes-vous sur de vouloir supprimer ce jeu?';
-
+    // On a utilisé des params additionnels Matdialog dans le constructeur
+    // pour permettre d'appeler un autre modal permettant de sauvegarder le nom du joueur
     // eslint-disable-next-line max-params
     constructor(
         readonly gameService: GameService,

@@ -16,7 +16,8 @@ export class GameNameSaveComponent {
     showFeedback: string;
     lowerLengthNameLimit: number;
     upperLengthNameLimit: number;
-
+    // On a utilisé 2 params additionnels <Matdialog, MatdialogRef> dans le constructeur
+    // pour permettre d'appeler un autre modal permettant de sauvegarder le nom du joueur
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,

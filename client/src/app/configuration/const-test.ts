@@ -1,3 +1,4 @@
+// this file contains all the constants used for the test
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 // eslint-disable @typescript-eslint/no-magic-numbers*/
 export const FIRST_SET = [1, 2, 3];

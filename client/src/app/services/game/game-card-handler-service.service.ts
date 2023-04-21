@@ -4,7 +4,6 @@ import { Game, GameIdentifier, GamersInfo } from '@app/interfaces/game-handler';
 import { SocketClientService } from '@app/services/socket/socket-client.service';
 import { SocketClient } from '@app/utils/socket-client';
 import { Socket } from 'socket.io-client';
-// eslint-disable-next-line no-restricted-imports
 
 @Injectable({
     providedIn: 'root',

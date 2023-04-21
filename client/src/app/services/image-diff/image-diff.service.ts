@@ -20,7 +20,6 @@ export class ImageDiffService {
     hasBeenChanged: boolean;
     setDiffPixels: Set<number>;
     listDifferencesLength: number = 0;
-    // differencePixelArray: number[];
     currentDifferenceTemp: Set<number>;
     listDifferences: Set<number>[];
     differenceMatrix: number[];

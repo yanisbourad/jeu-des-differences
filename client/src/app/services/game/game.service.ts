@@ -39,7 +39,7 @@ export class GameService {
     isWinner: boolean;
     startDate: string;
     hasAbandonedGame: boolean;
-
+    // cette classe est le cerveau principale pour la gestion des jeux, donc il fait appel à plusieurs services
     // eslint-disable-next-line max-params
     constructor(
         private readonly gameCardHandlerService: GameCardHandlerService,

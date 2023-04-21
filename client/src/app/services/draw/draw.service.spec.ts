@@ -6,6 +6,7 @@ describe('DrawService', () => {
     let service: DrawService;
     let canvas: HTMLCanvasElement;
     let image: ImageBitmap;
+    const tickTime = 3000;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const diff = new Set([1, 2, 3, 4]);
 
@@ -121,8 +122,7 @@ describe('DrawService', () => {
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tick(3000);
+        tick(tickTime);
         context.drawImage(image, 0, 0);
         const imageData = thisCanvas.toDataURL('image/png');
         expect(imageData).toBeTruthy();
@@ -139,8 +139,7 @@ describe('DrawService', () => {
         thisCanvas.width = constants.DEFAULT_WIDTH;
         thisCanvas.height = constants.DEFAULT_HEIGHT;
         const context = thisCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tick(3000);
+        tick(tickTime);
         context.drawImage(image, 0, 0);
         const imageDataUrl = thisCanvas.toDataURL('image/png');
         const imageDate: ImageData = context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);

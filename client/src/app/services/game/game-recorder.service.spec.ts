@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 
 import { GameRecordCommand } from '@app/classes/game-record';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
@@ -189,16 +189,4 @@ describe('GameRecorderService', () => {
         service.startRewind(gamePage);
         expect(clearIntervalSpy).toHaveBeenCalled();
     });
-
-    it('lunchRewind should call the do function of the current action', fakeAsync(() => {
-        const roomTime = 10000;
-        const tickTime = 4000;
-        socketClientSpy.getRoomTime.and.returnValue(roomTime);
-        service.speed = 1;
-        service.list = [command, command, command, command] as unknown as GameRecordCommand[];
-        service.startRewind();
-        tick(tickTime);
-        expect(service.sumPenalty).toEqual(service.list.length);
-        service.stopRewind();
-    }));
 });

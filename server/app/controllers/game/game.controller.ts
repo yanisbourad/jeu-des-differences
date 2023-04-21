@@ -92,12 +92,9 @@ export class GameController {
             await this.gamesService.addGame(game);
             response.status(HttpStatus.OK).json('Game added successfully');
         } catch (error) {
-            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+            response.status(HttpStatus.CONFLICT).send(error.message);
         }
     }
-
-
-
     @Delete('/')
     async deleteAllGames(@Res() response: Response) {
         try {
@@ -114,7 +111,7 @@ export class GameController {
             await this.gamesService.deleteGame(id);
             response.status(HttpStatus.OK).json('Game deleted successfully');
         } catch (error) {
-            response.status(HttpStatus.BAD_REQUEST).send(error.message);
+            response.status(HttpStatus.NO_CONTENT).send(error.message);
         }
     }
 
@@ -128,7 +125,4 @@ export class GameController {
             response.status(HttpStatus.BAD_REQUEST).send(error.message);
         }
     }
-
-
-
 }

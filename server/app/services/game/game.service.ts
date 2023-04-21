@@ -1,5 +1,6 @@
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { TimerConstantsModel } from '@app/model/database/timer-constants';
+import { SECOND_TIME } from '@common/const-chat-gateway';
 import { Game, GameInfo, TimeConfig } from '@common/game';
 import { Controller, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -20,7 +21,7 @@ export class GameService {
 
     constructor(
         @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
-         readonly logger: Logger,
+        readonly logger: Logger,
         @InjectModel(TimerConstantsModel.name) public timerConstantsModel: Model<TimerConstantsModel>,
     ) {
         if (!fs.existsSync(this.rootPath)) {
@@ -56,8 +57,16 @@ export class GameService {
         const it = this.gamesNames.map(async (gameName) => {
             const game = this.getGame(gameName);
             if (game) {
-                const recordsSolo = await this.gameRecordModel.find({ gameName: gameName, keyServer: this.getKey, typeGame: 'solo' }).sort({ time: 1 }).limit(3).exec();
-                const recordsMulti = await this.gameRecordModel.find({ gameName: gameName, keyServer: this.getKey, typeGame: 'multi' }).sort({ time: 1 }).limit(3).exec();
+                const recordsSolo = await this.gameRecordModel
+                    .find({ gameName, keyServer: this.getKey, typeGame: 'solo' })
+                    .sort({ time: 1 })
+                    .limit(3)
+                    .exec();
+                const recordsMulti = await this.gameRecordModel
+                    .find({ gameName, keyServer: this.getKey, typeGame: 'multi' })
+                    .sort({ time: 1 })
+                    .limit(3)
+                    .exec();
                 return { ...game, rankingSolo: recordsSolo, rankingMulti: recordsMulti };
             }
         });
@@ -80,7 +89,6 @@ export class GameService {
     getGames(): Map<string, Game> {
         if (this.gamesNames.length === 0) {
             return;
-            // throw Error('Failed to get Games, list is empty');
         }
         for (const gameName of this.gamesNames) {
             this.games.set(gameName, this.getGame(gameName));
@@ -96,35 +104,34 @@ export class GameService {
         const basRecords: GameRecord[] = [];
 
         for (let i = 0; i < 3; i++) {
-            let recordInfo = this.generateFakeRecordInfo()
+            let recordInfo = this.generateFakeRecordInfo();
             basRecords.push({
                 gameName: name,
                 typeGame: 'multi',
                 time: recordInfo.time,
                 playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
-                keyServer: this.getKey
+                keyServer: this.getKey,
             });
-            recordInfo = this.generateFakeRecordInfo()
+            recordInfo = this.generateFakeRecordInfo();
             basRecords.push({
                 gameName: name,
                 typeGame: 'solo',
                 time: recordInfo.time,
                 playerName: recordInfo.name,
                 dateStart: new Date().getTime().toString(),
-                keyServer: this.getKey
+                keyServer: this.getKey,
             });
         }
         return basRecords;
     }
 
-    generateFakeRecordInfo(): { name: string, time: string } {
-        const minutes = Math.floor(Math.random() * (rangeTime.minutesMax - rangeTime.minutesMin + 1) + rangeTime.minutesMin)
-        const seconds = Math.floor(Math.random() * (rangeTime.secondesMax - rangeTime.secondesMin + 1) + rangeTime.secondesMin)
-        const name = listNames[Math.floor(Math.random() * listNames.length)]
-        // add 0 if seconds < 10 to have a good format
-        const time = seconds < 10 ? `${minutes}:0${seconds}` : `${minutes}:${seconds}`
-        return { name, time }
+    generateFakeRecordInfo(): { name: string; time: string } {
+        const minutes = Math.floor(Math.random() * (rangeTime.minutesMax - rangeTime.minutesMin + 1) + rangeTime.minutesMin);
+        const seconds = Math.floor(Math.random() * (rangeTime.secondesMax - rangeTime.secondesMin + 1) + rangeTime.secondesMin);
+        const name = listNames[Math.floor(Math.random() * listNames.length)];
+        const time = seconds < SECOND_TIME ? `${minutes}:0${seconds}` : `${minutes}:${seconds}`;
+        return { name, time };
     }
     async addGame(game: Game): Promise<void> {
         if (this.gamesNames.includes(game.gameName)) {

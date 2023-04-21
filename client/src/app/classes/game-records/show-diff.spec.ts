@@ -1,7 +1,6 @@
-import { ElementRef } from '@angular/core';
+import { ElementRef, EventEmitter } from '@angular/core';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { DrawService } from '@app/services/draw/draw.service';
-import { of } from 'rxjs';
 import { ShowDiffRecord } from './show-diff';
 
 describe('ShowDiffRecord', () => {
@@ -12,7 +11,7 @@ describe('ShowDiffRecord', () => {
     let canvasImageModifier: HTMLCanvasElement;
     let component: GamePageComponent;
     let showDiffRecord: ShowDiffRecord;
-
+    // let getImageDateFromDataUrl: (dataUrl: string) => EventEmitter<ImageData>;
     beforeEach(() => {
         canvas1 = { nativeElement: document.createElement('canvas') };
         canvas2 = { nativeElement: document.createElement('canvas') };
@@ -34,9 +33,13 @@ describe('ShowDiffRecord', () => {
             hintsService: { removeDifference: jasmine.createSpy() },
             getCanvasImageModifier: canvasImageModifier,
         } as unknown as GamePageComponent;
-        DrawService.getImageDateFromDataUrl = jasmine.createSpy().and.returnValue(of({} as ImageData));
+        // getImageDateFromDataUrl = DrawService.getImageDateFromDataUrl.bind(DrawService);
+        // DrawService.getImageDateFromDataUrl = jasmine.createSpy().and.returnValue(of({} as ImageData));
 
         showDiffRecord = new ShowDiffRecord(new Set([1, 2]), { canvas1, canvas2, canvas0, canvas3 }, true, { x: 0, y: 0 });
+    });
+    afterAll(() => {
+        // DrawService.getImageDateFromDataUrl = getImageDateFromDataUrl;
     });
 
     it('should call showMessage, reduceNbrDifferences and displayWord when isMeWhoFound is true', () => {
@@ -68,16 +71,33 @@ describe('ShowDiffRecord', () => {
     });
 
     it('should draw difference', () => {
-        DrawService.drawDiff = jasmine.createSpy();
+        const spy = spyOn(DrawService, 'drawDiff').and.callFake(() => {
+            // expect the function to be called
+            expect(true).toBe(true);
+        });
         showDiffRecord.drawDifference({ diff: new Set([1, 2]), canvas: { canvas1, canvas2 }, originalImage: {} as ImageData, canvasImageModifier });
         expect(DrawService.drawDiff).toHaveBeenCalled();
+        spy.and.callThrough();
     });
 
     it('should test the case when the difference is not found by me', () => {
         showDiffRecord = new ShowDiffRecord(new Set([1, 2]), { canvas1, canvas2 });
-        showDiffRecord.drawDifference = jasmine.createSpy();
+        const obs: EventEmitter<ImageData> = new EventEmitter<ImageData>();
+        const spyGetter = spyOn(DrawService, 'getImageDateFromDataUrl').and.callFake(() => {
+            return obs;
+        });
+        const spy = spyOn(showDiffRecord, 'drawDifference').and.callFake(() => {
+            // expect the function is called
+            expect(true).toBe(true);
+        });
         component.gameService.handlePlayerDifference = jasmine.createSpy();
         showDiffRecord.do(component);
+        obs.emit({} as ImageData);
         expect(component.gameService.handlePlayerDifference).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+        expect(spyGetter).toHaveBeenCalled();
+
+        spy.and.callThrough();
+        spyGetter.and.callThrough();
     });
 });

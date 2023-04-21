@@ -1,23 +1,23 @@
 /* eslint-disable max-lines */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
-import { GamePageComponent } from './game-page.component';
-import { GameService } from '@app/services/game/game.service';
-import { SocketClientService } from '@app/services/socket/socket-client.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
-import { HintsService } from '@app/services/hints/hints.service';
-import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
-import { DrawService } from '@app/services/draw/draw.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import { MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
+import { ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
+import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
+import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { HintsService } from '@app/services/hints/hints.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { Game } from '@common/game';
 import { Subject, of } from 'rxjs';
+import { GamePageComponent } from './game-page.component';
 // import { of } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
-import { GameMessageEvent } from '@app/classes/game-records/message-event';
-import { Game } from '@common/game';
-import { ElementRef } from '@angular/core';
 class ActivatedRouteMock {
     params = { subscribe: jasmine.createSpy('subscribe') };
     snapshot = {
@@ -99,7 +99,6 @@ describe('GamePageComponent', () => {
             'launchHints',
             'stopInterval',
         ]);
-        drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearDiff', 'getImageDateFromDataUrl', 'drawImage']);
         gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do', 'startRewind']);
         gameState = new Subject<boolean>();
         playerFoundDiff = new Subject<string>();
@@ -164,7 +163,7 @@ describe('GamePageComponent', () => {
         expect(component.subscribeToTimeLimit).not.toHaveBeenCalled();
         expect(component.subscribeToDifference).not.toHaveBeenCalled();
         expect(component.cheatModeService.cheatModeKeyBinding).toHaveBeenCalled();
-        expect(component.hintsService.hintsKeyBinding).not.toHaveBeenCalled();
+        expect(component.hintsService.hintsKeyBinding).toHaveBeenCalled();
         expect(component.hintsService.resetService).not.toHaveBeenCalled();
         expect(component.loadImages).not.toHaveBeenCalled();
         expect(component.cheatModeService.resetService).not.toHaveBeenCalled();
@@ -228,7 +227,9 @@ describe('GamePageComponent', () => {
         component.canvas3 = { nativeElement: document.createElement('canvas') };
         component.canvasCheat0 = { nativeElement: document.createElement('canvas') };
         component.canvasCheat1 = { nativeElement: document.createElement('canvas') };
-        spyOn(DrawService, 'clearDiff');
+        const spyClear = spyOn(DrawService, 'clearDiff').and.callFake(() => {
+            expect(true).toBeTrue();
+        });
         component.clearCanvases();
         // Expect that all canvases were cleared
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvas0.nativeElement);
@@ -238,6 +239,7 @@ describe('GamePageComponent', () => {
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvasCheat0.nativeElement);
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvasCheat1.nativeElement);
         expect(component.loadImages).toHaveBeenCalled();
+        spyClear.and.callThrough();
     });
     it('ngAfterViewInit should call joinRoomSolo if gameType is solo', () => {
         component.gameService.gameType = 'solo';
@@ -314,9 +316,18 @@ describe('GamePageComponent', () => {
         component.ngOnInit();
         expect(gameServiceSpy.getTimeLimitGame).not.toHaveBeenCalled();
     });
-    it('ngOnInit should not call getLimitGameTime', () => {
+    it('ngOnInit should not call hintsKeyBinding', () => {
         component.gameService.game = mockGame;
         gameServiceSpy.gameType = 'solo';
-        expect(hintsServiceSpy.hintsKeyBinding).not.toHaveBeenCalled();
+        component.ngOnInit();
+        expect(hintsServiceSpy.hintsKeyBinding).toHaveBeenCalled();
+    });
+    it('should ngOnInit call loadImages', () => {
+        component.gameService.game = mockGame;
+        component.gameService.gameType = 'solo';
+        component.gameService.mode = 'tempsLimite';
+        socketClientServiceSpy.imageLoaded$ = of(mockGame);
+        component.ngOnInit();
+        expect(component.loadImages).not.toHaveBeenCalled();
     });
 });

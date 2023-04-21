@@ -106,7 +106,7 @@ describe('GamingHistoryController', () => {
             return res;
         };
         res.json = (message) => {
-            expect(message).toEqual('Game deleted successfully');
+            expect(message).toEqual('Gaming history deleted successfully');
             return res;
         };
         await controller.deleteGamingHistory(res);

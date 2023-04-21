@@ -246,9 +246,10 @@ describe('HintsService', () => {
     it('drawDifference should call drawDiff', () => {
         const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
         spyOn(hintsService, 'drawDifference').and.callThrough();
-        spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
+        const spy = spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
         hintsService.drawDifference(diff);
         expect(hintsService.drawDifference).toHaveBeenCalled();
+        spy.and.callThrough();
     });
 
     it('removeHotkeysEventListener should call not removeEventListener if indexEvent is undefined', () => {
@@ -270,10 +271,11 @@ describe('HintsService', () => {
         const canvasA = document.createElement('canvas');
         const canvasB = document.createElement('canvas');
         spyOn(hintsService, 'clearCanvas').and.callThrough();
-        spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
+        const spy = spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
         hintsService.clearCanvas(canvasA, canvasB);
         expect(hintsService.clearCanvas).toHaveBeenCalled();
-        expect(DrawService.clearDiff).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+        spy.and.callThrough();
     });
 
     it('resetService should reinitialize all variables', () => {

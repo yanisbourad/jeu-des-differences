@@ -130,9 +130,11 @@ export class ImageDiffService {
         while (this.setDiffPixels.size > 0) {
             // represent for each key of position the last smallest distance from a real diff
             this.mapDistPoint = new Map();
+
             // get fist diff position
             const position = [...this.setDiffPixels][0];
             const point: Point = this.getPositionFromAbsolute(position);
+
             // differenceMatrix is a Point[] representing one difference
             this.currentDifferenceTemp = new Set<number>();
             this.listBfsInput.push({ point, distance: 0 });
@@ -140,9 +142,11 @@ export class ImageDiffService {
                 const bfsInput = this.listBfsInput.pop();
                 if (bfsInput) this.bfs(bfsInput.point, bfsInput.distance, this.radius);
             }
+
             // after all the recursive calls has ended add the current diff to the diff list
             this.listDifferences.push(this.currentDifferenceTemp);
         }
+
         this.currentDifferenceTemp = new Set<number>();
         // clearing the service is needed to be able to read the next images
         this.listDifferencesLength = this.listDifferences.length;
@@ -150,63 +154,17 @@ export class ImageDiffService {
     }
 
     bfs(point: Point, distance: number, radius: number): void {
-        if (point.x < 0 || point.y < 0 || point.x >= constants.DEFAULT_WIDTH || point.y >= constants.DEFAULT_HEIGHT) {
-            // Point is outside of borderers
-            return;
-        }
+        if (this.pointIsOutOfBorder(point)) return;
+
         const position = this.getPositionsFromXY(point.x, point.y);
         if (this.differenceMatrix[position] === 1) {
             // if is a difference
-            if (this.setDiffPixels.has(position)) {
-                // if the difference has never been visited before
-                this.setDiffPixels.delete(position);
-                // add this position to the differenceMatrix
-                this.currentDifferenceTemp.add(position);
-                // next bfs will have a distance of 0
-                distance = 0;
-            } else {
-                // already visited
-                return;
-            }
+            distance = this.bfsHandleIsDifferent(position);
         } else {
             // if not a difference
-            let lastDistance = this.mapDistPoint.get(position);
-            // if fist time reading this point
-            if (!lastDistance) {
-                // puts the lastDistance as unreachable
-                lastDistance = radius + 1;
-            }
-
-            if (distance < radius && distance < lastDistance) {
-                // adding it to the differenceMatrix
-                this.currentDifferenceTemp.add(position);
-                // if distance is the lower ever found
-                this.mapDistPoint.set(position, distance);
-                // next bfs should have a distance greater than the parent
-                distance++;
-            } else {
-                // distance is greater than the max radius
-                return;
-            }
+            distance = this.bfsHandleIsNotDifferent(position, distance, radius);
         }
-
-        // Adding the 8 neighbors of the current point
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                if (i === 0 && j === 0) continue;
-                this.listBfsInput.push({ point: { x: point.x + i, y: point.y + j }, distance });
-            }
-        }
-    }
-
-    getPositionsFromXY(x: number, y: number): number {
-        return x + y * constants.DEFAULT_WIDTH;
-    }
-
-    getPositionFromAbsolute(x: number): Point {
-        const y = Math.floor(x / constants.DEFAULT_WIDTH);
-        const xPosition = x - y * constants.DEFAULT_WIDTH;
-        return { x: xPosition, y };
+        if (distance !== constants.BFS_IGNORE_POINT) this.bfsAddNeighbors(point, distance);
     }
 
     getDifficulty(): string {
@@ -219,5 +177,66 @@ export class ImageDiffService {
         if (this.listDifferences.length >= this.upperLimitDifficultyLevel && count / totalSurface < this.ratioLimitDifficultyLevel)
             return 'Difficile';
         return 'Facile';
+    }
+
+    getPositionsFromXY(x: number, y: number): number {
+        return x + y * constants.DEFAULT_WIDTH;
+    }
+
+    getPositionFromAbsolute(x: number): Point {
+        const y = Math.floor(x / constants.DEFAULT_WIDTH);
+        const xPosition = x - y * constants.DEFAULT_WIDTH;
+        return { x: xPosition, y };
+    }
+
+    private pointIsOutOfBorder(point: Point): boolean {
+        if (point.x < 0 || point.y < 0 || point.x >= constants.DEFAULT_WIDTH || point.y >= constants.DEFAULT_HEIGHT) {
+            // Point is outside of borderers
+            return true;
+        }
+        return false;
+    }
+
+    private bfsAddNeighbors(point: Point, distance: number): void {
+        // Adding the 8 neighbors of the current point
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                this.listBfsInput.push({ point: { x: point.x + i, y: point.y + j }, distance });
+            }
+        }
+    }
+
+    private bfsHandleIsNotDifferent(position: number, distance: number, radius: number): number {
+        let lastDistance = this.mapDistPoint.get(position);
+        // if fist time reading this point
+        if (!lastDistance) {
+            // puts the lastDistance as unreachable
+            lastDistance = radius + 1;
+        }
+
+        if (distance < radius && distance < lastDistance) {
+            // adding it to the differenceMatrix
+            this.currentDifferenceTemp.add(position);
+            // if distance is the lower ever found
+            this.mapDistPoint.set(position, distance);
+            // next bfs should have a distance greater than the parent
+            return distance + 1;
+        }
+        // distance is greater than the max radius
+        return constants.BFS_IGNORE_POINT;
+    }
+
+    private bfsHandleIsDifferent(position: number): number {
+        if (this.setDiffPixels.has(position)) {
+            // if the difference has never been visited before
+            this.setDiffPixels.delete(position);
+            // add this position to the differenceMatrix
+            this.currentDifferenceTemp.add(position);
+            // next bfs will have a distance of 0
+            return 0;
+        }
+        // Point already visited
+        return constants.BFS_IGNORE_POINT;
     }
 }

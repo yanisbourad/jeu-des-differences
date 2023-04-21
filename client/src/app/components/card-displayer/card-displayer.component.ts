@@ -12,7 +12,7 @@ import { GameInfo } from '@common/game';
 export class CardDisplayerComponent implements OnInit {
     currentPage: number;
     allPages: number;
-    cardByPage: number = constants.GAMES_BY_PAGE;
+    cardByPage: number;
     allCards: GameInfo[];
     isViewable: boolean;
 
@@ -22,6 +22,7 @@ export class CardDisplayerComponent implements OnInit {
         private readonly gameCardHandlerService: GameCardHandlerService,
     ) {
         this.currentPage = 0;
+        this.cardByPage = constants.GAMES_BY_PAGE;
     }
     ngOnInit(): void {
         this.isViewable = false;

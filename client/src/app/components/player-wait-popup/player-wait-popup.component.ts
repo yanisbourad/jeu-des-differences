@@ -21,6 +21,7 @@ export class PlayerWaitPopupComponent implements OnInit, AfterContentChecked {
     isTriggered: boolean;
     isGameAvailable: boolean;
     limitedTimeGame: string;
+    //  we need to disable max-params because we need MatdialogRef, MatDialog for modals
     // eslint-disable-next-line max-params
     constructor(
         public dialogReff: MatDialogRef<PlayerWaitPopupComponent>,

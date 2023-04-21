@@ -1,11 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Point } from '@app/interfaces/point';
 
-// TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 500;
 export const DEFAULT_HEIGHT = 500;
 
-// TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
     Left = 0,
     Middle = 1,
@@ -41,12 +39,9 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        // this.drawService.drawGrid();
-        // this.drawService.drawWord('Différence');
         this.canvas.nativeElement.focus();
     }
 
-    // TODO : déplacer ceci dans un service de gestion de la souris!
     mouseHitDetect(event: MouseEvent) {
         if (event.button === MouseButton.Left) {
             this.mousePosition = { x: event.offsetX, y: event.offsetY };

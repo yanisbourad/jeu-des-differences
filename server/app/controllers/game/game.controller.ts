@@ -73,7 +73,7 @@ export class GameController {
     @Get('/:id')
     async gameId(@Param('id') id: string, @Res() response: Response) {
         try {
-            const game = await this.gamesService.getGame(id);
+            const game = this.gamesService.getGame(id);
             response.status(HttpStatus.OK).json(game);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);

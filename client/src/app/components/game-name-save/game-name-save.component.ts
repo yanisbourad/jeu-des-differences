@@ -17,6 +17,8 @@ export class GameNameSaveComponent {
     lowerLengthNameLimit: number;
     upperLengthNameLimit: number;
 
+    //  we need to disable max-params because we need to use both two services and at
+    // the same time MatdialogRef, MatDialog and Router to navigate to the right page
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,

@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NamePopupComponent } from '@app/components/name-popup/name-popup.component';
+import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { GameService } from '@app/services/game/game.service';
 import { GameInfo } from '@common/game';
 import { firstValueFrom } from 'rxjs';
-import { VerificationFeedbackComponent } from '@app/components/verification-feedback/verification-feedback.component';
 
 @Component({
     selector: 'app-game-card',
@@ -16,21 +16,27 @@ import { VerificationFeedbackComponent } from '@app/components/verification-feed
 export class GameCardComponent implements OnInit {
     @Input() card!: GameInfo;
     @Output() gameDeleted = new EventEmitter<void>();
-    createJoinState: string = 'Créer';
+    createJoinState: string;
     name: string;
     gameName: string;
     typePage: 'Classique' | 'Configuration';
     url: string;
-    messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
-    messageDeleteGame: string = 'Êtes-vous sur de vouloir supprimer ce jeu?';
+    messageDeleteRecords: string;
+    messageDeleteGame: string;
 
+    //  we need to disable max-params because we need to use both two services and at
+    // the same time MatDialog and Router to navigate to the right page
     // eslint-disable-next-line max-params
     constructor(
-        readonly gameService: GameService,
         public dialog: MatDialog,
         private router: Router,
+        readonly gameService: GameService,
         private readonly gameCardHandlerService: GameCardHandlerService,
-    ) {}
+    ) {
+        this.createJoinState = 'Créer';
+        this.messageDeleteRecords = 'Êtes-vous sur de vouloir reinitialiser les meilleurs temps de ce jeu?';
+        this.messageDeleteGame = 'Êtes-vous sur de vouloir supprimer ce jeu?';
+    }
     openDialog(): void {
         this.gameService.rankingSoloCopy = this.card.rankingSolo;
         this.gameService.rankingMultiCopy = this.card.rankingMulti;
@@ -46,11 +52,9 @@ export class GameCardComponent implements OnInit {
             this.name = result;
         });
     }
-
     ngOnInit(): void {
         this.url = this.router.url;
     }
-
     launchDialog(): void {
         const dialogRef = this.dialog.open(NamePopupComponent, {
             data: { name: this.name, gameName: this.card.gameName, gameType: 'double' },
@@ -64,7 +68,6 @@ export class GameCardComponent implements OnInit {
             this.name = result;
         });
     }
-
     changeButton(): string {
         switch (this.url) {
             case '/classique': {
@@ -79,7 +82,6 @@ export class GameCardComponent implements OnInit {
         }
         return '';
     }
-
     async onDelete(gameName: string) {
         try {
             await firstValueFrom(this.gameService.deleteGame(gameName));
@@ -91,7 +93,6 @@ export class GameCardComponent implements OnInit {
     async onReinitialise(gameName: string) {
         this.gameService.deleteOneGameRecords(gameName).subscribe();
     }
-
     launchFeedbackResetSpecificGameRecords(gameName: string, showedMessage: string): void {
         this.dialog
             .open(VerificationFeedbackComponent, {
@@ -104,7 +105,6 @@ export class GameCardComponent implements OnInit {
             .afterClosed()
             .subscribe();
     }
-
     launchFeedbackDeleteGame(gameName: string, showedMessage: string): void {
         this.dialog
             .open(VerificationFeedbackComponent, {

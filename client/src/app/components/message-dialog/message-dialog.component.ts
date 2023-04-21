@@ -18,6 +18,8 @@ import { SocketClientService } from '@app/services/socket/socket-client.service'
 export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
     gameCount: number;
+    //  we need to disable max-params because we need to use both three services and at
+    // the same time MatdialogRef, MatDialog and Router to navigate to the right page
     // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)

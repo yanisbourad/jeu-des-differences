@@ -16,9 +16,12 @@ export class HeaderComponent {
     newUrl: string;
     readonly logo: string = 'https://cdn-icons-png.flaticon.com/512/8464/8464334.png';
     readonly title: string = 'VQ';
-    messageDeleteGames: string = 'Êtes-vous sur de vouloir supprimer tous les jeux?';
-    messageDeleteRecords: string = 'Êtes-vous sur de vouloir reinitialiser tous les meilleurs temps?';
-    constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {}
+    messageDeleteGames: string;
+    messageDeleteRecords: string;
+    constructor(public dialog: MatDialog, public router: Router, readonly gameDatabaseService: GameDatabaseService) {
+        this.messageDeleteGames = 'Êtes-vous sur de vouloir supprimer tous les jeux?';
+        this.messageDeleteRecords = 'Êtes-vous sur de vouloir reinitialiser tous les meilleurs temps?';
+    }
     openSettings(): void {
         const dialogRef = this.dialog.open(TimePopupComponent, {
             height: '774px',

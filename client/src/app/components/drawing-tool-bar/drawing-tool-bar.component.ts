@@ -12,18 +12,25 @@ import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 export class DrawingToolBarComponent {
     // eslint-disable-next-line @angular-eslint/no-output-on-prefix
     @Output() onReadyToDraw = new EventEmitter();
-    lineWidth: number = constants.DEFAULT_LINE_WIDTH;
-    lineColor: string = constants.DEFAULT_LINE_COLOR;
-    selectedRadius: number = constants.DEFAULT_RADIUS;
-    showMessage: boolean = false;
-    showDifference: number = 0;
-    tool: string = 'pencil';
+    lineWidth: number;
+    lineColor: string;
+    selectedRadius: number;
+    showMessage: boolean;
+    showDifference: number;
+    tool: string;
 
     constructor(
         private readonly drawingService: DrawService,
         private readonly imageDifferenceService: ImageDiffService,
         private readonly commandService: CommandService,
-    ) {}
+    ) {
+        this.lineWidth = constants.DEFAULT_LINE_WIDTH;
+        this.lineColor = constants.DEFAULT_LINE_COLOR;
+        this.selectedRadius = constants.DEFAULT_RADIUS;
+        this.showMessage = false;
+        this.showDifference = 0;
+        this.tool = 'pencil';
+    }
     get const(): typeof constants {
         return constants;
     }

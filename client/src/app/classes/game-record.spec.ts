@@ -19,6 +19,7 @@ describe('GameRecordCommand', () => {
     };
     const mousePosition: Vec2 = { x: 10, y: 10 };
     const word = 'Test word';
+    const tickTime = 2000;
 
     beforeEach(() => {
         gamePage = jasmine.createSpyObj<GamePageComponent>('GamePageComponent', ['clearCanvases']);
@@ -103,8 +104,7 @@ describe('GameRecordCommand', () => {
         spyOn(canvas2.nativeElement.style, 'setProperty').and.callThrough();
 
         await gameRecordCommand.blinkDifference(canvas1, canvas2);
-        const deuxMilles = 2000;
-        tick(deuxMilles);
+        tick(tickTime);
 
         expect(canvas1.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);
         expect(canvas2.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);

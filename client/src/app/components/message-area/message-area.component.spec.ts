@@ -26,7 +26,7 @@ describe('MessageAreaComponent', () => {
             providers: [
                 { provide: GameService, useValue: gameServiceMock },
                 { provide: SocketClientService, useValue: socketClientMock },
-                { provide: GameRecorderService, useValue: gameRecorderService}
+                { provide: GameRecorderService, useValue: gameRecorderService },
             ],
         }).compileComponents();
     });

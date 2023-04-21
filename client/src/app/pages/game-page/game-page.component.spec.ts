@@ -22,7 +22,7 @@ class ActivatedRouteMock {
     params = { subscribe: jasmine.createSpy('subscribe') };
     snapshot = {
         paramMap: {
-            get: jasmine.createSpy('get').and.returnValues('defaultName', 'defaultPlayer'),
+            get: jasmine.createSpy('get').and.returnValues('defaultName', 'defaultPlayer', 'solo', 1, ''),
         },
     };
 }
@@ -46,6 +46,13 @@ describe('GamePageComponent', () => {
     let imageLoaded: Subject<Game>;
     let mouseEvent: MouseEvent;
     let notADiff: Set<number>;
+    const mockGame: Game = {
+        gameName: 'G',
+        difficulty: 'Facile',
+        originalImageData: 'u',
+        modifiedImageData: 'o',
+        listDifferences: ['1', '2'],
+    };
 
     beforeEach(() => {
         socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', [
@@ -89,9 +96,10 @@ describe('GamePageComponent', () => {
             'resetService',
             'stopHints',
             'hintsKeyBinding',
+            'launchHints',
             'stopInterval',
         ]);
-        drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearDiff', 'getImageDateFromDataUrl']);
+        drawServiceSpy = jasmine.createSpyObj('DrawService', ['clearDiff', 'getImageDateFromDataUrl', 'drawImage']);
         gameRecorderServiceSpy = jasmine.createSpyObj('GameRecorderService', ['getGameRecorder', 'subscribe', 'do', 'startRewind']);
         gameState = new Subject<boolean>();
         playerFoundDiff = new Subject<string>();
@@ -110,7 +118,6 @@ describe('GamePageComponent', () => {
         socketClientServiceSpy.messageToAdd$ = messageToAdd.asObservable();
         socketClientServiceSpy.imageLoaded$ = imageLoaded.asObservable();
         mouseEvent = new MouseEvent('click', { button: 0 });
-        gameServiceSpy.mode = 'classic';
     });
 
     beforeEach(async () => {
@@ -130,6 +137,7 @@ describe('GamePageComponent', () => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
         component.route = new ActivatedRouteMock() as unknown as ActivatedRoute;
+        spyOn(component, 'loadImages').and.stub();
         fixture.detectChanges();
     });
 
@@ -142,14 +150,13 @@ describe('GamePageComponent', () => {
     });
 
     it('should set up the game for rewind and subscribe to game events', () => {
+        gameServiceSpy.mode = 'classic';
+        component.gameService.gameType = 'solo';
         spyOn(component, 'loading');
         spyOn(component, 'subscribeToGameStatus');
         spyOn(component, 'subscribeToTimeLimit');
         spyOn(component, 'subscribeToDifference');
-        spyOn(component, 'loadImages');
-
         component.ngOnInit();
-
         expect(component.gameService.setStartDate).toHaveBeenCalled();
         expect(component.gameService.handleDisconnect).toHaveBeenCalled();
         expect(component.loading).toHaveBeenCalled();
@@ -168,7 +175,6 @@ describe('GamePageComponent', () => {
         expect(component.cheatModeService.removeHotkeysEventListener).not.toHaveBeenCalled();
         expect(component.hintsService.removeHotkeysEventListener).not.toHaveBeenCalled();
     });
-
     it('should ngAfterViewInit', () => {
         component.gameService.gameType = 'solo';
         component.gameService.mode = '';
@@ -176,7 +182,6 @@ describe('GamePageComponent', () => {
         expect(socketClientServiceSpy.joinRoomSolo).toHaveBeenCalled();
         expect(component.ngAfterViewInit).toBeTruthy();
     });
-
     it('startRewind should call stopCheating, stopHints and startRewind', () => {
         component.notRewinding = false;
         component.startRewind();
@@ -184,36 +189,30 @@ describe('GamePageComponent', () => {
         expect(hintsServiceSpy.stopHints).toHaveBeenCalled();
         expect(gameRecorderServiceSpy.startRewind).toHaveBeenCalled();
     });
-
     it('startRewind should call initForRewind if notRewinding is true', () => {
         spyOn(component, 'initForRewind');
         component.notRewinding = true;
         component.startRewind();
         expect(component.initForRewind).toHaveBeenCalled();
     });
-
     it('gameTime should return gameService gameTime', () => {
         gameServiceSpy.gameTime = 10;
         expect(component.gameTime).toEqual(gameServiceSpy.gameTime);
     });
-
     it('currentTimer should return roomTime', () => {
         const expectedTime = 10;
         socketClientServiceSpy.getRoomTime.and.returnValue(expectedTime);
         expect(component.currentTimer).toEqual(expectedTime);
     });
-
     it('getCanvasImageModifier should return modifiedImage.nativeElement', () => {
         const expectedImage = 'image';
         component.modifiedImage = { nativeElement: expectedImage } as unknown as ElementRef<HTMLCanvasElement>;
         expect(component.getCanvasImageModifier).toEqual(component.modifiedImage.nativeElement);
     });
-
     it('mouseHitDetect should call mouseHitDetect from gameService', () => {
         component.mouseHitDetect(mouseEvent);
         expect(gameServiceSpy.mouseHitDetect).toHaveBeenCalled();
     });
-
     it('showMessage should call pushMessage with correct parameters', () => {
         const message = { message: 'test', playerName: 'str', mine: true, color: 'st', pos: 'string', event: true };
         spyOn(component.chat, 'pushMessage').and.callThrough();
@@ -229,7 +228,6 @@ describe('GamePageComponent', () => {
         component.canvas3 = { nativeElement: document.createElement('canvas') };
         component.canvasCheat0 = { nativeElement: document.createElement('canvas') };
         component.canvasCheat1 = { nativeElement: document.createElement('canvas') };
-
         spyOn(DrawService, 'clearDiff');
         component.clearCanvases();
         // Expect that all canvases were cleared
@@ -239,9 +237,7 @@ describe('GamePageComponent', () => {
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvas3.nativeElement);
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvasCheat0.nativeElement);
         expect(DrawService.clearDiff).toHaveBeenCalledWith(component.canvasCheat1.nativeElement);
-
-        // Expect that loadImages was called
-        // expect(canvasCheat1.loadImages).toHaveBeenCalled();
+        expect(component.loadImages).toHaveBeenCalled();
     });
     it('ngAfterViewInit should call joinRoomSolo if gameType is solo', () => {
         component.gameService.gameType = 'solo';
@@ -254,25 +250,13 @@ describe('GamePageComponent', () => {
         expect(socketClientServiceSpy.sendRoomName).toHaveBeenCalled();
     });
     it('initForRewind should call initRewind from gameService', () => {
-        component.gameService.game = {
-            gameName: 'difference 1',
-            difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        };
+        component.gameService.game = mockGame;
         component.initForRewind();
         expect(gameServiceSpy.initRewind).toHaveBeenCalled();
     });
     it('initForRewind should call disconnect from socket', () => {
         component.notRewinding = true;
-        component.gameService.game = {
-            gameName: 'difference 1',
-            difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        };
+        component.gameService.game = mockGame;
         component.initForRewind();
         expect(socketClientServiceSpy.disconnect).toHaveBeenCalled();
     });
@@ -308,18 +292,11 @@ describe('GamePageComponent', () => {
     });
     it('should call the appropriate methods when a difference is found', () => {
         const mockDifference: Set<number> = new Set([1, 2, 3]);
-        const game1 = {
-            gameName: 'difference 1',
-            difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        } as Game;
         // Set up the spy objects to return the necessary values
         socketClientServiceSpy.diffFound$ = of(mockDifference);
         socketClientServiceSpy.difference$ = of(mockDifference);
         socketClientServiceSpy.getRoomName.and.returnValue('room');
-        socketClientServiceSpy.getGame.and.returnValue(game1);
+        socketClientServiceSpy.getGame.and.returnValue(mockGame);
         gameServiceSpy.mode = 'tempsLimite';
         component.subscribeToDifference();
         expect(socketClientServiceSpy.sendDifference).toHaveBeenCalledWith(mockDifference, 'room');
@@ -330,28 +307,15 @@ describe('GamePageComponent', () => {
         component.subscribeToDifference();
         expect(socketClientServiceSpy.sendDifference).not.toHaveBeenCalledWith(notADiff, 'room');
     });
-
     it('ngOnInit should not call getLimitGameTime', () => {
-        component.gameService.game = {
-            gameName: 'difference 1',
-            difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        };
+        component.gameService.game = mockGame;
         component.gameService.mode = 'classic';
         component.gameService.gameType = 'solo';
         component.ngOnInit();
         expect(gameServiceSpy.getTimeLimitGame).not.toHaveBeenCalled();
     });
     it('ngOnInit should not call getLimitGameTime', () => {
-        component.gameService.game = {
-            gameName: 'difference 1',
-            difficulty: 'Facile',
-            originalImageData: 'imageOriginal1',
-            modifiedImageData: 'imageModifie1',
-            listDifferences: ['diffrence 1', 'difference 2'],
-        };
+        component.gameService.game = mockGame;
         gameServiceSpy.gameType = 'solo';
         expect(hintsServiceSpy.hintsKeyBinding).not.toHaveBeenCalled();
     });

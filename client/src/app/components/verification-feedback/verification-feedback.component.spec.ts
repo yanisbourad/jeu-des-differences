@@ -11,7 +11,7 @@ describe('VerificationFeedbackComponent', () => {
     const data = {
         message: 'data',
         confirmFunction: () => {
-            console.log('ok');
+            return;
         },
     };
 
@@ -28,7 +28,7 @@ describe('VerificationFeedbackComponent', () => {
                     provide: location,
                     useValue: {
                         reload: () => {
-                            console.log('reloaded');
+                            return;
                         },
                     },
                 },

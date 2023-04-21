@@ -15,6 +15,7 @@ describe('GameRecorderService', () => {
     let socketClientSpy: jasmine.SpyObj<SocketClientService>;
     const messageToAdd = new Subject<GameMessageEvent>();
     const gamePage = { initForRewind: jasmine.createSpy('initForRewind').and.returnValue(0) } as unknown as GamePageComponent;
+    let command: GameRecordCommand;
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['']);
         socketClientSpy = jasmine.createSpyObj('SocketClientService', ['messageToAdd$', 'getRoomTime', 'getRoomName', 'gameTime']);
@@ -27,7 +28,7 @@ describe('GameRecorderService', () => {
         });
         TestBed.configureTestingModule({});
         service = TestBed.inject(GameRecorderService);
-        const command = {
+        command = {
             do: () => {
                 expect(true).toBeTrue();
             },
@@ -37,7 +38,7 @@ describe('GameRecorderService', () => {
             },
 
             penalty: 1,
-        };
+        } as unknown as GameRecordCommand;
         service.page = gamePage;
 
         service.list = [command, command, command, command] as unknown as GameRecordCommand[];
@@ -52,8 +53,11 @@ describe('GameRecorderService', () => {
     });
 
     it('should do the messageToAdd subscription', () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        const nextMessage = { do: () => {} } as unknown as GameMessageEvent;
+        const nextMessage = {
+            do: () => {
+                return;
+            },
+        } as unknown as GameMessageEvent;
         const spy = spyOn(nextMessage, 'do');
         messageToAdd.next(nextMessage);
         expect(spy).toHaveBeenCalled();
@@ -123,7 +127,9 @@ describe('GameRecorderService', () => {
         speed = 3;
         const mille = 1000;
         const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
-        service.myTimeout = setInterval(() => {}, mille);
+        service.myTimeout = setInterval(() => {
+            expect(true).toBeTrue();
+        }, mille);
         service.rewindSpeed = speed;
         expect(clearIntervalSpy).toHaveBeenCalled();
         service.stopRewind();
@@ -155,8 +161,6 @@ describe('GameRecorderService', () => {
     });
 
     it('startRewind should call initForRewind on the gamePage', () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-
         service.list = [
             {
                 do: () => {
@@ -177,8 +181,10 @@ describe('GameRecorderService', () => {
     });
 
     it('lunchRewind should clearInterval if its defined', () => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers, @typescript-eslint/no-empty-function
-        service.myTimeout = setInterval(() => {}, 1000);
+        const timeout = 1000;
+        service.myTimeout = setInterval(() => {
+            expect(true).toBeTrue();
+        }, timeout);
         const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
         service.startRewind(gamePage);
         expect(clearIntervalSpy).toHaveBeenCalled();

@@ -1,9 +1,10 @@
-import { COUNTDOWN_DELAY, DELAY_BEFORE_EMITTING_TIME, MAX_COUNTDOWN } from '@common/const-chat-gateway';
-import { ServerTimeService } from './server-time.service';
+/* eslint-disable no-restricted-imports */
+import { COUNTDOWN_DELAY, DELAY_BEFORE_EMITTING_TIME, MAX_COUNTDOWN, TAMPON_TIME, TAMPON_TIME_1 } from '@common/const-chat-gateway';
+import { TimeConfig } from '@common/game';
+import { Test, TestingModule } from '@nestjs/testing';
 import { SinonFakeTimers, SinonStubbedInstance, createStubInstance, useFakeTimers } from 'sinon';
 import { GameService } from '../game/game.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { TimeConfig } from '@common/game';
+import { ServerTimeService } from './server-time.service';
 
 describe('ClientTimeService', () => {
     let service: ServerTimeService;
@@ -24,11 +25,9 @@ describe('ClientTimeService', () => {
             ],
         }).compile();
         service = module.get<ServerTimeService>(ServerTimeService);
-        service.timeConstants = {timeBonus: 5, timeInit: 30, timePen: 5};
+        service.timeConstants = { timeBonus: 5, timeInit: 30, timePen: 5 };
         const mockTimeConfig: TimeConfig = { timeInit: 30, timePen: 5, timeBonus: 5 };
-        jest.spyOn(gameService, 'getConstants').mockReturnValue(
-            Promise.resolve(mockTimeConfig)
-        )
+        jest.spyOn(gameService, 'getConstants').mockReturnValue(Promise.resolve(mockTimeConfig));
     });
 
     afterEach(() => {
@@ -42,19 +41,19 @@ describe('ClientTimeService', () => {
 
     it('should get the time constants from cache', async () => {
         await service.getTimeConstants();
-        expect(service.timeConstants).toEqual({timeBonus: 5, timeInit: 30, timePen: 5});
+        expect(service.timeConstants).toEqual({ timeBonus: 5, timeInit: 30, timePen: 5 });
     });
 
-    it('should start the chronometer', async() => {
+    it('should start the chronometer', async () => {
         await service.startChronometer('1');
         clock.tick(DELAY_BEFORE_EMITTING_TIME);
         expect(service.getElapsedTime('1')).toBe(1);
         service.stopChronometer('1');
     });
 
-    it('should start the countDown', async() => {
+    it('should start the countDown', async () => {
         await service.startCountDown('1');
-        const time = service.timeConstants.timeInit-1;
+        const time = service.timeConstants.timeInit - 1;
         clock.tick(DELAY_BEFORE_EMITTING_TIME);
         expect(service.getElapsedTime('1')).toBe(time);
         service.stopChronometer('1');
@@ -72,26 +71,24 @@ describe('ClientTimeService', () => {
         service.tamponTime = 5;
         service.timeConstants.timeBonus = 3;
         service.incrementTime();
-        expect(service.tamponTime).toEqual(8);
+        expect(service.tamponTime).toEqual(TAMPON_TIME_1);
     });
-        
+
     it('should set tamponTime to MAX_COUNTDOWN if tamponTime + timeBonus is greater than MAX_COUNTDOWN', () => {
         service.tamponTime = 118;
         service.incrementTime();
         expect(service.tamponTime).toEqual(MAX_COUNTDOWN);
     });
-        
+
     it('should decrease tamponTime by timePen if tamponTime - timePen is greater than 0', () => {
         service.tamponTime = 10;
         service.timeConstants.timePen = 3;
         service.decrementTime('test-id');
-        expect(service.tamponTime).toEqual(7);
+        expect(service.tamponTime).toEqual(TAMPON_TIME);
     });
-        
+
     it('should set tamponTime to 0 and call stopChronometer if tamponTime - timePen is less than or equal to 0', async () => {
-        jest.spyOn(gameService, 'getConstants').mockReturnValue(
-            Promise.resolve({timeBonus: 5, timeInit: 3, timePen: 5})
-        )
+        jest.spyOn(gameService, 'getConstants').mockReturnValue(Promise.resolve({ timeBonus: 5, timeInit: 3, timePen: 5 }));
         await service.startCountDown('test-id');
         clock.tick(DELAY_BEFORE_EMITTING_TIME);
         service.decrementTime('test-id');

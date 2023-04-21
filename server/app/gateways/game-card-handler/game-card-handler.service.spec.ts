@@ -154,7 +154,6 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
                 gameType: 'classic',
-
             }),
         ).toBe(3);
         expect(service.joiningPlayersQueue.get('uno').length).toBe(1);
@@ -166,7 +165,6 @@ describe('GameCardHandlerService', () => {
             name: 'Peter',
             gameName: 'uno',
             gameType: 'classic',
-
         });
         expect(
             service.dispatchPlayer({
@@ -174,7 +172,6 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
                 gameType: 'classic',
-
             }),
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         ).toBe(4);
@@ -188,7 +185,6 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
                 gameType: 'classic',
-
             }),
         ).toBe(3);
     });
@@ -201,7 +197,6 @@ describe('GameCardHandlerService', () => {
                 name: 'Pablo',
                 gameName: 'uno',
                 gameType: 'classic',
-
             }),
         ).toBe(OVER_CROWDED);
     });
@@ -282,7 +277,7 @@ describe('GameCardHandlerService', () => {
                 id: 'tas',
                 name: 'Baddy',
                 gameName: 'uno',
-                gameType: 'classic'
+                gameType: 'classic',
             }),
         );
     });
@@ -298,7 +293,7 @@ describe('GameCardHandlerService', () => {
         expect(service.isGameAvailable('uno')).toBeTruthy();
         expect(service.isGameAvailable('dos')).toBeFalsy();
     });
-    it("should  handle limited time cancel", () => {
+    it('should  handle limited time cancel', () => {
         service.players.set('rac', { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'classic' });
         service.players.set('tas', { id: 'tas', name: 'Baddy', gameName: 'uno', gameType: 'classic' });
         service.timeLimitedGamesQueue.push('rac', 'tas');
@@ -306,12 +301,17 @@ describe('GameCardHandlerService', () => {
         expect(service.handleLimitedTimeCancel('rac')).toBeTruthy();
     });
     it('should return array of player who is joining', () => {
-        expect(JSON.stringify(service.manageJoinLimitMode({ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' }))).toBe(JSON.stringify([{ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' }]));
+        expect(JSON.stringify(service.manageJoinLimitMode({ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' }))).toBe(
+            JSON.stringify([{ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' }]),
+        );
     });
     it('should return array of 2 players who are joining', () => {
         service.manageJoinLimitMode({ id: 'rad', name: 'Bad', gameName: 'uno', gameType: 'limit' });
         expect(JSON.stringify(service.manageJoinLimitMode({ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' }))).toBe(
-            JSON.stringify([{ id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' },
-            { id: 'rad', name: 'Bad', gameName: 'uno', gameType: 'limit' }]));
+            JSON.stringify([
+                { id: 'rac', name: 'Bad', gameName: 'uno', gameType: 'limit' },
+                { id: 'rad', name: 'Bad', gameName: 'uno', gameType: 'limit' },
+            ]),
+        );
     });
 });

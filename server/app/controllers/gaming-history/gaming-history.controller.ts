@@ -54,7 +54,7 @@ export class GamingHistoryController {
     async deleteGamingHistory(@Res() response: Response) {
         try {
             await this.gamesRecordService.deleteGamingHistory();
-            response.status(HttpStatus.OK).json('Game deleted successfully');
+            response.status(HttpStatus.OK).json('Gaming history deleted successfully');
         } catch (error) {
             response.status(HttpStatus.NO_CONTENT).send(error.message);
         }

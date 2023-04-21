@@ -13,7 +13,13 @@ describe('GameCardHandlerGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
-    let player1, player2, player3, player4, player5, map, payload, payloadLimited;
+    let player1;
+    let player2;
+    let player3;
+    let player4;
+    let map;
+    let payload;
+    let payloadLimited;
     let gameCardHandlerService: SinonStubbedInstance<GameCardHandlerService>;
     beforeEach(async () => {
         logger = createStubInstance(Logger);

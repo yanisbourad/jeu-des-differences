@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { DELAY_BEFORE_EMITTING_TIME, MAX_COUNTDOWN } from '@common/const-chat-gateway';
-import { interval, Subscription } from 'rxjs';
-import { Service } from 'typedi';
 import { GameService } from '@app/services/game/game.service';
-import {TimeConfig } from '@common/game';
+import { DELAY_BEFORE_EMITTING_TIME, MAX_COUNTDOWN } from '@common/const-chat-gateway';
+import { TimeConfig } from '@common/game';
+import { Injectable } from '@nestjs/common';
+import { Subscription, interval } from 'rxjs';
+import { Service } from 'typedi';
 
 @Injectable()
 @Service()
@@ -18,18 +18,18 @@ export class ServerTimeService {
     incrementCount: boolean;
 
     constructor(private gameService: GameService) {
-       this.getTimeConstants();
+        this.getTimeConstants();
     }
 
     async getTimeConstants(): Promise<void> {
-        this.timeConstants = await this.gameService.getConstants()
+        this.timeConstants = await this.gameService.getConstants();
     }
 
     async startChronometer(id: string): Promise<void> {
         await this.getTimeConstants();
-        this.count.set(id, 0)
+        this.count.set(id, 0);
         this.timers[id] = interval(DELAY_BEFORE_EMITTING_TIME).subscribe(() => {
-            this.count.set(id, this.count.get(id)+1)
+            this.count.set(id, this.count.get(id) + 1);
             this.elapsedTimes.set(id, this.count.get(id));
         });
     }
@@ -82,12 +82,13 @@ export class ServerTimeService {
         return this.elapsedTimes.get(id);
     }
 
-    resetTimer(id: string): void { 
+    resetTimer(id: string): void {
         this.elapsedTimes.set(id, 0);
         this.elapsedTime = 0;
     }
 
-    resetAllTimers(): void { // used to reset all timers when test suite is finished
+    resetAllTimers(): void {
+        // used to reset all timers when test suite is finished
         this.elapsedTimes.clear();
         this.elapsedTime = 0;
         // unsubscribe to every timers

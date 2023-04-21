@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 
 import { GameRecord, GameRecordDocument } from '@app/model/database/game-record';
 import { GamingHistory, GamingHistoryDocument } from '@app/model/database/gaming-history';
+import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 import { GameService } from '@app/services/game/game.service';
 import { Logger } from '@nestjs/common';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { GameRecordService } from './game-record.service';
-import { CreateGamingHistoryDto } from '@app/model/dto/gaming-history/create-gaming-history.dto';
 
 describe('GameRecordService', () => {
     let service: GameRecordService;
@@ -101,11 +102,11 @@ describe('GameRecordService', () => {
             keyServer: 'test',
         };
         const errorMessage = 'Failed to insert Game: test error';
-    
+
         jest.spyOn(gameRecordModel, 'create').mockImplementation(() => {
             throw new Error('test error');
         });
-    
+
         await expect(service.addGameRecord(gameRecord)).rejects.not.toThrow(errorMessage);
     });
 
@@ -161,19 +162,6 @@ describe('GameRecordService', () => {
         expect(findMock).toHaveBeenCalled();
         expect(execMock).toHaveBeenCalled();
         expect(result).not.toEqual(gamingHistoryRecords);
-    });
-
-    it('should insert a gaming history record', async () => {
-        const record: CreateGamingHistoryDto = {
-            gameName: 'test',
-            dateStart: '2023-04-20',
-            time: '00:05',
-            gameType: 'solo',
-            playerName: 'John',
-            opponentName: 'Jane',
-            hasAbandonedGame: false,
-        };
-        expect(gamingHistoryModel.create).not.toBeCalled();
     });
 
     it('should reject with an error message if insertion fails', async () => {

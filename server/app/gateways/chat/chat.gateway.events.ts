@@ -16,5 +16,5 @@ export enum ChatEvents {
     MousePosition = 'mousePosition',
     StartTimeLimit = 'startTimeLimit',
     StartMultiTimeLimit = 'startMultiTimeLimit',
-    ModifyTime = 'modifyTime'
+    ModifyTime = 'modifyTime',
 }

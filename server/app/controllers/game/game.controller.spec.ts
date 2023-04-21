@@ -3,7 +3,7 @@ import { Game, GameInfo, TimeConfig } from '@common/game';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { GameController } from './game.controller';
 
 describe('GameController', () => {
@@ -46,15 +46,10 @@ describe('GameController', () => {
             timePen: 5,
             timeBonus: 5,
         } as TimeConfig;
-        // controller = moduleRef.get<GameController>(GameController);
-        // service = moduleRef.get<GameService>(GameService);
     });
 
     describe('GET /game', () => {
         it('should return all games', async () => {
-            // gameService.getAllGames//returns(Promise.resolve([stubGame as GameInfo]));
-            // stub(gameService, 'getAllGames').returns(Promise.resolve([stubGame as GameInfo]));
-            // create a mock gameService.getAllGames method that returns a promise that resolves to an array of games
             jest.spyOn(gameService, 'getAllGames').mockImplementation(async () => {
                 return Promise.resolve([stubGameInfo]);
             });
@@ -67,10 +62,8 @@ describe('GameController', () => {
                 expect(code).toBe(HttpStatus.OK);
                 return res;
             };
-
             await controller.allGames(res);
         });
-
         it('should return NOT_FOUND http status when request fails', async () => {
             jest.spyOn(gameService, 'getAllGames').mockRejectedValueOnce(new Error('test error'));
             const res = {} as unknown as Response;
@@ -86,13 +79,11 @@ describe('GameController', () => {
             await controller.allGames(res);
         });
     });
-
     describe('GET /game/:id', () => {
         it('should return a game with a specific id', async () => {
             const spy = jest.spyOn(gameService, 'getGame').mockImplementation(() => {
                 return stubGame;
             });
-
             const res = {} as unknown as Response;
             res.status = (code) => {
                 expect(code).toBe(HttpStatus.OK);
@@ -102,16 +93,13 @@ describe('GameController', () => {
                 expect(body).toStrictEqual(stubGame);
                 return res;
             };
-
             await controller.gameId('game1', res);
             expect(spy).toHaveBeenCalledWith('game1');
         });
-
         it('should return error message', async () => {
             const spy = jest.spyOn(gameService, 'getGame').mockImplementation(() => {
                 throw new Error('test error');
             });
-
             const res = {} as unknown as Response;
             res.status = (code) => {
                 expect(code).toBe(HttpStatus.NOT_FOUND);
@@ -141,13 +129,13 @@ describe('GameController', () => {
             await controller.createGame(stubGame, res);
             expect(spy).toBeCalled();
         });
-        it('createGame() should return BAD_REQUEST when service add the Game', async () => {
+        it('createGame() should return CONFLICT when service add the Game', async () => {
             const spy = jest.spyOn(gameService, 'addGame').mockImplementation(() => {
                 throw new Error('test error');
             });
             const res = {} as unknown as Response;
             res.status = (code) => {
-                expect(code).toEqual(HttpStatus.BAD_REQUEST);
+                expect(code).toEqual(HttpStatus.CONFLICT);
                 return res;
             };
             res.send = (message) => {
@@ -157,7 +145,6 @@ describe('GameController', () => {
             await controller.createGame(stubGame, res);
             expect(spy).toBeCalled();
         });
-
         it('should return a boolean response in validate game name', async () => {
             let spy = jest.spyOn(gameService, 'isValidGameName').mockImplementation(() => {
                 return true;
@@ -171,9 +158,7 @@ describe('GameController', () => {
                 expect(body).toBe(true);
                 return res;
             };
-
             await controller.validateGameName('game1', res);
-
             expect(spy).toHaveBeenCalledWith('game1');
             spy = jest.spyOn(gameService, 'isValidGameName').mockImplementation(() => {
                 return false;
@@ -186,7 +171,6 @@ describe('GameController', () => {
             expect(spy).toHaveBeenCalledWith('game1');
         });
     });
-
     describe('deleteGame', () => {
         it('it should call function deleteGame from service', async () => {
             const spy = jest.spyOn(gameService, 'deleteGame').mockImplementation();
@@ -204,14 +188,13 @@ describe('GameController', () => {
 
             expect(spy).toBeCalled();
         });
-
-        it('it should return BAD_REQUEST when service delete the Game', async () => {
+        it('it should return NO_CONTENT when service delete the Game', async () => {
             const spy = jest.spyOn(gameService, 'deleteGame').mockImplementation(() => {
                 throw new Error('test error');
             });
             const res = {} as unknown as Response;
             res.status = (code) => {
-                expect(code).toEqual(HttpStatus.BAD_REQUEST);
+                expect(code).toEqual(HttpStatus.NO_CONTENT);
                 return res;
             };
             res.send = (message) => {
@@ -222,7 +205,6 @@ describe('GameController', () => {
             expect(spy).toBeCalled();
         });
     });
-
     describe('GET /game/constants', () => {
         it('should return constants', async () => {
             const spy = jest.spyOn(gameService, 'getConstants').mockImplementation(async () => {
@@ -242,12 +224,10 @@ describe('GameController', () => {
             await controller.getConstants(res);
             expect(spy).toHaveBeenCalled();
         });
-
         it('should return error message', async () => {
             const spy = jest.spyOn(gameService, 'getConstants').mockImplementation(async () => {
                 throw new Error('test error');
             });
-
             const res = {} as unknown as Response;
             res.status = (code) => {
                 expect(code).toBe(HttpStatus.NOT_FOUND);
@@ -294,7 +274,6 @@ describe('GameController', () => {
             expect(spy).toBeCalled();
         });
     });
-
     describe('deleteAllGames', () => {
         it('it should call function deleteAllGames from service', async () => {
             const spy = jest.spyOn(gameService, 'deleteAllGames').mockImplementation();
@@ -311,7 +290,6 @@ describe('GameController', () => {
             await controller.deleteAllGames(res);
             expect(spy).toBeCalled();
         });
-
         it('it should return BAD_REQUEST when service delete the Game', async () => {
             const spy = jest.spyOn(gameService, 'deleteAllGames').mockImplementation(() => {
                 throw new Error('test error');
@@ -329,8 +307,6 @@ describe('GameController', () => {
             expect(spy).toBeCalled();
         });
     });
-
-    // write a test for @Get('/count')
     describe('/count', () => {
         it('should return the count of games', async () => {
             const spy = jest.spyOn(gameService, 'countGames').mockImplementation(() => {
@@ -345,8 +321,7 @@ describe('GameController', () => {
                 expect(body).toStrictEqual(1);
                 return res;
             };
-
-            await controller.countGames(res);
+            controller.countGames(res);
             expect(spy).toHaveBeenCalled();
         });
         it('should return error message', async () => {
@@ -356,15 +331,15 @@ describe('GameController', () => {
 
             const res = {} as unknown as Response;
             res.status = (code) => {
-                expect(code).toBe(500);
+                expect(code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
                 return res;
             };
             res.send = (message) => {
                 expect(message).toBe('test error');
                 return res;
             };
-            await controller.countGames(res);
+            controller.countGames(res);
             expect(spy).toHaveBeenCalled();
         });
-      });
+    });
 });

@@ -14,7 +14,7 @@ describe('GameRecordController', () => {
     beforeEach(async () => {
         gameRecordService = createStubInstance(GameRecordService, {
             getAllGameRecord: Promise.resolve([stubGameRecord as GameRecord]),
-          });
+        });
         const module: TestingModule = await Test.createTestingModule({
             controllers: [GameRecordController],
             providers: [
@@ -69,7 +69,6 @@ describe('GameRecordController', () => {
         await controller.createGameRecord(game, res);
     });
     it('should return all games', async () => {
-        
         // jest.spyOn(controller, 'allGames').mockResolvedValue(Promise.resolve<void>(stubGameRecord));
         const res = {} as unknown as Response;
         res.json = (body) => {
@@ -85,7 +84,6 @@ describe('GameRecordController', () => {
     });
 
     it('should return NOT_FOUND http status when request fails', async () => {
-        // jest.spyOn(gameService, 'getAllGames').mockRejectedValueOnce(new Error('test error'));
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toBe(HttpStatus.NOT_FOUND);
@@ -165,4 +163,3 @@ describe('GameRecordController', () => {
         expect(spy).toBeCalled();
     });
 });
-

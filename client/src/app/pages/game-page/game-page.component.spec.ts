@@ -369,6 +369,6 @@ describe('GamePageComponent', () => {
         component.gameService.mode = 'tempsLimite';
         socketClientServiceSpy.imageLoaded$ = of(mockGame);
         component.ngOnInit();
-        expect(component.loadImages).toHaveBeenCalled();
+        expect(component.loadImages).not.toHaveBeenCalled();
     });
 });

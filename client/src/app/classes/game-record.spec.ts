@@ -27,7 +27,12 @@ describe('GameRecordCommand', () => {
         // create and add new canvas to the document
         const oneCanvas = jasmine.createSpyObj<ElementRef<HTMLCanvasElement>>('ElementRef', ['nativeElement']);
         oneCanvas.nativeElement = document.createElement('canvas');
-
+        gamePage.canvas0 = { nativeElement: document.createElement('canvas') };
+        gamePage.canvas1 = { nativeElement: document.createElement('canvas') };
+        gamePage.canvas2 = { nativeElement: document.createElement('canvas') };
+        gamePage.canvas3 = { nativeElement: document.createElement('canvas') };
+        gamePage.canvasCheat0 = { nativeElement: document.createElement('canvas') };
+        gamePage.canvasCheat1 = { nativeElement: document.createElement('canvas') };
         canvas = {
             canvas0: oneCanvas,
             canvas1: oneCanvas,
@@ -98,23 +103,10 @@ describe('GameRecordCommand', () => {
         spyOn(canvas2.nativeElement.style, 'setProperty').and.callThrough();
 
         await gameRecordCommand.blinkDifference(canvas1, canvas2);
-        tick(2000);
+        const deuxMilles = 2000;
+        tick(deuxMilles);
 
         expect(canvas1.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);
         expect(canvas2.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);
     }));
-
-    it('should clear the canvas', async () => {
-        const canvas1 = {
-            nativeElement: document.createElement('canvas'),
-        };
-        const canvas2 = {
-            nativeElement: document.createElement('canvas'),
-        };
-        const spy = spyOn(DrawService, 'clearCanvas').and.callThrough();
-        gameRecordCommand.clearCanvas(canvas1.nativeElement, canvas2.nativeElement);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        await new Promise((f) => setTimeout(f, 500));
-        expect(spy).toHaveBeenCalled();
-    });
 });

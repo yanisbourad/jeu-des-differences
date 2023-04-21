@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { CheatModeService } from './cheat-mode.service';
 import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
@@ -97,7 +96,6 @@ describe('CheatModeService', () => {
     it('drawDifference should call drawDiff', () => {
         const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
         spyOn(cheatModeService, 'drawDifference').and.callThrough();
-        spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
         cheatModeService.drawDifference(diff);
         expect(cheatModeService.drawDifference).toHaveBeenCalled();
     });

@@ -99,7 +99,6 @@ describe('GameRecordCommand', () => {
         const canvas2 = {
             nativeElement: document.createElement('canvas'),
         };
-
         spyOn(canvas1.nativeElement.style, 'setProperty').and.callThrough();
         spyOn(canvas2.nativeElement.style, 'setProperty').and.callThrough();
 

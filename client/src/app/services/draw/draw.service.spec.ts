@@ -131,6 +131,7 @@ describe('DrawService', async () => {
         context.drawImage(image, 0, 0);
         const imageData = thisCanvas.toDataURL('image/png');
         expect(imageData).toBeTruthy();
+
         DrawService.getImageDateFromDataUrl(imageData).subscribe((data) => {
             expect(data).toBeTruthy();
             expect(data.width).toEqual(constants.DEFAULT_WIDTH);

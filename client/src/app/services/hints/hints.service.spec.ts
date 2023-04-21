@@ -2,13 +2,13 @@ import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameDatabaseService } from '@app/services//game/game-database.service';
+import { DrawService } from '@app/services/draw/draw.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
 import { HintsDisplayService } from '@app/services/hints/hints-display.service';
 import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { TimeConfig } from '@common/game';
 import { Subject } from 'rxjs';
-import { DrawService } from '../draw/draw.service';
 import { HintsService } from './hints.service';
 import SpyObj = jasmine.SpyObj;
 

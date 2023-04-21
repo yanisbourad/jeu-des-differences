@@ -6,7 +6,6 @@ import SpyObj = jasmine.SpyObj;
 describe('VerificationFeedbackComponent', () => {
     let component: VerificationFeedbackComponent;
     let fixture: ComponentFixture<VerificationFeedbackComponent>;
-    // let windowReloadSpy: jasmine.SpyObj<VerificationFeedbackComponent>;
     let dialogSpy: SpyObj<MatDialogRef<VerificationFeedbackComponent>>;
     const data = {
         message: 'data',
@@ -17,7 +16,6 @@ describe('VerificationFeedbackComponent', () => {
 
     beforeEach(async () => {
         dialogSpy = jasmine.createSpyObj('MatDialogRef<VerificationFeedbackComponent>', ['close']);
-        // windowReloadSpy = jasmine.createSpyObj(component, ['windowReload']);
         await TestBed.configureTestingModule({
             declarations: [VerificationFeedbackComponent],
             imports: [MatDialogModule],
@@ -34,10 +32,6 @@ describe('VerificationFeedbackComponent', () => {
                 },
             ],
         }).compileComponents();
-
-        // windowReloadSpy.windowReload.and.callFake(() => {
-        //     console.log('reloaded');
-        // });
         fixture = TestBed.createComponent(VerificationFeedbackComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

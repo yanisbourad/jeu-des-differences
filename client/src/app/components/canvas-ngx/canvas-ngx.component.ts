@@ -28,7 +28,8 @@ export class CanvasNgxComponent implements AfterViewInit {
     listDraw: Drawing[];
     isDrawing: boolean;
     currentDrawing: Drawing;
-
+    // On a utilisé 4 parametres additionnels dans le constructeur
+    // pour permettre d'appeler les services necessaires à la gestion des commmandes et des canvas
     // eslint-disable-next-line max-params
     constructor(
         private readonly drawService: DrawService,

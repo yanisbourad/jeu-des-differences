@@ -2,8 +2,8 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameMessageEvent } from '@app/classes/game-records/message-event';
-import { PlayerWaitPopupComponent } from '@app/components//player-wait-popup/player-wait-popup.component';
 import { GeneralFeedbackComponent } from '@app/components/general-feedback/general-feedback.component';
+import { PlayerWaitPopupComponent } from '@app/components/player-wait-popup/player-wait-popup.component';
 import * as constantsTime from '@app/configuration/const-time';
 import { GameCardHandlerService } from '@app/services/game/game-card-handler-service.service';
 import { GameRecorderService } from '@app/services/game/game-recorder.service';
@@ -18,6 +18,9 @@ import { SocketClientService } from '@app/services/socket/socket-client.service'
 export class MessageDialogComponent {
     winner: string = this.gameService.playerName;
     gameCount: number;
+    // message dialog est la modale principale utilisé par notre application, donc il fait appel à plusieurs autres services
+    // pour cette raison, il est necessaire de passer les toutes ces dependances dans le constructeur
+    // de la classe et d'ou la raison d'utiliser le eslint-disable pour les max-params
     //  we need to disable max-params because we need to use both three services and at
     // the same time MatdialogRef, MatDialog and Router to navigate to the right page
     // eslint-disable-next-line max-params

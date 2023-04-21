@@ -17,7 +17,8 @@ export class GameCreationPageComponent {
     @ViewChild('modifiedCanvasComponent') modifiedCanvasComponent: CanvasNgxComponent;
     @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef<HTMLInputElement>;
     reposition: boolean = false;
-
+    // On a utilisé 1 parametre additionnel Matdialog dans le constructeur
+    // pour permettre d'appeler une autre modal
     // eslint-disable-next-line max-params
     constructor(
         public dialog: MatDialog,

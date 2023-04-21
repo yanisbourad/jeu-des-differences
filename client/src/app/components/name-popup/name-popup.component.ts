@@ -19,8 +19,8 @@ export class NamePopupComponent implements OnInit {
     upperLimitNameLength: number;
     // ce component est reutilise pour demander le nom du joueur et transferer des donnees
     // au component suivant dans certaines situations ou rediriger vers une page du jeu
-    // pour cette raison, il est necessaire de passer les quatre dependances dans le constructeur
-    // de la clase et d'ou la raison d'utiliser le eslint-disable pour les max-params
+    // pour cette raison, il est necessaire de passer les autres dependances dans le constructeur
+    // de la classe, d'ou la raison d'utiliser le eslint-disable pour les max-params
     // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<NamePopupComponent>,

@@ -10,7 +10,7 @@ import { GameRecord } from '@common/game';
 @Injectable({
     providedIn: 'root',
 })
-// to contain various helpful functions
+// contains various useful functions for gameService
 export class GameHelperService {
     path: ImagePath;
     playerName: string;

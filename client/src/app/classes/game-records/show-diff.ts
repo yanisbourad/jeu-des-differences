@@ -19,6 +19,7 @@ export class ShowDiffRecord extends GameRecordCommand {
     canvas: Canvases | AllCanvas;
     isMeWhoFound: boolean;
     position: Vec2;
+    // params used to initialize class variables
     // eslint-disable-next-line max-params
     constructor(diff: Set<number>, canvas: Canvases | AllCanvas, isMeWhoFound: boolean = false, position: Vec2 = { x: 0, y: 0 }) {
         super();

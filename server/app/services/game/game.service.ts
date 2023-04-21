@@ -20,7 +20,7 @@ export class GameService {
 
     constructor(
         @InjectModel(GameRecord.name) public gameRecordModel: Model<GameRecordDocument>,
-        private readonly logger: Logger,
+         readonly logger: Logger,
         @InjectModel(TimerConstantsModel.name) public timerConstantsModel: Model<TimerConstantsModel>,
     ) {
         if (!fs.existsSync(this.rootPath)) {

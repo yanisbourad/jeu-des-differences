@@ -111,8 +111,11 @@ export class DrawService {
     }
 
     static drawImage(image: ImageData, canvas: HTMLCanvasElement): void {
-        const context = DrawService.getContext(canvas);
-        context.putImageData(image, 0, 0);
+        // validate if the image is of type 'ImageData'
+        if (image instanceof ImageData) {
+            const context = DrawService.getContext(canvas);
+            context.putImageData(image, 0, 0);
+        }
     }
 
     static clearCanvas(canvas: HTMLCanvasElement) {

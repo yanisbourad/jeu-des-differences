@@ -121,8 +121,9 @@ describe('GameRecorderService', () => {
 
         // test if there is a timeout
         speed = 3;
+        const mille = 1000;
         const clearIntervalSpy = spyOn(window, 'clearInterval').and.callThrough();
-        service.myTimeout = setInterval(() => {}, 1000);
+        service.myTimeout = setInterval(() => {}, mille);
         service.rewindSpeed = speed;
         expect(clearIntervalSpy).toHaveBeenCalled();
         service.stopRewind();

@@ -69,6 +69,7 @@ describe('DrawService', async () => {
         const data = await context.getImageData(0, 0, constants.DEFAULT_WIDTH, constants.DEFAULT_HEIGHT);
         DrawService.drawDiff(diff, thisCanvas, '', data);
         expect(spy).toHaveBeenCalledTimes(diff.size);
+        spy.and.callThrough();
     });
 
     it('should draw a difference', () => {

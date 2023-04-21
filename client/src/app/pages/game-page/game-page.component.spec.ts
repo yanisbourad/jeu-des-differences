@@ -1,23 +1,23 @@
 /* eslint-disable max-lines */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
-import { GamePageComponent } from './game-page.component';
-import { GameService } from '@app/services/game/game.service';
-import { SocketClientService } from '@app/services/socket/socket-client.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
-import { HintsService } from '@app/services/hints/hints.service';
-import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
-import { DrawService } from '@app/services/draw/draw.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import { MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
+import { ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { GameMessageEvent } from '@app/classes/game-records/message-event';
+import { MessageAreaComponent } from '@app/components/message-area/message-area.component';
+import { CheatModeService } from '@app/services/cheat-mode/cheat-mode.service';
+import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { GameService } from '@app/services/game/game.service';
+import { HintsService } from '@app/services/hints/hints.service';
+import { SocketClientService } from '@app/services/socket/socket-client.service';
+import { Game } from '@common/game';
 import { Subject, of } from 'rxjs';
+import { GamePageComponent } from './game-page.component';
 // import { of } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
-import { GameMessageEvent } from '@app/classes/game-records/message-event';
-import { Game } from '@common/game';
-import { ElementRef } from '@angular/core';
 class ActivatedRouteMock {
     params = { subscribe: jasmine.createSpy('subscribe') };
     snapshot = {

@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
-import { CheatModeService } from './cheat-mode.service';
-import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
-import { GameRecorderService } from '@app/services/game/game-recorder.service';
-import SpyObj = jasmine.SpyObj;
-import * as constantsTime from '@app/configuration/const-time';
 import { ElementRef } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import * as constantsTime from '@app/configuration/const-time';
 import { DrawService } from '@app/services/draw/draw.service';
+import { GameRecorderService } from '@app/services/game/game-recorder.service';
+import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
+import { CheatModeService } from './cheat-mode.service';
+import SpyObj = jasmine.SpyObj;
 
 describe('CheatModeService', () => {
     let cheatModeService: CheatModeService;
@@ -96,8 +96,10 @@ describe('CheatModeService', () => {
     it('drawDifference should call drawDiff', () => {
         const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
         spyOn(cheatModeService, 'drawDifference').and.callThrough();
+        const spy = spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
         cheatModeService.drawDifference(diff);
         expect(cheatModeService.drawDifference).toHaveBeenCalled();
+        spy.calls.reset();
     });
 
     it('removeHotkeysEventListener should call not removeEventListener if indexEvent is undefined', () => {
@@ -119,10 +121,11 @@ describe('CheatModeService', () => {
         const canvasA = document.createElement('canvas');
         const canvasB = document.createElement('canvas');
         spyOn(cheatModeService, 'clearCanvasCheat').and.callThrough();
-        spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
+        const spy = spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
         cheatModeService.clearCanvasCheat(canvasA, canvasB);
         expect(cheatModeService.clearCanvasCheat).toHaveBeenCalled();
-        expect(DrawService.clearDiff).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+        spy.calls.reset();
     });
 
     it('resetService should reinitialize all variables', () => {

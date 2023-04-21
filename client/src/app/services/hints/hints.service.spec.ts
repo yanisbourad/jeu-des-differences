@@ -8,6 +8,7 @@ import { HotkeysService } from '@app/services/hotkeys/hotkeys.service';
 import { ImageDiffService } from '@app/services/image-diff/image-diff.service';
 import { TimeConfig } from '@common/game';
 import { Subject } from 'rxjs';
+import { DrawService } from '../draw/draw.service';
 import { HintsService } from './hints.service';
 import SpyObj = jasmine.SpyObj;
 
@@ -245,7 +246,10 @@ describe('HintsService', () => {
     it('drawDifference should call drawDiff', () => {
         const diff = new Set([dist.dist1, dist.dist2, dist.dist3, dist.dist4]);
         spyOn(hintsService, 'drawDifference').and.callThrough();
+        const spy = spyOn(DrawService, 'drawDiff').and.callFake(() => ({}));
         hintsService.drawDifference(diff);
+        expect(hintsService.drawDifference).toHaveBeenCalled();
+        spy.and.callThrough();
     });
 
     it('removeHotkeysEventListener should call not removeEventListener if indexEvent is undefined', () => {
@@ -267,10 +271,11 @@ describe('HintsService', () => {
         const canvasA = document.createElement('canvas');
         const canvasB = document.createElement('canvas');
         spyOn(hintsService, 'clearCanvas').and.callThrough();
-        // spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
+        const spy = spyOn(DrawService, 'clearDiff').and.callFake(() => ({}));
         hintsService.clearCanvas(canvasA, canvasB);
         expect(hintsService.clearCanvas).toHaveBeenCalled();
-        // expect(DrawService.clearDiff).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+        spy.and.callThrough();
     });
 
     it('resetService should reinitialize all variables', () => {

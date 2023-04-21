@@ -73,7 +73,7 @@ describe('GameService', () => {
 
     beforeEach(() => {
         gameService = TestBed.inject(GameService);
-        game = { gameName: 'Game', difficulty: 'Facile', originalImageData: 'string', modifiedImageData: 'string', listDifferences: ['1', '2', '3']};
+        game = { gameName: 'Game', difficulty: 'Facile', originalImageData: 'string', modifiedImageData: 'string', listDifferences: ['1', '2', '3'] };
         gameInformation = { gameTitle: 'Test Game', gameMode: 'solo', gameDifficulty: 'Facile', nDifferences: 3 };
         gameInfo = {
             gameName: 'Test Game',

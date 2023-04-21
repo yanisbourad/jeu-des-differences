@@ -37,7 +37,12 @@ export class ShowDiffRecord extends GameRecordCommand {
         }
         const originalImage: string = component.gameService.game.originalImageData;
         DrawService.getImageDateFromDataUrl(originalImage).subscribe((imageData) => {
-            this.drawDifference(this.diff, this.canvas, imageData, component.getCanvasImageModifier);
+            this.drawDifference({
+                diff: this.diff,
+                canvas: this.canvas,
+                originalImage: imageData,
+                canvasImageModifier: component.getCanvasImageModifier,
+            });
         });
         if (component.gameService.mode) {
             this.clearCanvas(this.canvas.canvas1.nativeElement, this.canvas.canvas2.nativeElement);
@@ -49,18 +54,18 @@ export class ShowDiffRecord extends GameRecordCommand {
         component.hintsService.removeDifference(this.diff);
     }
 
-    drawDifference(
-        diff: Set<number>,
+    drawDifference(information: {
+        diff: Set<number>;
         canvas: {
             canvas1: ElementRef<HTMLCanvasElement>;
             canvas2: ElementRef<HTMLCanvasElement>;
-        },
-        originalImage: ImageData,
-        canvasImageModifier: HTMLCanvasElement,
-    ): void {
-        DrawService.drawDiff(diff, canvas.canvas1.nativeElement);
-        DrawService.drawDiff(diff, canvas.canvas2.nativeElement);
-        DrawService.drawDiff(diff, canvasImageModifier, 'black', originalImage);
-        this.clearCanvas(canvas.canvas1.nativeElement, canvas.canvas2.nativeElement);
+        };
+        originalImage: ImageData;
+        canvasImageModifier: HTMLCanvasElement;
+    }): void {
+        DrawService.drawDiff(information.diff, information.canvas.canvas1.nativeElement);
+        DrawService.drawDiff(information.diff, information.canvas.canvas2.nativeElement);
+        DrawService.drawDiff(information.diff, information.canvasImageModifier, 'black', information.originalImage);
+        this.clearCanvas(information.canvas.canvas1.nativeElement, information.canvas.canvas2.nativeElement);
     }
 }

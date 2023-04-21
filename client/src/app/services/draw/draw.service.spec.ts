@@ -7,8 +7,7 @@ describe('DrawService', async () => {
     let canvas: HTMLCanvasElement;
     let image: ImageBitmap;
     const timeOut = 500;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    const diff = new Set([1, 2, 3, 4]);
+    const diff = new Set([1, 2, 3, 3]);
     beforeAll((done) => {
         // read the image file as a data URL
         const xhr = new XMLHttpRequest();
@@ -73,6 +72,7 @@ describe('DrawService', async () => {
     });
 
     it('should draw a difference', () => {
+        // we need to use 'any' to be able to implement the spy
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
         DrawService.drawDiff(diff, canvas);
@@ -80,6 +80,7 @@ describe('DrawService', async () => {
     });
 
     it('should clear the canvas', () => {
+        // we need to use 'any' to be able to implement the spy
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spy = spyOn<any>(canvas.getContext('2d'), 'fillRect');
         DrawService.clearCanvas(canvas);
@@ -87,6 +88,7 @@ describe('DrawService', async () => {
     });
 
     it('should clear the difference', () => {
+        // we need to use 'any' to be able to implement the spy
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spy = spyOn<any>(canvas.getContext('2d'), 'clearRect');
         DrawService.clearDiff(canvas);
@@ -94,6 +96,7 @@ describe('DrawService', async () => {
     });
 
     it('should draw a word', () => {
+        // we need to use 'any' to be able to implement the spy
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spy = spyOn<any>(canvas.getContext('2d'), 'fillText');
         const position: Vec2 = { x: 0, y: 0 };

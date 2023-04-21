@@ -26,10 +26,16 @@ describe('TimePopupComponent', () => {
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef<NamePopupComponent>', ['close', 'afterClosed']);
         TestBed.configureTestingModule({
             declarations: [TimePopupComponent],
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             providers: [
                 { provide: MatDialogRef, useValue: dialogRefSpy },
-                { provide: MatDialog, useValue: { open: () => {} } },
+                {
+                    provide: MatDialog,
+                    useValue: {
+                        open: () => {
+                            return;
+                        },
+                    },
+                },
                 { provide: GameDatabaseService, useValue: communicationServiceSpy },
             ],
         }).compileComponents();
@@ -92,7 +98,6 @@ describe('TimePopupComponent', () => {
         expect(component.timer3).toBe(originalValue - constants.TIMER_INCREMENT);
     });
     it('should call close', () => {
-        // const spy = spyOn(component.dialogRef, 'close').and.callThrough();
         component.onNoClick();
         expect(dialogRefSpy.close).toHaveBeenCalled();
     });

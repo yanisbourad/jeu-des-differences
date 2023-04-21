@@ -93,12 +93,13 @@ describe('GameRecordCommand', () => {
         const canvas2 = {
             nativeElement: document.createElement('canvas'),
         };
+        const tickTime = 2000;
 
         spyOn(canvas1.nativeElement.style, 'setProperty').and.callThrough();
         spyOn(canvas2.nativeElement.style, 'setProperty').and.callThrough();
 
         await gameRecordCommand.blinkDifference(canvas1, canvas2);
-        tick(2000);
+        tick(tickTime);
 
         expect(canvas1.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);
         expect(canvas2.nativeElement.style.setProperty).toHaveBeenCalledTimes(BLINKING_COUNT);

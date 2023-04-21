@@ -69,7 +69,7 @@ describe('ShowDiffRecord', () => {
 
     it('should draw difference', () => {
         DrawService.drawDiff = jasmine.createSpy();
-        showDiffRecord.drawDifference(new Set([1, 2]), { canvas1, canvas2 }, {} as ImageData, canvasImageModifier);
+        showDiffRecord.drawDifference({ diff: new Set([1, 2]), canvas: { canvas1, canvas2 }, originalImage: {} as ImageData, canvasImageModifier });
         expect(DrawService.drawDiff).toHaveBeenCalled();
     });
 

@@ -20,6 +20,7 @@ describe('GameRecordCommand', () => {
     const mousePosition: Vec2 = { x: 10, y: 10 };
     const word = 'Test word';
     const tickTime = 2000;
+    let audioMock: jasmine.SpyObj<HTMLAudioElement>;
 
     beforeEach(() => {
         gamePage = jasmine.createSpyObj<GamePageComponent>('GamePageComponent', ['clearCanvases']);
@@ -45,11 +46,26 @@ describe('GameRecordCommand', () => {
                 component.clearCanvases();
             }
         })();
+        audioMock = jasmine.createSpyObj('HTMLAudioElement', ['load', 'play']);
+        spyOn(window, 'Audio').and.returnValue(audioMock);
     });
 
+    it('should playSuccessAudio', () => {
+        gameRecordCommand.playSuccessAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
+    });
+
+    it('should playFailureAudio', () => {
+        gameRecordCommand.playFailureAudio();
+        expect(audioMock.load).toHaveBeenCalled();
+        expect(audioMock.play).toHaveBeenCalled();
+    });
     it('should call drawWord and playFailureAudio method when word is Erreur', () => {
         spyOn(DrawService, 'drawWord').and.callThrough();
-        spyOn(gameRecordCommand, 'playFailureAudio').and.callThrough();
+        spyOn(gameRecordCommand, 'playFailureAudio').and.callFake(() => {
+            return;
+        });
 
         gameRecordCommand.displayWord('Erreur', canvas, mousePosition);
 
@@ -60,7 +76,9 @@ describe('GameRecordCommand', () => {
 
     it('should call drawWord, playSuccessAudio, blinkDifference and clearCanvas method when word is not Erreur', async () => {
         spyOn(DrawService, 'drawWord').and.callThrough();
-        spyOn(gameRecordCommand, 'playSuccessAudio').and.callThrough();
+        spyOn(gameRecordCommand, 'playSuccessAudio').and.callFake(() => {
+            return;
+        });
         spyOn(gameRecordCommand, 'blinkDifference').and.callThrough();
         spyOn(gameRecordCommand, 'clearCanvas').and.callThrough();
 
